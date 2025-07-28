@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -22,6 +23,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,11 +45,20 @@ import ru.solrudev.ackpine.splits.ApkSplits.validate
 import ru.solrudev.ackpine.splits.SplitPackage
 import ru.solrudev.ackpine.splits.SplitPackage.Companion.toSplitPackage
 import ru.solrudev.ackpine.splits.ZippedApkSplits
+import timber.log.Timber
 
 @Destination<RootGraph>(start = true)
 @Composable
 fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = koinViewModel()) {
-    InstallUi(modifier = modifier, onInstall = viewModel::installPackage)
+    val error = viewModel.error.collectAsState().value
+    val context = LocalContext.current
+    val uiState = viewModel.uiState.collectAsState().value
+    InstallUi(
+        modifier = modifier,
+        onInstall = viewModel::installPackage,
+        error = error.resolve(context),
+        uiState = uiState
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,7 +66,8 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
 private fun InstallUi(
     modifier: Modifier = Modifier,
     onInstall: (splitPackage: SplitPackage.Provider, fileName: String) -> Unit = { _, _ -> },
-    error: String? = null
+    error: String? = null,
+    uiState: InstallUiState = InstallUiState()
 ) {
     val context = LocalContext.current
     var startAnimation by remember { mutableStateOf(false) }
@@ -73,14 +85,24 @@ private fun InstallUi(
         }
 
     fun getApksFromUri(uri: Uri): SplitPackage.Provider {
-        val context = context
         val mimeType = context.contentResolver.getType(uri)?.lowercase()
-        return when (mimeType) {
-            "application/vnd.android.package-archive" -> SingletonApkSequence(uri, context).toSplitPackage()
-            "application/zip", "application/octet-stream" -> ZippedApkSplits.getApksForUri(uri, context)
+        val displayName = context.contentResolver.getDisplayName(uri)
+        val extension = displayName.substringAfterLast('.', "").lowercase()
+        Timber.d("Selected file: $uri, MIME type: $mimeType")
+        return when {
+            (mimeType == "application/vnd.android.package-archive" || extension == "apk") -> SingletonApkSequence(
+                uri,
+                context
+            ).toSplitPackage()
+
+            extension in listOf("apks", "xapk", "apkm", "zip") -> ZippedApkSplits.getApksForUri(
+                uri,
+                context
+            )
                 .validate()
                 .toSplitPackage()
                 .filterCompatible(context)
+
             else -> SplitPackage.empty()
         }
     }
@@ -156,9 +178,40 @@ private fun InstallUi(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            Column {
-                Text(text = "Install Screen")
-                Text(text = "File uri: ${result.value?.toString() ?: "No file selected"}")
+            LazyColumn {
+                items(uiState.sessions.size) {
+                    val session = uiState.sessions[it]
+                    Column {
+                        Text(
+                            text = session.name,
+                        )
+                        Text(
+                            text = session.id.toString(),
+                        )
+                        Text(
+                            text = session.error.resolve(context),
+                        )
+                        Text(
+                            text = session.isCancellable.toString(),
+                        )
+
+                    }
+                }
+                items(uiState.sessionsProgress.size) {
+                    val session = uiState.sessionsProgress[it]
+                    Column {
+                        Text(
+                            text = session.id.toString(),
+                        )
+                        Text(
+                            text = session.currentProgress.toString(),
+                        )
+                        Text(
+                            text = session.progressMax.toString(),
+                        )
+
+                    }
+                }
             }
 
         }
