@@ -1,0 +1,1 @@
+Install APK, APKS, XAPK & APKM with split APK support, Shizuku silent install, and VirusTotal malware scanning.
