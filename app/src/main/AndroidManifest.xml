@@ -17,6 +17,14 @@
         android:name="android.permission.ENFORCE_UPDATE_OWNERSHIP"
         tools:node="remove" />
 
+    <!-- Query all installed packages on Android 11+ without QUERY_ALL_PACKAGES -->
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent>
+    </queries>
+
     <application
         android:name=".App"
         android:allowBackup="true"
