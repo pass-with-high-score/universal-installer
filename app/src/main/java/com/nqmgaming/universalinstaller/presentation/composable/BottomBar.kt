@@ -1,14 +1,16 @@
 package com.nqmgaming.universalinstaller.presentation.composable
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.nqmgaming.universalinstaller.R
@@ -46,7 +48,7 @@ fun BottomBar(
                 },
                 icon = {
                     Icon(
-                        painter = painterResource(destination.icon),
+                        imageVector = destination.icon,
                         contentDescription = stringResource(destination.label)
                     )
                 },
@@ -58,10 +60,10 @@ fun BottomBar(
 
 enum class BottomBarItem(
     val direction: DirectionDestinationSpec,
-    @StringRes val label: Int,
-    @DrawableRes val icon: Int,
+    val label: Int,
+    val icon: ImageVector,
 ) {
-    Install(InstallScreenDestination, R.string.txt_install, R.drawable.ic_apk_install),
-    Uninstall(UninstallScreenDestination, R.string.txt_uninstall, R.drawable.ic_delete),
-    Settings(SettingScreenDestination, R.string.txt_setting, R.drawable.ic_setting)
+    Install(InstallScreenDestination, R.string.txt_install, Icons.Rounded.InstallMobile),
+    Uninstall(UninstallScreenDestination, R.string.txt_uninstall, Icons.Rounded.DeleteOutline),
+    Settings(SettingScreenDestination, R.string.txt_setting, Icons.Rounded.Settings)
 }

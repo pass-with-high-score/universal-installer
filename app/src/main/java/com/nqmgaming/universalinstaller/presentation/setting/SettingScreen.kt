@@ -1,107 +1,318 @@
 package com.nqmgaming.universalinstaller.presentation.setting
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.rounded.Code
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.SettingsApplications
+import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.nqmgaming.universalinstaller.R
-import com.nqmgaming.universalinstaller.ui.theme.UniversalInstallerTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>
 @Composable
-fun SettingScreen(modifier: Modifier = Modifier) {
-    SettingUi(modifier = modifier)
+fun SettingScreen(modifier: Modifier = Modifier, viewModel: SettingViewModel = koinViewModel()) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    SettingUi(
+        modifier = modifier,
+        uiState = uiState,
+        onThemeChanged = viewModel::setThemeMode,
+        onShizukuChanged = viewModel::setUseShizuku,
+        onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SettingUi(modifier: Modifier = Modifier) {
-    var startAnimation by remember { mutableStateOf(false) }
-    val bottomPadding by animateDpAsState(
-        targetValue = if (startAnimation) 100.dp else 0.dp,
-        animationSpec = spring()
-    )
-    LaunchedEffect(Unit) {
-        startAnimation = true
-    }
+private fun SettingUi(
+    modifier: Modifier = Modifier,
+    uiState: SettingUiState = SettingUiState(),
+    onThemeChanged: (ThemeMode) -> Unit = {},
+    onShizukuChanged: (Boolean) -> Unit = {},
+    onVirusTotalKeyChanged: (String) -> Unit = {},
+) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
     Scaffold(
-        modifier = modifier, topBar = {
-            CenterAlignedTopAppBar(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
                 title = {
                     Text(
-                        text = "Universal Installer",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                        )
+                        text = "Settings",
+                        style = MaterialTheme.typography.headlineMedium,
                     )
-                }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(bottom = bottomPadding),
-                onClick = {},
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_setting),
-                        contentDescription = "Settings",
-                    )
-                    Text(
-                        text = "Settings",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                        )
+    ) { innerPadding ->
+        LazyColumn(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            // ── Installation Section ─────────────────────
+            item {
+                SettingsSection(title = "Installation", icon = Icons.Rounded.SettingsApplications) {
+                    val shizukuStatusText = when (uiState.shizukuState) {
+                        ShizukuState.NOT_INSTALLED -> "Shizuku not installed"
+                        ShizukuState.NOT_RUNNING -> "Shizuku installed but not running"
+                        ShizukuState.NO_PERMISSION -> "Tap to grant Shizuku permission"
+                        ShizukuState.READY -> "Silent install without prompts"
+                    }
+                    val shizukuStatusColor = when (uiState.shizukuState) {
+                        ShizukuState.READY -> MaterialTheme.colorScheme.primary
+                        ShizukuState.NO_PERMISSION -> MaterialTheme.colorScheme.tertiary
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                    ListItem(
+                        headlineContent = {
+                            Text("Shizuku Backend", style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = shizukuStatusText,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = shizukuStatusColor,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.AdminPanelSettings,
+                                contentDescription = null,
+                                tint = if (uiState.shizukuState == ShizukuState.READY)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = uiState.useShizuku,
+                                onCheckedChange = onShizukuChanged,
+                                enabled = uiState.shizukuAvailable,
+                            )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
                 }
             }
-        },
-        floatingActionButtonPosition = FabPosition.Center
-    ) { innerPadding ->
-        Box(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
-            Text(text = "Settings Screen")
 
+            // ── Security Section ─────────────────────────
+            item {
+                SettingsSection(title = "Security", icon = Icons.Rounded.Security) {
+                    var apiKeyInput by remember(uiState.virusTotalApiKey) {
+                        mutableStateOf(uiState.virusTotalApiKey)
+                    }
+                    ListItem(
+                        headlineContent = {
+                            Text("VirusTotal API Key", style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Column {
+                                Text(
+                                    text = "Enable malware scanning before install",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Spacer(Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = apiKeyInput,
+                                    onValueChange = {
+                                        apiKeyInput = it
+                                        onVirusTotalKeyChanged(it)
+                                    },
+                                    placeholder = { Text("Enter API key…") },
+                                    singleLine = true,
+                                    visualTransformation = PasswordVisualTransformation(),
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = MaterialTheme.shapes.medium,
+                                )
+                            }
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.Shield,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+            }
+
+            // ── Appearance Section ───────────────────────
+            item {
+                SettingsSection(title = "Appearance", icon = Icons.Rounded.Palette) {
+                    ListItem(
+                        headlineContent = {
+                            Text("Theme", style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Column {
+                                Text(
+                                    text = "Choose your preferred theme",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                                Spacer(Modifier.height(8.dp))
+                                SingleChoiceSegmentedButtonRow(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    ThemeMode.entries.forEachIndexed { index, mode ->
+                                        SegmentedButton(
+                                            selected = uiState.themeMode == mode,
+                                            onClick = { onThemeChanged(mode) },
+                                            shape = SegmentedButtonDefaults.itemShape(
+                                                index = index,
+                                                count = ThemeMode.entries.size,
+                                            ),
+                                            icon = {
+                                                Icon(
+                                                    imageVector = when (mode) {
+                                                        ThemeMode.System -> Icons.Rounded.SettingsApplications
+                                                        ThemeMode.Light -> Icons.Rounded.LightMode
+                                                        ThemeMode.Dark -> Icons.Rounded.DarkMode
+                                                    },
+                                                    contentDescription = null,
+                                                    modifier = Modifier.size(18.dp),
+                                                )
+                                            }
+                                        ) {
+                                            Text(mode.label, style = MaterialTheme.typography.labelMedium)
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+            }
+
+            // ── About Section ────────────────────────────
+            item {
+                SettingsSection(title = "About", icon = Icons.Rounded.Info) {
+                    ListItem(
+                        headlineContent = {
+                            Text("Universal Installer", style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Version ${uiState.appVersion.ifBlank { "1.0" }}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.Code,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+            }
+
+            item {
+                Spacer(Modifier.height(8.dp))
+            }
         }
     }
 }
 
-@Preview
 @Composable
-private fun SettingScreenPreview() {
-    UniversalInstallerTheme {
-        SettingUi()
+private fun SettingsSection(
+    title: String,
+    icon: ImageVector,
+    content: @Composable () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp),
+                )
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            content()
+        }
     }
 }

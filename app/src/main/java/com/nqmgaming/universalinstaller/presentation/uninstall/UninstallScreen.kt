@@ -1,107 +1,334 @@
 package com.nqmgaming.universalinstaller.presentation.uninstall
 
-import androidx.compose.animation.core.animateDpAsState
+import android.graphics.drawable.Drawable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Android
+import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.SearchOff
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.nqmgaming.universalinstaller.R
-import com.nqmgaming.universalinstaller.ui.theme.UniversalInstallerTheme
+import androidx.core.graphics.drawable.toBitmap
+import com.nqmgaming.universalinstaller.domain.model.InstalledApp
+import com.nqmgaming.universalinstaller.presentation.composable.EmptyStateView
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>
 @Composable
-fun UninstallScreen(modifier: Modifier = Modifier) {
-    UninstallUi(modifier = modifier)
+fun UninstallScreen(modifier: Modifier = Modifier, viewModel: UninstallViewModel = koinViewModel()) {
+    val uiState by viewModel.uiState.collectAsState()
+
+    UninstallUi(
+        modifier = modifier,
+        uiState = uiState,
+        onSearchQueryChanged = viewModel::onSearchQueryChanged,
+        onToggleSystemApps = viewModel::toggleSystemApps,
+        onUninstall = viewModel::uninstallApp,
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun UninstallUi(modifier: Modifier = Modifier) {
-    var startAnimation by remember { mutableStateOf(false) }
-    val bottomPadding by animateDpAsState(
-        targetValue = if (startAnimation) 100.dp else 0.dp,
-        animationSpec = spring()
-    )
-    LaunchedEffect(Unit) {
-        startAnimation = true
-    }
+private fun UninstallUi(
+    modifier: Modifier = Modifier,
+    uiState: UninstallUiState = UninstallUiState(),
+    onSearchQueryChanged: (String) -> Unit = {},
+    onToggleSystemApps: () -> Unit = {},
+    onUninstall: (String) -> Unit = {},
+) {
+    val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+    var showFilterMenu by remember { mutableStateOf(false) }
+
     Scaffold(
-        modifier = modifier, topBar = {
-            CenterAlignedTopAppBar(
+        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        topBar = {
+            LargeTopAppBar(
                 title = {
                     Text(
-                        text = "Universal Installer",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                        )
+                        text = "Uninstall",
+                        style = MaterialTheme.typography.headlineMedium,
                     )
-                }
+                },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showFilterMenu = true }) {
+                            Icon(
+                                imageVector = Icons.Rounded.FilterList,
+                                contentDescription = "Filter"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showFilterMenu,
+                            onDismissRequest = { showFilterMenu = false },
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text("Show system apps") },
+                                onClick = { onToggleSystemApps() },
+                                trailingIcon = {
+                                    Switch(
+                                        checked = uiState.showSystemApps,
+                                        onCheckedChange = { onToggleSystemApps() },
+                                    )
+                                },
+                            )
+                        }
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                modifier = Modifier.padding(bottom = bottomPadding),
-                onClick = {},
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_delete),
-                        contentDescription = "Uninstall",
-                    )
-                    Text(
-                        text = "Uninstall",
-                        style = MaterialTheme.typography.bodyLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                        )
-                    )
-                }
-            }
-        },
-        floatingActionButtonPosition = FabPosition.Center
     ) { innerPadding ->
-        Box(
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
-            Text(text = "Uninstall Screen")
+            // Search bar
+            SearchBar(
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = uiState.searchQuery,
+                        onQueryChange = onSearchQueryChanged,
+                        onSearch = {},
+                        expanded = false,
+                        onExpandedChange = {},
+                        placeholder = { Text("Search apps…") },
+                        leadingIcon = {
+                            Icon(
+                                imageVector = Icons.Rounded.Search,
+                                contentDescription = null
+                            )
+                        },
+                    )
+                },
+                expanded = false,
+                onExpandedChange = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {}
 
+            when {
+                uiState.isLoading -> {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+
+                uiState.filteredApps.isEmpty() -> {
+                    EmptyStateView(
+                        icon = Icons.Rounded.SearchOff,
+                        title = "No apps found",
+                        subtitle = if (uiState.searchQuery.isNotBlank())
+                            "No apps match \"${uiState.searchQuery}\""
+                        else "No user-installed apps found",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 32.dp)
+                    )
+                }
+
+                else -> {
+                    LazyColumn(
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        items(
+                            items = uiState.filteredApps,
+                            key = { it.packageName }
+                        ) { app ->
+                            AppCard(
+                                app = app,
+                                onUninstall = { onUninstall(app.packageName) },
+                            )
+                        }
+                        item {
+                            Spacer(Modifier.height(8.dp))
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
-@Preview
 @Composable
-private fun UninstallScreenPreview() {
-    UniversalInstallerTheme {
-        UninstallUi()
+private fun AppCard(
+    app: InstalledApp,
+    onUninstall: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    var showConfirmDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    // Load icon lazily per-item — avoids loading all icons at once
+    val icon: Drawable? = remember(app.packageName) {
+        try {
+            context.packageManager.getApplicationIcon(app.packageName)
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    if (showConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { showConfirmDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showConfirmDialog = false
+                    onUninstall()
+                }) {
+                    Text("Uninstall", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showConfirmDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Uninstall ${app.appName}?") },
+            text = {
+                Text("This will remove ${app.appName} (${app.packageName}) from your device.")
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.DeleteOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            }
+        )
+    }
+
+    ElevatedCard(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            // App icon — loaded lazily, high-res bitmap
+            if (icon != null) {
+                Image(
+                    bitmap = icon.toBitmap(128, 128).asImageBitmap(),
+                    contentDescription = app.appName,
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(MaterialTheme.shapes.medium)
+                )
+            } else {
+                Icon(
+                    imageVector = Icons.Rounded.Android,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                )
+            }
+
+            // App info
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = app.appName,
+                    style = MaterialTheme.typography.titleSmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = app.packageName,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                if (app.versionName.isNotBlank()) {
+                    Text(
+                        text = "v${app.versionName}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                    )
+                }
+            }
+
+            // Delete button
+            FilledTonalIconButton(
+                onClick = { showConfirmDialog = true },
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.DeleteOutline,
+                    contentDescription = "Uninstall ${app.appName}",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(20.dp),
+                )
+            }
+        }
     }
 }

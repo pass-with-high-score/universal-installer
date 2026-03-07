@@ -46,6 +46,11 @@ android {
         compose = true
         buildConfig = true
     }
+
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
 }
 
 dependencies {
@@ -58,6 +63,9 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.coil.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,11 +79,16 @@ dependencies {
     implementation(libs.koin.core)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
-//    implementation(libs.android.material)
 
     implementation("io.github.raamcosta.compose-destinations:core:2.2.0")
     ksp("io.github.raamcosta.compose-destinations:ksp:2.2.0")
     implementation("io.github.raamcosta.compose-destinations:bottom-sheet:2.2.0")
 
     implementation("com.jakewharton.timber:timber:5.0.1")
+
+    implementation(libs.ktor.client.core)
+    implementation(libs.ktor.client.cio)
+
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
 }

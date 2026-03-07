@@ -2,19 +2,19 @@
     <string name="app_name">Universal Installer</string>
     <string name="txt_install">Install</string>
     <string name="txt_uninstall">Uninstall</string>
-    <string name="txt_setting">Setting</string>
+    <string name="txt_setting">Settings</string>
     <string name="default_percentage" translatable="false">0%</string>
     <string name="percentage" translatable="false">%d%%</string>
     <string name="screen_title_install">Install</string>
     <string name="screen_title_uninstall">Uninstall</string>
     <string name="cancel">Cancel</string>
-    <string name="fab_install">Install</string>
+    <string name="fab_install">Install Package</string>
     <string name="uninstall">Uninstall</string>
-    <string name="session_error">Error</string>
-    <string name="session_error_with_reason">Error: %s</string>
+    <string name="session_error">Installation failed</string>
+    <string name="session_error_with_reason">Installation failed: %s</string>
     <string name="no_install_sessions">No install sessions</string>
     <string name="no_installed_applications">No installed applications</string>
-    <string name="error_no_base_apk">No base APK found</string>
+    <string name="error_no_base_apk">No base APK found in this package</string>
     <string name="error_conflicting_base_apk">More than one base APK found</string>
     <string name="error_conflicting_split_name">Conflicting split name: %s</string>
     <string name="error_conflicting_package_name">Conflicting package name. Expected: %1$s, found: %2$s, name: %3$s</string>
