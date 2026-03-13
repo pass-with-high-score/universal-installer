@@ -13,16 +13,10 @@ import com.ramcosta.composedestinations.utils.startDestination
 @Composable
 fun AppScaffold(
     modifier: Modifier = Modifier,
-    navController: NavHostController,
-    bottomBar: @Composable (DestinationSpec) -> Unit,
     content: @Composable (PaddingValues) -> Unit,
 ) {
-    val destination =
-        navController.currentDestinationAsState().value ?: NavGraphs.root.startDestination
-
     Scaffold(
         modifier = modifier,
-        bottomBar = { bottomBar(destination) },
         content = content
     )
 }

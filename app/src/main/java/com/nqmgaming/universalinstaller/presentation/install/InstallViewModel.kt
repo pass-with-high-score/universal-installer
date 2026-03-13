@@ -1,7 +1,9 @@
 package com.nqmgaming.universalinstaller.presentation.install
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nqmgaming.universalinstaller.domain.installer.AppInstaller
@@ -39,19 +41,24 @@ class InstallViewModel(
     private val _parsedAppInfo = MutableStateFlow<AppInfo?>(null)
     val parsedAppInfo: StateFlow<AppInfo?> = _parsedAppInfo.asStateFlow()
 
+    private val _existingAppInfo = MutableStateFlow<ExistingAppInfo?>(null)
+    val existingAppInfo: StateFlow<ExistingAppInfo?> = _existingAppInfo.asStateFlow()
+
     private var installJob: Job? = null
 
     val uiState = combine(
         _error,
         sessionDataRepository.sessions,
         sessionDataRepository.sessionsProgress,
-        _parsedAppInfo
-    ) { error, sessions, progress, appInfo ->
+        _parsedAppInfo,
+        _existingAppInfo
+    ) { error, sessions, progress, appInfo, existing ->
         InstallUiState(
             error = error,
             sessions = sessions,
             sessionsProgress = progress,
-            parsedAppInfo = appInfo
+            parsedAppInfo = appInfo,
+            existingAppInfo = existing
         )
     }.stateIn(viewModelScope, SharingStarted.Lazily, InstallUiState())
 
@@ -62,6 +69,7 @@ class InstallViewModel(
                 val appInfo = appParser.parse(context, uri)
                 if (appInfo != null) {
                     _parsedAppInfo.value = appInfo
+                    checkExistingApp(appInfo.packageName)
                 } else {
                     _error.value = "Failed to parse application information."
                 }
@@ -72,7 +80,21 @@ class InstallViewModel(
         }
     }
 
-    fun installPackage(uri: Uri, isApks: Boolean, fileName: String, method: InstallMethod = InstallMethod.STANDARD) {
+    private fun checkExistingApp(packageName: String) {
+        try {
+            val packageInfo = context.packageManager.getPackageInfo(packageName, 0)
+            val versionCode = PackageInfoCompat.getLongVersionCode(packageInfo)
+            val versionName = packageInfo.versionName ?: "Unknown"
+            _existingAppInfo.value = ExistingAppInfo(versionName, versionCode)
+        } catch (e: PackageManager.NameNotFoundException) {
+            _existingAppInfo.value = null
+        } catch (e: Exception) {
+            Timber.e(e, "Error checking existing app")
+            _existingAppInfo.value = null
+        }
+    }
+
+    fun installPackage(uri: Uri, isApks: Boolean, fileName: String, deleteAfterInstall: Boolean, method: InstallMethod = InstallMethod.STANDARD) {
         installJob?.cancel()
         installJob = viewModelScope.launch(Dispatchers.IO) {
             val sessionId = UUID.randomUUID()
@@ -103,6 +125,18 @@ class InstallViewModel(
                         }
                         is InstallState.Success -> {
                             sessionDataRepository.updateSessionProgress(sessionId, 100, 100)
+                            if (deleteAfterInstall) {
+                                try {
+                                    val deletedRows = context.contentResolver.delete(uri, null, null)
+                                    if (deletedRows > 0) {
+                                        Timber.d("Successfully deleted file: $uri")
+                                    } else {
+                                        Timber.w("Failed to delete file: $uri (0 rows affected)")
+                                    }
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Exception while deleting file: $uri")
+                                }
+                            }
                             // Remove session after brief delay or keep it for history
                         }
                         is InstallState.Error -> {

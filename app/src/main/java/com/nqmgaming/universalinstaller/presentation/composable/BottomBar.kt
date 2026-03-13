@@ -13,7 +13,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import com.nqmgaming.universalinstaller.R
 import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.InstallScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.UninstallScreenDestination
 import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
@@ -61,7 +60,6 @@ enum class BottomBarItem(
     @StringRes val label: Int,
     @DrawableRes val icon: Int,
 ) {
-    Install(InstallScreenDestination, R.string.txt_install, R.drawable.ic_apk_install),
     Uninstall(UninstallScreenDestination, R.string.txt_uninstall, R.drawable.ic_delete),
     Settings(SettingScreenDestination, R.string.txt_setting, R.drawable.ic_setting)
 }

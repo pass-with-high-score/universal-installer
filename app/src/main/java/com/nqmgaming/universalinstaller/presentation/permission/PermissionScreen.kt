@@ -22,8 +22,8 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.nqmgaming.universalinstaller.util.PermissionUtil
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.InstallScreenDestination
 import com.ramcosta.composedestinations.generated.destinations.PermissionScreenDestination
+import com.ramcosta.composedestinations.generated.destinations.ScannerScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Destination<RootGraph>(start = true)
@@ -44,7 +44,7 @@ fun PermissionScreen(
                 hasStorage = PermissionUtil.hasStoragePermission(context)
                 hasInstall = PermissionUtil.hasInstallPermission(context)
                 if (hasStorage && hasInstall) {
-                    navigator.navigate(InstallScreenDestination) {
+                    navigator.navigate(ScannerScreenDestination) {
                         popUpTo(PermissionScreenDestination) {
                             inclusive = true
                         }
@@ -60,7 +60,7 @@ fun PermissionScreen(
 
     LaunchedEffect(hasStorage, hasInstall) {
         if (hasStorage && hasInstall) {
-            navigator.navigate(InstallScreenDestination) {
+            navigator.navigate(ScannerScreenDestination) {
                 popUpTo(PermissionScreenDestination) {
                     inclusive = true
                 }

@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.nqmgaming.universalinstaller.presentation.composable.AppScaffold
-import com.nqmgaming.universalinstaller.presentation.composable.BottomBar
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.generated.NavGraphs
 
@@ -16,10 +15,6 @@ fun UniversalInstallerApp(modifier: Modifier = Modifier) {
 
     AppScaffold(
         modifier = modifier,
-        navController = navController,
-        bottomBar = {
-            BottomBar(navController)
-        }
     ) {
         DestinationsNavHost(
             navController = navController,
