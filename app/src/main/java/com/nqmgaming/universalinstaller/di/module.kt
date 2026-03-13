@@ -14,6 +14,9 @@ import com.nqmgaming.universalinstaller.domain.repository.SessionDataRepository
 import com.nqmgaming.universalinstaller.presentation.install.InstallViewModel
 import com.nqmgaming.universalinstaller.presentation.manager.AppManagerViewModel
 import com.nqmgaming.universalinstaller.presentation.scanner.ScannerViewModel
+import com.nqmgaming.universalinstaller.presentation.settings.SettingsViewModel
+import com.nqmgaming.universalinstaller.data.repository.SettingsRepositoryImpl
+import com.nqmgaming.universalinstaller.domain.repository.SettingsRepository
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
@@ -42,8 +45,12 @@ val appModule = module {
     // Inject Installer (Default to StandardInstaller)
     single<AppInstaller> { StandardInstaller(androidContext(), get()) }
     
+    // Inject Settings
+    single<SettingsRepository> { SettingsRepositoryImpl(androidContext()) }
+    
     // ViewModels
     viewModel { ScannerViewModel(get()) }
-    viewModel { InstallViewModel(get(), get(), get(), androidContext()) }
+    viewModel { InstallViewModel(get(), get(), get(), get(), androidContext()) }
     viewModel { AppManagerViewModel(get()) }
+    viewModel { SettingsViewModel(get()) }
 }

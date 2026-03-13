@@ -15,6 +15,7 @@ import com.nqmgaming.universalinstaller.domain.model.SessionData
 import com.nqmgaming.universalinstaller.domain.model.app.AppInfo
 import com.nqmgaming.universalinstaller.domain.parser.AppParser
 import com.nqmgaming.universalinstaller.domain.repository.SessionDataRepository
+import com.nqmgaming.universalinstaller.domain.repository.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.solrudev.ackpine.splits.ZippedApkSplits
@@ -32,6 +34,7 @@ class InstallViewModel(
     private val appParser: AppParser,
     private val appInstaller: AppInstaller,
     private val sessionDataRepository: SessionDataRepository,
+    private val settingsRepository: SettingsRepository,
     private val context: Context
 ) : ViewModel() {
 
@@ -94,9 +97,11 @@ class InstallViewModel(
         }
     }
 
-    fun installPackage(uri: Uri, isApks: Boolean, fileName: String, deleteAfterInstall: Boolean, method: InstallMethod = InstallMethod.STANDARD) {
+    fun installPackage(uri: Uri, isApks: Boolean, fileName: String, deleteAfterInstall: Boolean) {
         installJob?.cancel()
         installJob = viewModelScope.launch(Dispatchers.IO) {
+            val method = settingsRepository.installMethodFlow.first()
+            
             val sessionId = UUID.randomUUID()
             val sessionData = SessionData(sessionId, fileName)
             sessionDataRepository.addSessionData(sessionData)
