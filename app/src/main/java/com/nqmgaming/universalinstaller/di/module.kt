@@ -20,9 +20,11 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import ru.solrudev.ackpine.installer.PackageInstaller
+import ru.solrudev.ackpine.uninstaller.PackageUninstaller
 
 val appModule = module {
     single { PackageInstaller.getInstance(androidContext()) }
+    single { PackageUninstaller.getInstance(androidContext()) }
     
     // Inject Session Repository
     factory { (handle: SavedStateHandle) -> SessionDataRepositoryImpl(handle) }
@@ -35,7 +37,7 @@ val appModule = module {
     single<FileScannerRepository> { FileScannerRepositoryImpl(androidContext()) }
     
     // Inject App Manager
-    single<AppManagerRepository> { AppManagerRepositoryImpl(androidContext()) }
+    single<AppManagerRepository> { AppManagerRepositoryImpl(androidContext(), get()) }
     
     // Inject Installer (Default to StandardInstaller)
     single<AppInstaller> { StandardInstaller(androidContext(), get()) }

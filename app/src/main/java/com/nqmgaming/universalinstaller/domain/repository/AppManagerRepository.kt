@@ -16,4 +16,5 @@ data class InstalledApp(
 interface AppManagerRepository {
     suspend fun getInstalledApps(includeSystemApps: Boolean = false): List<InstalledApp>
     suspend fun extractApp(app: InstalledApp): Result<String>
+    suspend fun uninstallApp(packageName: String): Result<Unit>
 }

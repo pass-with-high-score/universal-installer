@@ -20,8 +20,17 @@ import java.util.Locale
 import java.util.zip.ZipEntry
 import java.util.zip.ZipOutputStream
 
+import java.util.UUID
+import ru.solrudev.ackpine.uninstaller.PackageUninstaller
+import ru.solrudev.ackpine.uninstaller.createSession
+import ru.solrudev.ackpine.session.Session
+import ru.solrudev.ackpine.session.await
+import ru.solrudev.ackpine.session.parameters.Confirmation
+import kotlinx.coroutines.flow.first
+
 class AppManagerRepositoryImpl(
-    private val context: Context
+    private val context: Context,
+    private val packageUninstaller: PackageUninstaller
 ) : AppManagerRepository {
 
     override suspend fun getInstalledApps(includeSystemApps: Boolean): List<InstalledApp> = withContext(Dispatchers.IO) {
@@ -136,6 +145,27 @@ class AppManagerRepositoryImpl(
                 }
                 MediaScannerConnection.scanFile(context, arrayOf(destFile.absolutePath), null, null)
                 Result.success(destFile.absolutePath)
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun uninstallApp(packageName: String): Result<Unit> = withContext(Dispatchers.IO) {
+        try {
+            val sessionName = "UninstallSession_${UUID.randomUUID().toString().substring(0, 8)}"
+            
+            val session = packageUninstaller.createSession(packageName) {
+                confirmation = Confirmation.IMMEDIATE
+            }
+
+            val result = session.await()
+            if (result is Session.State.Succeeded) {
+                Result.success(Unit)
+            } else if (result is Session.State.Failed) {
+                Result.failure(Exception(result.failure.toString()))
+            } else {
+                Result.failure(Exception("Uninstallation cancelled"))
             }
         } catch (e: Exception) {
             Result.failure(e)

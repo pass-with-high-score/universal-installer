@@ -17,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -67,6 +68,13 @@ fun AppManagerScreen(
         }
     }
 
+    LaunchedEffect(uiState.uninstallMessage) {
+        uiState.uninstallMessage?.let { message ->
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearMessage()
+        }
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -108,14 +116,15 @@ fun AppManagerScreen(
                     items(uiState.installedApps) { app ->
                         InstalledAppItem(
                             app = app,
-                            isExtracting = uiState.isExtracting,
-                            onExtract = { viewModel.extractApp(app) }
+                            isOperating = uiState.isExtracting || uiState.isUninstalling,
+                            onExtract = { viewModel.extractApp(app) },
+                            onUninstall = { viewModel.uninstallApp(app) }
                         )
                     }
                 }
             }
 
-            if (uiState.isExtracting) {
+            if (uiState.isExtracting || uiState.isUninstalling) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -129,7 +138,7 @@ fun AppManagerScreen(
                         ) {
                             CircularProgressIndicator()
                             Text(
-                                "Extracting APK...",
+                                if (uiState.isExtracting) "Extracting APK..." else "Uninstalling App...",
                                 modifier = Modifier.padding(top = 16.dp),
                                 style = MaterialTheme.typography.bodyLarge
                             )
@@ -142,7 +151,12 @@ fun AppManagerScreen(
 }
 
 @Composable
-fun InstalledAppItem(app: InstalledApp, isExtracting: Boolean, onExtract: () -> Unit) {
+fun InstalledAppItem(
+    app: InstalledApp, 
+    isOperating: Boolean, 
+    onExtract: () -> Unit,
+    onUninstall: () -> Unit
+) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -187,11 +201,21 @@ fun InstalledAppItem(app: InstalledApp, isExtracting: Boolean, onExtract: () -> 
                 )
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = onExtract,
-                enabled = !isExtracting
-            ) {
-                Text("Backup")
+            Column(horizontalAlignment = Alignment.End) {
+                Button(
+                    onClick = onExtract,
+                    enabled = !isOperating
+                ) {
+                    Text("Backup")
+                }
+                Spacer(modifier = Modifier.padding(top = 8.dp))
+                Button(
+                    onClick = onUninstall,
+                    enabled = !isOperating,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Uninstall")
+                }
             }
         }
     }
