@@ -2,10 +2,12 @@ package com.nqmgaming.universalinstaller.presentation.install
 
 import com.nqmgaming.universalinstaller.domain.model.SessionData
 import com.nqmgaming.universalinstaller.domain.model.SessionProgress
+import com.nqmgaming.universalinstaller.domain.model.app.AppInfo
 import ru.solrudev.ackpine.resources.ResolvableString
 
 data class InstallUiState(
-    val error: ResolvableString = ResolvableString.empty(),
+    val error: String? = null,
     val sessions: List<SessionData> = emptyList(),
-    val sessionsProgress: List<SessionProgress> = emptyList()
+    val sessionsProgress: List<SessionProgress> = emptyList(),
+    val parsedAppInfo: AppInfo? = null
 )

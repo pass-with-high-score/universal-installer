@@ -4,8 +4,6 @@ import androidx.lifecycle.SavedStateHandle
 import com.nqmgaming.universalinstaller.domain.model.SessionData
 import com.nqmgaming.universalinstaller.domain.model.SessionProgress
 import com.nqmgaming.universalinstaller.domain.repository.SessionDataRepository
-import ru.solrudev.ackpine.resources.ResolvableString
-import ru.solrudev.ackpine.session.Progress
 import java.util.UUID
 
 private const val SESSIONS_KEY = "SESSIONS"
@@ -36,7 +34,7 @@ class SessionDataRepositoryImpl(private val savedStateHandle: SavedStateHandle) 
 
     override fun addSessionData(sessionData: SessionData) {
         _sessions += sessionData
-        _sessionsProgress += SessionProgress(sessionData.id, Progress())
+        _sessionsProgress += SessionProgress(sessionData.id, 0, 100)
     }
 
     override fun removeSessionData(id: UUID) {
@@ -48,11 +46,11 @@ class SessionDataRepositoryImpl(private val savedStateHandle: SavedStateHandle) 
         _sessionsProgress = sessionsProgress
     }
 
-    override fun updateSessionProgress(id: UUID, progress: Progress) {
+    override fun updateSessionProgress(id: UUID, currentProgress: Int, maxProgress: Int) {
         val sessionsProgress = _sessionsProgress.toMutableList()
         val sessionProgressIndex = sessionsProgress.indexOfFirst { it.id == id }
         if (sessionProgressIndex != -1) {
-            sessionsProgress[sessionProgressIndex] = SessionProgress(id, progress)
+            sessionsProgress[sessionProgressIndex] = SessionProgress(id, currentProgress, maxProgress)
         }
         _sessionsProgress = sessionsProgress
     }
@@ -71,7 +69,7 @@ class SessionDataRepositoryImpl(private val savedStateHandle: SavedStateHandle) 
         _sessions = sessions
     }
 
-    override fun setError(id: UUID, error: ResolvableString) {
+    override fun setError(id: UUID, error: String) {
         val sessions = _sessions.toMutableList()
         val sessionDataIndex = sessions.indexOfFirst { it.id == id }
         if (sessionDataIndex != -1) {
