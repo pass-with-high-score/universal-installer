@@ -51,6 +51,7 @@ class InstallViewModel(
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
+    private var pendingOriginalUri: Uri? = null
 
     val history = historyDao.getAll()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -85,6 +86,7 @@ class InstallViewModel(
         viewModelScope.launch {
             _isLoading.value = true
             pendingFileName = fileName
+            pendingOriginalUri = uri
             val info = withContext(Dispatchers.IO) {
                 extractApkInfoAndCacheUris(context, uri, splitPackage, fileName)
             }
@@ -97,27 +99,38 @@ class InstallViewModel(
     fun confirmInstall() {
         val uris = pendingApkUris ?: return
         val fn = pendingFileName ?: return
+        val originalUri = pendingOriginalUri
         val apkInfo = _pendingApkInfo.value
         _pendingApkInfo.value = null
         pendingApkUris = null
         pendingFileName = null
+        pendingOriginalUri = null
 
         viewModelScope.launch {
             if (uris.isEmpty()) return@launch
             val iconPath = cacheIcon(apkInfo)
+            val deleteAfterInstall = readDeleteApkPref()
             val sessionData = SessionData(
                 id = UUID.randomUUID(),
                 name = fn,
                 appName = apkInfo?.appName ?: "",
                 iconPath = iconPath,
             )
-            activeController().install(uris, sessionData, viewModelScope)
+            activeController().install(
+                uris = uris,
+                sessionData = sessionData,
+                scope = viewModelScope,
+                context = application,
+                originalUri = originalUri,
+                deleteAfterInstall = deleteAfterInstall,
+            )
         }
     }
 
     fun dismissPendingInstall() {
         _pendingApkInfo.value = null
         pendingApkUris = null
+        pendingOriginalUri = null
         pendingFileName = null
     }
 
@@ -137,6 +150,13 @@ class InstallViewModel(
 
     private suspend fun activeController(): BaseInstallController {
         return if (readShizukuPref()) shizukuController else defaultController
+    }
+
+    private suspend fun readDeleteApkPref(): Boolean {
+        return try {
+            val prefs = application.dataStore.data.first()
+            prefs[androidx.datastore.preferences.core.booleanPreferencesKey("delete_apk_after_install")] ?: false
+        } catch (_: Exception) { false }
     }
 
     private suspend fun readShizukuPref(): Boolean {

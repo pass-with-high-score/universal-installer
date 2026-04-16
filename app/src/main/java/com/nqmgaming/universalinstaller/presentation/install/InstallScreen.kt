@@ -1,6 +1,8 @@
 package com.nqmgaming.universalinstaller.presentation.install
 
+import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -82,12 +84,31 @@ private fun InstallUi(
     val filePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
             if (uri == null) return@rememberLauncherForActivityResult
+            // Take persistable permissions so we can delete the file later if needed
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                )
+            } catch (_: Exception) { /* some providers don't support persistable permissions */ }
             val mimeType = context.contentResolver.getType(uri)?.lowercase()
             val displayName = context.contentResolver.getDisplayName(uri)
             val extension = displayName.substringAfterLast('.', "").lowercase()
+            val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
+            val isApkMime = mimeType == "application/vnd.android.package-archive"
+
+            if (!isApkMime && extension !in validExtensions) {
+                Toast.makeText(
+                    context,
+                    "Unsupported file. Please select an APK, APKS, XAPK, or APKM file.",
+                    Toast.LENGTH_LONG
+                ).show()
+                return@rememberLauncherForActivityResult
+            }
+
             Timber.d("Selected file: $uri, MIME type: $mimeType")
             val apks = when {
-                (mimeType == "application/vnd.android.package-archive" || extension == "apk") -> SingletonApkSequence(
+                (isApkMime || extension == "apk") -> SingletonApkSequence(
                     uri,
                     context
                 ).toSplitPackage()

@@ -1,6 +1,9 @@
 package com.nqmgaming.universalinstaller.presentation.install.controller
 
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.provider.DocumentsContract
 import com.nqmgaming.universalinstaller.data.local.InstallHistoryDao
 import com.nqmgaming.universalinstaller.presentation.install.InstallErrorHelper
 import com.nqmgaming.universalinstaller.data.local.InstallHistoryEntity
@@ -31,6 +34,8 @@ abstract class BaseInstallController(
 ) {
     private val activeSessions = mutableMapOf<UUID, ProgressSession<InstallFailure>>()
     private val sessionUris = mutableMapOf<UUID, List<Uri>>()
+    private val originalFileUris = mutableMapOf<UUID, Uri>()
+    private val deleteFlags = mutableMapOf<UUID, Boolean>()
 
     protected abstract suspend fun createSession(
         uris: List<Uri>,
@@ -41,14 +46,19 @@ abstract class BaseInstallController(
         uris: List<Uri>,
         sessionData: SessionData,
         scope: CoroutineScope,
+        context: Context? = null,
+        originalUri: Uri? = null,
+        deleteAfterInstall: Boolean = false,
     ) {
         scope.launch {
             val session = createSession(uris, sessionData.name)
             activeSessions[session.id] = session
             sessionUris[session.id] = uris
+            if (originalUri != null) originalFileUris[session.id] = originalUri
+            deleteFlags[session.id] = deleteAfterInstall
             val data = sessionData.copy(id = session.id)
             sessionDataRepository.addSessionData(data)
-            awaitSession(session, scope)
+            awaitSession(session, scope, context)
         }
     }
 
@@ -92,7 +102,7 @@ abstract class BaseInstallController(
         }
     }
 
-    private fun awaitSession(session: ProgressSession<InstallFailure>, scope: CoroutineScope) {
+    private fun awaitSession(session: ProgressSession<InstallFailure>, scope: CoroutineScope, context: Context? = null) {
         scope.launch {
             session.progress
                 .onEach { progress ->
@@ -110,9 +120,12 @@ abstract class BaseInstallController(
                 when (val result = session.await()) {
                     Session.State.Succeeded -> {
                         saveHistory(sessionData, success = true)
+                        deleteSourceFileIfNeeded(session.id, context)
                         sessionDataRepository.removeSessionData(session.id)
                         activeSessions.remove(session.id)
                         sessionUris.remove(session.id)
+                        originalFileUris.remove(session.id)
+                        deleteFlags.remove(session.id)
                     }
                     is Session.State.Failed -> {
                         val errorInfo = InstallErrorHelper.getErrorInfo(result.failure)
@@ -125,6 +138,8 @@ abstract class BaseInstallController(
                 sessionDataRepository.removeSessionData(session.id)
                 activeSessions.remove(session.id)
                 sessionUris.remove(session.id)
+                originalFileUris.remove(session.id)
+                deleteFlags.remove(session.id)
                 throw e
             } catch (e: Exception) {
                 handleError(e.message, session.id)
@@ -152,6 +167,23 @@ abstract class BaseInstallController(
             )
         } catch (e: Exception) {
             Timber.e(e, "Failed to save install history")
+        }
+    }
+
+    private fun deleteSourceFileIfNeeded(sessionId: UUID, context: Context?) {
+        if (deleteFlags[sessionId] != true || context == null) return
+        val uri = originalFileUris[sessionId] ?: return
+        try {
+            // Take write permission granted by OpenDocument picker
+            context.contentResolver.takePersistableUriPermission(
+                uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+        } catch (_: Exception) { /* permission may already be held or not available */ }
+        try {
+            DocumentsContract.deleteDocument(context.contentResolver, uri)
+            Timber.d("Deleted source file: $uri")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to delete source file: $uri")
         }
     }
 

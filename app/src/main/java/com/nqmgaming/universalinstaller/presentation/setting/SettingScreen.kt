@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.rounded.Info
@@ -69,6 +70,7 @@ fun SettingScreen(modifier: Modifier = Modifier, viewModel: SettingViewModel = k
         onShizukuChanged = viewModel::setUseShizuku,
         onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
         onShizukuOptionChanged = viewModel::setShizukuOption,
+        onDeleteApkChanged = viewModel::setDeleteApkAfterInstall,
     )
 }
 
@@ -81,6 +83,7 @@ private fun SettingUi(
     onShizukuChanged: (Boolean) -> Unit = {},
     onVirusTotalKeyChanged: (String) -> Unit = {},
     onShizukuOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
+    onDeleteApkChanged: (Boolean) -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -152,6 +155,36 @@ private fun SettingUi(
                                 checked = uiState.useShizuku,
                                 onCheckedChange = onShizukuChanged,
                                 enabled = uiState.shizukuAvailable,
+                            )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    ListItem(
+                        headlineContent = {
+                            Text("Delete APK after install", style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = "Automatically delete the source file after successful installation",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.CleaningServices,
+                                contentDescription = null,
+                                tint = if (uiState.deleteApkAfterInstall)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = uiState.deleteApkAfterInstall,
+                                onCheckedChange = onDeleteApkChanged,
                             )
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),

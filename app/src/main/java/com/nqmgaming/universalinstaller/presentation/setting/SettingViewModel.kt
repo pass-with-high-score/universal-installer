@@ -127,12 +127,16 @@ class SettingViewModel(
                 allUsers = prefs[PreferencesKeys.SHIZUKU_ALL_USERS] ?: false,
             )
         },
+        dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.DELETE_APK_AFTER_INSTALL] ?: false
+        },
     ) { flows ->
         val theme = flows[0] as ThemeMode
         val useShizuku = flows[1] as Boolean
         val vtKey = flows[2] as String
         val shizukuState = flows[3] as ShizukuState
         val shizukuOpts = flows[4] as ShizukuOptions
+        val deleteApk = flows[5] as Boolean
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
@@ -142,6 +146,7 @@ class SettingViewModel(
             themeMode = theme,
             useShizuku = useShizuku && shizukuState == ShizukuState.READY,
             virusTotalApiKey = vtKey,
+            deleteApkAfterInstall = deleteApk,
             shizukuState = shizukuState,
             shizukuAvailable = shizukuState == ShizukuState.READY || shizukuState == ShizukuState.NO_PERMISSION,
             shizukuOptions = shizukuOpts,
@@ -189,6 +194,14 @@ class SettingViewModel(
                 dataStore.edit { prefs ->
                     prefs[PreferencesKeys.USE_SHIZUKU] = false
                 }
+            }
+        }
+    }
+
+    fun setDeleteApkAfterInstall(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.DELETE_APK_AFTER_INSTALL] = enabled
             }
         }
     }
