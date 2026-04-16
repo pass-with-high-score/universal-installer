@@ -2,6 +2,7 @@ package com.nqmgaming.universalinstaller.presentation.install.controller
 
 import android.app.Application
 import android.net.Uri
+import com.nqmgaming.universalinstaller.data.local.InstallHistoryDao
 import com.nqmgaming.universalinstaller.domain.repository.SessionDataRepository
 import com.nqmgaming.universalinstaller.presentation.setting.PreferencesKeys
 import com.nqmgaming.universalinstaller.presentation.setting.dataStore
@@ -18,7 +19,8 @@ class ShizukuInstallController(
     private val application: Application,
     packageInstaller: PackageInstaller,
     sessionDataRepository: SessionDataRepository,
-) : BaseInstallController(packageInstaller, sessionDataRepository) {
+    historyDao: InstallHistoryDao,
+) : BaseInstallController(packageInstaller, sessionDataRepository, historyDao) {
 
     @OptIn(DelicateAckpineApi::class)
     override suspend fun createSession(

@@ -1,5 +1,7 @@
 package com.nqmgaming.universalinstaller.presentation.uninstall
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,15 +14,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Android
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SearchOff
+import androidx.compose.material.icons.rounded.SelectAll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -28,6 +33,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +45,7 @@ import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -74,6 +81,10 @@ fun UninstallScreen(modifier: Modifier = Modifier, viewModel: UninstallViewModel
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onToggleSystemApps = viewModel::toggleSystemApps,
         onUninstall = viewModel::uninstallApp,
+        onToggleSelection = viewModel::toggleSelection,
+        onClearSelection = viewModel::clearSelection,
+        onToggleSelectAll = viewModel::toggleSelectAll,
+        onUninstallSelected = viewModel::uninstallSelected,
     )
 }
 
@@ -85,53 +96,127 @@ private fun UninstallUi(
     onSearchQueryChanged: (String) -> Unit = {},
     onToggleSystemApps: () -> Unit = {},
     onUninstall: (String) -> Unit = {},
+    onToggleSelection: (String) -> Unit = {},
+    onClearSelection: () -> Unit = {},
+    onToggleSelectAll: () -> Unit = {},
+    onUninstallSelected: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showFilterMenu by remember { mutableStateOf(false) }
+    var showBatchConfirm by remember { mutableStateOf(false) }
+
+    if (showBatchConfirm) {
+        AlertDialog(
+            onDismissRequest = { showBatchConfirm = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    showBatchConfirm = false
+                    onUninstallSelected()
+                }) {
+                    Text("Uninstall", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showBatchConfirm = false }) {
+                    Text("Cancel")
+                }
+            },
+            title = { Text("Uninstall ${uiState.selectedPackages.size} apps?") },
+            text = {
+                Text("This will remove ${uiState.selectedPackages.size} selected apps from your device.")
+            },
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.DeleteOutline,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            }
+        )
+    }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
-            LargeTopAppBar(
-                expandedHeight = 120.dp,
-                title = {
-                    Text(
-                        text = "Uninstall",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
-                },
-                actions = {
-                    Box {
-                        IconButton(onClick = { showFilterMenu = true }) {
+            if (uiState.isSelectionMode) {
+                // Selection mode top bar
+                TopAppBar(
+                    title = {
+                        Text("${uiState.selectedPackages.size} selected")
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onClearSelection) {
+                            Icon(Icons.Rounded.Close, contentDescription = "Cancel selection")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = onToggleSelectAll) {
                             Icon(
-                                imageVector = Icons.Rounded.FilterList,
-                                contentDescription = "Filter"
+                                Icons.Rounded.SelectAll,
+                                contentDescription = if (uiState.isAllSelected) "Deselect all" else "Select all",
+                                tint = if (uiState.isAllSelected)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
-                        DropdownMenu(
-                            expanded = showFilterMenu,
-                            onDismissRequest = { showFilterMenu = false },
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Show system apps") },
-                                onClick = { onToggleSystemApps() },
-                                trailingIcon = {
-                                    Switch(
-                                        checked = uiState.showSystemApps,
-                                        onCheckedChange = { onToggleSystemApps() },
-                                    )
-                                },
+                        IconButton(onClick = { showBatchConfirm = true }) {
+                            Icon(
+                                Icons.Rounded.DeleteOutline,
+                                contentDescription = "Uninstall selected",
+                                tint = MaterialTheme.colorScheme.error,
                             )
                         }
-                    }
-                },
-                scrollBehavior = scrollBehavior,
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background,
-                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
-                ),
-            )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        navigationIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        actionIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ),
+                )
+            } else {
+                LargeTopAppBar(
+                    expandedHeight = 120.dp,
+                    title = {
+                        Text(
+                            text = "Uninstall",
+                            style = MaterialTheme.typography.headlineMedium,
+                        )
+                    },
+                    actions = {
+                        Box {
+                            IconButton(onClick = { showFilterMenu = true }) {
+                                Icon(
+                                    imageVector = Icons.Rounded.FilterList,
+                                    contentDescription = "Filter"
+                                )
+                            }
+                            DropdownMenu(
+                                expanded = showFilterMenu,
+                                onDismissRequest = { showFilterMenu = false },
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text("Show system apps") },
+                                    onClick = { onToggleSystemApps() },
+                                    trailingIcon = {
+                                        Switch(
+                                            checked = uiState.showSystemApps,
+                                            onCheckedChange = { onToggleSystemApps() },
+                                        )
+                                    },
+                                )
+                            }
+                        }
+                    },
+                    scrollBehavior = scrollBehavior,
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    ),
+                )
+            }
         },
     ) { innerPadding ->
         Column(
@@ -140,29 +225,31 @@ private fun UninstallUi(
                 .fillMaxSize()
         ) {
             // Search bar
-            SearchBar(
-                inputField = {
-                    SearchBarDefaults.InputField(
-                        query = uiState.searchQuery,
-                        onQueryChange = onSearchQueryChanged,
-                        onSearch = {},
-                        expanded = false,
-                        onExpandedChange = {},
-                        placeholder = { Text("Search apps…") },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Rounded.Search,
-                                contentDescription = null
-                            )
-                        },
-                    )
-                },
-                expanded = false,
-                onExpandedChange = {},
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-            ) {}
+            if (!uiState.isSelectionMode) {
+                SearchBar(
+                    inputField = {
+                        SearchBarDefaults.InputField(
+                            query = uiState.searchQuery,
+                            onQueryChange = onSearchQueryChanged,
+                            onSearch = {},
+                            expanded = false,
+                            onExpandedChange = {},
+                            placeholder = { Text("Search apps…") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Search,
+                                    contentDescription = null
+                                )
+                            },
+                        )
+                    },
+                    expanded = false,
+                    onExpandedChange = {},
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                ) {}
+            }
 
             when {
                 uiState.isLoading -> {
@@ -198,7 +285,11 @@ private fun UninstallUi(
                         ) { app ->
                             AppCard(
                                 app = app,
+                                isSelectionMode = uiState.isSelectionMode,
+                                isSelected = app.packageName in uiState.selectedPackages,
                                 onUninstall = { onUninstall(app.packageName) },
+                                onLongClick = { onToggleSelection(app.packageName) },
+                                onToggleSelect = { onToggleSelection(app.packageName) },
                                 modifier = Modifier.animateItem(),
                             )
                         }
@@ -212,10 +303,15 @@ private fun UninstallUi(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun AppCard(
     app: InstalledApp,
+    isSelectionMode: Boolean,
+    isSelected: Boolean,
     onUninstall: () -> Unit,
+    onLongClick: () -> Unit,
+    onToggleSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showConfirmDialog by remember { mutableStateOf(false) }
@@ -242,17 +338,37 @@ private fun AppCard(
                 Text("This will remove ${app.appName} (${app.packageName}) from your device.")
             },
             icon = {
-                Icon(
-                    imageVector = Icons.Rounded.DeleteOutline,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.error,
+                SubcomposeAsyncImage(
+                    model = ImageRequest.Builder(context)
+                        .data(AppIconData(app.packageName))
+                        .build(),
+                    contentDescription = app.appName,
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(MaterialTheme.shapes.medium),
+                    error = {
+                        Icon(
+                            imageVector = Icons.Rounded.DeleteOutline,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    },
+                    success = { SubcomposeAsyncImageContent() },
                 )
             }
         )
     }
 
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .combinedClickable(
+                onClick = {
+                    if (isSelectionMode) onToggleSelect() else showConfirmDialog = true
+                },
+                onLongClick = onLongClick,
+            ),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.elevatedCardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -265,6 +381,18 @@ private fun AppCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            // Selection indicator
+            if (isSelectionMode) {
+                Icon(
+                    imageVector = if (isSelected) Icons.Rounded.CheckCircle
+                        else Icons.Rounded.RadioButtonUnchecked,
+                    contentDescription = null,
+                    tint = if (isSelected) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp),
+                )
+            }
+
             SubcomposeAsyncImage(
                 model = ImageRequest.Builder(context)
                     .data(AppIconData(app.packageName))
@@ -309,16 +437,18 @@ private fun AppCard(
                 }
             }
 
-            // Delete button
-            FilledTonalIconButton(
-                onClick = { showConfirmDialog = true },
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.DeleteOutline,
-                    contentDescription = "Uninstall ${app.appName}",
-                    tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp),
-                )
+            // Delete button (only in normal mode)
+            if (!isSelectionMode) {
+                FilledTonalIconButton(
+                    onClick = { showConfirmDialog = true },
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.DeleteOutline,
+                        contentDescription = "Uninstall ${app.appName}",
+                        tint = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
             }
         }
     }

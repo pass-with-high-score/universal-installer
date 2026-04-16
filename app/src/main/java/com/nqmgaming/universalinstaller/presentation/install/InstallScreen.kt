@@ -5,8 +5,10 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -16,15 +18,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import com.nqmgaming.universalinstaller.data.local.InstallHistoryEntity
 import com.nqmgaming.universalinstaller.presentation.composable.SessionCard
 import com.nqmgaming.universalinstaller.util.extension.getDisplayName
 import com.ramcosta.composedestinations.annotation.Destination
@@ -41,10 +46,12 @@ import timber.log.Timber
 fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = koinViewModel()) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val history by viewModel.history.collectAsState()
 
     InstallUi(
         modifier = modifier,
         uiState = uiState,
+        history = history,
         onFilePicked = { uri, splitPackage, fileName ->
             viewModel.parseApkInfo(context, uri, splitPackage, fileName)
         },
@@ -52,6 +59,7 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
         onDismissPreview = viewModel::dismissPendingInstall,
         onCancel = viewModel::cancelSession,
         onRetry = viewModel::retrySession,
+        onClearHistory = viewModel::clearHistory,
     )
 }
 
@@ -60,11 +68,13 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
 private fun InstallUi(
     modifier: Modifier = Modifier,
     uiState: InstallUiState = InstallUiState(),
+    history: List<InstallHistoryEntity> = emptyList(),
     onFilePicked: (uri: Uri, splitPackage: SplitPackage.Provider, fileName: String) -> Unit = { _, _, _ -> },
     onConfirmInstall: () -> Unit = {},
     onDismissPreview: () -> Unit = {},
     onCancel: (java.util.UUID) -> Unit = {},
     onRetry: (java.util.UUID) -> Unit = {},
+    onClearHistory: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -138,7 +148,7 @@ private fun InstallUi(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // File picker card — always visible
+            // File picker card
             item(key = "file_picker") {
                 FilePickerCard(
                     isLoading = uiState.isLoading,
@@ -167,6 +177,37 @@ private fun InstallUi(
                         sessionProgress = sessionProgress,
                         onCancel = { onCancel(session.id) },
                         onRetry = { onRetry(session.id) },
+                        modifier = Modifier.animateItem(),
+                    )
+                }
+            }
+
+            // Install history
+            if (history.isNotEmpty()) {
+                item(key = "history_header") {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "History",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        TextButton(onClick = onClearHistory) {
+                            Text("Clear", style = MaterialTheme.typography.labelMedium)
+                        }
+                    }
+                }
+                items(
+                    items = history,
+                    key = { "history_${it.id}" }
+                ) { entry ->
+                    HistoryCard(
+                        entry = entry,
                         modifier = Modifier.animateItem(),
                     )
                 }

@@ -32,6 +32,9 @@ data class UninstallUiState(
     val searchQuery: String = "",
     val isLoading: Boolean = true,
     val showSystemApps: Boolean = false,
+    val selectedPackages: Set<String> = emptySet(),
+    val isSelectionMode: Boolean = false,
+    val isAllSelected: Boolean = false,
 )
 
 class UninstallViewModel(
@@ -43,13 +46,20 @@ class UninstallViewModel(
     private val _searchQuery = MutableStateFlow("")
     private val _isLoading = MutableStateFlow(true)
     private val _showSystemApps = MutableStateFlow(false)
+    private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
 
     val uiState: StateFlow<UninstallUiState> = combine(
         _apps,
         _searchQuery,
         _isLoading,
         _showSystemApps,
-    ) { apps, query, loading, showSystem ->
+        _selectedPackages,
+    ) { flows ->
+        val apps = flows[0] as List<InstalledApp>
+        val query = flows[1] as String
+        val loading = flows[2] as Boolean
+        val showSystem = flows[3] as Boolean
+        val selected = flows[4] as Set<String>
         val filtered = apps
             .filter { app ->
                 if (!showSystem && app.isSystemApp) return@filter false
@@ -64,6 +74,9 @@ class UninstallViewModel(
             searchQuery = query,
             isLoading = loading,
             showSystemApps = showSystem,
+            selectedPackages = selected,
+            isSelectionMode = selected.isNotEmpty(),
+            isAllSelected = filtered.isNotEmpty() && selected.containsAll(filtered.map { it.packageName }.toSet()),
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UninstallUiState())
 
@@ -77,6 +90,27 @@ class UninstallViewModel(
 
     fun toggleSystemApps() {
         _showSystemApps.value = !_showSystemApps.value
+    }
+
+    fun toggleSelection(packageName: String) {
+        _selectedPackages.value = _selectedPackages.value.toMutableSet().apply {
+            if (contains(packageName)) remove(packageName) else add(packageName)
+        }
+    }
+
+    fun clearSelection() {
+        _selectedPackages.value = emptySet()
+    }
+
+    fun toggleSelectAll() {
+        val allPackages = uiState.value.filteredApps.map { it.packageName }.toSet()
+        _selectedPackages.value = if (_selectedPackages.value == allPackages) emptySet() else allPackages
+    }
+
+    fun uninstallSelected() {
+        val packages = _selectedPackages.value.toList()
+        _selectedPackages.value = emptySet()
+        packages.forEach { uninstallApp(it) }
     }
 
     fun uninstallApp(packageName: String) {

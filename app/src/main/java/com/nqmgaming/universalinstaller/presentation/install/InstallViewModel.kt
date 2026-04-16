@@ -7,6 +7,7 @@ import android.os.Build
 import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.nqmgaming.universalinstaller.data.local.InstallHistoryDao
 import com.nqmgaming.universalinstaller.data.remote.VirusTotalService
 import com.nqmgaming.universalinstaller.domain.model.ApkInfo
 import com.nqmgaming.universalinstaller.domain.model.SessionData
@@ -39,16 +40,28 @@ class InstallViewModel(
     packageInstaller: PackageInstaller,
     private val sessionDataRepository: SessionDataRepository,
     private val virusTotalService: VirusTotalService,
+    private val historyDao: InstallHistoryDao,
 ) : ViewModel() {
 
-    private val defaultController = DefaultInstallController(packageInstaller, sessionDataRepository)
-    private val shizukuController = ShizukuInstallController(application, packageInstaller, sessionDataRepository)
+    private val defaultController = DefaultInstallController(packageInstaller, sessionDataRepository, historyDao)
+    private val shizukuController = ShizukuInstallController(application, packageInstaller, sessionDataRepository, historyDao)
 
     private val _isLoading = MutableStateFlow(false)
     private val _pendingApkInfo = MutableStateFlow<ApkInfo?>(null)
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
+
+    val history = historyDao.getAll()
+        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    fun clearHistory() {
+        viewModelScope.launch { historyDao.clearAll() }
+    }
+
+    fun deleteHistoryEntry(id: Long) {
+        viewModelScope.launch { historyDao.deleteById(id) }
+    }
 
     val uiState = combine(
         sessionDataRepository.sessions,
@@ -140,9 +153,9 @@ class InstallViewModel(
         return withContext(Dispatchers.IO) {
             try {
                 val bitmap = (drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
-                    ?: android.graphics.Bitmap.createBitmap(48, 48, android.graphics.Bitmap.Config.ARGB_8888).also { bmp ->
+                    ?: android.graphics.Bitmap.createBitmap(192, 192, android.graphics.Bitmap.Config.ARGB_8888).also { bmp ->
                         val canvas = android.graphics.Canvas(bmp)
-                        drawable.setBounds(0, 0, 48, 48)
+                        drawable.setBounds(0, 0, 192, 192)
                         drawable.draw(canvas)
                     }
                 val file = File(application.cacheDir, "session_icon_${System.currentTimeMillis()}.png")

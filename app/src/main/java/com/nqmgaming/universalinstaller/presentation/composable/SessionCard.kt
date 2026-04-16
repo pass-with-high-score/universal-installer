@@ -85,15 +85,14 @@ fun SessionCard(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // Header row: icon + name + action button (non-error)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // App icon or status icon
                 AppIcon(sessionData, hasError, isComplete)
 
-                // App name, file name, and status
                 Column(modifier = Modifier.weight(1f)) {
                     val displayName = sessionData.appName.ifEmpty { sessionData.name }
                     Text(
@@ -112,35 +111,21 @@ fun SessionCard(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    Text(
-                        text = when {
-                            hasError -> errorText
-                            isComplete -> "Installed successfully"
-                            else -> "${(progress * 100).toInt()}% installing…"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = when {
-                            hasError -> MaterialTheme.colorScheme.error
-                            isComplete -> MaterialTheme.colorScheme.tertiary
-                            else -> MaterialTheme.colorScheme.onSurfaceVariant
-                        },
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                    )
+                    if (!hasError) {
+                        Text(
+                            text = if (isComplete) "Installed successfully"
+                            else "${(progress * 100).toInt()}% installing…",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (isComplete) MaterialTheme.colorScheme.tertiary
+                            else MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
                 }
 
-                // Cancel / Retry button
-                if (hasError) {
-                    FilledTonalButton(onClick = onRetry) {
-                        Icon(
-                            imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "Retry",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(Modifier.width(4.dp))
-                        Text("Retry", style = MaterialTheme.typography.labelMedium)
-                    }
-                } else if (sessionData.isCancellable && !isComplete) {
+                // Cancel button (only when installing)
+                if (!hasError && sessionData.isCancellable && !isComplete) {
                     FilledTonalButton(onClick = onCancel) {
                         Icon(
                             imageVector = Icons.Rounded.Cancel,
@@ -150,6 +135,39 @@ fun SessionCard(
                         Spacer(Modifier.width(4.dp))
                         Text("Cancel", style = MaterialTheme.typography.labelMedium)
                     }
+                }
+            }
+
+            // Error section — full width below header
+            if (hasError) {
+                val parts = errorText.split("\n", limit = 2)
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = parts[0],
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                if (parts.size > 1) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = parts[1],
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.height(12.dp))
+                FilledTonalButton(
+                    onClick = onRetry,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Refresh,
+                        contentDescription = "Retry",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text("Retry", style = MaterialTheme.typography.labelMedium)
                 }
             }
 
@@ -166,7 +184,6 @@ fun SessionCard(
                     trackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
                 )
             } else if (!isComplete && !hasError) {
-                // Indeterminate progress
                 Spacer(Modifier.height(12.dp))
                 LinearProgressIndicator(
                     modifier = Modifier

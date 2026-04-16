@@ -1,7 +1,9 @@
 package com.nqmgaming.universalinstaller.presentation.install.controller
 
 import android.net.Uri
-import com.nqmgaming.universalinstaller.R
+import com.nqmgaming.universalinstaller.data.local.InstallHistoryDao
+import com.nqmgaming.universalinstaller.presentation.install.InstallErrorHelper
+import com.nqmgaming.universalinstaller.data.local.InstallHistoryEntity
 import com.nqmgaming.universalinstaller.domain.model.SessionData
 import com.nqmgaming.universalinstaller.domain.repository.SessionDataRepository
 import kotlinx.coroutines.CancellationException
@@ -25,6 +27,7 @@ import java.util.UUID
 abstract class BaseInstallController(
     protected val packageInstaller: PackageInstaller,
     protected val sessionDataRepository: SessionDataRepository,
+    protected val historyDao: InstallHistoryDao,
 ) {
     private val activeSessions = mutableMapOf<UUID, ProgressSession<InstallFailure>>()
     private val sessionUris = mutableMapOf<UUID, List<Uri>>()
@@ -69,7 +72,7 @@ abstract class BaseInstallController(
         install(
             uris = uris,
             sessionData = SessionData(
-                id = UUID.randomUUID(), // placeholder, replaced by install()
+                id = UUID.randomUUID(),
                 name = oldSession.name,
                 appName = oldSession.appName,
                 iconPath = oldSession.iconPath,
@@ -103,13 +106,20 @@ abstract class BaseInstallController(
                 }
                 .launchIn(this)
             try {
+                val sessionData = sessionDataRepository.sessions.value.find { it.id == session.id }
                 when (val result = session.await()) {
                     Session.State.Succeeded -> {
+                        saveHistory(sessionData, success = true)
                         sessionDataRepository.removeSessionData(session.id)
                         activeSessions.remove(session.id)
                         sessionUris.remove(session.id)
                     }
-                    is Session.State.Failed -> handleError(result.failure.message, session.id)
+                    is Session.State.Failed -> {
+                        val errorInfo = InstallErrorHelper.getErrorInfo(result.failure)
+                        val fullMessage = "${errorInfo.title}\n${errorInfo.guidance}"
+                        saveHistory(sessionData, success = false, errorMessage = errorInfo.title)
+                        handleError(fullMessage, session.id)
+                    }
                 }
             } catch (e: CancellationException) {
                 sessionDataRepository.removeSessionData(session.id)
@@ -123,12 +133,30 @@ abstract class BaseInstallController(
         }
     }
 
-    private fun handleError(message: String?, sessionId: UUID) {
-        val err = if (message != null) {
-            ResolvableString.transientResource(R.string.session_error_with_reason, message)
-        } else {
-            ResolvableString.transientResource(R.string.session_error)
+    private suspend fun saveHistory(
+        sessionData: SessionData?,
+        success: Boolean,
+        errorMessage: String? = null,
+    ) {
+        if (sessionData == null) return
+        try {
+            historyDao.insert(
+                InstallHistoryEntity(
+                    appName = sessionData.appName.ifEmpty { sessionData.name },
+                    packageName = "",
+                    fileName = sessionData.name,
+                    iconPath = sessionData.iconPath,
+                    success = success,
+                    errorMessage = errorMessage,
+                )
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to save install history")
         }
+    }
+
+    private fun handleError(message: String?, sessionId: UUID) {
+        val err = ResolvableString.raw(message ?: "Installation failed")
         sessionDataRepository.setError(sessionId, err)
     }
 }

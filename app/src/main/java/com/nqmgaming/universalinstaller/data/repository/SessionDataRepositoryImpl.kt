@@ -35,8 +35,8 @@ class SessionDataRepositoryImpl(private val savedStateHandle: SavedStateHandle) 
     )
 
     override fun addSessionData(sessionData: SessionData) {
-        _sessions += sessionData
-        _sessionsProgress += SessionProgress(sessionData.id, Progress())
+        _sessions = listOf(sessionData) + _sessions
+        _sessionsProgress = listOf(SessionProgress(sessionData.id, Progress())) + _sessionsProgress
     }
 
     override fun removeSessionData(id: UUID) {

@@ -27,6 +27,7 @@ object PreferencesKeys {
     val THEME_MODE = stringPreferencesKey("theme_mode")
     val USE_SHIZUKU = booleanPreferencesKey("use_shizuku")
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")
+    val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
 
     // Shizuku install options
     val SHIZUKU_BYPASS_LOW_TARGET_SDK = booleanPreferencesKey("shizuku_bypass_low_target_sdk")
@@ -63,6 +64,7 @@ data class SettingUiState(
     val themeMode: ThemeMode = ThemeMode.System,
     val useShizuku: Boolean = false,
     val virusTotalApiKey: String = "",
+    val deleteApkAfterInstall: Boolean = false,
     val shizukuState: ShizukuState = ShizukuState.NOT_INSTALLED,
     val shizukuAvailable: Boolean = false,
     val shizukuOptions: ShizukuOptions = ShizukuOptions(),
@@ -162,13 +164,11 @@ class SettingViewModel(
      */
     fun setUseShizuku(enabled: Boolean) {
         if (enabled) {
-            // Check if Shizuku binder is alive
             if (_shizukuState.value == ShizukuState.NOT_RUNNING ||
                 _shizukuState.value == ShizukuState.NOT_INSTALLED
             ) {
                 return
             }
-            // Check permission
             try {
                 if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
                     _shizukuState.value = ShizukuState.READY
@@ -177,11 +177,8 @@ class SettingViewModel(
                             prefs[PreferencesKeys.USE_SHIZUKU] = true
                         }
                     }
-                } else if (Shizuku.shouldShowRequestPermissionRationale()) {
-                    // User previously denied and chose "Don't ask again"
-                    _shizukuState.value = ShizukuState.NO_PERMISSION
                 } else {
-                    // Request permission — result comes via permissionResultListener
+                    // Always request permission — Shizuku service shows its own dialog
                     Shizuku.requestPermission(0)
                 }
             } catch (e: Exception) {

@@ -1,6 +1,8 @@
 package com.nqmgaming.universalinstaller.di
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.room.Room
+import com.nqmgaming.universalinstaller.data.local.AppDatabase
 import com.nqmgaming.universalinstaller.data.remote.VirusTotalService
 import com.nqmgaming.universalinstaller.data.repository.SessionDataRepositoryImpl
 import com.nqmgaming.universalinstaller.domain.repository.SessionDataRepository
@@ -21,6 +23,13 @@ val appModule = module {
     single { PackageUninstaller.getInstance(get()) }
     factory { (handle: SavedStateHandle) -> SessionDataRepositoryImpl(handle) }
     singleOf(::SessionDataRepositoryImpl) { bind<SessionDataRepository>() }
+
+    // Room
+    single {
+        Room.databaseBuilder(get(), AppDatabase::class.java, "universal_installer.db")
+            .build()
+    }
+    single { get<AppDatabase>().installHistoryDao() }
 
     // Ktor HttpClient
     single { HttpClient(CIO) }

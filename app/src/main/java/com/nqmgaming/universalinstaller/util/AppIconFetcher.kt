@@ -19,7 +19,7 @@ class AppIconFetcher(
 ) : Fetcher {
     override suspend fun fetch(): FetchResult {
         val drawable = context.packageManager.getApplicationIcon(data.packageName)
-        val bitmap = drawable.toBitmap(48, 48)
+        val bitmap = drawable.toBitmap(192, 192)
         return ImageFetchResult(
             image = bitmap.asImage(),
             isSampled = false,
