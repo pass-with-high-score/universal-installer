@@ -1,38 +1,35 @@
-Universal Installer is a powerful and modern Android package installer that supports all APK formats.
+Universal Installer is a modern Android package manager that handles what the default installer can't — split APKs, bundled packages, and silent installations.
 
-🚀 Multi-format Support
-Install .apk, .apks, .xapk, and .apkm files seamlessly. Universal Installer handles split APK bundles with ease, powered by the Ackpine library for maximum reliability.
+<b>Supported Formats</b>
+• APK — Standard Android packages
+• APKS — Split APK bundles
+• XAPK — Compressed split bundles (APKPure format)
+• APKM — Split bundles (APKMirror format)
 
-🔍 APK Analysis
-Before installing, preview detailed information about the APK:
-• App name, icon, and version
-• Package name and file size
-• Required permissions
-• Supported CPU architectures (ABIs)
-• Supported languages
-• Minimum Android version required
+<b>Key Features</b>
+• Install split APK packages that the default installer rejects
+• Preview APK details before installing — app name, version, permissions, architectures, languages
+• VirusTotal malware scanning — check files for threats before installation
+• Installation history — track every install with status and timestamp
+• Batch uninstall — long-press to select multiple apps and remove them at once
+• Search and filter installed apps including system apps
+• Auto-delete source file after successful install (optional)
+• Light, dark, and system theme support with Material You
 
-⚡ Shizuku Silent Install
-Skip the system confirmation dialog with Shizuku integration. Install and uninstall apps silently — perfect for power users and developers.
+<b>Shizuku Mode (Optional)</b>
+For advanced users with Shizuku installed:
+• Silent install without user prompts
+• Replace existing packages
+• Allow version downgrades
+• Auto-grant permissions
+• Install for all users
+• Bypass low target SDK restrictions
+• Allow test/debug packages
 
-🛡️ VirusTotal Security Scanning
-Automatically scan APK files for malware before installation using the VirusTotal API. Stay safe with real-time threat detection from 70+ antivirus engines.
+<b>Privacy</b>
+• No internet required for core functionality
+• VirusTotal scanning is optional and requires your own API key
+• No ads, no tracking, no data collection
+• Fully open source — inspect the code yourself
 
-📱 App Manager
-Browse, search, and uninstall installed apps. Filter between user and system apps with a clean, searchable interface.
-
-🎨 Material You Design
-Beautiful Material 3 UI with dynamic theming, supporting both light and dark modes. Smooth animations and modern design language throughout.
-
-📂 File Association
-Open APK files directly from any file manager — Universal Installer registers as a handler for all supported formats.
-
-Key Features:
-• Split APK support (APKS, XAPK, APKM)
-• Shizuku silent install/uninstall
-• VirusTotal malware scanning
-• Detailed APK info preview
-• App uninstall manager
-• Material 3 dynamic theming
-• Light and dark mode
-• No ads, no tracking
+Source code: https://github.com/pass-with-high-score/universal-installer

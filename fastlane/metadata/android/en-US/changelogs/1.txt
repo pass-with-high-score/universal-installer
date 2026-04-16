@@ -1,9 +1,10 @@
 Initial release
 
-• Multi-format APK installer (APK, APKS, XAPK, APKM)
-• Split APK support via Ackpine
-• Shizuku silent install/uninstall
+• Install APK, APKS, XAPK, and APKM packages
+• APK preview with detailed info before install
 • VirusTotal malware scanning
-• APK info preview (icon, permissions, ABIs, languages)
-• App uninstall manager
-• Material 3 UI with dark mode
+• Shizuku silent install with advanced options
+• Batch uninstall with multi-select
+• Installation history tracking
+• Auto-delete APK after install option
+• Material You theming (light/dark/system)

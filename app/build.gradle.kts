@@ -24,7 +24,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -83,11 +84,11 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
 
-    implementation("io.github.raamcosta.compose-destinations:core:2.2.0")
-    ksp("io.github.raamcosta.compose-destinations:ksp:2.2.0")
-    implementation("io.github.raamcosta.compose-destinations:bottom-sheet:2.2.0")
+    implementation(libs.core)
+    ksp(libs.compose.destinations.ksp)
+    implementation(libs.bottom.sheet)
 
-    implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation(libs.timber)
 
     implementation(libs.ktor.client.core)
     implementation(libs.ktor.client.cio)
