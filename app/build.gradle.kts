@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "com.nqmgaming.universalinstaller"
+    namespace = "app.pwhs.universalinstaller"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.nqmgaming.universalinstaller"
+        applicationId = "com.app.universalinstaller"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
