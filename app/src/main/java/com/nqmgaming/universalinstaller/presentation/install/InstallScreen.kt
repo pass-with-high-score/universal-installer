@@ -19,11 +19,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -70,41 +67,31 @@ private fun InstallUi(
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
-    val result = remember { mutableStateOf<Uri?>(null) }
     val filePickerLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
-            result.value = it
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
+            if (uri == null) return@rememberLauncherForActivityResult
+            val mimeType = context.contentResolver.getType(uri)?.lowercase()
+            val displayName = context.contentResolver.getDisplayName(uri)
+            val extension = displayName.substringAfterLast('.', "").lowercase()
+            Timber.d("Selected file: $uri, MIME type: $mimeType")
+            val apks = when {
+                (mimeType == "application/vnd.android.package-archive" || extension == "apk") -> SingletonApkSequence(
+                    uri,
+                    context
+                ).toSplitPackage()
+
+                extension in listOf("apks", "xapk", "apkm", "zip") -> ZippedApkSplits.getApksForUri(
+                    uri,
+                    context
+                )
+                    .validate()
+                    .toSplitPackage()
+                    .filterCompatible(context)
+
+                else -> SplitPackage.empty()
+            }
+            onFilePicked(uri, apks, displayName)
         }
-
-    fun getApksFromUri(uri: Uri): SplitPackage.Provider {
-        val mimeType = context.contentResolver.getType(uri)?.lowercase()
-        val displayName = context.contentResolver.getDisplayName(uri)
-        val extension = displayName.substringAfterLast('.', "").lowercase()
-        Timber.d("Selected file: $uri, MIME type: $mimeType")
-        return when {
-            (mimeType == "application/vnd.android.package-archive" || extension == "apk") -> SingletonApkSequence(
-                uri,
-                context
-            ).toSplitPackage()
-
-            extension in listOf("apks", "xapk", "apkm", "zip") -> ZippedApkSplits.getApksForUri(
-                uri,
-                context
-            )
-                .validate()
-                .toSplitPackage()
-                .filterCompatible(context)
-
-            else -> SplitPackage.empty()
-        }
-    }
-
-    LaunchedEffect(result.value) {
-        val uri = result.value ?: return@LaunchedEffect
-        val name = context.contentResolver.getDisplayName(uri)
-        val apks = getApksFromUri(uri)
-        onFilePicked(uri, apks, name)
-    }
 
     // APK Info Preview Bottom Sheet
     if (uiState.pendingApkInfo != null) {
