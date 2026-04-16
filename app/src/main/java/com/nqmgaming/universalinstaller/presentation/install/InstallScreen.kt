@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,8 +39,10 @@ import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Storage
-import androidx.compose.material3.AssistChip
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
@@ -55,7 +58,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.ui.graphics.Color
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -75,6 +77,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import com.nqmgaming.universalinstaller.domain.model.ApkInfo
 import com.nqmgaming.universalinstaller.presentation.composable.EmptyStateView
+import com.nqmgaming.universalinstaller.ui.theme.LocalExtendedColors
 import com.nqmgaming.universalinstaller.presentation.composable.SessionCard
 import com.nqmgaming.universalinstaller.util.extension.getDisplayName
 import com.ramcosta.composedestinations.annotation.Destination
@@ -174,8 +177,10 @@ private fun InstallUi(
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             LargeTopAppBar(
+                expandedHeight = 120.dp,
                 title = {
                     Text(
                         text = "Install Package",
@@ -184,7 +189,7 @@ private fun InstallUi(
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.background,
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
             )
@@ -260,6 +265,7 @@ private fun InstallUi(
                             sessionData = session,
                             sessionProgress = sessionProgress,
                             onCancel = { onCancel(session.id) },
+                            modifier = Modifier.animateItem(),
                         )
                     }
                 }
@@ -334,53 +340,32 @@ private fun ApkInfoContent(
             modifier = Modifier.fillMaxWidth(),
         ) {
             if (apkInfo.versionName.isNotBlank()) {
-                AssistChip(
-                    onClick = {},
-                    label = { Text("v${apkInfo.versionName}", style = MaterialTheme.typography.labelSmall) },
+                InfoChip(
+                    label = "v${apkInfo.versionName}",
                     leadingIcon = {
                         Icon(Icons.Rounded.Android, null, modifier = Modifier.size(16.dp))
                     },
                 )
             }
             if (apkInfo.fileSizeBytes > 0) {
-                AssistChip(
-                    onClick = {},
-                    label = {
-                        Text(
-                            Formatter.formatShortFileSize(context, apkInfo.fileSizeBytes),
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
+                InfoChip(
+                    label = Formatter.formatShortFileSize(context, apkInfo.fileSizeBytes),
                     leadingIcon = {
                         Icon(Icons.Rounded.Storage, null, modifier = Modifier.size(16.dp))
                     },
                 )
             }
-            AssistChip(
-                onClick = {},
-                label = { Text(apkInfo.fileFormat, style = MaterialTheme.typography.labelSmall) },
-            )
+            InfoChip(label = apkInfo.fileFormat)
             if (apkInfo.minSdkVersion > 0) {
-                AssistChip(
-                    onClick = {},
-                    label = {
-                        Text(
-                            "Android ${sdkToAndroid(apkInfo.minSdkVersion)}+",
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    },
+                InfoChip(
+                    label = "Android ${sdkToAndroid(apkInfo.minSdkVersion)}+",
                     leadingIcon = {
                         Icon(Icons.Rounded.PhoneAndroid, null, modifier = Modifier.size(16.dp))
                     },
                 )
             }
             if (apkInfo.splitCount > 1) {
-                AssistChip(
-                    onClick = {},
-                    label = {
-                        Text("${apkInfo.splitCount} splits", style = MaterialTheme.typography.labelSmall)
-                    },
-                )
+                InfoChip(label = "${apkInfo.splitCount} splits")
             }
         }
 
@@ -439,10 +424,7 @@ private fun ApkInfoContent(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         apkInfo.supportedAbis.forEach { abi ->
-                            AssistChip(
-                                onClick = {},
-                                label = { Text(abi, style = MaterialTheme.typography.labelSmall) },
-                            )
+                            InfoChip(label = abi)
                         }
                     }
                 }
@@ -480,21 +462,10 @@ private fun ApkInfoContent(
                         verticalArrangement = Arrangement.spacedBy(4.dp),
                     ) {
                         apkInfo.supportedLanguages.take(20).forEach { lang ->
-                            AssistChip(
-                                onClick = {},
-                                label = { Text(lang, style = MaterialTheme.typography.labelSmall) },
-                            )
+                            InfoChip(label = lang)
                         }
                         if (apkInfo.supportedLanguages.size > 20) {
-                            AssistChip(
-                                onClick = {},
-                                label = {
-                                    Text(
-                                        "+${apkInfo.supportedLanguages.size - 20} more",
-                                        style = MaterialTheme.typography.labelSmall
-                                    )
-                                },
-                            )
+                            InfoChip(label = "+${apkInfo.supportedLanguages.size - 20} more")
                         }
                     }
                 }
@@ -504,10 +475,12 @@ private fun ApkInfoContent(
         // VirusTotal Security Scan
         apkInfo.vtResult?.let { vt ->
             Spacer(Modifier.height(16.dp))
+            val extendedColors = LocalExtendedColors.current
+            val warningColor = extendedColors.warning
             val vtColor = when (vt.status) {
                 com.nqmgaming.universalinstaller.domain.model.VtStatus.CLEAN -> MaterialTheme.colorScheme.primary
                 com.nqmgaming.universalinstaller.domain.model.VtStatus.MALICIOUS -> MaterialTheme.colorScheme.error
-                com.nqmgaming.universalinstaller.domain.model.VtStatus.SUSPICIOUS -> Color(0xFFFF9800)
+                com.nqmgaming.universalinstaller.domain.model.VtStatus.SUSPICIOUS -> warningColor
                 com.nqmgaming.universalinstaller.domain.model.VtStatus.SCANNING -> MaterialTheme.colorScheme.tertiary
                 else -> MaterialTheme.colorScheme.onSurfaceVariant
             }
@@ -515,7 +488,7 @@ private fun ApkInfoContent(
                 com.nqmgaming.universalinstaller.domain.model.VtStatus.MALICIOUS ->
                     MaterialTheme.colorScheme.errorContainer
                 com.nqmgaming.universalinstaller.domain.model.VtStatus.SUSPICIOUS ->
-                    Color(0xFFFFF3E0)
+                    extendedColors.warningContainer
                 else -> MaterialTheme.colorScheme.surfaceContainerLow
             }
             ElevatedCard(
@@ -558,11 +531,20 @@ private fun ApkInfoContent(
                             )
                         }
                         com.nqmgaming.universalinstaller.domain.model.VtStatus.CLEAN -> {
-                            Text(
-                                text = "✅ No threats detected",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.primary,
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.CheckCircle,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    text = "No threats detected",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
                             Text(
                                 text = "${vt.harmless} engines confirmed safe · ${vt.undetected} undetected",
                                 style = MaterialTheme.typography.labelSmall,
@@ -570,11 +552,20 @@ private fun ApkInfoContent(
                             )
                         }
                         com.nqmgaming.universalinstaller.domain.model.VtStatus.MALICIOUS -> {
-                            Text(
-                                text = "⚠️ ${vt.malicious} engine(s) detected threats!",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.error,
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Warning,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    text = "${vt.malicious} engine(s) detected threats!",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            }
                             Text(
                                 text = "${vt.malicious} malicious · ${vt.suspicious} suspicious · ${vt.harmless} harmless",
                                 style = MaterialTheme.typography.labelSmall,
@@ -582,11 +573,20 @@ private fun ApkInfoContent(
                             )
                         }
                         com.nqmgaming.universalinstaller.domain.model.VtStatus.SUSPICIOUS -> {
-                            Text(
-                                text = "⚠️ ${vt.suspicious} engine(s) flagged as suspicious",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = Color(0xFFFF9800),
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Warning,
+                                    contentDescription = null,
+                                    tint = warningColor,
+                                    modifier = Modifier.size(16.dp),
+                                )
+                                Spacer(Modifier.width(4.dp))
+                                Text(
+                                    text = "${vt.suspicious} engine(s) flagged as suspicious",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = warningColor,
+                                )
+                            }
                             Text(
                                 text = "${vt.suspicious} suspicious · ${vt.harmless} harmless · ${vt.undetected} undetected",
                                 style = MaterialTheme.typography.labelSmall,
@@ -714,6 +714,28 @@ private fun InfoRow(label: String, value: String) {
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
         )
+    }
+}
+
+@Composable
+private fun InfoChip(
+    label: String,
+    leadingIcon: @Composable (() -> Unit)? = null,
+) {
+    Surface(
+        shape = MaterialTheme.shapes.small,
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        tonalElevation = 0.dp,
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            leadingIcon?.invoke()
+            Text(label, style = MaterialTheme.typography.labelSmall)
+        }
     }
 }
 

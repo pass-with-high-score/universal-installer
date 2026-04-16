@@ -10,6 +10,10 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 
@@ -86,6 +90,31 @@ val ExpressiveShapes = Shapes(
     extraLarge = RoundedCornerShape(28.dp),
 )
 
+// ── Extended colors not covered by Material 3 ──────────
+@Immutable
+data class ExtendedColors(
+    val warning: Color = Color.Unspecified,
+    val onWarning: Color = Color.Unspecified,
+    val warningContainer: Color = Color.Unspecified,
+    val success: Color = Color.Unspecified,
+)
+
+val LocalExtendedColors = staticCompositionLocalOf { ExtendedColors() }
+
+private val LightExtendedColors = ExtendedColors(
+    warning = WarningLight,
+    onWarning = Color(0xFFFFFFFF),
+    warningContainer = Color(0xFFFFF3E0),
+    success = SuccessLight,
+)
+
+private val DarkExtendedColors = ExtendedColors(
+    warning = WarningDark,
+    onWarning = Color(0xFF3E2700),
+    warningContainer = Color(0xFF4E3600),
+    success = SuccessDark,
+)
+
 @Composable
 fun UniversalInstallerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -101,10 +130,14 @@ fun UniversalInstallerTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        shapes = ExpressiveShapes,
-        content = content
-    )
+    val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors
+
+    CompositionLocalProvider(LocalExtendedColors provides extendedColors) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = Typography,
+            shapes = ExpressiveShapes,
+            content = content
+        )
+    }
 }

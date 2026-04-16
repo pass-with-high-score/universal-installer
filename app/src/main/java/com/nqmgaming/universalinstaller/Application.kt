@@ -1,13 +1,16 @@
 package com.nqmgaming.universalinstaller
 
 import android.app.Application
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
 import com.nqmgaming.universalinstaller.di.appModule
+import com.nqmgaming.universalinstaller.util.AppIconFetcher
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.GlobalContext.startKoin
 import timber.log.Timber
 
-class App : Application() {
+class App : Application(), SingletonImageLoader.Factory {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
@@ -18,5 +21,13 @@ class App : Application() {
             androidContext(this@App)
             modules(appModule)
         }
+    }
+
+    override fun newImageLoader(context: android.content.Context): ImageLoader {
+        return ImageLoader.Builder(context)
+            .components {
+                add(AppIconFetcher.Factory(context))
+            }
+            .build()
     }
 }

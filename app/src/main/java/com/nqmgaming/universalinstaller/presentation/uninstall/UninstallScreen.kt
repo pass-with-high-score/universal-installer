@@ -1,15 +1,9 @@
 package com.nqmgaming.universalinstaller.presentation.uninstall
 
-import android.graphics.drawable.Drawable
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,12 +49,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
+import coil3.request.ImageRequest
+import com.nqmgaming.universalinstaller.util.AppIconData
 import com.nqmgaming.universalinstaller.domain.model.InstalledApp
 import com.nqmgaming.universalinstaller.presentation.composable.EmptyStateView
 import com.ramcosta.composedestinations.annotation.Destination
@@ -95,8 +91,10 @@ private fun UninstallUi(
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+        contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             LargeTopAppBar(
+                expandedHeight = 120.dp,
                 title = {
                     Text(
                         text = "Uninstall",
@@ -130,7 +128,7 @@ private fun UninstallUi(
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.background,
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
             )
@@ -201,6 +199,7 @@ private fun UninstallUi(
                             AppCard(
                                 app = app,
                                 onUninstall = { onUninstall(app.packageName) },
+                                modifier = Modifier.animateItem(),
                             )
                         }
                         item {
@@ -221,15 +220,6 @@ private fun AppCard(
 ) {
     var showConfirmDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
-    // Load icon lazily per-item — avoids loading all icons at once
-    val icon: Drawable? = remember(app.packageName) {
-        try {
-            context.packageManager.getApplicationIcon(app.packageName)
-        } catch (_: Exception) {
-            null
-        }
-    }
 
     if (showConfirmDialog) {
         AlertDialog(
@@ -275,23 +265,24 @@ private fun AppCard(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // App icon — loaded lazily, high-res bitmap
-            if (icon != null) {
-                Image(
-                    bitmap = icon.toBitmap(128, 128).asImageBitmap(),
-                    contentDescription = app.appName,
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(MaterialTheme.shapes.medium)
-                )
-            } else {
-                Icon(
-                    imageVector = Icons.Rounded.Android,
-                    contentDescription = null,
-                    modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                )
-            }
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(AppIconData(app.packageName))
+                    .build(),
+                contentDescription = app.appName,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                error = {
+                    Icon(
+                        imageVector = Icons.Rounded.Android,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                    )
+                },
+                success = { SubcomposeAsyncImageContent() },
+            )
 
             // App info
             Column(modifier = Modifier.weight(1f)) {
