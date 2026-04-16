@@ -68,7 +68,7 @@ fun SplashScreen(
             verticalArrangement = Arrangement.Center,
         ) {
             Image(
-                painter = painterResource(R.drawable.ic_launcher_foreground),
+                painter = painterResource(R.drawable.logo),
                 contentDescription = null,
                 modifier = Modifier.size(96.dp),
             )
