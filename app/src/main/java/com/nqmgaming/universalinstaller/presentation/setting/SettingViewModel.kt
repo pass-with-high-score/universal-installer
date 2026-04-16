@@ -23,10 +23,18 @@ import timber.log.Timber
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
-private object PreferencesKeys {
+object PreferencesKeys {
     val THEME_MODE = stringPreferencesKey("theme_mode")
     val USE_SHIZUKU = booleanPreferencesKey("use_shizuku")
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")
+
+    // Shizuku install options
+    val SHIZUKU_BYPASS_LOW_TARGET_SDK = booleanPreferencesKey("shizuku_bypass_low_target_sdk")
+    val SHIZUKU_ALLOW_TEST = booleanPreferencesKey("shizuku_allow_test")
+    val SHIZUKU_REPLACE_EXISTING = booleanPreferencesKey("shizuku_replace_existing")
+    val SHIZUKU_REQUEST_DOWNGRADE = booleanPreferencesKey("shizuku_request_downgrade")
+    val SHIZUKU_GRANT_ALL_PERMISSIONS = booleanPreferencesKey("shizuku_grant_all_permissions")
+    val SHIZUKU_ALL_USERS = booleanPreferencesKey("shizuku_all_users")
 }
 
 enum class ThemeMode(val label: String) {
@@ -42,12 +50,22 @@ enum class ShizukuState {
     READY,
 }
 
+data class ShizukuOptions(
+    val bypassLowTargetSdk: Boolean = false,
+    val allowTest: Boolean = false,
+    val replaceExisting: Boolean = false,
+    val requestDowngrade: Boolean = false,
+    val grantAllPermissions: Boolean = false,
+    val allUsers: Boolean = false,
+)
+
 data class SettingUiState(
     val themeMode: ThemeMode = ThemeMode.System,
     val useShizuku: Boolean = false,
     val virusTotalApiKey: String = "",
     val shizukuState: ShizukuState = ShizukuState.NOT_INSTALLED,
     val shizukuAvailable: Boolean = false,
+    val shizukuOptions: ShizukuOptions = ShizukuOptions(),
     val appVersion: String = "",
 )
 
@@ -97,20 +115,34 @@ class SettingViewModel(
             prefs[PreferencesKeys.VIRUSTOTAL_API_KEY] ?: ""
         },
         _shizukuState,
-    ) { theme, useShizuku, vtKey, shizukuState ->
+        dataStore.data.map { prefs ->
+            ShizukuOptions(
+                bypassLowTargetSdk = prefs[PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK] ?: false,
+                allowTest = prefs[PreferencesKeys.SHIZUKU_ALLOW_TEST] ?: false,
+                replaceExisting = prefs[PreferencesKeys.SHIZUKU_REPLACE_EXISTING] ?: false,
+                requestDowngrade = prefs[PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE] ?: false,
+                grantAllPermissions = prefs[PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS] ?: false,
+                allUsers = prefs[PreferencesKeys.SHIZUKU_ALL_USERS] ?: false,
+            )
+        },
+    ) { flows ->
+        val theme = flows[0] as ThemeMode
+        val useShizuku = flows[1] as Boolean
+        val vtKey = flows[2] as String
+        val shizukuState = flows[3] as ShizukuState
+        val shizukuOpts = flows[4] as ShizukuOptions
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
                 .versionName ?: ""
-        } catch (_: Exception) {
-            ""
-        }
+        } catch (_: Exception) { "" }
         SettingUiState(
             themeMode = theme,
             useShizuku = useShizuku && shizukuState == ShizukuState.READY,
             virusTotalApiKey = vtKey,
             shizukuState = shizukuState,
             shizukuAvailable = shizukuState == ShizukuState.READY || shizukuState == ShizukuState.NO_PERMISSION,
+            shizukuOptions = shizukuOpts,
             appVersion = versionName,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingUiState())
@@ -161,6 +193,12 @@ class SettingViewModel(
                     prefs[PreferencesKeys.USE_SHIZUKU] = false
                 }
             }
+        }
+    }
+
+    fun setShizukuOption(key: Preferences.Key<Boolean>, value: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs -> prefs[key] = value }
         }
     }
 

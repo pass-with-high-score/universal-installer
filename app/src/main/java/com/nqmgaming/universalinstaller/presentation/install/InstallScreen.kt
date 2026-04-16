@@ -51,6 +51,7 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
         onConfirmInstall = viewModel::confirmInstall,
         onDismissPreview = viewModel::dismissPendingInstall,
         onCancel = viewModel::cancelSession,
+        onRetry = viewModel::retrySession,
     )
 }
 
@@ -63,6 +64,7 @@ private fun InstallUi(
     onConfirmInstall: () -> Unit = {},
     onDismissPreview: () -> Unit = {},
     onCancel: (java.util.UUID) -> Unit = {},
+    onRetry: (java.util.UUID) -> Unit = {},
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -164,6 +166,7 @@ private fun InstallUi(
                         sessionData = session,
                         sessionProgress = sessionProgress,
                         onCancel = { onCancel(session.id) },
+                        onRetry = { onRetry(session.id) },
                         modifier = Modifier.animateItem(),
                     )
                 }

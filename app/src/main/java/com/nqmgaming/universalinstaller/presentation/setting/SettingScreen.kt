@@ -49,6 +49,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.datastore.preferences.core.Preferences
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -67,6 +68,7 @@ fun SettingScreen(modifier: Modifier = Modifier, viewModel: SettingViewModel = k
         onThemeChanged = viewModel::setThemeMode,
         onShizukuChanged = viewModel::setUseShizuku,
         onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
+        onShizukuOptionChanged = viewModel::setShizukuOption,
     )
 }
 
@@ -78,6 +80,7 @@ private fun SettingUi(
     onThemeChanged: (ThemeMode) -> Unit = {},
     onShizukuChanged: (Boolean) -> Unit = {},
     onVirusTotalKeyChanged: (String) -> Unit = {},
+    onShizukuOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -153,6 +156,50 @@ private fun SettingUi(
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
+                }
+            }
+
+            // ── Shizuku Options Section (visible when Shizuku enabled) ──
+            if (uiState.useShizuku) {
+                item {
+                    SettingsSection(title = "Shizuku Options", icon = Icons.Rounded.AdminPanelSettings) {
+                        ShizukuOptionItem(
+                            title = "Replace existing",
+                            subtitle = "Replace already installed packages",
+                            checked = uiState.shizukuOptions.replaceExisting,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_REPLACE_EXISTING, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = "Allow downgrade",
+                            subtitle = "Allow installing older version over newer",
+                            checked = uiState.shizukuOptions.requestDowngrade,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = "Grant all permissions",
+                            subtitle = "Auto-grant all requested permissions",
+                            checked = uiState.shizukuOptions.grantAllPermissions,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = "Allow test packages",
+                            subtitle = "Allow installing debug/test APKs",
+                            checked = uiState.shizukuOptions.allowTest,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_ALLOW_TEST, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = "Bypass low target SDK block",
+                            subtitle = "Install apps targeting old SDK versions",
+                            checked = uiState.shizukuOptions.bypassLowTargetSdk,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = "Install for all users",
+                            subtitle = "Install package for all device users",
+                            checked = uiState.shizukuOptions.allUsers,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_ALL_USERS, it) },
+                        )
+                    }
                 }
             }
 
@@ -318,4 +365,29 @@ private fun SettingsSection(
             content()
         }
     }
+}
+
+@Composable
+private fun ShizukuOptionItem(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    ListItem(
+        headlineContent = {
+            Text(title, style = MaterialTheme.typography.bodyMedium)
+        },
+        supportingContent = {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        trailingContent = {
+            Switch(checked = checked, onCheckedChange = onCheckedChange)
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    )
 }
