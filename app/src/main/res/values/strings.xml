@@ -142,6 +142,11 @@
     <string name="setting_section_appearance">Appearance</string>
     <string name="setting_theme_title">Theme</string>
     <string name="setting_theme_subtitle">Choose your preferred theme</string>
+    <string name="setting_language_title">Language</string>
+    <string name="setting_language_subtitle">Change app language</string>
+    <string name="language_screen_title">Language</string>
+    <string name="back_cd">Back</string>
+    <string name="done_cd">Done</string>
     <string name="setting_section_about">About</string>
     <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">Version %s</string>

@@ -143,7 +143,7 @@
     <string name="installer_mode_using">%s का उपयोग कर रहा है</string>
 
     <string name="install_error_cancelled_title">इंस्टॉलेशन रद्द हो गया</string>
-    <string name="install_error_cancelled_guidance">इंस्टॉलेशन को उपयोगकर्ता या सिस्टम द्वारा रद्द कर दिया गया था। पुनः प्रयास करने के लिए \'पुनः प्रयास करें' पर टैप करें。</string>
+    <string name="install_error_cancelled_guidance">इंस्टॉलेशन को उपयोगकर्ता या सिस्टम द्वारा रद्द कर दिया गया था। पुनः प्रयास करने के लिए \'पुनः प्रयास करें\' पर टैप करें।</string>
     <string name="install_error_blocked_title">इंस्टॉलेशन ब्लॉक हो गया</string>
     <string name="install_error_blocked_guidance">आपकी डिवाइस नीति या सुरक्षा सेटिंग्स ने इस इंस्टॉल को ब्लॉक कर दिया है। जांचें कि सेटिंग्स &gt; ऐप्स &gt; विशेष एक्सेस में अज्ञात स्रोतों की अनुमति है या नहीं।</string>
     <string name="install_error_conflict_title">पैकेज में विरोध</string>
@@ -155,11 +155,11 @@
     <string name="install_error_storage_title">पर्याप्त स्टोरेज नहीं है</string>
     <string name="install_error_storage_guidance">आपके डिवाइस में पर्याप्त खाली स्थान नहीं है। सेटिंग्स &gt; स्टोरेज में स्थान खाली करें और पुनः प्रयास करें।</string>
     <string name="install_error_timeout_title">इंस्टॉलेशन का समय समाप्त</string>
-    <string name="install_error_timeout_guidance">इंस्टॉलेशन में बहुत अधिक समय लगा और उसे रद्द कर दिया गया। पुनः प्रयास करने के लिए \'पुनः प्रयास करें' पर टैप करें।</string>
+    <string name="install_error_timeout_guidance">इंस्टॉलेशन में बहुत अधिक समय लगा और उसे रद्द कर दिया गया। पुनः प्रयास करने के लिए \'पुनः प्रयास करें\' पर टैप करें।</string>
     <string name="install_error_unexpected_title">अप्रत्याशित त्रुटि</string>
     <string name="install_error_unexpected_guidance">एक अप्रत्याशित त्रुटि हुई: %s. ऐप या अपने डिवाइस को पुनरारंभ करने का प्रयास करें।</string>
     <string name="install_error_failed_title">इंस्टॉलेशन विफल</string>
-    <string name="install_error_unknown_guidance">एक अज्ञात त्रुटि हुई। पुनः प्रयास करने के लिए \'पुनः प्रयास करें' पर टैप करें।</string>
+    <string name="install_error_unknown_guidance">एक अज्ञात त्रुटि हुई। पुनः प्रयास करने के लिए \'पुनः प्रयास करें\' पर टैप करें।</string>
     <string name="install_error_unknown_guidance_short">एक अज्ञात त्रुटि हुई।</string>
 
     <string name="splash_tagline">कुछ भी इंस्टॉल करें, कहीं भी</string>

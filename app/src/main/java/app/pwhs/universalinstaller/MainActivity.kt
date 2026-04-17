@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -23,6 +24,7 @@ import app.pwhs.universalinstaller.presentation.setting.ThemeMode
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import app.pwhs.universalinstaller.presentation.splash.SplashScreen
 import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
+import app.pwhs.universalinstaller.util.LocaleHelper
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.map
 
@@ -33,6 +35,10 @@ class MainActivity : ComponentActivity() {
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { /* granted or not — uninstall flow works either way, notifications just won't show */ }
+
+    override fun attachBaseContext(newBase: Context) {
+        super.attachBaseContext(LocaleHelper.wrap(newBase))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

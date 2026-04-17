@@ -19,7 +19,9 @@ import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Security
@@ -61,11 +63,17 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.LanguageScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>
 @Composable
-fun SettingScreen(modifier: Modifier = Modifier, viewModel: SettingViewModel = koinViewModel()) {
+fun SettingScreen(
+    navigator: DestinationsNavigator,
+    modifier: Modifier = Modifier,
+    viewModel: SettingViewModel = koinViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     SettingUi(
@@ -76,6 +84,7 @@ fun SettingScreen(modifier: Modifier = Modifier, viewModel: SettingViewModel = k
         onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
         onShizukuOptionChanged = viewModel::setShizukuOption,
         onDeleteApkChanged = viewModel::setDeleteApkAfterInstall,
+        onLanguageClick = { navigator.navigate(LanguageScreenDestination) },
     )
 }
 
@@ -89,6 +98,7 @@ private fun SettingUi(
     onVirusTotalKeyChanged: (String) -> Unit = {},
     onShizukuOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
     onDeleteApkChanged: (Boolean) -> Unit = {},
+    onLanguageClick: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -332,6 +342,35 @@ private fun SettingUi(
                                 }
                             }
                         },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    ListItem(
+                        headlineContent = {
+                            Text(stringResource(R.string.setting_language_title), style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = stringResource(R.string.setting_language_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.Language,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        trailingContent = {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        modifier = Modifier.clickable(onClick = onLanguageClick),
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
                 }
