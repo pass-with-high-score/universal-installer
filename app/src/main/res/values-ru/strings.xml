@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">Просматривайте установленные приложения, удаляйте ненужные и легко управляйте своим устройством.</string>
     <string name="onboarding_page3_title">Разрешить установку</string>
     <string name="onboarding_page3_desc">Для установки пакетов приложению требуется разрешение на установку из неизвестных источников. Нажмите кнопку ниже, чтобы предоставить его.</string>
+    <string name="setting_language_title">Язык</string>
+    <string name="setting_language_subtitle">Изменить язык приложения</string>
+    <string name="language_screen_title">Язык</string>
+    <string name="back_cd">Назад</string>
+    <string name="done_cd">Готово</string>
 </resources>

@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">설치된 앱을 찾아보고, 원치 않는 앱을 제거하며, 기기를 쉽게 관리하세요.</string>
     <string name="onboarding_page3_title">설치 허용</string>
     <string name="onboarding_page3_desc">패키지를 설치하려면 알 수 없는 출처에서 설치할 수 있는 권한이 필요합니다. 아래 버튼을 탭하여 권한을 부여하세요.</string>
+    <string name="setting_language_title">언어</string>
+    <string name="setting_language_subtitle">앱 언어 변경</string>
+    <string name="language_screen_title">언어</string>
+    <string name="back_cd">뒤로</string>
+    <string name="done_cd">완료</string>
 </resources>

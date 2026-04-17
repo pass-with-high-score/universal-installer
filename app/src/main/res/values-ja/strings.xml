@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">インストール済みのアプリを閲覧し、不要なアプリをアンインストールしてデバイスを簡単に管理できます。</string>
     <string name="onboarding_page3_title">インストールの許可</string>
     <string name="onboarding_page3_desc">パッケージをインストールするには、提供元不明のアプリをインストールする権限が必要です。下のボタンをタップして権限を付与してください。</string>
+    <string name="setting_language_title">言語</string>
+    <string name="setting_language_subtitle">アプリの言語を変更</string>
+    <string name="language_screen_title">言語</string>
+    <string name="back_cd">戻る</string>
+    <string name="done_cd">完了</string>
 </resources>

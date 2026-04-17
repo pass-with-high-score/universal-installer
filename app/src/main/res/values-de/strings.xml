@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">Durchsuche installierte Apps, deinstalliere unerwünschte Apps und verwalte dein Gerät mühelos.</string>
     <string name="onboarding_page3_title">Installation zulassen</string>
     <string name="onboarding_page3_desc">Um Pakete zu installieren, benötigt die App die Berechtigung zur Installation aus unbekannten Quellen. Tippe auf die Schaltfläche unten, um sie zu erteilen.</string>
+    <string name="setting_language_title">Sprache</string>
+    <string name="setting_language_subtitle">App-Sprache ändern</string>
+    <string name="language_screen_title">Sprache</string>
+    <string name="back_cd">Zurück</string>
+    <string name="done_cd">Fertig</string>
 </resources>

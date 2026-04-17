@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">Navega por las aplicaciones instaladas, desinstala las que no desees y administra tu dispositivo sin esfuerzo.</string>
     <string name="onboarding_page3_title">Permitir la instalación</string>
     <string name="onboarding_page3_desc">Para instalar paquetes, la aplicación necesita permiso para instalar desde fuentes desconocidas. Toca el botón de abajo para concederlo.</string>
+    <string name="setting_language_title">Idioma</string>
+    <string name="setting_language_subtitle">Cambiar el idioma de la aplicación</string>
+    <string name="language_screen_title">Idioma</string>
+    <string name="back_cd">Atrás</string>
+    <string name="done_cd">Listo</string>
 </resources>

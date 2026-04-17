@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">浏览已安装的应用，卸载不需要的应用，轻松管理您的设备。</string>
     <string name="onboarding_page3_title">允许安装</string>
     <string name="onboarding_page3_desc">为了安装包，应用需要具有安装未知来源应用的权限。点击下方按钮以授予权限。</string>
+    <string name="setting_language_title">语言</string>
+    <string name="setting_language_subtitle">更改应用语言</string>
+    <string name="language_screen_title">语言</string>
+    <string name="back_cd">返回</string>
+    <string name="done_cd">完成</string>
 </resources>

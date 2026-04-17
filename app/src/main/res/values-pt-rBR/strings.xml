@@ -172,7 +172,12 @@
     <string name="onboarding_page1_title">Instale Qualquer Pacote</string>
     <string name="onboarding_page1_desc">Suporte aos formatos APK, APKS, XAPK e APKM. Instale split APKs com facilidade.</string>
     <string name="onboarding_page2_title">Gerencie Seus Aplicativos</string>
-    <string name="onboarding_page2_desc">Navegue pelos aplicativos instalados, desinstale os indesejados e gerencie seu dispositivo sem esforço.</string>
+    <string name="onboarding_page2_desc">Navegue pelos aplicativos instalados, desinstale os indesejados e gerencie o seu dispositivo sem esforço.</string>
     <string name="onboarding_page3_title">Permitir Instalação</string>
     <string name="onboarding_page3_desc">Para instalar pacotes, o aplicativo precisa de permissão para instalar de fontes desconhecidas. Toque no botão abaixo para concedê-la.</string>
+    <string name="setting_language_title">Idioma</string>
+    <string name="setting_language_subtitle">Alterar o idioma do aplicativo</string>
+    <string name="language_screen_title">Idioma</string>
+    <string name="back_cd">Voltar</string>
+    <string name="done_cd">Concluído</string>
 </resources>

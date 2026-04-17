@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">تصفح التطبيقات المثبتة، وقم بإلغاء تثبيت التطبيقات غير المرغوب فيها، وأدر جهازك بسهولة.</string>
     <string name="onboarding_page3_title">السماح بالتثبيت</string>
     <string name="onboarding_page3_desc">لتثبيت الحزم، يحتاج التطبيق إلى إذن للتثبيت من مصادر غير معروفة. اضغط على الزر أدناه لمنحه.</string>
+    <string name="setting_language_title">اللغة</string>
+    <string name="setting_language_subtitle">تغيير لغة التطبيق</string>
+    <string name="language_screen_title">اللغة</string>
+    <string name="back_cd">رجوع</string>
+    <string name="done_cd">تم</string>
 </resources>

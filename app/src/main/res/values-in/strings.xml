@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">Jelajahi aplikasi yang terinstal, copot pemasangan aplikasi yang tidak diinginkan, dan kelola perangkat Anda dengan mudah.</string>
     <string name="onboarding_page3_title">Izinkan Instalasi</string>
     <string name="onboarding_page3_desc">Untuk menginstal paket, aplikasi memerlukan izin untuk menginstal dari sumber yang tidak dikenal. Ketuk tombol di bawah untuk memberikannya.</string>
+    <string name="setting_language_title">Bahasa</string>
+    <string name="setting_language_subtitle">Ubah bahasa aplikasi</string>
+    <string name="language_screen_title">Bahasa</string>
+    <string name="back_cd">Kembali</string>
+    <string name="done_cd">Selesai</string>
 </resources>

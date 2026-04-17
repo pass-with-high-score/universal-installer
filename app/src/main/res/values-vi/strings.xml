@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">Duyệt qua các ứng dụng đã cài đặt, gỡ cài đặt những ứng dụng không mong muốn và quản lý thiết bị của bạn một cách dễ dàng.</string>
     <string name="onboarding_page3_title">Cho phép Cài đặt</string>
     <string name="onboarding_page3_desc">Để cài đặt các gói, ứng dụng cần có quyền cài đặt từ các nguồn không xác định. Nhấn nút bên dưới để cấp quyền.</string>
+    <string name="setting_language_title">Ngôn ngữ</string>
+    <string name="setting_language_subtitle">Thay đổi ngôn ngữ ứng dụng</string>
+    <string name="language_screen_title">Ngôn ngữ</string>
+    <string name="back_cd">Quay lại</string>
+    <string name="done_cd">Xong</string>
 </resources>

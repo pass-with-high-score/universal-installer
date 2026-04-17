@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">Parcourez les applications installées, désinstallez celles dont vous ne voulez pas et gérez votre appareil sans effort.</string>
     <string name="onboarding_page3_title">Autoriser l\'installation</string>
     <string name="onboarding_page3_desc">Pour installer des paquets, l\'application a besoin de l\'autorisation d\'installer depuis des sources inconnues. Appuyez sur le bouton ci-dessous pour l\'accorder.</string>
+    <string name="setting_language_title">Langue</string>
+    <string name="setting_language_subtitle">Changer la langue de l\'application</string>
+    <string name="language_screen_title">Langue</string>
+    <string name="back_cd">Retour</string>
+    <string name="done_cd">Terminé</string>
 </resources>

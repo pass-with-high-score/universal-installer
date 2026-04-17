@@ -175,4 +175,9 @@
     <string name="onboarding_page2_desc">इंस्टॉल किए गए ऐप्स ब्राउज़ करें, अवांछित ऐप्स को अनइंस्टॉल करें, और अपने डिवाइस को आसानी से प्रबंधित करें।</string>
     <string name="onboarding_page3_title">इंस्टॉलेशन की अनुमति दें</string>
     <string name="onboarding_page3_desc">पैकेज इंस्टॉल करने के लिए, ऐप को अज्ञात स्रोतों से इंस्टॉल करने की अनुमति चाहिए। इसे प्रदान करने के लिए नीचे दिए गए बटन पर टैप करें।</string>
+    <string name="setting_language_title">भाषा</string>
+    <string name="setting_language_subtitle">ऐप की भाषा बदलें</string>
+    <string name="language_screen_title">भाषा</string>
+    <string name="back_cd">वापस</string>
+    <string name="done_cd">हो गया</string>
 </resources>

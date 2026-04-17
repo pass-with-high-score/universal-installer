@@ -177,4 +177,9 @@
     <string name="onboarding_page2_desc">Yüklü uygulamalara göz atın, istenmeyenleri kaldırın ve cihazınızı zahmetsizce yönetin.</string>
     <string name="onboarding_page3_title">Yüklemeye İzin Ver</string>
     <string name="onboarding_page3_desc">Paketleri yüklemek için, uygulamanın bilinmeyen kaynaklardan yükleme iznine ihtiyacı vardır. İzin vermek için aşağıdaki düğmeye dokunun.</string>
+    <string name="setting_language_title">Dil</string>
+    <string name="setting_language_subtitle">Uygulama dilini değiştir</string>
+    <string name="language_screen_title">Dil</string>
+    <string name="back_cd">Geri</string>
+    <string name="done_cd">Bitti</string>
 </resources>
