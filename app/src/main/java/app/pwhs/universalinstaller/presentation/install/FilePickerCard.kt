@@ -22,7 +22,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 
 @Composable
 internal fun FilePickerCard(
@@ -70,13 +72,14 @@ internal fun FilePickerCard(
             }
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = if (isLoading) "Parsing package…" else "Select a package",
+                    text = if (isLoading) stringResource(R.string.file_picker_parsing)
+                           else stringResource(R.string.file_picker_select),
                     style = MaterialTheme.typography.titleSmall,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = "APK, APKS, XAPK, APKM",
+                    text = stringResource(R.string.file_picker_formats),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

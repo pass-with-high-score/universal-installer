@@ -1,5 +1,7 @@
 package app.pwhs.universalinstaller.presentation.install
 
+import android.content.Context
+import app.pwhs.universalinstaller.R
 import ru.solrudev.ackpine.installer.InstallFailure
 
 object InstallErrorHelper {
@@ -9,51 +11,51 @@ object InstallErrorHelper {
         val guidance: String,
     )
 
-    fun getErrorInfo(failure: InstallFailure): ErrorInfo = when (failure) {
+    fun getErrorInfo(context: Context, failure: InstallFailure): ErrorInfo = when (failure) {
         is InstallFailure.Aborted -> ErrorInfo(
-            title = "Installation cancelled",
-            guidance = "The installation was cancelled by the user or system. Tap Retry to try again.",
+            title = context.getString(R.string.install_error_cancelled_title),
+            guidance = context.getString(R.string.install_error_cancelled_guidance),
         )
         is InstallFailure.Blocked -> ErrorInfo(
-            title = "Installation blocked",
-            guidance = "Your device policy or security settings blocked this install. Check if unknown sources are allowed in Settings > Apps > Special access.",
+            title = context.getString(R.string.install_error_blocked_title),
+            guidance = context.getString(R.string.install_error_blocked_guidance),
         )
         is InstallFailure.Conflict -> ErrorInfo(
-            title = "Package conflict",
-            guidance = "A conflicting version is already installed. Uninstall the existing app first, or enable \"Replace existing\" in Shizuku options.",
+            title = context.getString(R.string.install_error_conflict_title),
+            guidance = context.getString(R.string.install_error_conflict_guidance),
         )
         is InstallFailure.Incompatible -> ErrorInfo(
-            title = "Incompatible package",
-            guidance = "This APK is not compatible with your device. It may require a different CPU architecture, Android version, or missing hardware feature.",
+            title = context.getString(R.string.install_error_incompatible_title),
+            guidance = context.getString(R.string.install_error_incompatible_guidance),
         )
         is InstallFailure.Invalid -> ErrorInfo(
-            title = "Invalid package",
-            guidance = "The APK file is corrupted or not a valid Android package. Try downloading it again from a trusted source.",
+            title = context.getString(R.string.install_error_invalid_title),
+            guidance = context.getString(R.string.install_error_invalid_guidance),
         )
         is InstallFailure.Storage -> ErrorInfo(
-            title = "Not enough storage",
-            guidance = "Your device doesn't have enough free space. Free up storage in Settings > Storage and try again.",
+            title = context.getString(R.string.install_error_storage_title),
+            guidance = context.getString(R.string.install_error_storage_guidance),
         )
         is InstallFailure.Timeout -> ErrorInfo(
-            title = "Installation timed out",
-            guidance = "The installation took too long and was cancelled. Tap Retry to try again.",
+            title = context.getString(R.string.install_error_timeout_title),
+            guidance = context.getString(R.string.install_error_timeout_guidance),
         )
         is InstallFailure.Exceptional -> ErrorInfo(
-            title = "Unexpected error",
-            guidance = "An unexpected error occurred: ${failure.message}. Try restarting the app or your device.",
+            title = context.getString(R.string.install_error_unexpected_title),
+            guidance = context.getString(R.string.install_error_unexpected_guidance, failure.message ?: ""),
         )
         is InstallFailure.Generic -> ErrorInfo(
-            title = "Installation failed",
-            guidance = failure.message ?: "An unknown error occurred. Tap Retry to try again.",
+            title = context.getString(R.string.install_error_failed_title),
+            guidance = failure.message ?: context.getString(R.string.install_error_unknown_guidance),
         )
         else -> ErrorInfo(
-            title = "Installation failed",
-            guidance = failure.message ?: "An unknown error occurred.",
+            title = context.getString(R.string.install_error_failed_title),
+            guidance = failure.message ?: context.getString(R.string.install_error_unknown_guidance_short),
         )
     }
 
-    fun getUserFriendlyMessage(failure: InstallFailure): String {
-        val info = getErrorInfo(failure)
+    fun getUserFriendlyMessage(context: Context, failure: InstallFailure): String {
+        val info = getErrorInfo(context, failure)
         return "${info.title}: ${info.guidance}"
     }
 }

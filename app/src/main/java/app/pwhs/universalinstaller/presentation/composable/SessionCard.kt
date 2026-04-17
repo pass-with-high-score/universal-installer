@@ -34,8 +34,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import android.graphics.BitmapFactory
 import app.pwhs.universalinstaller.domain.model.SessionData
 import app.pwhs.universalinstaller.domain.model.SessionProgress
@@ -113,8 +115,8 @@ fun SessionCard(
                     }
                     if (!hasError) {
                         Text(
-                            text = if (isComplete) "Installed successfully"
-                            else "${(progress * 100).toInt()}% installing…",
+                            text = if (isComplete) stringResource(R.string.session_installed_success)
+                            else stringResource(R.string.session_installing_progress, (progress * 100).toInt()),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isComplete) MaterialTheme.colorScheme.tertiary
                             else MaterialTheme.colorScheme.onSurfaceVariant,
@@ -129,11 +131,11 @@ fun SessionCard(
                     FilledTonalButton(onClick = onCancel) {
                         Icon(
                             imageVector = Icons.Rounded.Cancel,
-                            contentDescription = "Cancel",
+                            contentDescription = stringResource(R.string.cancel),
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(Modifier.width(4.dp))
-                        Text("Cancel", style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.cancel), style = MaterialTheme.typography.labelMedium)
                     }
                 }
             }
@@ -163,11 +165,11 @@ fun SessionCard(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Refresh,
-                        contentDescription = "Retry",
+                        contentDescription = stringResource(R.string.session_retry),
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(Modifier.width(4.dp))
-                    Text("Retry", style = MaterialTheme.typography.labelMedium)
+                    Text(stringResource(R.string.session_retry), style = MaterialTheme.typography.labelMedium)
                 }
             }
 

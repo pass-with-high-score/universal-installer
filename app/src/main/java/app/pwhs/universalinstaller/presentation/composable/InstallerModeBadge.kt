@@ -19,7 +19,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.flow.map
@@ -32,7 +34,8 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
     }
     val useShizuku by useShizukuFlow.collectAsState(initial = false)
 
-    val label = if (useShizuku) "Shizuku" else "Package Installer"
+    val label = if (useShizuku) stringResource(R.string.installer_mode_shizuku)
+                else stringResource(R.string.installer_mode_package_installer)
     val icon = if (useShizuku) Icons.Rounded.AdminPanelSettings else Icons.Rounded.Android
     val container = if (useShizuku)
         MaterialTheme.colorScheme.primaryContainer
@@ -57,7 +60,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
             modifier = Modifier.size(14.dp),
         )
         Text(
-            text = "Using $label",
+            text = stringResource(R.string.installer_mode_using, label),
             style = MaterialTheme.typography.labelSmall,
             color = content,
             modifier = Modifier.padding(start = 6.dp),

@@ -32,4 +32,163 @@
     <string name="uninstall_notif_batch_done">Uninstall complete</string>
     <string name="uninstall_notif_batch_done_with_errors">Uninstall finished with errors</string>
     <string name="uninstall_notif_batch_done_text">%1$d succeeded · %2$d failed</string>
+
+    <!-- Shared status labels -->
+    <string name="status_success">Success</string>
+    <string name="status_failed">Failed</string>
+
+    <!-- Install Screen -->
+    <string name="install_sessions_header">Sessions</string>
+    <string name="install_history_header">History</string>
+    <string name="install_history_clear">Clear</string>
+    <string name="install_unsupported_file">Unsupported file. Please select an APK, APKS, XAPK, or APKM file.</string>
+
+    <!-- File Picker Card -->
+    <string name="file_picker_parsing">Parsing package…</string>
+    <string name="file_picker_select">Select a package</string>
+    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
+
+    <!-- Session Card -->
+    <string name="session_installed_success">Installed successfully</string>
+    <string name="session_installing_progress">%d%% installing…</string>
+    <string name="session_retry">Retry</string>
+
+    <!-- APK Info Bottom Sheet -->
+    <string name="apk_info_label_package">Package</string>
+    <string name="apk_info_label_version">Version</string>
+    <string name="apk_info_label_min_sdk">Min SDK</string>
+    <string name="apk_info_label_target_sdk">Target SDK</string>
+    <string name="apk_info_version_chip">v%s</string>
+    <string name="apk_info_min_sdk_chip">Android %s+</string>
+    <string name="apk_info_splits_count">%d splits</string>
+    <string name="apk_info_version_detail">%1$s (%2$d)</string>
+    <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
+    <string name="apk_info_section_architectures">Supported Architectures</string>
+    <string name="apk_info_section_languages">Supported Languages (%d)</string>
+    <string name="apk_info_section_permissions">Permissions (%d)</string>
+    <string name="apk_info_permissions_more">… and %d more</string>
+<string name="apk_info_vt_scan_title">VirusTotal Scan</string>
+    <string name="apk_info_vt_scanning">Scanning file…</string>
+    <string name="apk_info_vt_clean">No threats detected</string>
+    <string name="apk_info_vt_clean_detail">%1$d engines confirmed safe · %2$d undetected</string>
+    <string name="apk_info_vt_malicious">%d engine(s) detected threats!</string>
+    <string name="apk_info_vt_malicious_detail">%1$d malicious · %2$d suspicious · %3$d harmless</string>
+    <string name="apk_info_vt_suspicious">%d engine(s) flagged as suspicious</string>
+    <string name="apk_info_vt_suspicious_detail">%1$d suspicious · %2$d harmless · %3$d undetected</string>
+    <string name="apk_info_vt_not_found">File not found in VirusTotal database</string>
+    <string name="apk_info_vt_error">Scan error: %s</string>
+
+    <!-- Uninstall Screen -->
+    <string name="uninstall_show_system_apps">Show system apps</string>
+    <string name="uninstall_search_hint">Search apps…</string>
+    <string name="uninstall_no_apps_found">No apps found</string>
+    <string name="uninstall_no_match">No apps match \"%s\"</string>
+    <string name="uninstall_no_user_apps">No user-installed apps found</string>
+    <string name="uninstall_n_selected">%d selected</string>
+    <string name="uninstall_confirm_batch_title">Uninstall %d apps?</string>
+    <string name="uninstall_confirm_batch_text">This will remove %d selected apps from your device.</string>
+    <string name="uninstall_cancel_selection">Cancel selection</string>
+    <string name="uninstall_select_all">Select all</string>
+    <string name="uninstall_deselect_all">Deselect all</string>
+    <string name="uninstall_selected_action">Uninstall selected</string>
+    <string name="uninstall_filter_cd">Filter</string>
+    <string name="uninstall_logs_cd">Uninstall logs</string>
+    <string name="uninstall_confirm_single_title">Uninstall %s?</string>
+    <string name="uninstall_confirm_single_text">This will remove %1$s (%2$s) from your device.</string>
+    <string name="uninstall_app_cd">Uninstall %s</string>
+
+    <!-- Uninstall Logs Screen -->
+    <string name="logs_screen_title">Uninstall Logs</string>
+    <string name="logs_clear_all_dialog_title">Clear all logs?</string>
+    <string name="logs_clear_all_dialog_text">This will permanently remove the uninstall log history on this device.</string>
+    <string name="logs_clear">Clear</string>
+    <string name="logs_empty_title">No uninstall logs yet</string>
+    <string name="logs_empty_subtitle">Uninstall attempts — successful or failed — will show up here.</string>
+    <string name="logs_reason">Reason</string>
+    <string name="logs_back_cd">Back</string>
+    <string name="logs_clear_all_cd">Clear all</string>
+    <string name="logs_expand_cd">Expand</string>
+    <string name="logs_collapse_cd">Collapse</string>
+    <string name="logs_delete_entry_cd">Delete entry</string>
+
+    <!-- Settings Screen -->
+    <string name="setting_title">Settings</string>
+    <string name="setting_section_installation">Installation</string>
+    <string name="setting_shizuku_backend">Shizuku Backend</string>
+    <string name="setting_shizuku_not_installed">Shizuku not installed</string>
+    <string name="setting_shizuku_not_running">Shizuku installed but not running</string>
+    <string name="setting_shizuku_unsupported">Shizuku version too old (pre-v11)</string>
+    <string name="setting_shizuku_no_permission">Tap to grant Shizuku permission</string>
+    <string name="setting_shizuku_ready">Silent install without prompts</string>
+    <string name="setting_delete_apk_title">Delete APK after install</string>
+    <string name="setting_delete_apk_subtitle">Automatically delete the source file after successful installation</string>
+    <string name="setting_section_shizuku_options">Shizuku Options</string>
+    <string name="setting_shizuku_replace">Replace existing</string>
+    <string name="setting_shizuku_replace_sub">Replace already installed packages</string>
+    <string name="setting_shizuku_downgrade">Allow downgrade</string>
+    <string name="setting_shizuku_downgrade_sub">Allow installing older version over newer</string>
+    <string name="setting_shizuku_grant_permissions">Grant all permissions</string>
+    <string name="setting_shizuku_grant_permissions_sub">Auto-grant all requested permissions</string>
+    <string name="setting_shizuku_allow_test">Allow test packages</string>
+    <string name="setting_shizuku_allow_test_sub">Allow installing debug/test APKs</string>
+    <string name="setting_shizuku_bypass_sdk">Bypass low target SDK block</string>
+    <string name="setting_shizuku_bypass_sdk_sub">Install apps targeting old SDK versions</string>
+    <string name="setting_shizuku_all_users">Install for all users</string>
+    <string name="setting_shizuku_all_users_sub">Install package for all device users</string>
+    <string name="setting_section_security">Security</string>
+    <string name="setting_vt_key_title">VirusTotal API Key</string>
+    <string name="setting_vt_key_subtitle">Enable malware scanning before install</string>
+    <string name="setting_vt_key_placeholder">Enter API key…</string>
+    <string name="setting_section_appearance">Appearance</string>
+    <string name="setting_theme_title">Theme</string>
+    <string name="setting_theme_subtitle">Choose your preferred theme</string>
+    <string name="setting_section_about">About</string>
+    <string name="setting_about_app_name">Universal Installer</string>
+    <string name="setting_version">Version %s</string>
+    <string name="setting_github_title">GitHub</string>
+    <string name="setting_github_subtitle">Source code &amp; contributions</string>
+    <string name="setting_telegram_title">Telegram</string>
+    <string name="setting_telegram_subtitle">Join our community</string>
+
+    <!-- Installer Mode Badge -->
+    <string name="installer_mode_shizuku">Shizuku</string>
+    <string name="installer_mode_package_installer">Package Installer</string>
+    <string name="installer_mode_using">Using %s</string>
+
+    <!-- Install error messages -->
+    <string name="install_error_cancelled_title">Installation cancelled</string>
+    <string name="install_error_cancelled_guidance">The installation was cancelled by the user or system. Tap Retry to try again.</string>
+    <string name="install_error_blocked_title">Installation blocked</string>
+    <string name="install_error_blocked_guidance">Your device policy or security settings blocked this install. Check if unknown sources are allowed in Settings &gt; Apps &gt; Special access.</string>
+    <string name="install_error_conflict_title">Package conflict</string>
+    <string name="install_error_conflict_guidance">A conflicting version is already installed. Uninstall the existing app first, or enable \"Replace existing\" in Shizuku options.</string>
+    <string name="install_error_incompatible_title">Incompatible package</string>
+    <string name="install_error_incompatible_guidance">This APK is not compatible with your device. It may require a different CPU architecture, Android version, or missing hardware feature.</string>
+    <string name="install_error_invalid_title">Invalid package</string>
+    <string name="install_error_invalid_guidance">The APK file is corrupted or not a valid Android package. Try downloading it again from a trusted source.</string>
+    <string name="install_error_storage_title">Not enough storage</string>
+    <string name="install_error_storage_guidance">Your device doesn\'t have enough free space. Free up storage in Settings &gt; Storage and try again.</string>
+    <string name="install_error_timeout_title">Installation timed out</string>
+    <string name="install_error_timeout_guidance">The installation took too long and was cancelled. Tap Retry to try again.</string>
+    <string name="install_error_unexpected_title">Unexpected error</string>
+    <string name="install_error_unexpected_guidance">An unexpected error occurred: %s. Try restarting the app or your device.</string>
+    <string name="install_error_failed_title">Installation failed</string>
+    <string name="install_error_unknown_guidance">An unknown error occurred. Tap Retry to try again.</string>
+    <string name="install_error_unknown_guidance_short">An unknown error occurred.</string>
+
+    <!-- Splash Screen -->
+    <string name="splash_tagline">Install anything, anywhere</string>
+
+    <!-- Onboarding Screen -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_permission_granted">Permission granted</string>
+    <string name="onboarding_grant_permission">Grant Permission</string>
+    <string name="onboarding_page1_title">Install Any Package</string>
+    <string name="onboarding_page1_desc">Support APK, APKS, XAPK, and APKM formats. Install split APKs with ease.</string>
+    <string name="onboarding_page2_title">Manage Your Apps</string>
+    <string name="onboarding_page2_desc">Browse installed apps, uninstall unwanted ones, and manage your device effortlessly.</string>
+    <string name="onboarding_page3_title">Allow Installation</string>
+    <string name="onboarding_page3_desc">To install packages, the app needs permission to install from unknown sources. Tap the button below to grant it.</string>
 </resources>

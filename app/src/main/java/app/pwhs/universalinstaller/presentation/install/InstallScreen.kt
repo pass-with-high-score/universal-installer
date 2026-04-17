@@ -31,7 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.composable.SessionCard
@@ -102,7 +104,7 @@ private fun InstallUi(
             if (!isApkMime && extension !in validExtensions) {
                 Toast.makeText(
                     context,
-                    "Unsupported file. Please select an APK, APKS, XAPK, or APKM file.",
+                    context.getString(R.string.install_unsupported_file),
                     Toast.LENGTH_LONG
                 ).show()
                 return@rememberLauncherForActivityResult
@@ -153,7 +155,7 @@ private fun InstallUi(
                 title = {
                     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                         Text(
-                            text = "Install Package",
+                            text = stringResource(R.string.fab_install),
                             style = MaterialTheme.typography.headlineMedium,
                         )
                         InstallerModeBadge()
@@ -186,7 +188,7 @@ private fun InstallUi(
             if (uiState.sessions.isNotEmpty()) {
                 item(key = "sessions_header") {
                     Text(
-                        text = "Sessions",
+                        text = stringResource(R.string.install_sessions_header),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.padding(top = 4.dp),
@@ -219,12 +221,12 @@ private fun InstallUi(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
-                            text = "History",
+                            text = stringResource(R.string.install_history_header),
                             style = MaterialTheme.typography.labelLarge,
                             color = MaterialTheme.colorScheme.primary,
                         )
                         TextButton(onClick = onClearHistory) {
-                            Text("Clear", style = MaterialTheme.typography.labelMedium)
+                            Text(stringResource(R.string.install_history_clear), style = MaterialTheme.typography.labelMedium)
                         }
                     }
                 }

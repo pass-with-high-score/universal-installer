@@ -28,6 +28,7 @@ import timber.log.Timber
 import java.util.UUID
 
 abstract class BaseInstallController(
+    protected val context: Context,
     protected val packageInstaller: PackageInstaller,
     protected val sessionDataRepository: SessionDataRepository,
     protected val historyDao: InstallHistoryDao,
@@ -128,7 +129,8 @@ abstract class BaseInstallController(
                         deleteFlags.remove(session.id)
                     }
                     is Session.State.Failed -> {
-                        val errorInfo = InstallErrorHelper.getErrorInfo(result.failure)
+                        if (context == null) return@launch
+                        val errorInfo = InstallErrorHelper.getErrorInfo(context, result.failure)
                         val fullMessage = "${errorInfo.title}\n${errorInfo.guidance}"
                         saveHistory(sessionData, success = false, errorMessage = errorInfo.title)
                         handleError(fullMessage, session.id)

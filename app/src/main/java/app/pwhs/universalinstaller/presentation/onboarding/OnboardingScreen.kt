@@ -45,9 +45,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -60,28 +62,28 @@ private data class OnboardingPage(
     val description: String,
 )
 
-private val pages = listOf(
-    OnboardingPage(
-        icon = Icons.Rounded.InstallMobile,
-        title = "Install Any Package",
-        description = "Support APK, APKS, XAPK, and APKM formats. Install split APKs with ease.",
-    ),
-    OnboardingPage(
-        icon = Icons.Rounded.Widgets,
-        title = "Manage Your Apps",
-        description = "Browse installed apps, uninstall unwanted ones, and manage your device effortlessly.",
-    ),
-    OnboardingPage(
-        icon = Icons.Rounded.Security,
-        title = "Allow Installation",
-        description = "To install packages, the app needs permission to install from unknown sources. Tap the button below to grant it.",
-    ),
-)
 
 @Composable
 fun OnboardingScreen(
     onFinish: () -> Unit,
 ) {
+    val pages = listOf(
+        OnboardingPage(
+            icon = Icons.Rounded.InstallMobile,
+            title = stringResource(R.string.onboarding_page1_title),
+            description = stringResource(R.string.onboarding_page1_desc),
+        ),
+        OnboardingPage(
+            icon = Icons.Rounded.Widgets,
+            title = stringResource(R.string.onboarding_page2_title),
+            description = stringResource(R.string.onboarding_page2_desc),
+        ),
+        OnboardingPage(
+            icon = Icons.Rounded.Security,
+            title = stringResource(R.string.onboarding_page3_title),
+            description = stringResource(R.string.onboarding_page3_desc),
+        ),
+    )
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -123,7 +125,7 @@ fun OnboardingScreen(
                             pagerState.animateScrollToPage(pages.lastIndex)
                         }
                     }) {
-                        Text("Skip")
+                        Text(stringResource(R.string.onboarding_skip))
                     }
                 }
             }
@@ -186,7 +188,7 @@ fun OnboardingScreen(
                             pagerState.animateScrollToPage(pagerState.currentPage + 1)
                         }
                     }) {
-                        Text("Next")
+                        Text(stringResource(R.string.onboarding_next))
                         Spacer(Modifier.width(4.dp))
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowForward,
@@ -203,7 +205,7 @@ fun OnboardingScreen(
                             onFinish()
                         }
                     }) {
-                        Text("Get Started")
+                        Text(stringResource(R.string.onboarding_get_started))
                     }
                 }
             }
@@ -271,7 +273,7 @@ private fun PageContent(
                         modifier = Modifier.size(24.dp),
                     )
                     Text(
-                        text = "Permission granted",
+                        text = stringResource(R.string.onboarding_permission_granted),
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                     )
@@ -284,7 +286,7 @@ private fun PageContent(
                         modifier = Modifier.size(18.dp),
                     )
                     Spacer(Modifier.width(8.dp))
-                    Text("Grant Permission")
+                    Text(stringResource(R.string.onboarding_grant_permission))
                 }
             }
         }

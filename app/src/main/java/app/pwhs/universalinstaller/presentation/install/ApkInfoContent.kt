@@ -40,9 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import androidx.core.graphics.drawable.toBitmap
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtStatus
@@ -114,7 +116,7 @@ internal fun ApkInfoContent(
         ) {
             if (apkInfo.versionName.isNotBlank()) {
                 InfoChip(
-                    label = "v${apkInfo.versionName}",
+                    label = stringResource(R.string.apk_info_version_chip, apkInfo.versionName),
                     leadingIcon = {
                         Icon(Icons.Rounded.Android, null, modifier = Modifier.size(16.dp))
                     },
@@ -131,14 +133,14 @@ internal fun ApkInfoContent(
             InfoChip(label = apkInfo.fileFormat)
             if (apkInfo.minSdkVersion > 0) {
                 InfoChip(
-                    label = "Android ${sdkToAndroid(apkInfo.minSdkVersion)}+",
+                    label = stringResource(R.string.apk_info_min_sdk_chip, sdkToAndroid(apkInfo.minSdkVersion)),
                     leadingIcon = {
                         Icon(Icons.Rounded.PhoneAndroid, null, modifier = Modifier.size(16.dp))
                     },
                 )
             }
             if (apkInfo.splitCount > 1) {
-                InfoChip(label = "${apkInfo.splitCount} splits")
+                InfoChip(label = stringResource(R.string.apk_info_splits_count, apkInfo.splitCount))
             }
         }
 
@@ -183,7 +185,7 @@ internal fun ApkInfoContent(
                 modifier = Modifier.weight(1f),
                 shape = MaterialTheme.shapes.medium,
             ) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
             Button(
                 onClick = onInstall,
@@ -196,7 +198,7 @@ internal fun ApkInfoContent(
                     modifier = Modifier.size(18.dp),
                 )
                 Spacer(Modifier.width(8.dp))
-                Text("Install")
+                Text(stringResource(R.string.txt_install))
             }
         }
     }
@@ -214,15 +216,24 @@ private fun DetailsCard(apkInfo: ApkInfo) {
         ),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            InfoRow("Package", apkInfo.packageName)
+            InfoRow(stringResource(R.string.apk_info_label_package), apkInfo.packageName)
             if (apkInfo.versionName.isNotBlank()) {
-                InfoRow("Version", "${apkInfo.versionName} (${apkInfo.versionCode})")
+                InfoRow(
+                    stringResource(R.string.apk_info_label_version),
+                    stringResource(R.string.apk_info_version_detail, apkInfo.versionName, apkInfo.versionCode),
+                )
             }
             if (apkInfo.minSdkVersion > 0) {
-                InfoRow("Min SDK", "API ${apkInfo.minSdkVersion} (Android ${sdkToAndroid(apkInfo.minSdkVersion)})")
+                InfoRow(
+                    stringResource(R.string.apk_info_label_min_sdk),
+                    stringResource(R.string.apk_info_sdk_detail, apkInfo.minSdkVersion, sdkToAndroid(apkInfo.minSdkVersion)),
+                )
             }
             if (apkInfo.targetSdkVersion > 0) {
-                InfoRow("Target SDK", "API ${apkInfo.targetSdkVersion} (Android ${sdkToAndroid(apkInfo.targetSdkVersion)})")
+                InfoRow(
+                    stringResource(R.string.apk_info_label_target_sdk),
+                    stringResource(R.string.apk_info_sdk_detail, apkInfo.targetSdkVersion, sdkToAndroid(apkInfo.targetSdkVersion)),
+                )
             }
         }
     }
@@ -233,7 +244,7 @@ private fun DetailsCard(apkInfo: ApkInfo) {
 private fun AbisCard(abis: List<String>) {
     SectionCard(
         icon = Icons.Rounded.Memory,
-        title = "Supported Architectures",
+        title = stringResource(R.string.apk_info_section_architectures),
     ) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -249,7 +260,7 @@ private fun AbisCard(abis: List<String>) {
 private fun LanguagesCard(languages: List<String>) {
     SectionCard(
         icon = Icons.Rounded.Language,
-        title = "Supported Languages (${languages.size})",
+        title = stringResource(R.string.apk_info_section_languages, languages.size),
     ) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -257,7 +268,7 @@ private fun LanguagesCard(languages: List<String>) {
         ) {
             languages.take(20).forEach { lang -> InfoChip(label = lang) }
             if (languages.size > 20) {
-                InfoChip(label = "+${languages.size - 20} more")
+                InfoChip(label = "+${languages.size - 20}")
             }
         }
     }
@@ -294,7 +305,7 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "VirusTotal Scan",
+                    text = stringResource(R.string.apk_info_vt_scan_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = vtColor,
                 )
@@ -311,7 +322,7 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
             when (vt.status) {
                 VtStatus.SCANNING -> {
                     Text(
-                        text = "Scanning file…",
+                        text = stringResource(R.string.apk_info_vt_scanning),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -320,10 +331,10 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("No threats detected", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
+                        Text(stringResource(R.string.apk_info_vt_clean), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                     }
                     Text(
-                        text = "${vt.harmless} engines confirmed safe · ${vt.undetected} undetected",
+                        text = stringResource(R.string.apk_info_vt_clean_detail, vt.harmless, vt.undetected),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -332,10 +343,10 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.Warning, null, tint = MaterialTheme.colorScheme.error, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("${vt.malicious} engine(s) detected threats!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                        Text(stringResource(R.string.apk_info_vt_malicious, vt.malicious), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                     }
                     Text(
-                        text = "${vt.malicious} malicious · ${vt.suspicious} suspicious · ${vt.harmless} harmless",
+                        text = stringResource(R.string.apk_info_vt_malicious_detail, vt.malicious, vt.suspicious, vt.harmless),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -344,19 +355,19 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.Warning, null, tint = warningColor, modifier = Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
-                        Text("${vt.suspicious} engine(s) flagged as suspicious", style = MaterialTheme.typography.bodySmall, color = warningColor)
+                        Text(stringResource(R.string.apk_info_vt_suspicious, vt.suspicious), style = MaterialTheme.typography.bodySmall, color = warningColor)
                     }
                     Text(
-                        text = "${vt.suspicious} suspicious · ${vt.harmless} harmless · ${vt.undetected} undetected",
+                        text = stringResource(R.string.apk_info_vt_suspicious_detail, vt.suspicious, vt.harmless, vt.undetected),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 VtStatus.NOT_FOUND -> {
-                    Text("File not found in VirusTotal database", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(stringResource(R.string.apk_info_vt_not_found), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
                 VtStatus.ERROR -> {
-                    Text("Scan error: ${vt.errorMessage}", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.apk_info_vt_error, vt.errorMessage.orEmpty()), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                 }
                 else -> {}
             }
@@ -368,7 +379,7 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
 private fun PermissionsCard(permissions: List<String>) {
     SectionCard(
         icon = Icons.Rounded.Security,
-        title = "Permissions (${permissions.size})",
+        title = stringResource(R.string.apk_info_section_permissions, permissions.size),
     ) {
         permissions.take(10).forEach { perm ->
             val shortPerm = perm.substringAfterLast('.')
@@ -381,7 +392,7 @@ private fun PermissionsCard(permissions: List<String>) {
         }
         if (permissions.size > 10) {
             Text(
-                text = "… and ${permissions.size - 10} more",
+                text = stringResource(R.string.apk_info_permissions_more, permissions.size - 10),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 modifier = Modifier.padding(top = 4.dp),

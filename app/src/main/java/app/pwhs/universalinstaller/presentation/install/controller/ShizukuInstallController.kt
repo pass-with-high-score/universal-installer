@@ -20,7 +20,7 @@ class ShizukuInstallController(
     packageInstaller: PackageInstaller,
     sessionDataRepository: SessionDataRepository,
     historyDao: InstallHistoryDao,
-) : BaseInstallController(packageInstaller, sessionDataRepository, historyDao) {
+) : BaseInstallController(application, packageInstaller, sessionDataRepository, historyDao) {
 
     @OptIn(DelicateAckpineApi::class)
     override suspend fun createSession(

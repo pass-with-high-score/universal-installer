@@ -43,7 +43,7 @@ class InstallViewModel(
     private val historyDao: InstallHistoryDao,
 ) : ViewModel() {
 
-    private val defaultController = DefaultInstallController(packageInstaller, sessionDataRepository, historyDao)
+    private val defaultController = DefaultInstallController(application, packageInstaller, sessionDataRepository, historyDao)
     private val shizukuController = ShizukuInstallController(application, packageInstaller, sessionDataRepository, historyDao)
 
     private val _isLoading = MutableStateFlow(false)

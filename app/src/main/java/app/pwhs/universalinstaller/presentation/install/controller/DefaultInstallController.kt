@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.presentation.install.controller
 
+import android.content.Context
 import android.net.Uri
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
@@ -10,10 +11,11 @@ import ru.solrudev.ackpine.session.ProgressSession
 import ru.solrudev.ackpine.session.parameters.Confirmation
 
 class DefaultInstallController(
+    context: Context,
     packageInstaller: PackageInstaller,
     sessionDataRepository: SessionDataRepository,
     historyDao: InstallHistoryDao,
-) : BaseInstallController(packageInstaller, sessionDataRepository, historyDao) {
+) : BaseInstallController(context, packageInstaller, sessionDataRepository, historyDao) {
 
     override suspend fun createSession(
         uris: List<Uri>,

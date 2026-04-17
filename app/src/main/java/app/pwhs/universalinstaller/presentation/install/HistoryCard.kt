@@ -21,8 +21,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import java.io.File
 import java.text.SimpleDateFormat
@@ -102,7 +104,7 @@ internal fun HistoryCard(
             // Status badge
             Icon(
                 imageVector = if (entry.success) Icons.Rounded.CheckCircle else Icons.Rounded.Error,
-                contentDescription = if (entry.success) "Success" else "Failed",
+                contentDescription = if (entry.success) stringResource(R.string.status_success) else stringResource(R.string.status_failed),
                 tint = if (entry.success) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.error,
                 modifier = Modifier.size(20.dp),

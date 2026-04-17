@@ -58,8 +58,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.ImageRequest
@@ -122,17 +124,17 @@ private fun UninstallUi(
                     showBatchConfirm = false
                     onUninstallSelected()
                 }) {
-                    Text("Uninstall", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.uninstall), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showBatchConfirm = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
-            title = { Text("Uninstall ${uiState.selectedPackages.size} apps?") },
+            title = { Text(stringResource(R.string.uninstall_confirm_batch_title, uiState.selectedPackages.size)) },
             text = {
-                Text("This will remove ${uiState.selectedPackages.size} selected apps from your device.")
+                Text(stringResource(R.string.uninstall_confirm_batch_text, uiState.selectedPackages.size))
             },
             icon = {
                 Icon(
@@ -152,18 +154,18 @@ private fun UninstallUi(
                 // Selection mode top bar
                 TopAppBar(
                     title = {
-                        Text("${uiState.selectedPackages.size} selected")
+                        Text(stringResource(R.string.uninstall_n_selected, uiState.selectedPackages.size))
                     },
                     navigationIcon = {
                         IconButton(onClick = onClearSelection) {
-                            Icon(Icons.Rounded.Close, contentDescription = "Cancel selection")
+                            Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.uninstall_cancel_selection))
                         }
                     },
                     actions = {
                         IconButton(onClick = onToggleSelectAll) {
                             Icon(
                                 Icons.Rounded.SelectAll,
-                                contentDescription = if (uiState.isAllSelected) "Deselect all" else "Select all",
+                                contentDescription = if (uiState.isAllSelected) stringResource(R.string.uninstall_deselect_all) else stringResource(R.string.uninstall_select_all),
                                 tint = if (uiState.isAllSelected)
                                     MaterialTheme.colorScheme.primary
                                 else
@@ -173,7 +175,7 @@ private fun UninstallUi(
                         IconButton(onClick = { showBatchConfirm = true }) {
                             Icon(
                                 Icons.Rounded.DeleteOutline,
-                                contentDescription = "Uninstall selected",
+                                contentDescription = stringResource(R.string.uninstall_selected_action),
                                 tint = MaterialTheme.colorScheme.error,
                             )
                         }
@@ -191,7 +193,7 @@ private fun UninstallUi(
                     title = {
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             Text(
-                                text = "Uninstall",
+                                text = stringResource(R.string.screen_title_uninstall),
                                 style = MaterialTheme.typography.headlineMedium,
                             )
                             InstallerModeBadge()
@@ -201,14 +203,14 @@ private fun UninstallUi(
                         IconButton(onClick = onOpenLogs) {
                             Icon(
                                 imageVector = Icons.Rounded.ReceiptLong,
-                                contentDescription = "Uninstall logs",
+                                contentDescription = stringResource(R.string.uninstall_logs_cd),
                             )
                         }
                         Box {
                             IconButton(onClick = { showFilterMenu = true }) {
                                 Icon(
                                     imageVector = Icons.Rounded.FilterList,
-                                    contentDescription = "Filter"
+                                    contentDescription = stringResource(R.string.uninstall_filter_cd)
                                 )
                             }
                             DropdownMenu(
@@ -216,7 +218,7 @@ private fun UninstallUi(
                                 onDismissRequest = { showFilterMenu = false },
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text("Show system apps") },
+                                    text = { Text(stringResource(R.string.uninstall_show_system_apps)) },
                                     onClick = { onToggleSystemApps() },
                                     trailingIcon = {
                                         Switch(
@@ -252,7 +254,7 @@ private fun UninstallUi(
                             onSearch = {},
                             expanded = false,
                             onExpandedChange = {},
-                            placeholder = { Text("Search apps…") },
+                            placeholder = { Text(stringResource(R.string.uninstall_search_hint)) },
                             leadingIcon = {
                                 Icon(
                                     imageVector = Icons.Rounded.Search,
@@ -282,10 +284,10 @@ private fun UninstallUi(
                 uiState.filteredApps.isEmpty() -> {
                     EmptyStateView(
                         icon = Icons.Rounded.SearchOff,
-                        title = "No apps found",
+                        title = stringResource(R.string.uninstall_no_apps_found),
                         subtitle = if (uiState.searchQuery.isNotBlank())
-                            "No apps match \"${uiState.searchQuery}\""
-                        else "No user-installed apps found",
+                            stringResource(R.string.uninstall_no_match, uiState.searchQuery)
+                        else stringResource(R.string.uninstall_no_user_apps),
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(horizontal = 32.dp)
@@ -343,17 +345,17 @@ private fun AppCard(
                     showConfirmDialog = false
                     onUninstall()
                 }) {
-                    Text("Uninstall", color = MaterialTheme.colorScheme.error)
+                    Text(stringResource(R.string.uninstall), color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showConfirmDialog = false }) {
-                    Text("Cancel")
+                    Text(stringResource(R.string.cancel))
                 }
             },
-            title = { Text("Uninstall ${app.appName}?") },
+            title = { Text(stringResource(R.string.uninstall_confirm_single_title, app.appName)) },
             text = {
-                Text("This will remove ${app.appName} (${app.packageName}) from your device.")
+                Text(stringResource(R.string.uninstall_confirm_single_text, app.appName, app.packageName))
             },
             icon = {
                 SubcomposeAsyncImage(
@@ -462,7 +464,7 @@ private fun AppCard(
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteOutline,
-                        contentDescription = "Uninstall ${app.appName}",
+                        contentDescription = stringResource(R.string.uninstall_app_cd, app.appName),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(20.dp),
                     )

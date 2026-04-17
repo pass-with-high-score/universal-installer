@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.Preferences
 import app.pwhs.universalinstaller.R
 import androidx.compose.ui.text.input.KeyboardType
@@ -99,7 +100,7 @@ private fun SettingUi(
                 expandedHeight = 120.dp,
                 title = {
                     Text(
-                        text = "Settings",
+                        text = stringResource(R.string.setting_title),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                 },
@@ -120,13 +121,13 @@ private fun SettingUi(
         ) {
             // ── Installation Section ─────────────────────
             item {
-                SettingsSection(title = "Installation", icon = Icons.Rounded.SettingsApplications) {
+                SettingsSection(title = stringResource(R.string.setting_section_installation), icon = Icons.Rounded.SettingsApplications) {
                     val shizukuStatusText = when (uiState.shizukuState) {
-                        ShizukuState.NOT_INSTALLED -> "Shizuku not installed"
-                        ShizukuState.NOT_RUNNING -> "Shizuku installed but not running"
-                        ShizukuState.UNSUPPORTED -> "Shizuku version too old (pre-v11)"
-                        ShizukuState.NO_PERMISSION -> "Tap to grant Shizuku permission"
-                        ShizukuState.READY -> "Silent install without prompts"
+                        ShizukuState.NOT_INSTALLED -> stringResource(R.string.setting_shizuku_not_installed)
+                        ShizukuState.NOT_RUNNING -> stringResource(R.string.setting_shizuku_not_running)
+                        ShizukuState.UNSUPPORTED -> stringResource(R.string.setting_shizuku_unsupported)
+                        ShizukuState.NO_PERMISSION -> stringResource(R.string.setting_shizuku_no_permission)
+                        ShizukuState.READY -> stringResource(R.string.setting_shizuku_ready)
                     }
                     val shizukuStatusColor = when (uiState.shizukuState) {
                         ShizukuState.READY -> MaterialTheme.colorScheme.primary
@@ -135,7 +136,7 @@ private fun SettingUi(
                     }
                     ListItem(
                         headlineContent = {
-                            Text("Shizuku Backend", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.setting_shizuku_backend), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
                             Text(
@@ -166,11 +167,11 @@ private fun SettingUi(
                     )
                     ListItem(
                         headlineContent = {
-                            Text("Delete APK after install", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.setting_delete_apk_title), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
                             Text(
-                                text = "Automatically delete the source file after successful installation",
+                                text = stringResource(R.string.setting_delete_apk_subtitle),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -200,40 +201,40 @@ private fun SettingUi(
             // ── Shizuku Options Section (visible when Shizuku enabled) ──
             if (uiState.useShizuku) {
                 item {
-                    SettingsSection(title = "Shizuku Options", icon = Icons.Rounded.AdminPanelSettings) {
+                    SettingsSection(title = stringResource(R.string.setting_section_shizuku_options), icon = Icons.Rounded.AdminPanelSettings) {
                         ShizukuOptionItem(
-                            title = "Replace existing",
-                            subtitle = "Replace already installed packages",
+                            title = stringResource(R.string.setting_shizuku_replace),
+                            subtitle = stringResource(R.string.setting_shizuku_replace_sub),
                             checked = uiState.shizukuOptions.replaceExisting,
                             onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_REPLACE_EXISTING, it) },
                         )
                         ShizukuOptionItem(
-                            title = "Allow downgrade",
-                            subtitle = "Allow installing older version over newer",
+                            title = stringResource(R.string.setting_shizuku_downgrade),
+                            subtitle = stringResource(R.string.setting_shizuku_downgrade_sub),
                             checked = uiState.shizukuOptions.requestDowngrade,
                             onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE, it) },
                         )
                         ShizukuOptionItem(
-                            title = "Grant all permissions",
-                            subtitle = "Auto-grant all requested permissions",
+                            title = stringResource(R.string.setting_shizuku_grant_permissions),
+                            subtitle = stringResource(R.string.setting_shizuku_grant_permissions_sub),
                             checked = uiState.shizukuOptions.grantAllPermissions,
                             onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS, it) },
                         )
                         ShizukuOptionItem(
-                            title = "Allow test packages",
-                            subtitle = "Allow installing debug/test APKs",
+                            title = stringResource(R.string.setting_shizuku_allow_test),
+                            subtitle = stringResource(R.string.setting_shizuku_allow_test_sub),
                             checked = uiState.shizukuOptions.allowTest,
                             onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_ALLOW_TEST, it) },
                         )
                         ShizukuOptionItem(
-                            title = "Bypass low target SDK block",
-                            subtitle = "Install apps targeting old SDK versions",
+                            title = stringResource(R.string.setting_shizuku_bypass_sdk),
+                            subtitle = stringResource(R.string.setting_shizuku_bypass_sdk_sub),
                             checked = uiState.shizukuOptions.bypassLowTargetSdk,
                             onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK, it) },
                         )
                         ShizukuOptionItem(
-                            title = "Install for all users",
-                            subtitle = "Install package for all device users",
+                            title = stringResource(R.string.setting_shizuku_all_users),
+                            subtitle = stringResource(R.string.setting_shizuku_all_users_sub),
                             checked = uiState.shizukuOptions.allUsers,
                             onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_ALL_USERS, it) },
                         )
@@ -243,18 +244,18 @@ private fun SettingUi(
 
             // ── Security Section ─────────────────────────
             item {
-                SettingsSection(title = "Security", icon = Icons.Rounded.Security) {
+                SettingsSection(title = stringResource(R.string.setting_section_security), icon = Icons.Rounded.Security) {
                     var apiKeyInput by remember(uiState.virusTotalApiKey) {
                         mutableStateOf(uiState.virusTotalApiKey)
                     }
                     ListItem(
                         headlineContent = {
-                            Text("VirusTotal API Key", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.setting_vt_key_title), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
                             Column {
                                 Text(
-                                    text = "Enable malware scanning before install",
+                                    text = stringResource(R.string.setting_vt_key_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -265,7 +266,7 @@ private fun SettingUi(
                                         apiKeyInput = it
                                         onVirusTotalKeyChanged(it)
                                     },
-                                    placeholder = { Text("Enter API key…") },
+                                    placeholder = { Text(stringResource(R.string.setting_vt_key_placeholder)) },
                                     singleLine = true,
                                     visualTransformation = PasswordVisualTransformation(),
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -289,15 +290,15 @@ private fun SettingUi(
 
             // ── Appearance Section ───────────────────────
             item {
-                SettingsSection(title = "Appearance", icon = Icons.Rounded.Palette) {
+                SettingsSection(title = stringResource(R.string.setting_section_appearance), icon = Icons.Rounded.Palette) {
                     ListItem(
                         headlineContent = {
-                            Text("Theme", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.setting_theme_title), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
                             Column {
                                 Text(
-                                    text = "Choose your preferred theme",
+                                    text = stringResource(R.string.setting_theme_subtitle),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
@@ -339,14 +340,14 @@ private fun SettingUi(
             // ── About Section ────────────────────────────
             item {
                 val uriHandler = LocalUriHandler.current
-                SettingsSection(title = "About", icon = Icons.Rounded.Info) {
+                SettingsSection(title = stringResource(R.string.setting_section_about), icon = Icons.Rounded.Info) {
                     ListItem(
                         headlineContent = {
-                            Text("Universal Installer", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.setting_about_app_name), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
                             Text(
-                                text = "Version ${uiState.appVersion.ifBlank { "1.0" }}",
+                                text = stringResource(R.string.setting_version, uiState.appVersion.ifBlank { "1.0" }),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -363,11 +364,11 @@ private fun SettingUi(
                     )
                     ListItem(
                         headlineContent = {
-                            Text("GitHub", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.setting_github_title), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
                             Text(
-                                text = "Source code & contributions",
+                                text = stringResource(R.string.setting_github_subtitle),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -387,11 +388,11 @@ private fun SettingUi(
                     )
                     ListItem(
                         headlineContent = {
-                            Text("Telegram", style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.setting_telegram_title), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
                             Text(
-                                text = "Join our community",
+                                text = stringResource(R.string.setting_telegram_subtitle),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )

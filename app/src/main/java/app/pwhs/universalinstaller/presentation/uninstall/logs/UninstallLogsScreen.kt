@@ -54,9 +54,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.UninstallLogEntity
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
 import com.ramcosta.composedestinations.annotation.Destination
@@ -103,13 +105,13 @@ private fun UninstallLogsUi(
                 TextButton(onClick = {
                     showClearConfirm = false
                     onClearAll()
-                }) { Text("Clear", color = MaterialTheme.colorScheme.error) }
+                }) { Text(stringResource(R.string.logs_clear), color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = {
-                TextButton(onClick = { showClearConfirm = false }) { Text("Cancel") }
+                TextButton(onClick = { showClearConfirm = false }) { Text(stringResource(R.string.cancel)) }
             },
-            title = { Text("Clear all logs?") },
-            text = { Text("This will permanently remove the uninstall log history on this device.") },
+            title = { Text(stringResource(R.string.logs_clear_all_dialog_title)) },
+            text = { Text(stringResource(R.string.logs_clear_all_dialog_text)) },
             icon = {
                 Icon(
                     imageVector = Icons.Rounded.DeleteSweep,
@@ -128,13 +130,13 @@ private fun UninstallLogsUi(
                 expandedHeight = 120.dp,
                 title = {
                     Text(
-                        text = "Uninstall Logs",
+                        text = stringResource(R.string.logs_screen_title),
                         style = MaterialTheme.typography.headlineMedium,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Rounded.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Rounded.ArrowBack, contentDescription = stringResource(R.string.logs_back_cd))
                     }
                 },
                 actions = {
@@ -142,7 +144,7 @@ private fun UninstallLogsUi(
                         IconButton(onClick = { showClearConfirm = true }) {
                             Icon(
                                 imageVector = Icons.Rounded.DeleteSweep,
-                                contentDescription = "Clear all",
+                                contentDescription = stringResource(R.string.logs_clear_all_cd),
                             )
                         }
                     }
@@ -158,8 +160,8 @@ private fun UninstallLogsUi(
         if (logs.isEmpty()) {
             EmptyStateView(
                 icon = Icons.Rounded.HistoryToggleOff,
-                title = "No uninstall logs yet",
-                subtitle = "Uninstall attempts — successful or failed — will show up here.",
+                title = stringResource(R.string.logs_empty_title),
+                subtitle = stringResource(R.string.logs_empty_subtitle),
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize()
@@ -264,7 +266,7 @@ private fun UninstallLogCard(
             IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
                 Icon(
                     imageVector = Icons.Rounded.Close,
-                    contentDescription = "Delete entry",
+                    contentDescription = stringResource(R.string.logs_delete_entry_cd),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
                     modifier = Modifier.size(18.dp),
                 )
@@ -292,7 +294,7 @@ private fun StatusChip(success: Boolean, accent: Color) {
             .padding(horizontal = 10.dp, vertical = 4.dp),
     ) {
         Text(
-            text = if (success) "Success" else "Failed",
+            text = if (success) stringResource(R.string.status_success) else stringResource(R.string.status_failed),
             style = MaterialTheme.typography.labelSmall,
             fontWeight = FontWeight.Medium,
             color = accent,
@@ -312,7 +314,7 @@ private fun ErrorBlock(message: String, expanded: Boolean) {
             horizontalArrangement = Arrangement.spacedBy(6.dp),
         ) {
             Text(
-                text = "Reason",
+                text = stringResource(R.string.logs_reason),
                 style = MaterialTheme.typography.labelSmall,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.error,
@@ -320,7 +322,7 @@ private fun ErrorBlock(message: String, expanded: Boolean) {
             Spacer(Modifier.weight(1f))
             Icon(
                 imageVector = Icons.Rounded.ExpandMore,
-                contentDescription = if (expanded) "Collapse" else "Expand",
+                contentDescription = if (expanded) stringResource(R.string.logs_collapse_cd) else stringResource(R.string.logs_expand_cd),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier
                     .size(18.dp)
