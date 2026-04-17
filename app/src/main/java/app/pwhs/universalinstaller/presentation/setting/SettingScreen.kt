@@ -124,6 +124,7 @@ private fun SettingUi(
                     val shizukuStatusText = when (uiState.shizukuState) {
                         ShizukuState.NOT_INSTALLED -> "Shizuku not installed"
                         ShizukuState.NOT_RUNNING -> "Shizuku installed but not running"
+                        ShizukuState.UNSUPPORTED -> "Shizuku version too old (pre-v11)"
                         ShizukuState.NO_PERMISSION -> "Tap to grant Shizuku permission"
                         ShizukuState.READY -> "Silent install without prompts"
                     }

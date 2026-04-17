@@ -19,4 +19,17 @@
     <string name="error_conflicting_split_name">Conflicting split name: %s</string>
     <string name="error_conflicting_package_name">Conflicting package name. Expected: %1$s, found: %2$s, name: %3$s</string>
     <string name="error_conflicting_version_code">Conflicting version code. Expected: %1$s, found: %2$s, name: %3$s</string>
+
+    <!-- Uninstall notifications -->
+    <string name="uninstall_notif_channel_name">Uninstall progress</string>
+    <string name="uninstall_notif_channel_description">Shows progress while apps are being uninstalled</string>
+    <string name="uninstall_notif_single_title">Uninstalling…</string>
+    <string name="uninstall_notif_single_success">Uninstalled</string>
+    <string name="uninstall_notif_single_failed">Uninstall failed</string>
+    <string name="uninstall_notif_batch_title">Uninstalling %d apps…</string>
+    <string name="uninstall_notif_batch_preparing">Preparing…</string>
+    <string name="uninstall_notif_batch_progress_title">Uninstalling %1$d of %2$d</string>
+    <string name="uninstall_notif_batch_done">Uninstall complete</string>
+    <string name="uninstall_notif_batch_done_with_errors">Uninstall finished with errors</string>
+    <string name="uninstall_notif_batch_done_text">%1$d succeeded · %2$d failed</string>
 </resources>

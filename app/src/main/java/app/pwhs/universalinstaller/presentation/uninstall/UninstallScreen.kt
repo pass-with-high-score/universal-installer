@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material.icons.rounded.ReceiptLong
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.material.icons.rounded.SelectAll
@@ -68,11 +69,17 @@ import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.UninstallLogsScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>
 @Composable
-fun UninstallScreen(modifier: Modifier = Modifier, viewModel: UninstallViewModel = koinViewModel()) {
+fun UninstallScreen(
+    navigator: DestinationsNavigator,
+    modifier: Modifier = Modifier,
+    viewModel: UninstallViewModel = koinViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     UninstallUi(
@@ -85,6 +92,7 @@ fun UninstallScreen(modifier: Modifier = Modifier, viewModel: UninstallViewModel
         onClearSelection = viewModel::clearSelection,
         onToggleSelectAll = viewModel::toggleSelectAll,
         onUninstallSelected = viewModel::uninstallSelected,
+        onOpenLogs = { navigator.navigate(UninstallLogsScreenDestination) },
     )
 }
 
@@ -100,6 +108,7 @@ private fun UninstallUi(
     onClearSelection: () -> Unit = {},
     onToggleSelectAll: () -> Unit = {},
     onUninstallSelected: () -> Unit = {},
+    onOpenLogs: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showFilterMenu by remember { mutableStateOf(false) }
@@ -189,6 +198,12 @@ private fun UninstallUi(
                         }
                     },
                     actions = {
+                        IconButton(onClick = onOpenLogs) {
+                            Icon(
+                                imageVector = Icons.Rounded.ReceiptLong,
+                                contentDescription = "Uninstall logs",
+                            )
+                        }
                         Box {
                             IconButton(onClick = { showFilterMenu = true }) {
                                 Icon(

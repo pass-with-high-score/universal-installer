@@ -45,10 +45,11 @@ enum class ThemeMode(val label: String) {
 }
 
 enum class ShizukuState {
-    NOT_INSTALLED,
-    NOT_RUNNING,
-    NO_PERMISSION,
-    READY,
+    NOT_INSTALLED,   // no Shizuku app and no Sui — nothing to talk to
+    NOT_RUNNING,     // Shizuku app installed but service not started (binder dead)
+    UNSUPPORTED,     // pre-v11 Shizuku — modern API calls unavailable
+    NO_PERMISSION,   // binder alive, permission not granted
+    READY,           // binder alive, permission granted
 }
 
 data class ShizukuOptions(
@@ -86,7 +87,9 @@ class SettingViewModel(
 
     private val binderDeadListener = Shizuku.OnBinderDeadListener {
         Timber.d("Shizuku binder dead")
-        _shizukuState.value = ShizukuState.NOT_RUNNING
+        // Binder went away — decide if the Shizuku/Sui host is still installed.
+        _shizukuState.value = if (hasShizukuPackage()) ShizukuState.NOT_RUNNING
+        else ShizukuState.NOT_INSTALLED
     }
 
     private val permissionResultListener =
@@ -148,7 +151,9 @@ class SettingViewModel(
             virusTotalApiKey = vtKey,
             deleteApkAfterInstall = deleteApk,
             shizukuState = shizukuState,
-            shizukuAvailable = shizukuState == ShizukuState.READY || shizukuState == ShizukuState.NO_PERMISSION,
+            // "Available" means the binder is alive — we can talk to Shizuku/Sui now.
+            shizukuAvailable = shizukuState == ShizukuState.READY ||
+                    shizukuState == ShizukuState.NO_PERMISSION,
             shizukuOptions = shizukuOpts,
             appVersion = versionName,
         )
@@ -168,32 +173,35 @@ class SettingViewModel(
      * If turning off: just save the preference.
      */
     fun setUseShizuku(enabled: Boolean) {
-        if (enabled) {
-            if (_shizukuState.value == ShizukuState.NOT_RUNNING ||
-                _shizukuState.value == ShizukuState.NOT_INSTALLED
-            ) {
+        if (!enabled) {
+            viewModelScope.launch {
+                dataStore.edit { prefs -> prefs[PreferencesKeys.USE_SHIZUKU] = false }
+            }
+            return
+        }
+
+        // Re-probe in case the user just started Shizuku while this screen was open.
+        updateShizukuState()
+
+        when (_shizukuState.value) {
+            ShizukuState.NOT_INSTALLED, ShizukuState.NOT_RUNNING, ShizukuState.UNSUPPORTED -> {
+                Timber.d("Cannot enable Shizuku: state=${_shizukuState.value}")
                 return
             }
-            try {
-                if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
-                    _shizukuState.value = ShizukuState.READY
-                    viewModelScope.launch {
-                        dataStore.edit { prefs ->
-                            prefs[PreferencesKeys.USE_SHIZUKU] = true
-                        }
-                    }
-                } else {
-                    // Always request permission — Shizuku service shows its own dialog
-                    Shizuku.requestPermission(0)
+            ShizukuState.READY -> {
+                viewModelScope.launch {
+                    dataStore.edit { prefs -> prefs[PreferencesKeys.USE_SHIZUKU] = true }
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Error checking Shizuku permission")
             }
-        } else {
-            viewModelScope.launch {
-                dataStore.edit { prefs ->
-                    prefs[PreferencesKeys.USE_SHIZUKU] = false
+            ShizukuState.NO_PERMISSION -> try {
+                // shouldShowRequestPermissionRationale == true means user selected "Deny & Don't ask".
+                if (Shizuku.shouldShowRequestPermissionRationale()) {
+                    Timber.d("Shizuku permission permanently denied — user must re-enable in Shizuku app")
+                    return
                 }
+                Shizuku.requestPermission(SHIZUKU_REQUEST_CODE)
+            } catch (e: Exception) {
+                Timber.e(e, "Error requesting Shizuku permission")
             }
         }
     }
@@ -221,10 +229,14 @@ class SettingViewModel(
     }
 
     init {
+        // Sticky listener synchronously fires if binder is already alive (common case when
+        // Shizuku/Sui started before the app launched).
         Shizuku.addBinderReceivedListenerSticky(binderReceivedListener)
         Shizuku.addBinderDeadListener(binderDeadListener)
         Shizuku.addRequestPermissionResultListener(permissionResultListener)
-        checkShizukuInstalled()
+        // Resolve state up front — covers the case where the sticky listener does NOT fire
+        // (no binder yet) and we need to differentiate NOT_INSTALLED vs NOT_RUNNING.
+        updateShizukuState()
     }
 
     override fun onCleared() {
@@ -234,32 +246,62 @@ class SettingViewModel(
         Shizuku.removeRequestPermissionResultListener(permissionResultListener)
     }
 
-    private fun checkShizukuInstalled() {
-        try {
-            application.packageManager.getPackageInfo("moe.shizuku.privileged.api", 0)
-            // Shizuku is installed, but we need to wait for binder
-            // The binderReceivedListener will fire if binder is alive
-            _shizukuState.value = ShizukuState.NOT_RUNNING
-        } catch (_: PackageManager.NameNotFoundException) {
-            _shizukuState.value = ShizukuState.NOT_INSTALLED
-            Timber.d("Shizuku not installed on this device")
+    /**
+     * Single source of truth for Shizuku state. Ordered from strongest to weakest signal:
+     *   1. Binder alive (pingBinder) → service is actually running; Shizuku OR Sui.
+     *   2. Binder dead but Shizuku app installed → NOT_RUNNING (needs user to start it).
+     *   3. Neither → NOT_INSTALLED.
+     *
+     * We deliberately do not gate on PackageManager first — that check misses Sui (rooted
+     * variant with no Shizuku package) and was the reason the app reported "not installed"
+     * for users who had Shizuku/Sui actually running.
+     */
+    private fun updateShizukuState() {
+        val binderAlive = try {
+            Shizuku.pingBinder()
+        } catch (e: Exception) {
+            Timber.e(e, "Shizuku.pingBinder threw")
+            false
+        }
+
+        if (!binderAlive) {
+            _shizukuState.value = if (hasShizukuPackage()) ShizukuState.NOT_RUNNING
+            else ShizukuState.NOT_INSTALLED
+            return
+        }
+
+        // Binder is alive — but pre-v11 Shizuku doesn't expose the modern permission API.
+        val preV11 = try {
+            Shizuku.isPreV11()
+        } catch (e: Exception) {
+            Timber.e(e, "Shizuku.isPreV11 threw")
+            false
+        }
+        if (preV11) {
+            _shizukuState.value = ShizukuState.UNSUPPORTED
+            return
+        }
+
+        _shizukuState.value = try {
+            if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED)
+                ShizukuState.READY
+            else
+                ShizukuState.NO_PERMISSION
+        } catch (e: Exception) {
+            Timber.e(e, "Shizuku.checkSelfPermission threw despite live binder")
+            ShizukuState.NO_PERMISSION
         }
     }
 
-    private fun updateShizukuState() {
-        try {
-            if (Shizuku.pingBinder()) {
-                if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
-                    _shizukuState.value = ShizukuState.READY
-                } else {
-                    _shizukuState.value = ShizukuState.NO_PERMISSION
-                }
-            } else {
-                _shizukuState.value = ShizukuState.NOT_RUNNING
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error checking Shizuku state")
-            _shizukuState.value = ShizukuState.NOT_RUNNING
-        }
+    private fun hasShizukuPackage(): Boolean = try {
+        application.packageManager.getPackageInfo(SHIZUKU_PACKAGE, 0)
+        true
+    } catch (_: PackageManager.NameNotFoundException) {
+        false
+    }
+
+    companion object {
+        private const val SHIZUKU_PACKAGE = "moe.shizuku.privileged.api"
+        private const val SHIZUKU_REQUEST_CODE = 0
     }
 }

@@ -9,6 +9,7 @@ import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.universalinstaller.presentation.uninstall.UninstallViewModel
+import app.pwhs.universalinstaller.presentation.uninstall.logs.UninstallLogsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import org.koin.core.module.dsl.bind
@@ -27,9 +28,11 @@ val appModule = module {
     // Room
     single {
         Room.databaseBuilder(get(), AppDatabase::class.java, "universal_installer.db")
+            .addMigrations(AppDatabase.MIGRATION_1_2)
             .build()
     }
     single { get<AppDatabase>().installHistoryDao() }
+    single { get<AppDatabase>().uninstallLogDao() }
 
     // Ktor HttpClient
     single { HttpClient(CIO) }
@@ -38,4 +41,5 @@ val appModule = module {
     viewModelOf(::InstallViewModel)
     viewModelOf(::UninstallViewModel)
     viewModelOf(::SettingViewModel)
+    viewModelOf(::UninstallLogsViewModel)
 }

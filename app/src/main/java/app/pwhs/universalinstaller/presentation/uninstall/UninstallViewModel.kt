@@ -7,6 +7,8 @@ import android.os.Build
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.pwhs.universalinstaller.data.local.UninstallLogDao
+import app.pwhs.universalinstaller.data.local.UninstallLogEntity
 import app.pwhs.universalinstaller.domain.model.InstalledApp
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +42,10 @@ data class UninstallUiState(
 class UninstallViewModel(
     private val application: Application,
     private val packageUninstaller: PackageUninstaller,
+    private val uninstallLogDao: UninstallLogDao,
 ) : ViewModel() {
+
+    private val notifier = UninstallNotifier(application)
 
     private val _apps = MutableStateFlow<List<InstalledApp>>(emptyList())
     private val _searchQuery = MutableStateFlow("")
@@ -110,31 +115,86 @@ class UninstallViewModel(
     fun uninstallSelected() {
         val packages = _selectedPackages.value.toList()
         _selectedPackages.value = emptySet()
-        packages.forEach { uninstallApp(it) }
+        if (packages.isEmpty()) return
+        if (packages.size == 1) {
+            uninstallApp(packages.first())
+            return
+        }
+
+        viewModelScope.launch {
+            val useShizuku = readShizukuPref()
+            val total = packages.size
+            val notifId = notifier.notifyBatchStart(total)
+            var successful = 0
+            var failed = 0
+            packages.forEachIndexed { index, pkg ->
+                val appName = _apps.value.firstOrNull { it.packageName == pkg }?.appName ?: pkg
+                notifier.notifyBatchProgress(notifId, completed = index, total = total, currentAppName = appName)
+                val ok = performUninstall(pkg, useShizuku)
+                if (ok) successful++ else failed++
+            }
+            notifier.notifyBatchDone(notifId, successful = successful, failed = failed)
+        }
     }
 
     fun uninstallApp(packageName: String) {
         viewModelScope.launch {
-            try {
-                val useShizuku = readShizukuPref()
-                val session = packageUninstaller.createSession(packageName) {
-                    confirmation = Confirmation.IMMEDIATE
-                    if (useShizuku) {
-                        useShizuku {}
-                    }
+            val useShizuku = readShizukuPref()
+            val appName = _apps.value.firstOrNull { it.packageName == packageName }?.appName ?: packageName
+            val notifId = notifier.notifySingleStart(appName)
+            val ok = performUninstall(packageName, useShizuku)
+            notifier.notifySingleResult(notifId, appName, success = ok)
+        }
+    }
+
+    private suspend fun performUninstall(packageName: String, useShizuku: Boolean): Boolean {
+        val appName = _apps.value.firstOrNull { it.packageName == packageName }?.appName ?: packageName
+        return try {
+            val session = packageUninstaller.createSession(packageName) {
+                confirmation = Confirmation.IMMEDIATE
+                if (useShizuku) {
+                    useShizuku {}
                 }
-                when (session.await()) {
-                    Session.State.Succeeded -> {
-                        Timber.d("Uninstalled $packageName successfully")
-                        _apps.value = _apps.value.filter { it.packageName != packageName }
-                    }
-                    is Session.State.Failed -> {
-                        Timber.e("Failed to uninstall $packageName")
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Error uninstalling $packageName")
             }
+            when (val result = session.await()) {
+                Session.State.Succeeded -> {
+                    Timber.d("Uninstalled $packageName successfully")
+                    _apps.value = _apps.value.filter { it.packageName != packageName }
+                    saveLog(packageName, appName, success = true, errorMessage = null)
+                    true
+                }
+                is Session.State.Failed -> {
+                    val reason = result.failure.message?.takeIf { it.isNotBlank() }
+                        ?: "Uninstall failed (no reason reported)"
+                    Timber.e("Failed to uninstall $packageName — $reason")
+                    saveLog(packageName, appName, success = false, errorMessage = reason)
+                    false
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error uninstalling $packageName")
+            saveLog(packageName, appName, success = false, errorMessage = e.message ?: e::class.java.simpleName)
+            false
+        }
+    }
+
+    private suspend fun saveLog(
+        packageName: String,
+        appName: String,
+        success: Boolean,
+        errorMessage: String?,
+    ) {
+        try {
+            uninstallLogDao.insert(
+                UninstallLogEntity(
+                    packageName = packageName,
+                    appName = appName,
+                    success = success,
+                    errorMessage = errorMessage,
+                )
+            )
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to persist uninstall log")
         }
     }
 
