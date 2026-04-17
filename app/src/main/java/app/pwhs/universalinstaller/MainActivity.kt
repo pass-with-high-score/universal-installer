@@ -5,11 +5,13 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,9 +39,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         maybeRequestNotificationPermission()
         setContent {
-            val themeModeFlow = dataStore.data.map { prefs ->
-                val name = prefs[stringPreferencesKey("theme_mode")] ?: ThemeMode.System.name
-                ThemeMode.entries.find { it.name == name } ?: ThemeMode.System
+            // `remember` caches the Flow across recompositions so `map {}` isn't re-invoked
+            // every frame (Detekt/Android Lint: "Flow operator functions should not be invoked
+            // within composition").
+            val themeModeFlow = remember {
+                dataStore.data.map { prefs ->
+                    val name = prefs[stringPreferencesKey("theme_mode")] ?: ThemeMode.System.name
+                    ThemeMode.entries.find { it.name == name } ?: ThemeMode.System
+                }
             }
             val themeMode by themeModeFlow.collectAsState(initial = ThemeMode.System)
 
@@ -47,6 +54,30 @@ class MainActivity : ComponentActivity() {
                 ThemeMode.System -> isSystemInDarkTheme()
                 ThemeMode.Light -> false
                 ThemeMode.Dark -> true
+            }
+
+            // Re-apply edge-to-edge whenever the effective theme flips so the status-bar /
+            // navigation-bar icon colors (light vs dark glyphs) match the new background.
+            DisposableEffect(darkTheme) {
+                enableEdgeToEdge(
+                    statusBarStyle = if (darkTheme) {
+                        SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    } else {
+                        SystemBarStyle.light(
+                            android.graphics.Color.TRANSPARENT,
+                            android.graphics.Color.TRANSPARENT,
+                        )
+                    },
+                    navigationBarStyle = if (darkTheme) {
+                        SystemBarStyle.dark(android.graphics.Color.TRANSPARENT)
+                    } else {
+                        SystemBarStyle.light(
+                            android.graphics.Color.TRANSPARENT,
+                            android.graphics.Color.TRANSPARENT,
+                        )
+                    },
+                )
+                onDispose {}
             }
 
             var currentRoute by remember { mutableStateOf(AppRoute.Splash) }
