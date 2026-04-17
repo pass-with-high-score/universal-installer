@@ -1,10 +1,7 @@
 <resources>
-    <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
     <string name="txt_uninstall">Uninstall</string>
     <string name="txt_setting">Settings</string>
-    <string name="default_percentage" translatable="false">0%</string>
-    <string name="percentage" translatable="false">%d%%</string>
     <string name="screen_title_install">Install</string>
     <string name="screen_title_uninstall">Uninstall</string>
     <string name="cancel">Cancel</string>
@@ -67,7 +64,7 @@
     <string name="apk_info_section_languages">Supported Languages (%d)</string>
     <string name="apk_info_section_permissions">Permissions (%d)</string>
     <string name="apk_info_permissions_more">… and %d more</string>
-<string name="apk_info_vt_scan_title">VirusTotal Scan</string>
+    <string name="apk_info_vt_scan_title">VirusTotal Scan</string>
     <string name="apk_info_vt_scanning">Scanning file…</string>
     <string name="apk_info_vt_clean">No threats detected</string>
     <string name="apk_info_vt_clean_detail">%1$d engines confirmed safe · %2$d undetected</string>

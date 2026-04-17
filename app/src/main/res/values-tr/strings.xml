@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
     <string name="txt_uninstall">Uninstall</string>
     <string name="txt_setting">Settings</string>
