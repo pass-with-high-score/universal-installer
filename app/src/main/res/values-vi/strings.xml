@@ -180,4 +180,23 @@
     <string name="language_screen_title">Ngôn ngữ</string>
     <string name="back_cd">Quay lại</string>
     <string name="done_cd">Xong</string>
+    <string name="apk_info_vt_uploading">Đang tải lên VirusTotal… %d%%</string>
+    <string name="apk_info_vt_queued">Đã xếp hàng trên VirusTotal…</string>
+    <string name="apk_info_vt_analyzing">Đang phân tích trên các công cụ…</string>
+    <string name="apk_info_vt_too_large">Tệp quá lớn (%1$s). VirusTotal chấp nhận tối đa %2$d MB.</string>
+    <string name="apk_info_vt_large_hint">Tệp trên 32 MB — đang tải lên qua điểm cuối tệp lớn của VirusTotal. Quá trình này có thể mất vài phút.</string>
+    <string name="apk_info_vt_check_button">Kiểm tra với VirusTotal</string>
+    <string name="apk_info_vt_rescan_button">Quét lại</string>
+
+    <string name="vt_notif_channel_name">Quét VirusTotal</string>
+    <string name="vt_notif_channel_description">Tiến trình tải lên và phân tích của VirusTotal</string>
+    <string name="vt_notif_hashing">Đang băm tệp…</string>
+    <string name="vt_notif_uploading">Đang tải lên VirusTotal (%d%%)</string>
+    <string name="vt_notif_queued">Đã xếp hàng trên VirusTotal</string>
+    <string name="vt_notif_analyzing">VirusTotal đang phân tích</string>
+    <string name="vt_notif_result_clean">VirusTotal: an toàn</string>
+    <string name="vt_notif_result_malicious">VirusTotal: phát hiện mối đe dọa</string>
+    <string name="vt_notif_result_suspicious">VirusTotal: đáng ngờ</string>
+    <string name="vt_notif_result_done">Đã hoàn tất quét VirusTotal</string>
+    <string name="vt_notif_result_error">Quét VirusTotal thất bại</string>
 </resources>

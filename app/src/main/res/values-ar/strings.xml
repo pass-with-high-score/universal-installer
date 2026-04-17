@@ -180,4 +180,23 @@
     <string name="language_screen_title">اللغة</string>
     <string name="back_cd">رجوع</string>
     <string name="done_cd">تم</string>
+    <string name="apk_info_vt_uploading">جاري الرفع إلى VirusTotal… %d%%</string>
+    <string name="apk_info_vt_queued">في قائمة انتظار VirusTotal…</string>
+    <string name="apk_info_vt_analyzing">جاري التحليل عبر المحركات…</string>
+    <string name="apk_info_vt_too_large">الملف كبير جدًا (%1$s). يقبل VirusTotal حتى %2$d ميغابايت.</string>
+    <string name="apk_info_vt_large_hint">حجم الملف يتجاوز 32 ميغابايت — جاري الرفع عبر نقطة نهاية الملفات الكبيرة لـ VirusTotal. قد يستغرق هذا عدة دقائق.</string>
+    <string name="apk_info_vt_check_button">تحقق باستخدام VirusTotal</string>
+    <string name="apk_info_vt_rescan_button">فحص مرة أخرى</string>
+
+    <string name="vt_notif_channel_name">فحوصات VirusTotal</string>
+    <string name="vt_notif_channel_description">تقدم عمليات الرفع والتحليل في VirusTotal</string>
+    <string name="vt_notif_hashing">جاري تجزئة الملف…</string>
+    <string name="vt_notif_uploading">جاري الرفع إلى VirusTotal (%d%%)</string>
+    <string name="vt_notif_queued">في قائمة انتظار VirusTotal</string>
+    <string name="vt_notif_analyzing">جاري تحليل VirusTotal</string>
+    <string name="vt_notif_result_clean">VirusTotal: نظيف</string>
+    <string name="vt_notif_result_malicious">VirusTotal: تم اكتشاف تهديدات</string>
+    <string name="vt_notif_result_suspicious">VirusTotal: مشبوه</string>
+    <string name="vt_notif_result_done">اكتمل فحص VirusTotal</string>
+    <string name="vt_notif_result_error">فشل فحص VirusTotal</string>
 </resources>

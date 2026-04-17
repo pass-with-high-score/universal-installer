@@ -180,4 +180,23 @@
     <string name="language_screen_title">Langue</string>
     <string name="back_cd">Retour</string>
     <string name="done_cd">Terminé</string>
+    <string name="apk_info_vt_uploading">Téléchargement vers VirusTotal… %d%%</string>
+    <string name="apk_info_vt_queued">Dans la file d\'attente de VirusTotal…</string>
+    <string name="apk_info_vt_analyzing">Analyse par les moteurs…</string>
+    <string name="apk_info_vt_too_large">Fichier trop volumineux (%1$s). VirusTotal accepte jusqu\'à %2$d Mo.</string>
+    <string name="apk_info_vt_large_hint">Fichier de plus de 32 Mo — téléchargement via le point de terminaison pour gros fichiers de VirusTotal. Cela peut prendre quelques minutes.</string>
+    <string name="apk_info_vt_check_button">Vérifier avec VirusTotal</string>
+    <string name="apk_info_vt_rescan_button">Analyser à nouveau</string>
+
+    <string name="vt_notif_channel_name">Analyses VirusTotal</string>
+    <string name="vt_notif_channel_description">Progression des téléchargements et analyses VirusTotal</string>
+    <string name="vt_notif_hashing">Hachage du fichier…</string>
+    <string name="vt_notif_uploading">Téléchargement vers VirusTotal (%d%%)</string>
+    <string name="vt_notif_queued">Dans la file d\'attente de VirusTotal</string>
+    <string name="vt_notif_analyzing">Analyse VirusTotal en cours</string>
+    <string name="vt_notif_result_clean">VirusTotal : propre</string>
+    <string name="vt_notif_result_malicious">VirusTotal : menaces détectées</string>
+    <string name="vt_notif_result_suspicious">VirusTotal : suspect</string>
+    <string name="vt_notif_result_done">Analyse VirusTotal terminée</string>
+    <string name="vt_notif_result_error">Échec de l\'analyse VirusTotal</string>
 </resources>

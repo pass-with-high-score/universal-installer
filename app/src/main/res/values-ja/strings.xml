@@ -180,4 +180,23 @@
     <string name="language_screen_title">言語</string>
     <string name="back_cd">戻る</string>
     <string name="done_cd">完了</string>
+    <string name="apk_info_vt_uploading">VirusTotal にアップロード中… %d%%</string>
+    <string name="apk_info_vt_queued">VirusTotal のキューに追加されました…</string>
+    <string name="apk_info_vt_analyzing">エンジンで分析中…</string>
+    <string name="apk_info_vt_too_large">ファイルが大きすぎます (%1$s)。VirusTotal は最大 %2$d MB まで受け付けます。</string>
+    <string name="apk_info_vt_large_hint">ファイルが 32 MB を超えています。VirusTotal の大容量ファイル エンドポイント経由でアップロードしています。これには数分かかる場合があります。</string>
+    <string name="apk_info_vt_check_button">VirusTotal で確認する</string>
+    <string name="apk_info_vt_rescan_button">もう一度スキャン</string>
+
+    <string name="vt_notif_channel_name">VirusTotal スキャン</string>
+    <string name="vt_notif_channel_description">VirusTotal のアップロードと分析の進行状況</string>
+    <string name="vt_notif_hashing">ファイルのハッシュを計算中…</string>
+    <string name="vt_notif_uploading">VirusTotal にアップロード中 (%d%%)</string>
+    <string name="vt_notif_queued">VirusTotal のキューに追加されました</string>
+    <string name="vt_notif_analyzing">VirusTotal で分析中</string>
+    <string name="vt_notif_result_clean">VirusTotal: 安全</string>
+    <string name="vt_notif_result_malicious">VirusTotal: 脅威を検出</string>
+    <string name="vt_notif_result_suspicious">VirusTotal: 疑わしい</string>
+    <string name="vt_notif_result_done">VirusTotal スキャンが完了しました</string>
+    <string name="vt_notif_result_error">VirusTotal スキャンに失敗しました</string>
 </resources>

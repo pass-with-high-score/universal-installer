@@ -182,4 +182,23 @@
     <string name="language_screen_title">Dil</string>
     <string name="back_cd">Geri</string>
     <string name="done_cd">Bitti</string>
+    <string name="apk_info_vt_uploading">VirusTotal\'e yükleniyor… %d%%</string>
+    <string name="apk_info_vt_queued">VirusTotal\'de sıraya alındı…</string>
+    <string name="apk_info_vt_analyzing">Motorlar arasında analiz ediliyor…</string>
+    <string name="apk_info_vt_too_large">Dosya çok büyük (%1$s). VirusTotal en fazla %2$d MB kabul eder.</string>
+    <string name="apk_info_vt_large_hint">Dosya 32 MB\'ın üzerinde — VirusTotal\'in büyük dosya uç noktası üzerinden yükleniyor. Bu birkaç dakika sürebilir.</string>
+    <string name="apk_info_vt_check_button">VirusTotal ile Kontrol Et</string>
+    <string name="apk_info_vt_rescan_button">Yeniden tara</string>
+
+    <string name="vt_notif_channel_name">VirusTotal taramaları</string>
+    <string name="vt_notif_channel_description">VirusTotal yükleme ve analizlerinin ilerlemesi</string>
+    <string name="vt_notif_hashing">Dosya özetleniyor (hashing)…</string>
+    <string name="vt_notif_uploading">VirusTotal\'e yükleniyor (%d%%)</string>
+    <string name="vt_notif_queued">VirusTotal\'de sıraya alındı</string>
+    <string name="vt_notif_analyzing">VirusTotal analiz ediyor</string>
+    <string name="vt_notif_result_clean">VirusTotal: temiz</string>
+    <string name="vt_notif_result_malicious">VirusTotal: tehditler algılandı</string>
+    <string name="vt_notif_result_suspicious">VirusTotal: şüpheli</string>
+    <string name="vt_notif_result_done">VirusTotal taraması tamamlandı</string>
+    <string name="vt_notif_result_error">VirusTotal taraması başarısız oldu</string>
 </resources>

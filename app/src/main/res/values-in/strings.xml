@@ -180,4 +180,23 @@
     <string name="language_screen_title">Bahasa</string>
     <string name="back_cd">Kembali</string>
     <string name="done_cd">Selesai</string>
+    <string name="apk_info_vt_uploading">Mengunggah ke VirusTotal… %d%%</string>
+    <string name="apk_info_vt_queued">Dalam antrean VirusTotal…</string>
+    <string name="apk_info_vt_analyzing">Menganalisis di berbagai mesin…</string>
+    <string name="apk_info_vt_too_large">Berkas terlalu besar (%1$s). VirusTotal menerima hingga %2$d MB.</string>
+    <string name="apk_info_vt_large_hint">Berkas lebih dari 32 MB — mengunggah melalui endpoint berkas besar VirusTotal. Ini mungkin memakan waktu beberapa menit.</string>
+    <string name="apk_info_vt_check_button">Periksa dengan VirusTotal</string>
+    <string name="apk_info_vt_rescan_button">Pindai lagi</string>
+
+    <string name="vt_notif_channel_name">Pemindaian VirusTotal</string>
+    <string name="vt_notif_channel_description">Progres unggahan dan analisis VirusTotal</string>
+    <string name="vt_notif_hashing">Melakukan hashing pada berkas…</string>
+    <string name="vt_notif_uploading">Mengunggah ke VirusTotal (%d%%)</string>
+    <string name="vt_notif_queued">Dalam antrean VirusTotal</string>
+    <string name="vt_notif_analyzing">VirusTotal menganalisis</string>
+    <string name="vt_notif_result_clean">VirusTotal: bersih</string>
+    <string name="vt_notif_result_malicious">VirusTotal: ancaman terdeteksi</string>
+    <string name="vt_notif_result_suspicious">VirusTotal: mencurigakan</string>
+    <string name="vt_notif_result_done">Pemindaian VirusTotal selesai</string>
+    <string name="vt_notif_result_error">Pemindaian VirusTotal gagal</string>
 </resources>

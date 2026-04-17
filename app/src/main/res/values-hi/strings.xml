@@ -180,4 +180,23 @@
     <string name="language_screen_title">भाषा</string>
     <string name="back_cd">वापस</string>
     <string name="done_cd">हो गया</string>
+    <string name="apk_info_vt_uploading">VirusTotal पर अपलोड हो रहा है… %d%%</string>
+    <string name="apk_info_vt_queued">VirusTotal पर कतार में…</string>
+    <string name="apk_info_vt_analyzing">इंजनों में विश्लेषण हो रहा है…</string>
+    <string name="apk_info_vt_too_large">फ़ाइल बहुत बड़ी है (%1$s)। VirusTotal %2$d MB तक स्वीकार करता है।</string>
+    <string name="apk_info_vt_large_hint">फ़ाइल 32 MB से अधिक है — VirusTotal के बड़े-फ़ाइल एंडपॉइंट के माध्यम से अपलोड हो रहा है। इसमें कुछ मिनट लग सकते हैं।</string>
+    <string name="apk_info_vt_check_button">VirusTotal के साथ जांचें</string>
+    <string name="apk_info_vt_rescan_button">फिर से स्कैन करें</string>
+
+    <string name="vt_notif_channel_name">VirusTotal स्कैन</string>
+    <string name="vt_notif_channel_description">VirusTotal अपलोड और विश्लेषण की प्रगति</string>
+    <string name="vt_notif_hashing">फ़ाइल को हैश किया जा रहा है…</string>
+    <string name="vt_notif_uploading">VirusTotal पर अपलोड हो रहा है (%d%%)</string>
+    <string name="vt_notif_queued">VirusTotal पर कतार में</string>
+    <string name="vt_notif_analyzing">VirusTotal विश्लेषण कर रहा है</string>
+    <string name="vt_notif_result_clean">VirusTotal: साफ़</string>
+    <string name="vt_notif_result_malicious">VirusTotal: खतरे मिले</string>
+    <string name="vt_notif_result_suspicious">VirusTotal: संदिग्ध</string>
+    <string name="vt_notif_result_done">VirusTotal स्कैन पूरा हुआ</string>
+    <string name="vt_notif_result_error">VirusTotal स्कैन विफल रहा</string>
 </resources>
