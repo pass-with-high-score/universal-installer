@@ -48,6 +48,46 @@
     <string name="file_picker_select">Select a package</string>
     <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
 
+    <!-- Source Picker (Local vs Download) -->
+    <string name="source_tab_local">Local</string>
+    <string name="source_tab_download">Download</string>
+
+    <!-- Local source actions -->
+    <string name="source_local_header">Select File</string>
+    <string name="source_action_find_automatic">Find automatic .APK, .XAPK, .APKS, .APKM</string>
+    <string name="source_action_browse_packages">Browse only packages .APK, .XAPK, .APKM, .APKS</string>
+    <string name="source_action_browse_all">Browse all files */*</string>
+
+    <!-- Download (inline) -->
+    <string name="source_download_header">Download from URL</string>
+    <string name="source_download_hint">Enter or paste the URL here…</string>
+    <string name="source_download_start">Download</string>
+    <string name="source_download_paste">Paste</string>
+
+    <!-- Find automatic -->
+    <string name="find_auto_sheet_title">Packages on this device</string>
+    <string name="find_auto_permission_title">All-files access required</string>
+    <string name="find_auto_permission_body">To scan your device for packages, allow all-files access in system settings.</string>
+    <string name="find_auto_grant">Grant access</string>
+    <string name="find_auto_scanning">Scanning device…</string>
+    <string name="find_auto_empty">No packages found on this device.</string>
+    <string name="find_auto_rescan">Rescan</string>
+    <string name="find_auto_count">%d packages</string>
+
+    <!-- Remote Download Dialog -->
+    <string name="remote_download_title">Download package</string>
+    <string name="remote_download_hint">https://example.com/app.apks</string>
+    <string name="remote_download_paste">Paste</string>
+    <string name="remote_download_clipboard_empty">Clipboard is empty</string>
+    <string name="remote_download_clipboard_invalid">Clipboard does not contain a URL</string>
+    <string name="remote_download_invalid_url">Invalid URL. Must start with http:// or https://</string>
+    <string name="remote_download_start">Download</string>
+    <string name="remote_download_cancel">Cancel</string>
+    <string name="remote_download_progress_unknown">Downloading… %s</string>
+    <string name="remote_download_progress">Downloading… %1$d%% · %2$s / %3$s</string>
+    <string name="remote_download_failed">Download failed: %s</string>
+    <string name="remote_download_unsupported">Downloaded file is not a supported package</string>
+
     <!-- Session Card -->
     <string name="session_installed_success">Installed successfully</string>
     <string name="session_installing_progress">%d%% installing…</string>

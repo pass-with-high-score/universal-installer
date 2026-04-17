@@ -27,6 +27,10 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -61,12 +65,18 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
         onFilePicked = { uri, splitPackage, fileName ->
             viewModel.parseApkInfo(context, uri, splitPackage, fileName)
         },
+        onDownloadFromUrl = { url -> viewModel.downloadFromUrl(context, url) },
+        onCancelDownload = viewModel::cancelDownload,
+        onDismissDownloadError = viewModel::dismissDownloadError,
         onConfirmInstall = viewModel::confirmInstall,
         onDismissPreview = viewModel::dismissPendingInstall,
         onCancel = viewModel::cancelSession,
         onRetry = viewModel::retrySession,
         onClearHistory = viewModel::clearHistory,
         onCheckVirusTotal = { viewModel.scanVirusTotal(context) },
+        onStartDeviceScan = { viewModel.startDeviceScan(context) },
+        onDismissDeviceScan = viewModel::dismissDeviceScan,
+        onPickFromScan = { found -> viewModel.pickFromScan(context, found) },
     )
 }
 
@@ -77,15 +87,24 @@ private fun InstallUi(
     uiState: InstallUiState = InstallUiState(),
     history: List<InstallHistoryEntity> = emptyList(),
     onFilePicked: (uri: Uri, splitPackage: SplitPackage.Provider, fileName: String) -> Unit = { _, _, _ -> },
+    onDownloadFromUrl: (String) -> Unit = {},
+    onCancelDownload: () -> Unit = {},
+    onDismissDownloadError: () -> Unit = {},
     onConfirmInstall: () -> Unit = {},
     onDismissPreview: () -> Unit = {},
     onCancel: (java.util.UUID) -> Unit = {},
     onRetry: (java.util.UUID) -> Unit = {},
     onClearHistory: () -> Unit = {},
     onCheckVirusTotal: () -> Unit = {},
+    onStartDeviceScan: () -> Unit = {},
+    onDismissDeviceScan: () -> Unit = {},
+    onPickFromScan: (FoundPackageFile) -> Unit = {},
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    // "strict" means validate extension strictly against known package types; "permissive" accepts anything.
+    var strictPickerMode by remember { mutableStateOf(true) }
 
     val filePickerLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
@@ -103,7 +122,7 @@ private fun InstallUi(
             val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
             val isApkMime = mimeType == "application/vnd.android.package-archive"
 
-            if (!isApkMime && extension !in validExtensions) {
+            if (strictPickerMode && !isApkMime && extension !in validExtensions) {
                 Toast.makeText(
                     context,
                     context.getString(R.string.install_unsupported_file),
@@ -112,7 +131,7 @@ private fun InstallUi(
                 return@rememberLauncherForActivityResult
             }
 
-            Timber.d("Selected file: $uri, MIME type: $mimeType")
+            Timber.d("Selected file: $uri, MIME type: $mimeType, strict: $strictPickerMode")
             val apks = when {
                 (isApkMime || extension == "apk") -> SingletonApkSequence(
                     uri,
@@ -127,10 +146,32 @@ private fun InstallUi(
                     .toSplitPackage()
                     .filterCompatible(context)
 
-                else -> SplitPackage.empty()
+                else -> {
+                    // Browse all: unknown extension. Try treating as APK — ackpine will error
+                    // cleanly if it's not a real package.
+                    SingletonApkSequence(uri, context).toSplitPackage()
+                }
             }
             onFilePicked(uri, apks, displayName)
         }
+
+    var selectedTab by rememberSaveable { mutableStateOf(SourceTab.Local) }
+
+    val grantPermissionLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            // Re-check on return — user may or may not have granted.
+            onStartDeviceScan()
+        }
+
+    FoundApksSheet(
+        scanState = uiState.scanState,
+        onDismiss = onDismissDeviceScan,
+        onGrantPermission = {
+            grantPermissionLauncher.launch(ApkScanner.buildGrantIntent(context))
+        },
+        onRescan = onStartDeviceScan,
+        onPick = onPickFromScan,
+    )
 
     // APK Info Preview Bottom Sheet
     if (uiState.pendingApkInfo != null) {
@@ -179,11 +220,24 @@ private fun InstallUi(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // File picker card
-            item(key = "file_picker") {
-                FilePickerCard(
-                    isLoading = uiState.isLoading,
-                    onPickFile = { filePickerLauncher.launch(arrayOf("*/*")) },
+            item(key = "source_picker") {
+                SourcePicker(
+                    selectedTab = selectedTab,
+                    onTabChange = { selectedTab = it },
+                    isParsing = uiState.isLoading,
+                    downloadState = uiState.downloadState,
+                    onFindAutomatic = onStartDeviceScan,
+                    onBrowsePackages = {
+                        strictPickerMode = true
+                        filePickerLauncher.launch(arrayOf("*/*"))
+                    },
+                    onBrowseAll = {
+                        strictPickerMode = false
+                        filePickerLauncher.launch(arrayOf("*/*"))
+                    },
+                    onStartDownload = onDownloadFromUrl,
+                    onCancelDownload = onCancelDownload,
+                    onDismissDownloadError = onDismissDownloadError,
                 )
             }
 

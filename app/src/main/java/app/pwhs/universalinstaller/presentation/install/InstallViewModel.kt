@@ -8,11 +8,15 @@ import android.provider.OpenableColumns
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.universalinstaller.R
+import androidx.core.content.FileProvider
+import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
+import app.pwhs.universalinstaller.data.remote.PackageDownloadService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.SessionData
+import app.pwhs.universalinstaller.domain.model.SessionProgress
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
@@ -32,7 +36,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.solrudev.ackpine.installer.PackageInstaller
 import ru.solrudev.ackpine.splits.Apk
+import ru.solrudev.ackpine.splits.ApkSplits.validate
 import ru.solrudev.ackpine.splits.SplitPackage
+import ru.solrudev.ackpine.splits.SplitPackage.Companion.toSplitPackage
+import ru.solrudev.ackpine.splits.ZippedApkSplits
 import ru.solrudev.ackpine.splits.get
 import timber.log.Timber
 import java.io.File
@@ -44,6 +51,7 @@ class InstallViewModel(
     private val sessionDataRepository: SessionDataRepository,
     private val virusTotalService: VirusTotalService,
     private val virusTotalNotifier: VirusTotalNotifier,
+    private val packageDownloadService: PackageDownloadService,
     private val historyDao: InstallHistoryDao,
 ) : ViewModel() {
 
@@ -52,13 +60,18 @@ class InstallViewModel(
 
     private val _isLoading = MutableStateFlow(false)
     private val _pendingApkInfo = MutableStateFlow<ApkInfo?>(null)
+    private val _downloadState = MutableStateFlow<DownloadState>(DownloadState.Idle)
+    private val _scanState = MutableStateFlow<ScanState>(ScanState.Idle)
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
     private var pendingOriginalUri: Uri? = null
+    private var pendingDownloadedFile: File? = null
 
     private var scanJob: Job? = null
     private var scanNotifId: Int = -1
+    private var downloadJob: Job? = null
+    private var deviceScanJob: Job? = null
 
     val history = historyDao.getAll()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
@@ -76,12 +89,17 @@ class InstallViewModel(
         sessionDataRepository.sessionsProgress,
         _isLoading,
         _pendingApkInfo,
-    ) { sessions, progress, loading, apkInfo ->
+        _downloadState,
+        _scanState,
+    ) { flows ->
+        @Suppress("UNCHECKED_CAST")
         InstallUiState(
-            sessions = sessions,
-            sessionsProgress = progress,
-            isLoading = loading,
-            pendingApkInfo = apkInfo,
+            sessions = flows[0] as List<SessionData>,
+            sessionsProgress = flows[1] as List<SessionProgress>,
+            isLoading = flows[2] as Boolean,
+            pendingApkInfo = flows[3] as ApkInfo?,
+            downloadState = flows[4] as DownloadState,
+            scanState = flows[5] as ScanState,
         )
     }
         .onStart { activeController().restoreSessionsFromSavedState(viewModelScope) }
@@ -115,6 +133,9 @@ class InstallViewModel(
         pendingApkUris = null
         pendingFileName = null
         pendingOriginalUri = null
+        // Cache file lives in cacheDir; OS reclaims it. Just drop our reference so a later
+        // dismiss/download doesn't delete a file the install session is still reading.
+        pendingDownloadedFile = null
 
         viewModelScope.launch {
             if (uris.isEmpty()) return@launch
@@ -143,6 +164,151 @@ class InstallViewModel(
         pendingApkUris = null
         pendingOriginalUri = null
         pendingFileName = null
+        deletePendingDownloadedFile()
+    }
+
+    /**
+     * Download a package from [url] into cacheDir, then run it through the same parse flow as a
+     * locally-picked file. Progress surfaces via [InstallUiState.downloadState]; on success the
+     * download card resets and the preview sheet opens.
+     */
+    fun downloadFromUrl(context: Context, url: String) {
+        val trimmed = url.trim()
+        if (!trimmed.startsWith("http://", ignoreCase = true) &&
+            !trimmed.startsWith("https://", ignoreCase = true)
+        ) {
+            _downloadState.value = DownloadState.Error(
+                context.getString(R.string.remote_download_invalid_url)
+            )
+            return
+        }
+        downloadJob?.cancel()
+        _downloadState.value = DownloadState.Running(url = trimmed, bytesRead = 0L, totalBytes = -1L)
+        downloadJob = viewModelScope.launch {
+            val destName = trimmed.substringAfterLast('/').substringBefore('?')
+                .ifBlank { "download_${System.currentTimeMillis()}" }
+            val cacheDir = File(application.cacheDir, "downloads").apply { mkdirs() }
+            val destination = File(cacheDir, "${System.currentTimeMillis()}_$destName")
+            val result = packageDownloadService.download(trimmed, destination) { read, total ->
+                _downloadState.value = DownloadState.Running(
+                    url = trimmed,
+                    bytesRead = read,
+                    totalBytes = total,
+                )
+            }
+            result.fold(
+                onSuccess = { downloaded ->
+                    val ext = downloaded.fileName.substringAfterLast('.', "").lowercase()
+                    val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
+                    if (ext !in validExtensions) {
+                        downloaded.file.delete()
+                        _downloadState.value = DownloadState.Error(
+                            context.getString(R.string.remote_download_unsupported)
+                        )
+                        return@fold
+                    }
+                    _downloadState.value = DownloadState.Idle
+                    handleDownloadedFile(context, downloaded.file, downloaded.fileName, ext)
+                },
+                onFailure = { e ->
+                    if (e is kotlinx.coroutines.CancellationException) throw e
+                    Timber.e(e, "Download failed")
+                    _downloadState.value = DownloadState.Error(
+                        context.getString(
+                            R.string.remote_download_failed,
+                            e.message ?: e::class.java.simpleName,
+                        )
+                    )
+                },
+            )
+        }
+    }
+
+    fun cancelDownload() {
+        downloadJob?.cancel()
+        downloadJob = null
+        _downloadState.value = DownloadState.Idle
+    }
+
+    fun dismissDownloadError() {
+        if (_downloadState.value is DownloadState.Error) {
+            _downloadState.value = DownloadState.Idle
+        }
+    }
+
+    // ── Find automatic (device scan) ──────────────────────
+
+    fun startDeviceScan(context: Context) {
+        if (!ApkScanner.hasAllFilesAccess(context)) {
+            _scanState.value = ScanState.PermissionNeeded
+            return
+        }
+        deviceScanJob?.cancel()
+        _scanState.value = ScanState.Scanning
+        deviceScanJob = viewModelScope.launch {
+            val results = try {
+                ApkScanner.scan()
+            } catch (ce: kotlinx.coroutines.CancellationException) {
+                throw ce
+            } catch (t: Throwable) {
+                Timber.e(t, "Device scan failed")
+                emptyList()
+            }
+            _scanState.value = ScanState.Ready(results)
+        }
+    }
+
+    fun dismissDeviceScan() {
+        deviceScanJob?.cancel()
+        deviceScanJob = null
+        _scanState.value = ScanState.Idle
+    }
+
+    /** User picked a file from the scan results — hand it to the normal parse flow. */
+    fun pickFromScan(context: Context, found: FoundPackageFile) {
+        val file = File(found.path)
+        if (!file.exists()) return
+        val uri = androidx.core.content.FileProvider.getUriForFile(
+            context,
+            "${BuildConfig.APPLICATION_ID}.fileprovider",
+            file,
+        )
+        val splitProvider = if (found.extension == "apk") {
+            SingletonApkSequence(uri, context).toSplitPackage()
+        } else {
+            ZippedApkSplits.getApksForUri(uri, context)
+                .validate()
+                .toSplitPackage()
+                .filterCompatible(context)
+        }
+        _scanState.value = ScanState.Idle
+        deviceScanJob?.cancel()
+        parseApkInfo(context, uri, splitProvider, found.name)
+    }
+
+    private fun handleDownloadedFile(context: Context, file: File, displayName: String, extension: String) {
+        // Clean up any previous download that was never installed.
+        deletePendingDownloadedFile()
+        pendingDownloadedFile = file
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${BuildConfig.APPLICATION_ID}.fileprovider",
+            file,
+        )
+        val splitProvider = if (extension == "apk") {
+            SingletonApkSequence(uri, context).toSplitPackage()
+        } else {
+            ZippedApkSplits.getApksForUri(uri, context)
+                .validate()
+                .toSplitPackage()
+                .filterCompatible(context)
+        }
+        parseApkInfo(context, uri, splitProvider, displayName)
+    }
+
+    private fun deletePendingDownloadedFile() {
+        pendingDownloadedFile?.let { runCatching { it.delete() } }
+        pendingDownloadedFile = null
     }
 
     /**

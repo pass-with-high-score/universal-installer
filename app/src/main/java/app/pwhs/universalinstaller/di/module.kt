@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.room.Room
 import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.data.local.AppDatabase
+import app.pwhs.universalinstaller.data.remote.PackageDownloadService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.data.repository.SessionDataRepositoryImpl
@@ -68,6 +69,7 @@ val appModule = module {
     }
     single { VirusTotalService(get()) }
     single { VirusTotalNotifier(get()) }
+    single { PackageDownloadService(get()) }
 
     viewModelOf(::InstallViewModel)
     viewModelOf(::UninstallViewModel)
