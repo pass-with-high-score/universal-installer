@@ -1,1 +1,4 @@
 /build
+keystore-base64.txt
+keystore.jks
+/release
