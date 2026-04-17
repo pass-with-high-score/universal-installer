@@ -66,6 +66,7 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
         onCancel = viewModel::cancelSession,
         onRetry = viewModel::retrySession,
         onClearHistory = viewModel::clearHistory,
+        onCheckVirusTotal = { viewModel.scanVirusTotal(context) },
     )
 }
 
@@ -81,6 +82,7 @@ private fun InstallUi(
     onCancel: (java.util.UUID) -> Unit = {},
     onRetry: (java.util.UUID) -> Unit = {},
     onClearHistory: () -> Unit = {},
+    onCheckVirusTotal: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -142,6 +144,7 @@ private fun InstallUi(
                 apkInfo = uiState.pendingApkInfo,
                 onInstall = onConfirmInstall,
                 onCancel = onDismissPreview,
+                onCheckVirusTotal = onCheckVirusTotal,
             )
         }
     }

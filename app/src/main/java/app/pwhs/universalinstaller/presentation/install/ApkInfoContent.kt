@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Memory
@@ -30,10 +31,12 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,6 +59,7 @@ internal fun ApkInfoContent(
     apkInfo: ApkInfo,
     onInstall: () -> Unit,
     onCancel: () -> Unit,
+    onCheckVirusTotal: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -162,10 +166,12 @@ internal fun ApkInfoContent(
         }
 
         // VirusTotal Security Scan
-        apkInfo.vtResult?.let { vt ->
-            Spacer(Modifier.height(16.dp))
-            VirusTotalCard(vt)
-        }
+        Spacer(Modifier.height(16.dp))
+        VirusTotalCard(
+            vt = apkInfo.vtResult,
+            fileSizeBytes = apkInfo.fileSizeBytes,
+            onCheck = onCheckVirusTotal,
+        )
 
         // Permissions section
         if (apkInfo.permissions.isNotEmpty()) {
@@ -275,21 +281,32 @@ private fun LanguagesCard(languages: List<String>) {
 }
 
 @Composable
-private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult) {
+private fun VirusTotalCard(
+    vt: app.pwhs.universalinstaller.domain.model.VtResult?,
+    fileSizeBytes: Long,
+    onCheck: () -> Unit,
+) {
+    val context = LocalContext.current
     val extendedColors = LocalExtendedColors.current
     val warningColor = extendedColors.warning
-    val vtColor = when (vt.status) {
+    val status = vt?.status
+    val inProgress = status == VtStatus.SCANNING || status == VtStatus.UPLOADING ||
+            status == VtStatus.QUEUED || status == VtStatus.ANALYZING
+
+    val vtColor = when (status) {
         VtStatus.CLEAN -> MaterialTheme.colorScheme.primary
-        VtStatus.MALICIOUS -> MaterialTheme.colorScheme.error
+        VtStatus.MALICIOUS, VtStatus.TOO_LARGE -> MaterialTheme.colorScheme.error
         VtStatus.SUSPICIOUS -> warningColor
-        VtStatus.SCANNING -> MaterialTheme.colorScheme.tertiary
+        VtStatus.SCANNING, VtStatus.UPLOADING,
+        VtStatus.QUEUED, VtStatus.ANALYZING -> MaterialTheme.colorScheme.tertiary
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    val vtContainerColor = when (vt.status) {
-        VtStatus.MALICIOUS -> MaterialTheme.colorScheme.errorContainer
+    val vtContainerColor = when (status) {
+        VtStatus.MALICIOUS, VtStatus.TOO_LARGE -> MaterialTheme.colorScheme.errorContainer
         VtStatus.SUSPICIOUS -> extendedColors.warningContainer
         else -> MaterialTheme.colorScheme.surfaceContainerLow
     }
+
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -309,7 +326,7 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
                     style = MaterialTheme.typography.labelLarge,
                     color = vtColor,
                 )
-                if (vt.status == VtStatus.SCANNING) {
+                if (inProgress) {
                     Spacer(Modifier.width(8.dp))
                     CircularProgressIndicator(
                         modifier = Modifier.size(16.dp),
@@ -319,14 +336,35 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
                 }
             }
             Spacer(Modifier.height(8.dp))
-            when (vt.status) {
-                VtStatus.SCANNING -> {
+            when (status) {
+                VtStatus.SCANNING -> Text(
+                    text = stringResource(R.string.apk_info_vt_scanning),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                VtStatus.UPLOADING -> {
                     Text(
-                        text = stringResource(R.string.apk_info_vt_scanning),
+                        text = stringResource(R.string.apk_info_vt_uploading, vt.uploadProgress),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    Spacer(Modifier.height(6.dp))
+                    LinearProgressIndicator(
+                        progress = { vt.uploadProgress.coerceIn(0, 100) / 100f },
+                        modifier = Modifier.fillMaxWidth(),
+                        color = vtColor,
+                    )
                 }
+                VtStatus.QUEUED -> Text(
+                    text = stringResource(R.string.apk_info_vt_queued),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                VtStatus.ANALYZING -> Text(
+                    text = stringResource(R.string.apk_info_vt_analyzing),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 VtStatus.CLEAN -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
@@ -363,13 +401,47 @@ private fun VirusTotalCard(vt: app.pwhs.universalinstaller.domain.model.VtResult
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
-                VtStatus.NOT_FOUND -> {
-                    Text(stringResource(R.string.apk_info_vt_not_found), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                VtStatus.ERROR -> {
-                    Text(stringResource(R.string.apk_info_vt_error, vt.errorMessage.orEmpty()), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
-                }
+                VtStatus.NOT_FOUND -> Text(
+                    stringResource(R.string.apk_info_vt_not_found),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                VtStatus.TOO_LARGE -> Text(
+                    text = stringResource(
+                        R.string.apk_info_vt_too_large,
+                        android.text.format.Formatter.formatShortFileSize(context, fileSizeBytes),
+                        650,
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
+                VtStatus.ERROR -> Text(
+                    stringResource(R.string.apk_info_vt_error, vt.errorMessage),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                )
                 else -> {}
+            }
+
+            // Action button — only when we're idle and not too-large.
+            if (!inProgress && status != VtStatus.TOO_LARGE && status != VtStatus.NO_API_KEY) {
+                Spacer(Modifier.height(12.dp))
+                val label = when (status) {
+                    null -> stringResource(R.string.apk_info_vt_check_button)
+                    else -> stringResource(R.string.apk_info_vt_rescan_button)
+                }
+                TextButton(
+                    onClick = onCheck,
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CloudUpload,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(label, style = MaterialTheme.typography.labelLarge)
+                }
             }
         }
     }

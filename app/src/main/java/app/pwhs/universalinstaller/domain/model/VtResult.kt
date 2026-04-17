@@ -7,7 +7,11 @@ enum class VtStatus {
     NOT_FOUND,
     NO_API_KEY,
     ERROR,
-    SCANNING,
+    TOO_LARGE,
+    SCANNING,    // hashing + hash lookup
+    UPLOADING,   // posting bytes to VirusTotal
+    QUEUED,      // VT received the file and queued it
+    ANALYZING,   // VT engines are running
 }
 
 data class VtResult(
@@ -17,4 +21,6 @@ data class VtResult(
     val undetected: Int = 0,
     val status: VtStatus = VtStatus.NO_API_KEY,
     val errorMessage: String = "",
+    val uploadProgress: Int = 0,   // 0..100, meaningful only when status = UPLOADING
+    val analysisId: String = "",
 )

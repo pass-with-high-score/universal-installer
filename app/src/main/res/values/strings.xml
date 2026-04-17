@@ -77,6 +77,26 @@
     <string name="apk_info_vt_suspicious_detail">%1$d suspicious · %2$d harmless · %3$d undetected</string>
     <string name="apk_info_vt_not_found">File not found in VirusTotal database</string>
     <string name="apk_info_vt_error">Scan error: %s</string>
+    <string name="apk_info_vt_uploading">Uploading to VirusTotal… %d%%</string>
+    <string name="apk_info_vt_queued">Queued on VirusTotal…</string>
+    <string name="apk_info_vt_analyzing">Analyzing across engines…</string>
+    <string name="apk_info_vt_too_large">File too large (%1$s). VirusTotal accepts up to %2$d MB.</string>
+    <string name="apk_info_vt_large_hint">File over 32 MB — uploading via VirusTotal\'s large-file endpoint. This may take several minutes.</string>
+    <string name="apk_info_vt_check_button">Check with VirusTotal</string>
+    <string name="apk_info_vt_rescan_button">Scan again</string>
+
+    <!-- VirusTotal notifications -->
+    <string name="vt_notif_channel_name">VirusTotal scans</string>
+    <string name="vt_notif_channel_description">Progress of VirusTotal uploads and analyses</string>
+    <string name="vt_notif_hashing">Hashing file…</string>
+    <string name="vt_notif_uploading">Uploading to VirusTotal (%d%%)</string>
+    <string name="vt_notif_queued">Queued on VirusTotal</string>
+    <string name="vt_notif_analyzing">VirusTotal analyzing</string>
+    <string name="vt_notif_result_clean">VirusTotal: clean</string>
+    <string name="vt_notif_result_malicious">VirusTotal: threats detected</string>
+    <string name="vt_notif_result_suspicious">VirusTotal: suspicious</string>
+    <string name="vt_notif_result_done">VirusTotal scan complete</string>
+    <string name="vt_notif_result_error">VirusTotal scan failed</string>
 
     <!-- Uninstall Screen -->
     <string name="uninstall_show_system_apps">Show system apps</string>
