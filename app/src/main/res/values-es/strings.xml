@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: sospechoso</string>
     <string name="vt_notif_result_done">Análisis de VirusTotal completado</string>
     <string name="vt_notif_result_error">Error en el análisis de VirusTotal</string>
+    <string name="setting_sponsor_title">Patrocinar</string>
+    <string name="setting_sponsor_subtitle">Apoya el desarrollo en GitHub Sponsors</string>
 </resources>

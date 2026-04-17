@@ -139,6 +139,15 @@ Help us improve Universal Installer!
 
 ---
 
+## Sponsor
+
+If Universal Installer saves you time, consider supporting the project. Sponsorships help cover
+maintenance, new features, and keeping the app free.
+
+[![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4%EF%B8%8F-red?logo=github-sponsors)](https://github.com/sponsors/pass-with-high-score)
+
+---
+
 ## License
 
 This project is licensed under the **GNU License**.  

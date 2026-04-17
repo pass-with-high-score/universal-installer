@@ -20,6 +20,7 @@ import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.LightMode
@@ -446,6 +447,30 @@ private fun SettingUi(
                         },
                         modifier = Modifier.clickable {
                             uriHandler.openUri("https://t.me/blockads_android")
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    ListItem(
+                        headlineContent = {
+                            Text(stringResource(R.string.setting_sponsor_title), style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = stringResource(R.string.setting_sponsor_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.Favorite,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        modifier = Modifier.clickable {
+                            uriHandler.openUri("https://github.com/sponsors/pass-with-high-score")
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )

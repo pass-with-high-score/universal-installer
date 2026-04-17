@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal : suspect</string>
     <string name="vt_notif_result_done">Analyse VirusTotal terminée</string>
     <string name="vt_notif_result_error">Échec de l\'analyse VirusTotal</string>
+    <string name="setting_sponsor_title">Sponsor</string>
+    <string name="setting_sponsor_subtitle">Soutenez le développement sur GitHub Sponsors</string>
 </resources>

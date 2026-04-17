@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal：可疑</string>
     <string name="vt_notif_result_done">VirusTotal 扫描完成</string>
     <string name="vt_notif_result_error">VirusTotal 扫描失败</string>
+    <string name="setting_sponsor_title">赞助</string>
+    <string name="setting_sponsor_subtitle">在 GitHub Sponsors 上支持开发</string>
 </resources>

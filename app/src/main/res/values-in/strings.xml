@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: mencurigakan</string>
     <string name="vt_notif_result_done">Pemindaian VirusTotal selesai</string>
     <string name="vt_notif_result_error">Pemindaian VirusTotal gagal</string>
+    <string name="setting_sponsor_title">Sponsor</string>
+    <string name="setting_sponsor_subtitle">Dukung pengembangan di GitHub Sponsors</string>
 </resources>

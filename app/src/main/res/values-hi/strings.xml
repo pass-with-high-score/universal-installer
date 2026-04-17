@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: संदिग्ध</string>
     <string name="vt_notif_result_done">VirusTotal स्कैन पूरा हुआ</string>
     <string name="vt_notif_result_error">VirusTotal स्कैन विफल रहा</string>
+    <string name="setting_sponsor_title">प्रायोजक</string>
+    <string name="setting_sponsor_subtitle">GitHub Sponsors पर विकास का समर्थन करें</string>
 </resources>

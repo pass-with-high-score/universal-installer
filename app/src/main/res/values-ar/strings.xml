@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: مشبوه</string>
     <string name="vt_notif_result_done">اكتمل فحص VirusTotal</string>
     <string name="vt_notif_result_error">فشل فحص VirusTotal</string>
+    <string name="setting_sponsor_title">رعاية</string>
+    <string name="setting_sponsor_subtitle">ادعم التطوير عبر GitHub Sponsors</string>
 </resources>

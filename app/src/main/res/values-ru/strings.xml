@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: подозрительно</string>
     <string name="vt_notif_result_done">Сканирование VirusTotal завершено</string>
     <string name="vt_notif_result_error">Сбой сканирования VirusTotal</string>
+    <string name="setting_sponsor_title">Спонсор</string>
+    <string name="setting_sponsor_subtitle">Поддержите разработку на GitHub Sponsors</string>
 </resources>

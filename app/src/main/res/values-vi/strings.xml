@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: đáng ngờ</string>
     <string name="vt_notif_result_done">Đã hoàn tất quét VirusTotal</string>
     <string name="vt_notif_result_error">Quét VirusTotal thất bại</string>
+    <string name="setting_sponsor_title">Tài trợ</string>
+    <string name="setting_sponsor_subtitle">Ủng hộ quá trình phát triển trên GitHub Sponsors</string>
 </resources>

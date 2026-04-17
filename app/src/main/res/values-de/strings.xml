@@ -199,4 +199,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: verdächtig</string>
     <string name="vt_notif_result_done">VirusTotal-Scan abgeschlossen</string>
     <string name="vt_notif_result_error">VirusTotal-Scan fehlgeschlagen</string>
+    <string name="setting_sponsor_title">Sponsor</string>
+    <string name="setting_sponsor_subtitle">Unterstütze die Entwicklung über GitHub Sponsors</string>
 </resources>
