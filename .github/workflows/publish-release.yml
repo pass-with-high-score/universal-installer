@@ -1,0 +1,94 @@
+name: Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+concurrency:
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & Deploy to Play Store
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set Version Name
+        run: echo "VERSION_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2'
+          bundler-cache: true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.gradle/caches
+            ~/.gradle/daemon
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle.kts', '**/libs.versions.toml', 'gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
+      # Signing
+      - name: Decode keystore
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/universal-installer-release.jks
+
+      - name: Create key.properties
+        run: |
+          cat > key.properties <<EOF
+          storeFile=universal-installer-release.jks
+          storePassword=${{ secrets.STORE_PASSWORD }}
+          keyAlias=${{ secrets.KEY_ALIAS }}
+          keyPassword=${{ secrets.KEY_PASSWORD }}
+          EOF
+
+      - name: Decode Play Store key
+        run: echo "${{ secrets.PLAY_STORE_CONFIG_JSON }}" | base64 --decode > fastlane/play-store-key.json
+
+      # Build & Deploy
+      - name: Grant execute permission
+        run: chmod +x gradlew
+
+      - name: Deploy to internal track
+        run: bundle exec fastlane internal
+
+      - name: Build release APK
+        run: ./gradlew assembleRelease
+
+      # Artifacts
+      - name: Upload release AAB & APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-build
+          path: |
+            app/build/outputs/bundle/release/app-release.aab
+            app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+
+      # Upload assets to existing GitHub Release (or create if missing)
+      - name: Create GitHub Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: ${{ env.VERSION_NAME }}
+          draft: false
+          prerelease: false
+          files: app/build/outputs/apk/release/app-release.apk
+          token: ${{ secrets.GITHUB_TOKEN }}

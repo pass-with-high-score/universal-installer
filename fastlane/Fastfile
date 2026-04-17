@@ -2,7 +2,7 @@ default_platform(:android)
 
 platform :android do
 
-  desc "Runs all the tests"
+  desc "Run tests"
   lane :test do
     gradle(task: "test")
   end
@@ -14,81 +14,76 @@ platform :android do
     )
   end
 
-  desc "Build release APK"
+  desc "Build release AAB (Android App Bundle)"
   lane :build_release do
     gradle(
-      task: "assembleRelease"
-    )
-  end
-
-  desc "Build release AAB (for Play Store)"
-  lane :build_bundle do
-    gradle(
       task: "bundleRelease"
     )
   end
 
-  desc "Deploy a new beta build to Firebase App Distribution"
-  lane :beta do
-    gradle(
-      task: "assembleRelease"
-    )
-
-    firebase_app_distribution(
-      app: ENV["FIREBASE_APP_ID"],
-      groups: "beta-testers",
-      release_notes: changelog_from_git_commits(
-        commits_count: 10,
-        pretty: "- %s"
-      ),
-      apk_path: "app/build/outputs/apk/release/app-release.apk"
-    )
-  end
-
-  desc "Deploy to Google Play internal track"
-  lane :deploy_internal do
+  desc "Deploy internal testing track"
+  lane :internal do
     gradle(
       task: "bundleRelease"
     )
-
     upload_to_play_store(
       track: "internal",
       aab: "app/build/outputs/bundle/release/app-release.aab",
       skip_upload_metadata: true,
       skip_upload_images: true,
-      skip_upload_screenshots: true
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
     )
   end
 
-  desc "Promote internal to production"
-  lane :deploy_production do
+  desc "Promote internal to closed beta"
+  lane :beta do
     upload_to_play_store(
       track: "internal",
-      track_promote_to: "production",
+      track_promote_to: "beta",
+      json_key: "fastlane/play-store-key.json",
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
   end
 
-  desc "Increment version code"
-  lane :bump_version do |options|
-    # Read current version
-    path = "../app/build.gradle.kts"
-    content = File.read(path)
-
-    # Bump version code
-    current_code = content.match(/versionCode\s*=\s*(\d+)/)[1].to_i
-    new_code = current_code + 1
-    content.gsub!(/versionCode\s*=\s*\d+/, "versionCode = #{new_code}")
-
-    # Bump version name if provided
-    if options[:version_name]
-      content.gsub!(/versionName\s*=\s*"[^"]*"/, "versionName = \"#{options[:version_name]}\"")
-    end
-
-    File.write(path, content)
-    UI.success("Version bumped to code=#{new_code}")
+  desc "Deploy to production"
+  lane :production do
+    gradle(
+      task: "bundleRelease"
+    )
+    upload_to_play_store(
+      track: "production",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
+      json_key: "fastlane/play-store-key.json",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false,
+      release_status: "draft"
+    )
   end
 
+  desc "Increment version code"
+  lane :bump_version do |options|
+    version_name = options[:version] || "1.0"
+    # Read current versionCode from build.gradle.kts
+    build_gradle = File.read("../app/build.gradle.kts")
+    current_code = build_gradle.match(/versionCode = (\d+)/)[1].to_i
+    new_code = current_code + 1
+
+    # Update versionCode
+    new_content = build_gradle.gsub(
+      /versionCode = \d+/,
+      "versionCode = #{new_code}"
+    )
+    # Update versionName if provided
+    new_content = new_content.gsub(
+      /versionName = ".*"/,
+      "versionName = \"#{version_name}\""
+    )
+    File.write("../app/build.gradle.kts", new_content)
+
+    UI.success("✅ Bumped to versionCode=#{new_code}, versionName=#{version_name}")
+  end
 end

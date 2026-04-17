@@ -1,5 +1,2 @@
-{
-  "project_name": "Universal Installer",
-  "package_name": "com.nqmgaming.universalinstaller",
-  "json_key_file": ""
-}
+package_name("app.pwhs.universalinstaller")
+json_key_file("fastlane/play-store-key.json")
