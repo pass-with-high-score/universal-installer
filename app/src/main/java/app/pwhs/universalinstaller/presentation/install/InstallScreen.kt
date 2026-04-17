@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
@@ -32,6 +33,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
+import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.composable.SessionCard
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import com.ramcosta.composedestinations.annotation.Destination
@@ -147,12 +149,15 @@ private fun InstallUi(
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
         topBar = {
             LargeTopAppBar(
-                expandedHeight = 120.dp,
+                expandedHeight = 140.dp,
                 title = {
-                    Text(
-                        text = "Install Package",
-                        style = MaterialTheme.typography.headlineMedium,
-                    )
+                    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Text(
+                            text = "Install Package",
+                            style = MaterialTheme.typography.headlineMedium,
+                        )
+                        InstallerModeBadge()
+                    }
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(

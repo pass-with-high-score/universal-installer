@@ -65,6 +65,7 @@ import coil3.request.ImageRequest
 import app.pwhs.universalinstaller.util.AppIconData
 import app.pwhs.universalinstaller.domain.model.InstalledApp
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
+import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import org.koin.androidx.compose.koinViewModel
@@ -177,12 +178,15 @@ private fun UninstallUi(
                 )
             } else {
                 LargeTopAppBar(
-                    expandedHeight = 120.dp,
+                    expandedHeight = 140.dp,
                     title = {
-                        Text(
-                            text = "Uninstall",
-                            style = MaterialTheme.typography.headlineMedium,
-                        )
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Text(
+                                text = "Uninstall",
+                                style = MaterialTheme.typography.headlineMedium,
+                            )
+                            InstallerModeBadge()
+                        }
                     },
                     actions = {
                         Box {
