@@ -5,8 +5,10 @@ import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,11 +29,20 @@ fun BottomBar(
     navController: NavHostController
 ) {
     val navigator = navController.rememberDestinationsNavigator()
+    val colors = MaterialTheme.colorScheme
+    val itemColors = NavigationBarItemDefaults.colors(
+        selectedIconColor = colors.onPrimaryContainer,
+        selectedTextColor = colors.primary,
+        indicatorColor = colors.primaryContainer,
+        unselectedIconColor = colors.onSurfaceVariant,
+        unselectedTextColor = colors.onSurfaceVariant,
+    )
     NavigationBar {
         BottomBarItem.entries.forEach { destination ->
             val isCurrentDestOnBackStack by navController.isRouteOnBackStackAsState(destination.direction)
             NavigationBarItem(
                 selected = isCurrentDestOnBackStack,
+                colors = itemColors,
                 onClick = {
                     if (isCurrentDestOnBackStack) {
                         navigator.popBackStack(destination.direction, false)

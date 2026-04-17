@@ -2,16 +2,16 @@ package app.pwhs.universalinstaller.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── Primary: Trust Blue ──────────────────────────────────
-val PrimaryLight = Color(0xFF2563EB)
+// ── Primary: Logo Orange (FB923C → EA580C) ───────────────
+val PrimaryLight = Color(0xFFEA580C)
 val OnPrimaryLight = Color(0xFFFFFFFF)
-val PrimaryContainerLight = Color(0xFFDBE4FF)
-val OnPrimaryContainerLight = Color(0xFF001A41)
+val PrimaryContainerLight = Color(0xFFFFEDD5)
+val OnPrimaryContainerLight = Color(0xFF431407)
 
-val PrimaryDark = Color(0xFF93B4FF)
-val OnPrimaryDark = Color(0xFF002E69)
-val PrimaryContainerDark = Color(0xFF1B4DA0)
-val OnPrimaryContainerDark = Color(0xFFDBE4FF)
+val PrimaryDark = Color(0xFFFB923C)
+val OnPrimaryDark = Color(0xFF431407)
+val PrimaryContainerDark = Color(0xFF9A3412)
+val OnPrimaryContainerDark = Color(0xFFFFEDD5)
 
 // ── Secondary: Slate Blue ────────────────────────────────
 val SecondaryLight = Color(0xFF3B82F6)
