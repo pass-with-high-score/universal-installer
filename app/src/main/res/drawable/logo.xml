@@ -5,6 +5,34 @@
     android:viewportWidth="512"
     android:viewportHeight="512">
   <path
+      android:pathData="M0,0h512v512h-512z">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:startX="0"
+          android:startY="0"
+          android:endX="512"
+          android:endY="512"
+          android:type="linear">
+        <item android:offset="0" android:color="#FFFB923C"/>
+        <item android:offset="1" android:color="#FFEA580C"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
+      android:pathData="M0,0h512v512h-512z">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:startX="0"
+          android:startY="0"
+          android:endX="0"
+          android:endY="512"
+          android:type="linear">
+        <item android:offset="0" android:color="#1EFFFFFF"/>
+        <item android:offset="0.5" android:color="#00FFFFFF"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
       android:pathData="M389.12,0H122.88C55.02,0 0,55.02 0,122.88V389.12C0,456.98 55.02,512 122.88,512H389.12C456.98,512 512,456.98 512,389.12V122.88C512,55.02 456.98,0 389.12,0Z">
     <aapt:attr name="android:fillColor">
       <gradient
