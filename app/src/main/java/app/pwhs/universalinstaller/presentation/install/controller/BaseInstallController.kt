@@ -37,6 +37,7 @@ abstract class BaseInstallController(
     private val sessionUris = mutableMapOf<UUID, List<Uri>>()
     private val originalFileUris = mutableMapOf<UUID, Uri>()
     private val deleteFlags = mutableMapOf<UUID, Boolean>()
+    private val successHooks = mutableMapOf<UUID, suspend () -> Unit>()
 
     protected abstract suspend fun createSession(
         uris: List<Uri>,
@@ -50,6 +51,7 @@ abstract class BaseInstallController(
         context: Context? = null,
         originalUri: Uri? = null,
         deleteAfterInstall: Boolean = false,
+        onSuccess: (suspend () -> Unit)? = null,
     ) {
         scope.launch {
             val session = createSession(uris, sessionData.name)
@@ -57,6 +59,7 @@ abstract class BaseInstallController(
             sessionUris[session.id] = uris
             if (originalUri != null) originalFileUris[session.id] = originalUri
             deleteFlags[session.id] = deleteAfterInstall
+            if (onSuccess != null) successHooks[session.id] = onSuccess
             val data = sessionData.copy(id = session.id)
             sessionDataRepository.addSessionData(data)
             awaitSession(session, scope, context)
@@ -121,6 +124,15 @@ abstract class BaseInstallController(
                 when (val result = session.await()) {
                     Session.State.Succeeded -> {
                         saveHistory(sessionData, success = true)
+                        // Hook runs BEFORE source deletion so the hook can still read the original
+                        // zip (e.g. to extract OBB entries). Errors are caller-reported; we don't
+                        // roll back the APK install here.
+                        val hook = successHooks.remove(session.id)
+                        if (hook != null) {
+                            runCatching { hook() }.onFailure {
+                                Timber.e(it, "Install success hook failed")
+                            }
+                        }
                         deleteSourceFileIfNeeded(session.id, context)
                         sessionDataRepository.removeSessionData(session.id)
                         activeSessions.remove(session.id)
@@ -142,6 +154,7 @@ abstract class BaseInstallController(
                 sessionUris.remove(session.id)
                 originalFileUris.remove(session.id)
                 deleteFlags.remove(session.id)
+                successHooks.remove(session.id)
                 throw e
             } catch (e: Exception) {
                 handleError(e.message, session.id)

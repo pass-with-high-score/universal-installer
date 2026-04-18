@@ -25,6 +25,21 @@ sealed interface ScanState {
     data class Ready(val files: List<FoundPackageFile>) : ScanState
 }
 
+sealed interface ObbCopyState {
+    data object Idle : ObbCopyState
+    data class Running(
+        val appName: String,
+        val packageName: String,
+        val bytesCopied: Long,
+        val totalBytes: Long,
+    ) : ObbCopyState {
+        val progressPercent: Int
+            get() = if (totalBytes > 0) ((bytesCopied * 100L) / totalBytes).toInt().coerceIn(0, 100) else 0
+    }
+    data class Done(val appName: String, val fileCount: Int) : ObbCopyState
+    data class Error(val appName: String, val message: String) : ObbCopyState
+}
+
 data class InstallUiState(
     val sessions: List<SessionData> = emptyList(),
     val sessionsProgress: List<SessionProgress> = emptyList(),
@@ -32,4 +47,5 @@ data class InstallUiState(
     val pendingApkInfo: ApkInfo? = null,
     val downloadState: DownloadState = DownloadState.Idle,
     val scanState: ScanState = ScanState.Idle,
+    val obbCopyState: ObbCopyState = ObbCopyState.Idle,
 )

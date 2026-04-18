@@ -77,6 +77,7 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
         onStartDeviceScan = { viewModel.startDeviceScan(context) },
         onDismissDeviceScan = viewModel::dismissDeviceScan,
         onPickFromScan = { found -> viewModel.pickFromScan(context, found) },
+        onDismissObbCopy = viewModel::dismissObbCopy,
     )
 }
 
@@ -99,6 +100,7 @@ private fun InstallUi(
     onStartDeviceScan: () -> Unit = {},
     onDismissDeviceScan: () -> Unit = {},
     onPickFromScan: (FoundPackageFile) -> Unit = {},
+    onDismissObbCopy: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -220,6 +222,15 @@ private fun InstallUi(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            if (uiState.obbCopyState !is ObbCopyState.Idle) {
+                item(key = "obb_copy") {
+                    ObbCopyCard(
+                        state = uiState.obbCopyState,
+                        onDismiss = onDismissObbCopy,
+                    )
+                }
+            }
+
             item(key = "source_picker") {
                 SourcePicker(
                     selectedTab = selectedTab,

@@ -146,6 +146,17 @@ internal fun ApkInfoContent(
             if (apkInfo.splitCount > 1) {
                 InfoChip(label = stringResource(R.string.apk_info_splits_count, apkInfo.splitCount))
             }
+            if (apkInfo.obbFileNames.isNotEmpty()) {
+                val obbSize = if (apkInfo.obbTotalBytes > 0)
+                    " · ${Formatter.formatShortFileSize(context, apkInfo.obbTotalBytes)}"
+                else ""
+                InfoChip(
+                    label = stringResource(
+                        R.string.apk_info_obb_chip,
+                        apkInfo.obbFileNames.size,
+                    ) + obbSize,
+                )
+            }
         }
 
         Spacer(Modifier.height(16.dp))

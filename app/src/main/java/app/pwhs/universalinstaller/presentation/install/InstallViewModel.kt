@@ -62,11 +62,13 @@ class InstallViewModel(
     private val _pendingApkInfo = MutableStateFlow<ApkInfo?>(null)
     private val _downloadState = MutableStateFlow<DownloadState>(DownloadState.Idle)
     private val _scanState = MutableStateFlow<ScanState>(ScanState.Idle)
+    private val _obbCopyState = MutableStateFlow<ObbCopyState>(ObbCopyState.Idle)
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
     private var pendingOriginalUri: Uri? = null
     private var pendingDownloadedFile: File? = null
+    private var pendingObbEntries: List<ObbEntry> = emptyList()
 
     private var scanJob: Job? = null
     private var scanNotifId: Int = -1
@@ -91,6 +93,7 @@ class InstallViewModel(
         _pendingApkInfo,
         _downloadState,
         _scanState,
+        _obbCopyState,
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         InstallUiState(
@@ -100,6 +103,7 @@ class InstallViewModel(
             pendingApkInfo = flows[3] as ApkInfo?,
             downloadState = flows[4] as DownloadState,
             scanState = flows[5] as ScanState,
+            obbCopyState = flows[6] as ObbCopyState,
         )
     }
         .onStart { activeController().restoreSessionsFromSavedState(viewModelScope) }
@@ -110,6 +114,7 @@ class InstallViewModel(
     fun parseApkInfo(context: Context, uri: Uri, splitPackage: SplitPackage.Provider, fileName: String) {
         // A new file invalidates any in-flight scan.
         cancelActiveScan()
+        pendingObbEntries = emptyList()
         viewModelScope.launch {
             _isLoading.value = true
             pendingFileName = fileName
@@ -117,9 +122,16 @@ class InstallViewModel(
             val info = withContext(Dispatchers.IO) {
                 extractApkInfoAndCacheUris(context, uri, splitPackage, fileName)
             }
-            _pendingApkInfo.value = info
+            // OBB scan — only for archive-type bundles; skip raw APKs to avoid pointless I/O.
+            val ext = fileName.substringAfterLast('.', "").lowercase()
+            val archiveExts = setOf("apks", "xapk", "apkm", "zip")
+            val obbEntries = if (ext in archiveExts) ObbExtractor.scan(context, uri) else emptyList()
+            pendingObbEntries = obbEntries
+            _pendingApkInfo.value = info.copy(
+                obbFileNames = obbEntries.map { it.fileName },
+                obbTotalBytes = obbEntries.sumOf { it.sizeBytes.coerceAtLeast(0L) },
+            )
             _isLoading.value = false
-            // Auto-run a cheap hash lookup — if the file is already known to VT, we skip the upload.
             launchHashLookupOnly(context, uri)
         }
     }
@@ -129,12 +141,12 @@ class InstallViewModel(
         val fn = pendingFileName ?: return
         val originalUri = pendingOriginalUri
         val apkInfo = _pendingApkInfo.value
+        val obbEntries = pendingObbEntries
         _pendingApkInfo.value = null
         pendingApkUris = null
         pendingFileName = null
         pendingOriginalUri = null
-        // Cache file lives in cacheDir; OS reclaims it. Just drop our reference so a later
-        // dismiss/download doesn't delete a file the install session is still reading.
+        pendingObbEntries = emptyList()
         pendingDownloadedFile = null
 
         viewModelScope.launch {
@@ -147,6 +159,14 @@ class InstallViewModel(
                 appName = apkInfo?.appName ?: "",
                 iconPath = iconPath,
             )
+            val onSuccess: (suspend () -> Unit)? = if (obbEntries.isNotEmpty() && originalUri != null && apkInfo != null) {
+                val pkg = apkInfo.packageName
+                val appName = apkInfo.appName.ifBlank { pkg }
+                val hook: suspend () -> Unit = {
+                    copyObbFiles(application, originalUri, obbEntries, pkg, appName)
+                }
+                hook
+            } else null
             activeController().install(
                 uris = uris,
                 sessionData = sessionData,
@@ -154,8 +174,41 @@ class InstallViewModel(
                 context = application,
                 originalUri = originalUri,
                 deleteAfterInstall = deleteAfterInstall,
+                onSuccess = onSuccess,
             )
         }
+    }
+
+    private suspend fun copyObbFiles(
+        context: Context,
+        sourceUri: Uri,
+        entries: List<ObbEntry>,
+        packageName: String,
+        appName: String,
+    ) {
+        _obbCopyState.value = ObbCopyState.Running(
+            appName = appName,
+            packageName = packageName,
+            bytesCopied = 0L,
+            totalBytes = entries.sumOf { it.sizeBytes.coerceAtLeast(0L) },
+        )
+        val result = ObbExtractor.extract(
+            context = context,
+            uri = sourceUri,
+            entries = entries,
+            packageName = packageName,
+            onProgress = { copied, total ->
+                _obbCopyState.value = ObbCopyState.Running(appName, packageName, copied, total)
+            },
+        )
+        _obbCopyState.value = result.fold(
+            onSuccess = { count -> ObbCopyState.Done(appName, count) },
+            onFailure = { t -> ObbCopyState.Error(appName, t.message ?: "Copy failed") },
+        )
+    }
+
+    fun dismissObbCopy() {
+        _obbCopyState.value = ObbCopyState.Idle
     }
 
     fun dismissPendingInstall() {
@@ -164,6 +217,7 @@ class InstallViewModel(
         pendingApkUris = null
         pendingOriginalUri = null
         pendingFileName = null
+        pendingObbEntries = emptyList()
         deletePendingDownloadedFile()
     }
 

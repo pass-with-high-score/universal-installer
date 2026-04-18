@@ -101,6 +101,14 @@
     <string name="apk_info_version_chip">v%s</string>
     <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d splits</string>
+    <string name="apk_info_obb_chip">%d OBB</string>
+
+    <!-- OBB copy progress (shown after install succeeds) -->
+    <string name="obb_copy_title">Copying OBB files…</string>
+    <string name="obb_copy_progress">%1$s / %2$s · %3$d%%</string>
+    <string name="obb_copy_done">%1$s · %2$d OBB file(s) copied</string>
+    <string name="obb_copy_error">OBB copy failed: %s</string>
+    <string name="obb_copy_dismiss">Dismiss</string>
     <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Supported Architectures</string>
@@ -198,13 +206,13 @@
     <string name="setting_shizuku_set_source">Set install source</string>
     <string name="setting_shizuku_set_source_sub">Defaults to this app when off</string>
     <string name="setting_shizuku_installer_label">installed by (package name)</string>
-    <string name="setting_shizuku_installer_preset_play">Google Play Store</string>
-    <string name="setting_shizuku_installer_preset_aurora">Aurora Store</string>
-    <string name="setting_shizuku_installer_preset_fdroid">F-Droid</string>
-    <string name="setting_shizuku_installer_preset_amazon">Amazon Appstore</string>
-    <string name="setting_shizuku_installer_preset_samsung">Samsung Galaxy Store</string>
-    <string name="setting_shizuku_installer_preset_huawei">Huawei AppGallery</string>
-    <string name="setting_shizuku_installer_preset_xiaomi">Xiaomi GetApps</string>
+    <string name="setting_shizuku_installer_preset_play" translatable="false">Google Play Store</string>
+    <string name="setting_shizuku_installer_preset_aurora" translatable="false">Aurora Store</string>
+    <string name="setting_shizuku_installer_preset_fdroid" translatable="false">F-Droid</string>
+    <string name="setting_shizuku_installer_preset_amazon" translatable="false">Amazon Appstore</string>
+    <string name="setting_shizuku_installer_preset_samsung" translatable="false">Samsung Galaxy Store</string>
+    <string name="setting_shizuku_installer_preset_huawei" translatable="false">Huawei AppGallery</string>
+    <string name="setting_shizuku_installer_preset_xiaomi" translatable="false"> Xiaomi GetApps</string>
     <string name="setting_section_security">Security</string>
     <string name="setting_vt_key_title">VirusTotal API Key</string>
     <string name="setting_vt_key_subtitle">Enable malware scanning before install</string>

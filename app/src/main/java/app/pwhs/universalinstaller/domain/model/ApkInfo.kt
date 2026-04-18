@@ -18,4 +18,6 @@ data class ApkInfo(
     val supportedLanguages: List<String> = emptyList(),
     val sha256: String = "",
     val vtResult: VtResult? = null,
+    val obbFileNames: List<String> = emptyList(),
+    val obbTotalBytes: Long = 0L,
 )
