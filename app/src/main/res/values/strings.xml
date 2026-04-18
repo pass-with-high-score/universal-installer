@@ -38,10 +38,42 @@
     <string name="status_failed">Failed</string>
 
     <!-- Install Screen -->
+    <string name="install_storage_title">Storage</string>
+    <string name="install_storage_value">%1$s free / %2$s</string>
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">History</string>
     <string name="install_history_clear">Clear</string>
     <string name="install_unsupported_file">Unsupported file. Please select an APK, APKS, XAPK, or APKM file.</string>
+    <string name="install_no_splits_error">Couldn\'t parse the package. File may be corrupt, truncated, or not compatible with this device.</string>
+
+    <!-- Download notifications -->
+    <string name="download_notif_channel_name">Package downloads</string>
+    <string name="download_notif_channel_description">Progress of downloading APK/XAPK/APKS files from a URL</string>
+    <string name="download_notif_running_title">Downloading %s</string>
+    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
+    <string name="download_notif_running_text_unknown">Downloaded %s</string>
+    <string name="download_notif_done_title">Download complete</string>
+    <string name="download_notif_done_text">%s · open the app to install</string>
+    <string name="download_notif_failed_title">Download failed</string>
+
+    <!-- Download history screen -->
+    <string name="download_history_title">Download history</string>
+    <string name="download_history_empty">No downloaded packages yet.</string>
+    <string name="download_history_clear_cd">Clear all</string>
+    <string name="download_history_row_menu">More</string>
+    <string name="download_history_action_install">Install</string>
+    <string name="download_history_action_copy_url">Copy URL</string>
+    <string name="download_history_action_delete">Delete</string>
+    <string name="download_history_file_missing">File no longer on disk</string>
+    <string name="download_history_file_missing_inline">File missing</string>
+    <string name="download_history_url_copied">URL copied</string>
+    <string name="download_history_clear_title">Clear download history?</string>
+    <string name="download_history_clear_message">This removes all entries and deletes every file in Download/UniversalInstaller.</string>
+    <string name="download_history_clear_confirm">Clear</string>
+    <string name="download_history_delete_title">Delete this download?</string>
+    <string name="download_history_delete_message">Removes %s from disk and from history.</string>
+    <string name="download_history_delete_confirm">Delete</string>
+    <string name="download_history_open_button">Download history</string>
 
     <!-- File Picker Card -->
     <string name="file_picker_parsing">Parsing package…</string>
@@ -141,6 +173,7 @@
     <string name="apk_info_vt_suspicious_detail">%1$d suspicious · %2$d harmless · %3$d undetected</string>
     <string name="apk_info_vt_not_found">File not found in VirusTotal database</string>
     <string name="apk_info_vt_error">Scan error: %s</string>
+    <string name="apk_info_vt_no_api_key">No VirusTotal API key configured. Open Settings → Security → VirusTotal API Key to add one — free key at virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Uploading to VirusTotal… %d%%</string>
     <string name="apk_info_vt_queued">Queued on VirusTotal…</string>
     <string name="apk_info_vt_analyzing">Analyzing across engines…</string>
@@ -164,6 +197,14 @@
 
     <!-- Uninstall Screen -->
     <string name="uninstall_show_system_apps">Show system apps</string>
+    <string name="uninstall_app_count">%d apps</string>
+    <string name="uninstall_sort_name">Name</string>
+    <string name="uninstall_sort_size">Size</string>
+    <string name="uninstall_sort_installed">Installed</string>
+    <string name="uninstall_sort_last_used">Last used</string>
+    <string name="uninstall_sort_usage_toast">Grant Usage access to sort by last used</string>
+    <string name="uninstall_row_installed">Installed %s</string>
+    <string name="uninstall_row_used">Used %s</string>
     <string name="uninstall_search_hint">Search apps…</string>
     <string name="uninstall_no_apps_found">No apps found</string>
     <string name="uninstall_no_match">No apps match \"%s\"</string>

@@ -9,6 +9,7 @@ import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.data.repository.SessionDataRepositoryImpl
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
+import app.pwhs.universalinstaller.presentation.download.DownloadHistoryViewModel
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.universalinstaller.presentation.uninstall.UninstallViewModel
@@ -36,11 +37,12 @@ val appModule = module {
     // Room
     single {
         Room.databaseBuilder(get(), AppDatabase::class.java, "universal_installer.db")
-            .addMigrations(AppDatabase.MIGRATION_1_2)
+            .addMigrations(AppDatabase.MIGRATION_1_2, AppDatabase.MIGRATION_2_3)
             .build()
     }
     single { get<AppDatabase>().installHistoryDao() }
     single { get<AppDatabase>().uninstallLogDao() }
+    single { get<AppDatabase>().downloadHistoryDao() }
 
     // Ktor HttpClient. Uploads to VirusTotal can take minutes on slow connections, so we bump
     // the request timeout well past Ktor's default and leave the socket/connect timeouts sane.
@@ -75,4 +77,5 @@ val appModule = module {
     viewModelOf(::UninstallViewModel)
     viewModelOf(::SettingViewModel)
     viewModelOf(::UninstallLogsViewModel)
+    viewModelOf(::DownloadHistoryViewModel)
 }

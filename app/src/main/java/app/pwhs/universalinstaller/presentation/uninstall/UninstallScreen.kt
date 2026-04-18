@@ -14,11 +14,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ReceiptLong
 import androidx.compose.material.icons.rounded.Android
+import androidx.compose.material.icons.rounded.ArrowDownward
+import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
@@ -35,6 +41,8 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -84,6 +92,7 @@ fun UninstallScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
+    val context = LocalContext.current
     UninstallUi(
         modifier = modifier,
         uiState = uiState,
@@ -95,6 +104,18 @@ fun UninstallScreen(
         onToggleSelectAll = viewModel::toggleSelectAll,
         onUninstallSelected = viewModel::uninstallSelected,
         onOpenLogs = { navigator.navigate(UninstallLogsScreenDestination) },
+        onSortChange = viewModel::setSort,
+        onRequestUsageAccess = {
+            // Send user to the system Usage Access settings — we re-check on resume via
+            // refreshUsageAccess() and reload the list if it flipped.
+            runCatching {
+                context.startActivity(
+                    android.content.Intent(android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                )
+            }
+        },
+        onRefreshUsageAccess = viewModel::refreshUsageAccess,
     )
 }
 
@@ -111,6 +132,9 @@ private fun UninstallUi(
     onToggleSelectAll: () -> Unit = {},
     onUninstallSelected: () -> Unit = {},
     onOpenLogs: () -> Unit = {},
+    onSortChange: (UninstallSortBy) -> Unit = {},
+    onRequestUsageAccess: () -> Unit = {},
+    onRefreshUsageAccess: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showFilterMenu by remember { mutableStateOf(false) }
@@ -272,6 +296,27 @@ private fun UninstallUi(
                 ) {}
             }
 
+            if (!uiState.isSelectionMode) {
+                SortRow(
+                    sortBy = uiState.sortBy,
+                    direction = uiState.sortDirection,
+                    usageGranted = uiState.usageAccessGranted,
+                    count = uiState.filteredApps.size,
+                    onSortChange = onSortChange,
+                    onRequestUsageAccess = onRequestUsageAccess,
+                )
+            }
+
+            // Re-check usage access when user returns from the Settings screen.
+            val lifecycleOwner = androidx.lifecycle.compose.LocalLifecycleOwner.current
+            androidx.compose.runtime.DisposableEffect(lifecycleOwner) {
+                val observer = androidx.lifecycle.LifecycleEventObserver { _, event ->
+                    if (event == androidx.lifecycle.Lifecycle.Event.ON_RESUME) onRefreshUsageAccess()
+                }
+                lifecycleOwner.lifecycle.addObserver(observer)
+                onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+            }
+
             when {
                 uiState.isLoading -> {
                     Box(
@@ -296,7 +341,25 @@ private fun UninstallUi(
                 }
 
                 else -> {
+                    val listState = rememberLazyListState()
+                    // Any change in sort or filter jumps back to the top. `scrollToItem` is
+                    // O(1); `animateScrollToItem` steps through every item and lags hard on
+                    // 300+ apps — user already sees the chip flip, the jump doesn't need
+                    // animation.
+                    LaunchedEffect(
+                        uiState.sortBy,
+                        uiState.sortDirection,
+                        uiState.searchQuery,
+                        uiState.showSystemApps,
+                    ) {
+                        if (listState.firstVisibleItemIndex != 0 ||
+                            listState.firstVisibleItemScrollOffset != 0
+                        ) {
+                            listState.scrollToItem(0)
+                        }
+                    }
                     LazyColumn(
+                        state = listState,
                         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
@@ -322,6 +385,90 @@ private fun UninstallUi(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SortRow(
+    sortBy: UninstallSortBy,
+    direction: SortDirection,
+    usageGranted: Boolean,
+    count: Int,
+    onSortChange: (UninstallSortBy) -> Unit,
+    onRequestUsageAccess: () -> Unit,
+) {
+    val context = LocalContext.current
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = stringResource(R.string.uninstall_app_count, count),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+        Row(
+            modifier = Modifier
+                .horizontalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            SortChip(UninstallSortBy.Name, sortBy, direction, stringResource(R.string.uninstall_sort_name), onClick = { onSortChange(UninstallSortBy.Name) })
+            SortChip(UninstallSortBy.Size, sortBy, direction, stringResource(R.string.uninstall_sort_size), onClick = { onSortChange(UninstallSortBy.Size) })
+            SortChip(UninstallSortBy.InstalledAt, sortBy, direction, stringResource(R.string.uninstall_sort_installed), onClick = { onSortChange(UninstallSortBy.InstalledAt) })
+            SortChip(
+                axis = UninstallSortBy.LastUsed,
+                current = sortBy,
+                direction = direction,
+                label = stringResource(R.string.uninstall_sort_last_used),
+                onClick = {
+                    if (!usageGranted) {
+                        android.widget.Toast.makeText(
+                            context,
+                            context.getString(R.string.uninstall_sort_usage_toast),
+                            android.widget.Toast.LENGTH_LONG,
+                        ).show()
+                        onRequestUsageAccess()
+                    } else {
+                        onSortChange(UninstallSortBy.LastUsed)
+                    }
+                },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SortChip(
+    axis: UninstallSortBy,
+    current: UninstallSortBy,
+    direction: SortDirection,
+    label: String,
+    onClick: () -> Unit,
+) {
+    val selected = axis == current
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+        trailingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = if (direction == SortDirection.Asc)
+                        Icons.Rounded.ArrowUpward else Icons.Rounded.ArrowDownward,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                )
+            }
+        } else null,
+        colors = FilterChipDefaults.filterChipColors(),
+    )
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -449,11 +596,53 @@ private fun AppCard(
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                if (app.versionName.isNotBlank()) {
+                // Version + size on one line — both are "static" identifiers, always known.
+                val versionSizeLine = buildList {
+                    if (app.versionName.isNotBlank()) add("v${app.versionName}")
+                    if (app.sizeBytes > 0) {
+                        add(android.text.format.Formatter.formatShortFileSize(context, app.sizeBytes))
+                    }
+                }.joinToString(" · ")
+                if (versionSizeLine.isNotEmpty()) {
                     Text(
-                        text = "v${app.versionName}",
+                        text = versionSizeLine,
                         style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+                // Installed date + last-used time. Last-used is omitted when the user hasn't
+                // granted Usage access (we get 0 from UsageStatsManager in that case).
+                val dateParts = buildList {
+                    if (app.installedAt > 0) {
+                        add(stringResource(
+                            R.string.uninstall_row_installed,
+                            android.text.format.DateUtils.formatDateTime(
+                                context,
+                                app.installedAt,
+                                android.text.format.DateUtils.FORMAT_SHOW_DATE or
+                                    android.text.format.DateUtils.FORMAT_ABBREV_MONTH,
+                            )
+                        ))
+                    }
+                    if (app.lastUsedAt > 0) {
+                        val rel = android.text.format.DateUtils.getRelativeTimeSpanString(
+                            app.lastUsedAt,
+                            System.currentTimeMillis(),
+                            android.text.format.DateUtils.MINUTE_IN_MILLIS,
+                            android.text.format.DateUtils.FORMAT_ABBREV_RELATIVE,
+                        ).toString()
+                        add(stringResource(R.string.uninstall_row_used, rel))
+                    }
+                }
+                if (dateParts.isNotEmpty()) {
+                    Text(
+                        text = dateParts.joinToString(" · "),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
                 }
             }

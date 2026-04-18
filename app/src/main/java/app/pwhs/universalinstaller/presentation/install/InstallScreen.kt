@@ -47,6 +47,8 @@ import app.pwhs.universalinstaller.presentation.composable.SessionCard
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
+import com.ramcosta.composedestinations.generated.destinations.DownloadHistoryScreenDestination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 import ru.solrudev.ackpine.splits.ApkSplits.validate
 import ru.solrudev.ackpine.splits.SplitPackage
@@ -56,7 +58,11 @@ import timber.log.Timber
 
 @Destination<RootGraph>(start = true)
 @Composable
-fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = koinViewModel()) {
+fun InstallScreen(
+    navigator: DestinationsNavigator,
+    modifier: Modifier = Modifier,
+    viewModel: InstallViewModel = koinViewModel(),
+) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val history by viewModel.history.collectAsState()
@@ -85,6 +91,7 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
         onRemoveObb = { obb -> viewModel.removeAttachedObb(obb.uri) },
         onGrantObbFolder = viewModel::onObbTreeGranted,
         obbTreeHintUri = viewModel::obbTreeHintUri,
+        onOpenDownloadHistory = { navigator.navigate(DownloadHistoryScreenDestination) },
     )
 }
 
@@ -112,6 +119,7 @@ private fun InstallUi(
     onRemoveObb: (AttachedObb) -> Unit = {},
     onGrantObbFolder: (Uri?) -> Unit = {},
     obbTreeHintUri: () -> Uri? = { null },
+    onOpenDownloadHistory: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -283,6 +291,8 @@ private fun InstallUi(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
+            item(key = "storage") { StorageCard() }
+
             if (uiState.obbCopyState !is ObbCopyState.Idle) {
                 item(key = "obb_copy") {
                     ObbCopyCard(
@@ -314,6 +324,7 @@ private fun InstallUi(
                     onStartDownload = onDownloadFromUrl,
                     onCancelDownload = onCancelDownload,
                     onDismissDownloadError = onDismissDownloadError,
+                    onOpenDownloadHistory = onOpenDownloadHistory,
                 )
             }
 

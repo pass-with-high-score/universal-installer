@@ -28,6 +28,9 @@ import ru.solrudev.ackpine.session.parameters.Confirmation
 import ru.solrudev.ackpine.shizuku.useShizuku
 import timber.log.Timber
 
+enum class UninstallSortBy { Name, Size, InstalledAt, LastUsed }
+enum class SortDirection { Asc, Desc }
+
 data class UninstallUiState(
     val apps: List<InstalledApp> = emptyList(),
     val filteredApps: List<InstalledApp> = emptyList(),
@@ -37,6 +40,9 @@ data class UninstallUiState(
     val selectedPackages: Set<String> = emptySet(),
     val isSelectionMode: Boolean = false,
     val isAllSelected: Boolean = false,
+    val sortBy: UninstallSortBy = UninstallSortBy.Name,
+    val sortDirection: SortDirection = SortDirection.Asc,
+    val usageAccessGranted: Boolean = false,
 )
 
 class UninstallViewModel(
@@ -52,19 +58,24 @@ class UninstallViewModel(
     private val _isLoading = MutableStateFlow(true)
     private val _showSystemApps = MutableStateFlow(false)
     private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
+    private val _sortBy = MutableStateFlow(UninstallSortBy.Name)
+    private val _sortDirection = MutableStateFlow(SortDirection.Asc)
+    private val _usageAccess = MutableStateFlow(false)
 
     val uiState: StateFlow<UninstallUiState> = combine(
-        _apps,
-        _searchQuery,
-        _isLoading,
-        _showSystemApps,
-        _selectedPackages,
+        listOf(_apps, _searchQuery, _isLoading, _showSystemApps, _selectedPackages,
+            _sortBy, _sortDirection, _usageAccess)
     ) { flows ->
+        @Suppress("UNCHECKED_CAST")
         val apps = flows[0] as List<InstalledApp>
         val query = flows[1] as String
         val loading = flows[2] as Boolean
         val showSystem = flows[3] as Boolean
+        @Suppress("UNCHECKED_CAST")
         val selected = flows[4] as Set<String>
+        val sortBy = flows[5] as UninstallSortBy
+        val direction = flows[6] as SortDirection
+        val usage = flows[7] as Boolean
         val filtered = apps
             .filter { app ->
                 if (!showSystem && app.isSystemApp) return@filter false
@@ -72,7 +83,7 @@ class UninstallViewModel(
                 app.appName.contains(query, ignoreCase = true) ||
                         app.packageName.contains(query, ignoreCase = true)
             }
-            .sortedBy { it.appName.lowercase() }
+            .let { applySort(it, sortBy, direction) }
         UninstallUiState(
             apps = apps,
             filteredApps = filtered,
@@ -82,10 +93,67 @@ class UninstallViewModel(
             selectedPackages = selected,
             isSelectionMode = selected.isNotEmpty(),
             isAllSelected = filtered.isNotEmpty() && selected.containsAll(filtered.map { it.packageName }.toSet()),
+            sortBy = sortBy,
+            sortDirection = direction,
+            usageAccessGranted = usage,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UninstallUiState())
 
+    private fun applySort(
+        list: List<InstalledApp>,
+        sortBy: UninstallSortBy,
+        direction: SortDirection,
+    ): List<InstalledApp> {
+        // Primary key chosen per sortBy; name is always the stable tiebreaker so equal
+        // sizes / equal dates still render in a predictable order.
+        val nameKey: (InstalledApp) -> String = { it.appName.lowercase() }
+        val comparator: Comparator<InstalledApp> = when (sortBy) {
+            UninstallSortBy.Name -> compareBy(nameKey)
+            UninstallSortBy.Size -> compareBy<InstalledApp> { it.sizeBytes }.thenBy(nameKey)
+            UninstallSortBy.InstalledAt -> compareBy<InstalledApp> { it.installedAt }.thenBy(nameKey)
+            UninstallSortBy.LastUsed -> compareBy<InstalledApp> { it.lastUsedAt }.thenBy(nameKey)
+        }
+        val sorted = list.sortedWith(comparator)
+        return if (direction == SortDirection.Asc) sorted else sorted.reversed()
+    }
+
+    fun setSort(sortBy: UninstallSortBy) {
+        if (_sortBy.value == sortBy) {
+            // Same axis: flip direction
+            _sortDirection.value =
+                if (_sortDirection.value == SortDirection.Asc) SortDirection.Desc else SortDirection.Asc
+        } else {
+            _sortBy.value = sortBy
+            // Sensible defaults: Name → Asc (A-Z), Size/date/usage → Desc (big/recent first)
+            _sortDirection.value = if (sortBy == UninstallSortBy.Name) SortDirection.Asc else SortDirection.Desc
+        }
+    }
+
+    fun refreshUsageAccess() {
+        _usageAccess.value = hasUsageAccess()
+    }
+
+    private fun hasUsageAccess(): Boolean {
+        val appOps = application.getSystemService(android.content.Context.APP_OPS_SERVICE) as android.app.AppOpsManager
+        val mode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            appOps.unsafeCheckOpNoThrow(
+                android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(),
+                application.packageName,
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            appOps.checkOpNoThrow(
+                android.app.AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(),
+                application.packageName,
+            )
+        }
+        return mode == android.app.AppOpsManager.MODE_ALLOWED
+    }
+
     init {
+        _usageAccess.value = hasUsageAccess()
         loadInstalledApps()
     }
 
@@ -221,30 +289,71 @@ class UninstallViewModel(
                     pm.getInstalledApplications(0)
                 }
 
+                // Last-used lookup: single batch query over the past year — much cheaper than
+                // querying per package. Skipped entirely when the permission isn't granted.
+                val lastUsedMap = queryLastUsedMap()
+
                 installedInfos.map { appInfo ->
-                    val versionName = try {
+                    val pkgInfo = try {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             pm.getPackageInfo(
                                 appInfo.packageName,
                                 PackageManager.PackageInfoFlags.of(0)
-                            ).versionName ?: ""
+                            )
                         } else {
                             @Suppress("DEPRECATION")
-                            pm.getPackageInfo(appInfo.packageName, 0).versionName ?: ""
+                            pm.getPackageInfo(appInfo.packageName, 0)
                         }
-                    } catch (_: Exception) {
-                        ""
-                    }
+                    } catch (_: Exception) { null }
+
+                    val sourceDir = appInfo.sourceDir
+                    val sizeBytes = if (!sourceDir.isNullOrBlank()) {
+                        runCatching { java.io.File(sourceDir).length() }.getOrDefault(0L)
+                    } else 0L
+
                     InstalledApp(
                         packageName = appInfo.packageName,
                         appName = appInfo.loadLabel(pm).toString(),
-                        versionName = versionName,
+                        versionName = pkgInfo?.versionName ?: "",
                         isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
+                        sizeBytes = sizeBytes,
+                        installedAt = pkgInfo?.firstInstallTime ?: 0L,
+                        lastUsedAt = lastUsedMap[appInfo.packageName] ?: 0L,
                     )
                 }
             }
             _apps.value = apps
             _isLoading.value = false
+        }
+    }
+
+    /**
+     * Batch lookup for last-used timestamps via `UsageStatsManager`. Requires the user to
+     * have granted "Usage access" in system settings — we silently return an empty map if
+     * they haven't, and the UI offers a "grant" action from the Last Used sort option.
+     */
+    private fun queryLastUsedMap(): Map<String, Long> {
+        if (!hasUsageAccess()) return emptyMap()
+        return try {
+            val usm = application.getSystemService(android.content.Context.USAGE_STATS_SERVICE)
+                as android.app.usage.UsageStatsManager
+            val now = System.currentTimeMillis()
+            val yearAgo = now - 365L * 24 * 60 * 60 * 1000
+            val stats = usm.queryUsageStats(
+                android.app.usage.UsageStatsManager.INTERVAL_YEARLY, yearAgo, now
+            ) ?: return emptyMap()
+            // A package may appear multiple times — keep the max lastTimeUsed.
+            val map = HashMap<String, Long>(stats.size)
+            for (s in stats) {
+                val t = s.lastTimeUsed
+                if (t <= 0L) continue
+                val prev = map[s.packageName] ?: 0L
+                if (t > prev) map[s.packageName] = t
+            }
+            map
+        } catch (e: Exception) {
+            Timber.w(e, "queryUsageStats failed")
+            emptyMap()
         }
     }
 }

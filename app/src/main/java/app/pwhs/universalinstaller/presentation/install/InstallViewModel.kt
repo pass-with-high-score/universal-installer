@@ -59,6 +59,7 @@ class InstallViewModel(
     private val virusTotalNotifier: VirusTotalNotifier,
     private val packageDownloadService: PackageDownloadService,
     private val historyDao: InstallHistoryDao,
+    private val downloadHistoryDao: app.pwhs.universalinstaller.data.local.DownloadHistoryDao,
 ) : ViewModel() {
 
     private val defaultController = DefaultInstallController(application, packageInstaller, sessionDataRepository, historyDao)
@@ -74,7 +75,6 @@ class InstallViewModel(
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
     private var pendingOriginalUri: Uri? = null
-    private var pendingDownloadedFile: File? = null
     private var pendingObbEntries: List<ObbEntry> = emptyList()
 
     /**
@@ -181,7 +181,16 @@ class InstallViewModel(
     }
 
     fun confirmInstall() {
-        val uris = pendingApkUris ?: return
+        val uris = pendingApkUris
+        if (uris.isNullOrEmpty()) {
+            Timber.e("confirmInstall: pendingApkUris=${uris} — parse failed or splits incompatible")
+            android.widget.Toast.makeText(
+                application,
+                application.getString(R.string.install_no_splits_error),
+                android.widget.Toast.LENGTH_LONG,
+            ).show()
+            return
+        }
         val fn = pendingFileName ?: return
         val originalUri = pendingOriginalUri
         val apkInfo = _pendingApkInfo.value
@@ -193,10 +202,8 @@ class InstallViewModel(
         pendingOriginalUri = null
         pendingObbEntries = emptyList()
         _attachedObbFiles.value = emptyList()
-        pendingDownloadedFile = null
 
         viewModelScope.launch {
-            if (uris.isEmpty()) return@launch
             val iconPath = cacheIcon(apkInfo)
             val deleteAfterInstall = readDeleteApkPref()
             val sessionData = SessionData(
@@ -459,7 +466,6 @@ class InstallViewModel(
         pendingFileName = null
         pendingObbEntries = emptyList()
         _attachedObbFiles.value = emptyList()
-        deletePendingDownloadedFile()
     }
 
     /**
@@ -467,6 +473,37 @@ class InstallViewModel(
      * locally-picked file. Progress surfaces via [InstallUiState.downloadState]; on success the
      * download card resets and the preview sheet opens.
      */
+    private val downloadNotifier by lazy { DownloadNotifier(application) }
+
+    /**
+     * Rename the downloaded file to the Content-Disposition–reported name (e.g.
+     * `app-arm64-v8a-release.apk`) so users see a meaningful filename when they browse
+     * `/sdcard/Download/UniversalInstaller/` in any file manager. Collides safely — if a
+     * previous download of the same name is still on disk, the new file gets a ` (N)` suffix.
+     */
+    private fun renameToDisplayName(file: File, desiredName: String): File {
+        if (file.name == desiredName) return file
+        val parent = file.parentFile ?: return file
+        val targetName = uniqueFileName(parent, desiredName)
+        val target = File(parent, targetName)
+        return if (file.renameTo(target)) target else file
+    }
+
+    private fun uniqueFileName(dir: File, desired: String): String {
+        if (!File(dir, desired).exists()) return desired
+        val dot = desired.lastIndexOf('.')
+        val stem = if (dot > 0) desired.substring(0, dot) else desired
+        val ext = if (dot > 0) desired.substring(dot) else ""
+        var i = 1
+        while (File(dir, "$stem ($i)$ext").exists()) i++
+        return "$stem ($i)$ext"
+    }
+
+    companion object {
+        /** User-facing folder under /sdcard/Download/ so downloads are easy to browse. */
+        const val DOWNLOADS_SUBFOLDER = "UniversalInstaller"
+    }
+
     fun downloadFromUrl(context: Context, url: String) {
         val trimmed = url.trim()
         if (!trimmed.startsWith("http://", ignoreCase = true) &&
@@ -478,18 +515,27 @@ class InstallViewModel(
             return
         }
         downloadJob?.cancel()
+        val displayName = trimmed.substringAfterLast('/').substringBefore('?')
+            .ifBlank { "download_${System.currentTimeMillis()}" }
         _downloadState.value = DownloadState.Running(url = trimmed, bytesRead = 0L, totalBytes = -1L)
+        downloadNotifier.notifyProgress(displayName, 0L, -1L)
         downloadJob = viewModelScope.launch {
-            val destName = trimmed.substringAfterLast('/').substringBefore('?')
-                .ifBlank { "download_${System.currentTimeMillis()}" }
-            val cacheDir = File(application.cacheDir, "downloads").apply { mkdirs() }
-            val destination = File(cacheDir, "${System.currentTimeMillis()}_$destName")
+            // Public Downloads subfolder — survives uninstall, visible in the Downloads app,
+            // and user can manage (copy, share, delete) through any file manager.
+            val downloadsDir = File(
+                android.os.Environment.getExternalStoragePublicDirectory(
+                    android.os.Environment.DIRECTORY_DOWNLOADS
+                ),
+                DOWNLOADS_SUBFOLDER,
+            ).apply { mkdirs() }
+            val destination = File(downloadsDir, uniqueFileName(downloadsDir, displayName))
             val result = packageDownloadService.download(trimmed, destination) { read, total ->
                 _downloadState.value = DownloadState.Running(
                     url = trimmed,
                     bytesRead = read,
                     totalBytes = total,
                 )
+                downloadNotifier.notifyProgress(displayName, read, total)
             }
             result.fold(
                 onSuccess = { downloaded ->
@@ -497,23 +543,41 @@ class InstallViewModel(
                     val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
                     if (ext !in validExtensions) {
                         downloaded.file.delete()
-                        _downloadState.value = DownloadState.Error(
-                            context.getString(R.string.remote_download_unsupported)
-                        )
+                        val msg = context.getString(R.string.remote_download_unsupported)
+                        _downloadState.value = DownloadState.Error(msg)
+                        downloadNotifier.notifyFailed(msg)
                         return@fold
                     }
+                    // Rename the on-disk file to match the Content-Disposition name so users
+                    // see the same filename in a file manager as in our Download history UI.
+                    // Also fixes ackpine's `File.isApk` check (literal `.apk` suffix).
+                    val finalFile = renameToDisplayName(downloaded.file, downloaded.fileName)
                     _downloadState.value = DownloadState.Idle
-                    handleDownloadedFile(context, downloaded.file, downloaded.fileName, ext)
+                    downloadNotifier.notifyDone(finalFile.name)
+                    runCatching {
+                        downloadHistoryDao.insert(
+                            app.pwhs.universalinstaller.data.local.DownloadHistoryEntity(
+                                url = trimmed,
+                                fileName = finalFile.name,
+                                filePath = finalFile.absolutePath,
+                                sizeBytes = finalFile.length(),
+                            )
+                        )
+                    }.onFailure { Timber.e(it, "Failed to insert download history") }
+                    handleDownloadedFile(context, finalFile, finalFile.name, ext)
                 },
                 onFailure = { e ->
-                    if (e is kotlinx.coroutines.CancellationException) throw e
+                    if (e is kotlinx.coroutines.CancellationException) {
+                        downloadNotifier.cancel()
+                        throw e
+                    }
                     Timber.e(e, "Download failed")
-                    _downloadState.value = DownloadState.Error(
-                        context.getString(
-                            R.string.remote_download_failed,
-                            e.message ?: e::class.java.simpleName,
-                        )
+                    val msg = context.getString(
+                        R.string.remote_download_failed,
+                        e.message ?: e::class.java.simpleName,
                     )
+                    _downloadState.value = DownloadState.Error(msg)
+                    downloadNotifier.notifyFailed(msg)
                 },
             )
         }
@@ -523,11 +587,13 @@ class InstallViewModel(
         downloadJob?.cancel()
         downloadJob = null
         _downloadState.value = DownloadState.Idle
+        downloadNotifier.cancel()
     }
 
     fun dismissDownloadError() {
         if (_downloadState.value is DownloadState.Error) {
             _downloadState.value = DownloadState.Idle
+            downloadNotifier.cancel()
         }
     }
 
@@ -582,9 +648,6 @@ class InstallViewModel(
     }
 
     private fun handleDownloadedFile(context: Context, file: File, displayName: String, extension: String) {
-        // Clean up any previous download that was never installed.
-        deletePendingDownloadedFile()
-        pendingDownloadedFile = file
         val uri = FileProvider.getUriForFile(
             context,
             "${BuildConfig.APPLICATION_ID}.fileprovider",
@@ -599,11 +662,6 @@ class InstallViewModel(
                 .filterCompatible(context)
         }
         parseApkInfo(context, uri, splitProvider, displayName)
-    }
-
-    private fun deletePendingDownloadedFile() {
-        pendingDownloadedFile?.let { runCatching { it.delete() } }
-        pendingDownloadedFile = null
     }
 
     /**
@@ -814,7 +872,14 @@ class InstallViewModel(
     private fun launchHashLookupOnly(context: Context, originalUri: Uri) {
         viewModelScope.launch {
             val apiKey = readVirusTotalApiKey()
-            if (apiKey.isBlank()) return@launch
+            if (apiKey.isBlank()) {
+                // Surface the missing-key state instead of silently leaving the card empty —
+                // otherwise the Check button flips between label states with no feedback.
+                _pendingApkInfo.value = _pendingApkInfo.value?.copy(
+                    vtResult = VtResult(status = VtStatus.NO_API_KEY)
+                )
+                return@launch
+            }
 
             _pendingApkInfo.value = _pendingApkInfo.value?.copy(
                 vtResult = VtResult(status = VtStatus.SCANNING)
@@ -884,6 +949,12 @@ class InstallViewModel(
             val entries = splitPackage.get().toList()
             splitCount = entries.size
             pendingApkUris = entries.map { it.apk.uri }
+            if (entries.isEmpty()) {
+                Timber.e(
+                    "SplitPackage enumerated 0 entries for $originalUri (fileName=$fileName ext=$extension) — " +
+                        "remote downloads: check file isn't truncated; bundles: filterCompatible() may have excluded all"
+                )
+            }
 
             for (entry in entries) {
                 when (val apk = entry.apk) {

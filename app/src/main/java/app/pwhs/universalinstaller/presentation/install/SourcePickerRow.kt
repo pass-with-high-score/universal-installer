@@ -65,6 +65,7 @@ internal fun SourcePicker(
     onStartDownload: (String) -> Unit,
     onCancelDownload: () -> Unit,
     onDismissDownloadError: () -> Unit,
+    onOpenDownloadHistory: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
@@ -90,6 +91,7 @@ internal fun SourcePicker(
                     onStartDownload = onStartDownload,
                     onCancelDownload = onCancelDownload,
                     onDismissDownloadError = onDismissDownloadError,
+                    onOpenHistory = onOpenDownloadHistory,
                 )
             }
         }
@@ -241,6 +243,7 @@ private fun DownloadSourceContent(
     onStartDownload: (String) -> Unit,
     onCancelDownload: () -> Unit,
     onDismissDownloadError: () -> Unit,
+    onOpenHistory: () -> Unit,
 ) {
     val context = LocalContext.current
     var url by rememberSaveable { mutableStateOf("") }
@@ -337,6 +340,20 @@ private fun DownloadSourceContent(
             } else {
                 LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
             }
+        }
+
+        Spacer(Modifier.height(4.dp))
+        OutlinedButton(
+            onClick = onOpenHistory,
+            modifier = Modifier
+                .fillMaxWidth()
+                .defaultMinSize(minHeight = 48.dp),
+            shape = RoundedCornerShape(16.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.download_history_open_button),
+                style = MaterialTheme.typography.titleSmall,
+            )
         }
     }
 }

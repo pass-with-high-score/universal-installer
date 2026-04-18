@@ -23,6 +23,12 @@
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="29" />
+
+    <!-- Used for the "Sort by last used" option in the Uninstall screen. Not runtime-
+         granted — user opens system Usage Access settings from a hint inside the app. -->
+    <uses-permission
+        android:name="android.permission.PACKAGE_USAGE_STATS"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission
         android:name="android.permission.UPDATE_PACKAGES_WITHOUT_USER_ACTION"
         tools:node="remove" />

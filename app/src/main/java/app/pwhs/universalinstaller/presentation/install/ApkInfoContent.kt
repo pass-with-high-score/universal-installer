@@ -442,6 +442,11 @@ private fun VirusTotalCard(
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.error,
                 )
+                VtStatus.NO_API_KEY -> Text(
+                    text = stringResource(R.string.apk_info_vt_no_api_key),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
                 else -> {}
             }
 
