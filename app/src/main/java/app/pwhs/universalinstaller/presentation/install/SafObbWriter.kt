@@ -21,6 +21,8 @@ import kotlin.coroutines.coroutineContext
  */
 object SafObbWriter {
 
+    private const val BUFFER_BYTES = 1 * 1024 * 1024
+
     /**
      * Initial-URI hint for [android.content.Intent.ACTION_OPEN_DOCUMENT_TREE]. Deep-links
      * the system picker into `Android/obb/<pkg>/` so the user doesn't have to navigate.
@@ -50,8 +52,8 @@ object SafObbWriter {
                 ?: return@withContext Result.failure(IOException("Cannot open output stream"))
             var totalBytes = 0L
             try {
-                os.buffered().use<java.io.BufferedOutputStream, Unit> { bufOs ->
-                    val buf = ByteArray(64 * 1024)
+                os.buffered(BUFFER_BYTES).use<java.io.BufferedOutputStream, Unit> { bufOs ->
+                    val buf = ByteArray(BUFFER_BYTES)
                     while (true) {
                         coroutineContext.ensureActive()
                         val n = input.read(buf)

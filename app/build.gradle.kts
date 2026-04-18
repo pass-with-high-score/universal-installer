@@ -89,6 +89,7 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.documentfile)
+    implementation(libs.androidx.work.runtime)
     implementation(libs.coil.compose)
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

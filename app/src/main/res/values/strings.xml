@@ -116,6 +116,15 @@
     <string name="obb_copy_need_grant_title">OBB folder access needed</string>
     <string name="obb_copy_need_grant_body">Shizuku unavailable — grant access to Android/obb/%s/ so the app can copy OBB files there.</string>
     <string name="obb_copy_grant_button">Grant access</string>
+
+    <!-- OBB copy worker notifications -->
+    <string name="obb_notif_channel_name">OBB file copy</string>
+    <string name="obb_notif_channel_description">Progress of copying OBB data files to Android/obb</string>
+    <string name="obb_notif_running_title">Copying OBB · %s</string>
+    <string name="obb_notif_running_text">%d%%</string>
+    <string name="obb_notif_done_title">OBB copied · %s</string>
+    <string name="obb_notif_done_text">%d file(s) placed in Android/obb</string>
+    <string name="obb_notif_failed_title">OBB copy failed · %s</string>
     <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Supported Architectures</string>

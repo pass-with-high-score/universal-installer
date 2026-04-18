@@ -19,6 +19,8 @@ import kotlin.coroutines.coroutineContext
  */
 object ShizukuObbWriter {
 
+    private const val BUFFER_BYTES = 1 * 1024 * 1024
+
     fun isReady(): Boolean = try {
         Shizuku.pingBinder() &&
             !Shizuku.isPreV11() &&
@@ -47,8 +49,8 @@ object ShizukuObbWriter {
             val process = invokeShizukuNewProcess(arrayOf("sh", "-c", cmd), null, null)
             var totalBytes = 0L
             try {
-                process.outputStream.buffered().use { os ->
-                    val buf = ByteArray(64 * 1024)
+                process.outputStream.buffered(BUFFER_BYTES).use { os ->
+                    val buf = ByteArray(BUFFER_BYTES)
                     while (true) {
                         coroutineContext.ensureActive()
                         val n = input.read(buf)

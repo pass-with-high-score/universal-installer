@@ -24,6 +24,9 @@ import app.pwhs.universalinstaller.presentation.install.controller.BaseInstallCo
 import app.pwhs.universalinstaller.presentation.install.controller.DefaultInstallController
 import app.pwhs.universalinstaller.presentation.install.controller.ShizukuInstallController
 import androidx.datastore.preferences.core.edit
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import kotlinx.coroutines.Dispatchers
@@ -94,6 +97,28 @@ class InstallViewModel(
 
     val history = historyDao.getAll()
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+
+    init {
+        // Re-attach to any OBB worker still running from a previous app session so the user
+        // sees live progress / error state on the install screen even after closing + reopening.
+        reattachRunningObbWorker()
+    }
+
+    private fun reattachRunningObbWorker() {
+        viewModelScope.launch {
+            try {
+                val wm = WorkManager.getInstance(application)
+                val active = wm.getWorkInfosByTag(ObbCopyWorker.WORK_TAG).get()
+                    .firstOrNull { !it.state.isFinished }
+                    ?: return@launch
+                // App-name is already encoded in the notification; we don't preserve it across
+                // process death, so fall back to a generic label for the UI card.
+                observeObbWorker(active.id, appName = "", packageName = "")
+            } catch (t: Throwable) {
+                Timber.w(t, "Could not re-attach to OBB worker")
+            }
+        }
+    }
 
     fun clearHistory() {
         viewModelScope.launch { historyDao.clearAll() }
@@ -226,19 +251,82 @@ class InstallViewModel(
 
         val strategy = selectObbStrategy(packageName)
         when (strategy) {
-            ObbStrategy.Direct -> runObbCopyDirect(
-                context, sourceUri, entries, attached, packageName, appName, combinedTotal,
+            ObbStrategy.Direct -> enqueueObbWorker(
+                ObbCopyWorker.STRATEGY_DIRECT, null, sourceUri, entries, attached, packageName, appName,
             )
-            ObbStrategy.Shizuku -> runObbCopyShizuku(
-                context, sourceUri, entries, attached, packageName, appName, combinedTotal,
+            ObbStrategy.Shizuku -> enqueueObbWorker(
+                ObbCopyWorker.STRATEGY_SHIZUKU, null, sourceUri, entries, attached, packageName, appName,
             )
-            is ObbStrategy.Saf -> runObbCopySaf(
-                context, sourceUri, entries, attached, packageName, appName, combinedTotal,
-                strategy.treeUri,
+            is ObbStrategy.Saf -> enqueueObbWorker(
+                ObbCopyWorker.STRATEGY_SAF, strategy.treeUri, sourceUri, entries, attached, packageName, appName,
             )
             ObbStrategy.NeedSafGrant -> {
                 _obbCopyState.value = ObbCopyState.NeedSafGrant(appName, packageName)
             }
+        }
+    }
+
+    /**
+     * Enqueue the foreground worker and mirror its WorkInfo back into [_obbCopyState] so the
+     * Install screen UI stays in sync whether or not the app is in the foreground.
+     */
+    private fun enqueueObbWorker(
+        strategy: String,
+        treeUri: Uri?,
+        sourceUri: Uri?,
+        entries: List<ObbEntry>,
+        attached: List<AttachedObb>,
+        packageName: String,
+        appName: String,
+    ) {
+        val wm = WorkManager.getInstance(application)
+        val data = ObbCopyWorker.buildInputData(
+            strategy, packageName, appName, sourceUri, entries, attached, treeUri,
+        )
+        val workName = ObbCopyWorker.workNameFor(java.util.UUID.nameUUIDFromBytes(packageName.toByteArray()))
+        val request = ObbCopyWorker.buildRequest(workName, data)
+        wm.enqueueUniqueWork(workName, ExistingWorkPolicy.REPLACE, request)
+        observeObbWorker(request.id, appName, packageName)
+    }
+
+    private var obbWorkerObserverJob: Job? = null
+
+    private fun observeObbWorker(workId: java.util.UUID, appName: String, packageName: String) {
+        obbWorkerObserverJob?.cancel()
+        obbWorkerObserverJob = viewModelScope.launch {
+            WorkManager.getInstance(application)
+                .getWorkInfoByIdFlow(workId)
+                .collect { info ->
+                    if (info == null) return@collect
+                    when (info.state) {
+                        WorkInfo.State.ENQUEUED,
+                        WorkInfo.State.RUNNING,
+                        WorkInfo.State.BLOCKED -> {
+                            val bytes = info.progress.getLong(ObbCopyWorker.KEY_PROGRESS_BYTES, 0L)
+                            val total = info.progress.getLong(ObbCopyWorker.KEY_PROGRESS_TOTAL, 0L)
+                            _obbCopyState.value = ObbCopyState.Running(
+                                appName = appName,
+                                packageName = packageName,
+                                bytesCopied = bytes,
+                                totalBytes = total,
+                            )
+                        }
+                        WorkInfo.State.SUCCEEDED -> {
+                            val count = info.outputData.getInt(ObbCopyWorker.KEY_RESULT_FILE_COUNT, 0)
+                            pendingObbCopyJob = null
+                            _obbCopyState.value = ObbCopyState.Done(appName, count)
+                        }
+                        WorkInfo.State.FAILED -> {
+                            val err = info.outputData.getString(ObbCopyWorker.KEY_RESULT_ERROR) ?: "Copy failed"
+                            pendingObbCopyJob = null
+                            _obbCopyState.value = ObbCopyState.Error(appName, err)
+                        }
+                        WorkInfo.State.CANCELLED -> {
+                            pendingObbCopyJob = null
+                            _obbCopyState.value = ObbCopyState.Error(appName, "Cancelled")
+                        }
+                    }
+                }
         }
     }
 
@@ -263,225 +351,6 @@ class InstallViewModel(
                 it.uri == uri && it.isReadPermission && it.isWritePermission
             }
         } catch (_: Exception) { false }
-    }
-
-    private suspend fun runObbCopyDirect(
-        context: Context,
-        sourceUri: Uri?,
-        entries: List<ObbEntry>,
-        attached: List<AttachedObb>,
-        packageName: String,
-        appName: String,
-        combinedTotal: Long,
-    ) {
-        var bytesSoFar = 0L
-        var totalCopied = 0
-        if (entries.isNotEmpty() && sourceUri != null) {
-            val r = ObbExtractor.extract(
-                context = context,
-                uri = sourceUri,
-                entries = entries,
-                packageName = packageName,
-                onProgress = { copied, _ ->
-                    _obbCopyState.value = ObbCopyState.Running(
-                        appName, packageName, bytesSoFar + copied, combinedTotal,
-                    )
-                },
-            )
-            r.fold(
-                onSuccess = {
-                    totalCopied += it
-                    bytesSoFar += entries.sumOf { e -> e.sizeBytes.coerceAtLeast(0L) }
-                },
-                onFailure = { t -> return finishObbWithError(appName, t) },
-            )
-        }
-        if (attached.isNotEmpty()) {
-            val r = ObbExtractor.extractFromUris(
-                context = context,
-                files = attached,
-                packageName = packageName,
-                onProgress = { copied, _ ->
-                    _obbCopyState.value = ObbCopyState.Running(
-                        appName, packageName, bytesSoFar + copied, combinedTotal,
-                    )
-                },
-            )
-            r.fold(
-                onSuccess = { totalCopied += it },
-                onFailure = { t -> return finishObbWithError(appName, t) },
-            )
-        }
-        finishObbSuccess(appName, totalCopied)
-    }
-
-    private suspend fun runObbCopyShizuku(
-        context: Context,
-        sourceUri: Uri?,
-        entries: List<ObbEntry>,
-        attached: List<AttachedObb>,
-        packageName: String,
-        appName: String,
-        combinedTotal: Long,
-    ) {
-        var bytesSoFar = 0L
-        var totalCopied = 0
-
-        suspend fun copyOne(open: () -> java.io.InputStream?, fileName: String): Boolean {
-            val input = open() ?: run {
-                finishObbWithError(appName, IOException("Cannot open $fileName"))
-                return false
-            }
-            val r = input.use {
-                ShizukuObbWriter.copy(
-                    input = it,
-                    packageName = packageName,
-                    fileName = fileName,
-                    onBytesProgress = { fileBytes ->
-                        _obbCopyState.value = ObbCopyState.Running(
-                            appName, packageName, bytesSoFar + fileBytes, combinedTotal,
-                        )
-                    },
-                )
-            }
-            r.fold(
-                onSuccess = { totalCopied += 1 },
-                onFailure = { t -> finishObbWithError(appName, t); return false },
-            )
-            return true
-        }
-
-        // Bundle-embedded OBBs: re-read zip, pipe matching entries into Shizuku writer.
-        if (entries.isNotEmpty() && sourceUri != null) {
-            val entryPaths = entries.map { it.entryPath }.toSet()
-            try {
-                context.contentResolver.openInputStream(sourceUri)?.buffered()?.use { inputStream ->
-                    java.util.zip.ZipInputStream(inputStream).use { zis ->
-                        while (true) {
-                            val entry = zis.nextEntry ?: break
-                            if (entry.isDirectory || entry.name !in entryPaths) {
-                                zis.closeEntry(); continue
-                            }
-                            val fileName = entry.name.substringAfterLast('/')
-                            val beforeBytes = bytesSoFar
-                            val r = ShizukuObbWriter.copy(
-                                input = zis,
-                                packageName = packageName,
-                                fileName = fileName,
-                                onBytesProgress = { fileBytes ->
-                                    _obbCopyState.value = ObbCopyState.Running(
-                                        appName, packageName, beforeBytes + fileBytes, combinedTotal,
-                                    )
-                                },
-                            )
-                            r.fold(
-                                onSuccess = {
-                                    totalCopied += 1
-                                    val entryObj = entries.find { it.entryPath == entry.name }
-                                    bytesSoFar += (entryObj?.sizeBytes ?: 0L).coerceAtLeast(0L)
-                                },
-                                onFailure = { t -> return finishObbWithError(appName, t) },
-                            )
-                            zis.closeEntry()
-                        }
-                    }
-                } ?: return finishObbWithError(appName, IOException("Cannot open source"))
-            } catch (ce: kotlinx.coroutines.CancellationException) {
-                throw ce
-            } catch (t: Throwable) {
-                return finishObbWithError(appName, t)
-            }
-        }
-
-        // Attached standalone OBBs.
-        for (obb in attached) {
-            val beforeBytes = bytesSoFar
-            if (!copyOne({ context.contentResolver.openInputStream(obb.uri) }, obb.fileName)) return
-            bytesSoFar = beforeBytes + obb.sizeBytes.coerceAtLeast(0L)
-        }
-
-        finishObbSuccess(appName, totalCopied)
-    }
-
-    private suspend fun runObbCopySaf(
-        context: Context,
-        sourceUri: Uri?,
-        entries: List<ObbEntry>,
-        attached: List<AttachedObb>,
-        packageName: String,
-        appName: String,
-        combinedTotal: Long,
-        treeUri: Uri,
-    ) {
-        var bytesSoFar = 0L
-        var totalCopied = 0
-
-        if (entries.isNotEmpty() && sourceUri != null) {
-            val entryPaths = entries.map { it.entryPath }.toSet()
-            try {
-                context.contentResolver.openInputStream(sourceUri)?.buffered()?.use { inputStream ->
-                    java.util.zip.ZipInputStream(inputStream).use { zis ->
-                        while (true) {
-                            val entry = zis.nextEntry ?: break
-                            if (entry.isDirectory || entry.name !in entryPaths) {
-                                zis.closeEntry(); continue
-                            }
-                            val fileName = entry.name.substringAfterLast('/')
-                            val beforeBytes = bytesSoFar
-                            val r = SafObbWriter.copy(
-                                context = context,
-                                input = zis,
-                                treeUri = treeUri,
-                                fileName = fileName,
-                                onBytesProgress = { fileBytes ->
-                                    _obbCopyState.value = ObbCopyState.Running(
-                                        appName, packageName, beforeBytes + fileBytes, combinedTotal,
-                                    )
-                                },
-                            )
-                            r.fold(
-                                onSuccess = {
-                                    totalCopied += 1
-                                    val e = entries.find { it.entryPath == entry.name }
-                                    bytesSoFar += (e?.sizeBytes ?: 0L).coerceAtLeast(0L)
-                                },
-                                onFailure = { t -> return finishObbWithError(appName, t) },
-                            )
-                            zis.closeEntry()
-                        }
-                    }
-                } ?: return finishObbWithError(appName, IOException("Cannot open source"))
-            } catch (ce: kotlinx.coroutines.CancellationException) {
-                throw ce
-            } catch (t: Throwable) {
-                return finishObbWithError(appName, t)
-            }
-        }
-
-        for (obb in attached) {
-            val beforeBytes = bytesSoFar
-            val input = context.contentResolver.openInputStream(obb.uri)
-                ?: return finishObbWithError(appName, IOException("Cannot open ${obb.fileName}"))
-            val r = input.use {
-                SafObbWriter.copy(
-                    context = context,
-                    input = it,
-                    treeUri = treeUri,
-                    fileName = obb.fileName,
-                    onBytesProgress = { fileBytes ->
-                        _obbCopyState.value = ObbCopyState.Running(
-                            appName, packageName, beforeBytes + fileBytes, combinedTotal,
-                        )
-                    },
-                )
-            }
-            r.fold(
-                onSuccess = { totalCopied += 1; bytesSoFar = beforeBytes + obb.sizeBytes.coerceAtLeast(0L) },
-                onFailure = { t -> return finishObbWithError(appName, t) },
-            )
-        }
-
-        finishObbSuccess(appName, totalCopied)
     }
 
     private fun finishObbSuccess(appName: String, count: Int) {

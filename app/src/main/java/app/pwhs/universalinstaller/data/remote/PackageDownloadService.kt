@@ -13,6 +13,7 @@ import io.ktor.utils.io.core.readBytes
 import io.ktor.utils.io.readRemaining
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.io.readByteArray
 import java.io.File
 import java.io.IOException
 
@@ -46,8 +47,8 @@ class PackageDownloadService(private val client: HttpClient) {
                 destination.outputStream().use { out ->
                     while (!channel.isClosedForRead) {
                         val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
-                        while (!packet.isEmpty) {
-                            val bytes = packet.readBytes()
+                        while (!packet.exhausted()) {
+                            val bytes = packet.readByteArray()
                             out.write(bytes)
                             read += bytes.size
                             onProgress(read, total)

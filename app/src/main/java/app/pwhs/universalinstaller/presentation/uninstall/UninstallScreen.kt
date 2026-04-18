@@ -17,13 +17,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.ReceiptLong
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
-import androidx.compose.material.icons.rounded.ReceiptLong
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.material.icons.rounded.SelectAll
@@ -202,7 +202,7 @@ private fun UninstallUi(
                     actions = {
                         IconButton(onClick = onOpenLogs) {
                             Icon(
-                                imageVector = Icons.Rounded.ReceiptLong,
+                                imageVector = Icons.AutoMirrored.Rounded.ReceiptLong,
                                 contentDescription = stringResource(R.string.uninstall_logs_cd),
                             )
                         }
