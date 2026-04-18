@@ -71,6 +71,7 @@ class InstallViewModel(
     private val _scanState = MutableStateFlow<ScanState>(ScanState.Idle)
     private val _obbCopyState = MutableStateFlow<ObbCopyState>(ObbCopyState.Idle)
     private val _attachedObbFiles = MutableStateFlow<List<AttachedObb>>(emptyList())
+    private val _batchState = MutableStateFlow<BatchInstallState>(BatchInstallState.Idle)
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
@@ -137,6 +138,7 @@ class InstallViewModel(
         _scanState,
         _obbCopyState,
         _attachedObbFiles,
+        _batchState,
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         InstallUiState(
@@ -148,6 +150,7 @@ class InstallViewModel(
             scanState = flows[5] as ScanState,
             obbCopyState = flows[6] as ObbCopyState,
             attachedObbFiles = flows[7] as List<AttachedObb>,
+            batchState = flows[8] as BatchInstallState,
         )
     }
         .onStart { activeController().restoreSessionsFromSavedState(viewModelScope) }
@@ -458,6 +461,188 @@ class InstallViewModel(
         _attachedObbFiles.value = _attachedObbFiles.value.filterNot { it.uri == uri }
     }
 
+    // ── Batch install ────────────────────────────────────
+
+    /**
+     * Parse N files in a single pass. Each URI is resolved to a [BatchApkEntry] containing
+     * the full [ApkInfo] + installable split URIs. Failed parses produce an entry with
+     * `parseError` set so the user can still see what went wrong instead of silent drops.
+     * Emits `Parsing(processed, total)` as a loading indicator between `Idle` and `Ready`.
+     */
+    fun parseBatch(context: Context, uris: List<Uri>) {
+        if (uris.size <= 1) return
+        _batchState.value = BatchInstallState.Parsing(processed = 0, total = uris.size)
+        viewModelScope.launch {
+            val entries = mutableListOf<BatchApkEntry>()
+            withContext(Dispatchers.IO) {
+                uris.forEachIndexed { index, uri ->
+                    val displayName = context.contentResolver.getDisplayName(uri)
+                    val extension = displayName.substringAfterLast('.', "").lowercase()
+                    try {
+                        val splitProvider = buildSplitProvider(context, uri, extension)
+                        // Single enumeration: extractApkInfoAndCacheUris also populates
+                        // pendingApkUris from the same sequence, so we grab it and reset.
+                        // Avoids iterating a (potentially large) ZIP twice for XAPK/APKS.
+                        val (info, splitUris) = parseApkInfoForBatch(
+                            context, uri, splitProvider, displayName,
+                        )
+                        entries += BatchApkEntry(
+                            uri = uri,
+                            fileName = displayName,
+                            apkInfo = info,
+                            splitUris = splitUris,
+                            selected = splitUris.isNotEmpty(),
+                            parseError = if (splitUris.isEmpty())
+                                "No installable splits found" else null,
+                        )
+                    } catch (t: Throwable) {
+                        Timber.e(t, "Batch parse failed for $uri")
+                        entries += BatchApkEntry(
+                            uri = uri,
+                            fileName = displayName,
+                            apkInfo = app.pwhs.universalinstaller.domain.model.ApkInfo(
+                                appName = displayName.substringBeforeLast('.'),
+                                packageName = "Unknown",
+                                versionName = "",
+                                versionCode = 0L,
+                                icon = null,
+                                minSdkVersion = 0,
+                                targetSdkVersion = 0,
+                                fileSizeBytes = 0,
+                                permissions = emptyList(),
+                            ),
+                            splitUris = emptyList(),
+                            selected = false,
+                            parseError = t.message ?: "Parse failed",
+                        )
+                    }
+                    _batchState.value = BatchInstallState.Parsing(
+                        processed = index + 1, total = uris.size,
+                    )
+                }
+            }
+            // Flag duplicate-package entries: 1st occurrence wins (stays selected), later
+            // duplicates get a soft warning and are auto-deselected. This defends against the
+            // common mistake of picking two versions/signatures of the same app by accident —
+            // installing both serially usually fails or surprises the user (downgrade / signature
+            // mismatch). They can still re-check manually if that's really what they want.
+            val dupLabel = application.getString(R.string.batch_install_dup_package)
+            val seen = mutableSetOf<String>()
+            val deduped = entries.map { e ->
+                when {
+                    e.parseError != null -> e
+                    e.apkInfo.packageName.isBlank() || e.apkInfo.packageName == "Unknown" -> e
+                    e.apkInfo.packageName in seen -> e.copy(
+                        selected = false,
+                        conflictLabel = dupLabel,
+                    )
+                    else -> {
+                        seen += e.apkInfo.packageName
+                        e
+                    }
+                }
+            }
+            _batchState.value = BatchInstallState.Ready(deduped)
+        }
+    }
+
+    /**
+     * Runs [extractApkInfoAndCacheUris] once, captures the resolved split URIs it would
+     * have assigned to `pendingApkUris`, then restores the single-install slot. Returns
+     * both so the caller can enumerate the package exactly once.
+     */
+    private suspend fun parseApkInfoForBatch(
+        context: Context,
+        uri: Uri,
+        splitPackage: SplitPackage.Provider,
+        fileName: String,
+    ): Pair<app.pwhs.universalinstaller.domain.model.ApkInfo, List<Uri>> {
+        val backup = pendingApkUris
+        return try {
+            val info = extractApkInfoAndCacheUris(context, uri, splitPackage, fileName)
+            info to (pendingApkUris ?: emptyList())
+        } finally {
+            pendingApkUris = backup
+        }
+    }
+
+    private fun buildSplitProvider(
+        context: Context,
+        uri: Uri,
+        extension: String,
+    ): SplitPackage.Provider {
+        return when {
+            extension == "apk" ||
+                context.contentResolver.getType(uri)?.lowercase() ==
+                "application/vnd.android.package-archive" ->
+                SingletonApkSequence(uri, context).toSplitPackage()
+            extension in listOf("apks", "xapk", "apkm", "zip") ->
+                ZippedApkSplits.getApksForUri(uri, context)
+                    .validate()
+                    .toSplitPackage()
+                    .filterCompatible(context)
+            else -> SingletonApkSequence(uri, context).toSplitPackage()
+        }
+    }
+
+    fun toggleBatchSelection(uri: Uri) {
+        val ready = _batchState.value as? BatchInstallState.Ready ?: return
+        _batchState.value = BatchInstallState.Ready(
+            ready.entries.map { e ->
+                if (e.uri == uri && e.parseError == null) e.copy(selected = !e.selected) else e
+            }
+        )
+    }
+
+    fun setBatchAllSelected(selected: Boolean) {
+        val ready = _batchState.value as? BatchInstallState.Ready ?: return
+        _batchState.value = BatchInstallState.Ready(
+            ready.entries.map { e ->
+                if (e.parseError == null) e.copy(selected = selected) else e
+            }
+        )
+    }
+
+    fun dismissBatchInstall() {
+        _batchState.value = BatchInstallState.Idle
+    }
+
+    /**
+     * Enqueue install sessions for every selected batch entry. Sessions run in parallel via
+     * ackpine; non-Shizuku installs serialize naturally on the OS confirmation prompt.
+     * After enqueue we clear batch state and rely on the existing SessionCard feed to
+     * surface per-app progress.
+     */
+    fun confirmBatchInstall() {
+        val ready = _batchState.value as? BatchInstallState.Ready ?: return
+        val picked = ready.entries.filter { it.selected && it.splitUris.isNotEmpty() }
+        _batchState.value = BatchInstallState.Idle
+        if (picked.isEmpty()) return
+
+        viewModelScope.launch {
+            val deleteAfterInstall = readDeleteApkPref()
+            val controller = activeController()
+            for (entry in picked) {
+                val iconPath = cacheIcon(entry.apkInfo)
+                val sessionData = SessionData(
+                    id = UUID.randomUUID(),
+                    name = entry.fileName,
+                    appName = entry.apkInfo.appName,
+                    iconPath = iconPath,
+                )
+                controller.install(
+                    uris = entry.splitUris,
+                    sessionData = sessionData,
+                    scope = viewModelScope,
+                    context = application,
+                    originalUri = entry.uri,
+                    deleteAfterInstall = deleteAfterInstall,
+                    onSuccess = null,  // batch install skips OBB flow — standalone APKs only
+                )
+            }
+        }
+    }
+
     fun dismissPendingInstall() {
         cancelActiveScan()
         _pendingApkInfo.value = null
@@ -625,6 +810,24 @@ class InstallViewModel(
         _scanState.value = ScanState.Idle
     }
 
+    /**
+     * Deletes the given files from disk and refreshes the scan results. Relies on
+     * MANAGE_EXTERNAL_STORAGE (already granted for scanning) to delete from arbitrary
+     * folders. Files that fail to delete are silently skipped — no point blocking the UI on
+     * one stubborn file; the rescan will show which ones remain.
+     */
+    fun deleteFoundFiles(context: Context, files: List<FoundPackageFile>) {
+        if (files.isEmpty()) return
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                files.forEach { entry ->
+                    runCatching { File(entry.path).delete() }
+                }
+            }
+            startDeviceScan(context)
+        }
+    }
+
     /** User picked a file from the scan results — hand it to the normal parse flow. */
     fun pickFromScan(context: Context, found: FoundPackageFile) {
         val file = File(found.path)
@@ -645,6 +848,32 @@ class InstallViewModel(
         _scanState.value = ScanState.Idle
         deviceScanJob?.cancel()
         parseApkInfo(context, uri, splitProvider, found.name)
+    }
+
+    /**
+     * User multi-selected N files from the scan results. Converts each to a FileProvider URI
+     * and hands the list to [parseBatch] so the normal batch sheet takes over. Files that
+     * were deleted between scan and tap are silently skipped.
+     */
+    fun pickManyFromScan(context: Context, found: List<FoundPackageFile>) {
+        val uris = found.mapNotNull { entry ->
+            val f = File(entry.path)
+            if (!f.exists()) return@mapNotNull null
+            runCatching {
+                androidx.core.content.FileProvider.getUriForFile(
+                    context,
+                    "${BuildConfig.APPLICATION_ID}.fileprovider",
+                    f,
+                )
+            }.getOrNull()
+        }
+        _scanState.value = ScanState.Idle
+        deviceScanJob?.cancel()
+        if (uris.size >= 2) parseBatch(context, uris)
+        else if (uris.size == 1) {
+            // Degenerate case: only one file survived — fall back to single flow.
+            found.firstOrNull { File(it.path).exists() }?.let { pickFromScan(context, it) }
+        }
     }
 
     private fun handleDownloadedFile(context: Context, file: File, displayName: String, extension: String) {

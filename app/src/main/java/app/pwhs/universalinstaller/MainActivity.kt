@@ -128,9 +128,28 @@ class MainActivity : ComponentActivity() {
      */
     private fun handleViewIntent(intent: Intent?) {
         if (intent == null) return
-        val action = intent.action ?: return
-        if (action != Intent.ACTION_VIEW && action != Intent.ACTION_INSTALL_PACKAGE) return
-        val uri: Uri = intent.data ?: return
-        IntentHandoff.post(uri)
+        when (intent.action) {
+            Intent.ACTION_VIEW, Intent.ACTION_INSTALL_PACKAGE -> {
+                val uri: Uri = intent.data ?: return
+                IntentHandoff.post(uri)
+            }
+            Intent.ACTION_SEND -> {
+                // Share single: either intent.data or EXTRA_STREAM.
+                val uri = intent.data ?: @Suppress("DEPRECATION")
+                    (intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri) ?: return
+                IntentHandoff.post(uri)
+            }
+            Intent.ACTION_SEND_MULTIPLE -> {
+                val uris = @Suppress("DEPRECATION")
+                    intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                        ?.filterNotNull()
+                        ?: return
+                when {
+                    uris.isEmpty() -> return
+                    uris.size == 1 -> IntentHandoff.post(uris.first())
+                    else -> IntentHandoff.postBatch(uris)
+                }
+            }
+        }
     }
 }

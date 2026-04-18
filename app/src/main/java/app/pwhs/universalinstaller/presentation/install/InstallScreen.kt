@@ -15,7 +15,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -86,12 +90,19 @@ fun InstallScreen(
         onStartDeviceScan = { viewModel.startDeviceScan(context) },
         onDismissDeviceScan = viewModel::dismissDeviceScan,
         onPickFromScan = { found -> viewModel.pickFromScan(context, found) },
+        onPickManyFromScan = { found -> viewModel.pickManyFromScan(context, found) },
+        onDeleteScannedFiles = { found -> viewModel.deleteFoundFiles(context, found) },
         onDismissObbCopy = viewModel::dismissObbCopy,
         onAttachObb = { uri -> viewModel.attachObbFile(context, uri) },
         onRemoveObb = { obb -> viewModel.removeAttachedObb(obb.uri) },
         onGrantObbFolder = viewModel::onObbTreeGranted,
         obbTreeHintUri = viewModel::obbTreeHintUri,
         onOpenDownloadHistory = { navigator.navigate(DownloadHistoryScreenDestination) },
+        onBatchPicked = { uris -> viewModel.parseBatch(context, uris) },
+        onBatchToggleEntry = viewModel::toggleBatchSelection,
+        onBatchToggleAll = viewModel::setBatchAllSelected,
+        onBatchConfirm = viewModel::confirmBatchInstall,
+        onBatchDismiss = viewModel::dismissBatchInstall,
     )
 }
 
@@ -114,12 +125,19 @@ private fun InstallUi(
     onStartDeviceScan: () -> Unit = {},
     onDismissDeviceScan: () -> Unit = {},
     onPickFromScan: (FoundPackageFile) -> Unit = {},
+    onPickManyFromScan: (List<FoundPackageFile>) -> Unit = {},
+    onDeleteScannedFiles: (List<FoundPackageFile>) -> Unit = {},
     onDismissObbCopy: () -> Unit = {},
     onAttachObb: (Uri) -> Unit = {},
     onRemoveObb: (AttachedObb) -> Unit = {},
     onGrantObbFolder: (Uri?) -> Unit = {},
     obbTreeHintUri: () -> Uri? = { null },
     onOpenDownloadHistory: () -> Unit = {},
+    onBatchPicked: (List<Uri>) -> Unit = {},
+    onBatchToggleEntry: (Uri) -> Unit = {},
+    onBatchToggleAll: (Boolean) -> Unit = {},
+    onBatchConfirm: () -> Unit = {},
+    onBatchDismiss: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -129,9 +147,24 @@ private fun InstallUi(
     var strictPickerMode by remember { mutableStateOf(true) }
 
     val filePickerLauncher =
-        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
-            if (uri == null) return@rememberLauncherForActivityResult
-            // Take persistable permissions so we can delete the file later if needed
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
+            if (uris.isEmpty()) return@rememberLauncherForActivityResult
+
+            // Batch flow: 2+ files go through BatchInstallSheet where user can deselect
+            // individual items and see per-row parse errors.
+            if (uris.size >= 2) {
+                uris.forEach { u ->
+                    runCatching {
+                        context.contentResolver.takePersistableUriPermission(
+                            u, Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                        )
+                    }
+                }
+                onBatchPicked(uris)
+                return@rememberLauncherForActivityResult
+            }
+
+            val uri = uris.first()
             try {
                 context.contentResolver.takePersistableUriPermission(
                     uri,
@@ -225,6 +258,14 @@ private fun InstallUi(
         onFilePicked(uri, apks, displayName)
     }
 
+    // Batch share (`ACTION_SEND_MULTIPLE`) — hand the URIs to the VM's batch parser.
+    val pendingViewUris by IntentHandoff.pendingUris.collectAsState()
+    LaunchedEffect(pendingViewUris) {
+        val uris = pendingViewUris ?: return@LaunchedEffect
+        IntentHandoff.consumeBatch()
+        if (uris.size >= 2) onBatchPicked(uris)
+    }
+
     val grantPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             // Re-check on return — user may or may not have granted.
@@ -239,6 +280,8 @@ private fun InstallUi(
         },
         onRescan = onStartDeviceScan,
         onPick = onPickFromScan,
+        onPickMany = onPickManyFromScan,
+        onDeleteMany = onDeleteScannedFiles,
     )
 
     // APK Info Preview Bottom Sheet
@@ -261,6 +304,20 @@ private fun InstallUi(
         }
     }
 
+    BatchInstallSheet(
+        state = uiState.batchState,
+        onDismiss = onBatchDismiss,
+        onToggleEntry = onBatchToggleEntry,
+        onToggleAll = onBatchToggleAll,
+        onConfirm = onBatchConfirm,
+    )
+
+    var showPermissions by remember { mutableStateOf(false) }
+    PermissionCenterSheet(
+        visible = showPermissions,
+        onDismiss = { showPermissions = false },
+    )
+
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -274,6 +331,14 @@ private fun InstallUi(
                             style = MaterialTheme.typography.headlineMedium,
                         )
                         InstallerModeBadge()
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showPermissions = true }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Shield,
+                            contentDescription = stringResource(R.string.permissions_menu_cd),
+                        )
                     }
                 },
                 scrollBehavior = scrollBehavior,

@@ -15,13 +15,27 @@ object IntentHandoff {
     private val _pendingUri = MutableStateFlow<Uri?>(null)
     val pendingUri: StateFlow<Uri?> = _pendingUri.asStateFlow()
 
+    /** Multi-file share (`ACTION_SEND_MULTIPLE`) or multi-pick from inside the app. */
+    private val _pendingUris = MutableStateFlow<List<Uri>?>(null)
+    val pendingUris: StateFlow<List<Uri>?> = _pendingUris.asStateFlow()
+
     fun post(uri: Uri) {
         _pendingUri.value = uri
+    }
+
+    fun postBatch(uris: List<Uri>) {
+        _pendingUris.value = uris
     }
 
     fun consume(): Uri? {
         val value = _pendingUri.value
         if (value != null) _pendingUri.value = null
+        return value
+    }
+
+    fun consumeBatch(): List<Uri>? {
+        val value = _pendingUris.value
+        if (value != null) _pendingUris.value = null
         return value
     }
 }

@@ -19,8 +19,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.ContentPaste
+import androidx.compose.material.icons.rounded.FolderOpen
+import androidx.compose.material.icons.rounded.FolderZip
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -46,6 +50,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.core.content.getSystemService
@@ -195,27 +200,40 @@ private fun LocalSourceContent(
                 )
             }
         }
-        OutlinedLocalAction(
-            text = stringResource(R.string.source_action_find_automatic),
+        LocalSourceAction(
+            icon = Icons.Rounded.Search,
+            title = stringResource(R.string.source_action_find_automatic),
+            subtitle = stringResource(R.string.source_action_find_automatic_sub),
             enabled = !isParsing,
             onClick = onFindAutomatic,
         )
-        OutlinedLocalAction(
-            text = stringResource(R.string.source_action_browse_packages),
+        LocalSourceAction(
+            icon = Icons.Rounded.FolderZip,
+            title = stringResource(R.string.source_action_browse_packages),
+            subtitle = stringResource(R.string.source_action_browse_packages_sub),
             enabled = !isParsing,
             onClick = onBrowsePackages,
         )
-        OutlinedLocalAction(
-            text = stringResource(R.string.source_action_browse_all),
+        LocalSourceAction(
+            icon = Icons.Rounded.FolderOpen,
+            title = stringResource(R.string.source_action_browse_all),
+            subtitle = stringResource(R.string.source_action_browse_all_sub),
             enabled = !isParsing,
             onClick = onBrowseAll,
         )
     }
 }
 
+/**
+ * List-style action row: leading icon · title over subtitle · chevron. Left-aligned so the
+ * varying label lengths stay visually anchored — earlier center-wrapping looked ragged when
+ * subtitles (e.g. the extension list) wrapped to a second line.
+ */
 @Composable
-private fun OutlinedLocalAction(
-    text: String,
+private fun LocalSourceAction(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
@@ -223,17 +241,46 @@ private fun OutlinedLocalAction(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 56.dp),
+            .defaultMinSize(minHeight = 64.dp),
         enabled = enabled,
         shape = RoundedCornerShape(16.dp),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(
+            horizontal = 16.dp, vertical = 12.dp,
+        ),
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MaterialTheme.colorScheme.onSurface,
         ),
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleSmall,
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                modifier = Modifier.size(22.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.size(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(
+                imageVector = Icons.Rounded.ChevronRight,
+                contentDescription = null,
+                modifier = Modifier.size(20.dp),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 

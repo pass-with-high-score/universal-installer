@@ -46,11 +46,21 @@
     <string name="install_unsupported_file">Unsupported file. Please select an APK, APKS, XAPK, or APKM file.</string>
     <string name="install_no_splits_error">Couldn\'t parse the package. File may be corrupt, truncated, or not compatible with this device.</string>
 
+    <!-- Batch install -->
+    <string name="batch_install_title">Batch install</string>
+    <string name="batch_install_summary">%1$d packages · %2$s selected</string>
+    <string name="batch_install_parsing">Analyzing %1$d / %2$d…</string>
+    <string name="batch_install_select_all">Select all</string>
+    <string name="batch_install_deselect_all">Deselect all</string>
+    <string name="batch_install_failed_chip">%d failed</string>
+    <string name="batch_install_action">Install %1$d · %2$s</string>
+    <string name="batch_install_dup_package">Duplicate package</string>
+
     <!-- Download notifications -->
     <string name="download_notif_channel_name">Package downloads</string>
     <string name="download_notif_channel_description">Progress of downloading APK/XAPK/APKS files from a URL</string>
     <string name="download_notif_running_title">Downloading %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
+    <string name="download_notif_running_text" translatable="false">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">Downloaded %s</string>
     <string name="download_notif_done_title">Download complete</string>
     <string name="download_notif_done_text">%s · open the app to install</string>
@@ -78,7 +88,7 @@
     <!-- File Picker Card -->
     <string name="file_picker_parsing">Parsing package…</string>
     <string name="file_picker_select">Select a package</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
+    <string name="file_picker_formats" translatable="false">APK, APKS, XAPK, APKM</string>
 
     <!-- Source Picker (Local vs Download) -->
     <string name="source_tab_local">Local</string>
@@ -86,9 +96,12 @@
 
     <!-- Local source actions -->
     <string name="source_local_header">Select File</string>
-    <string name="source_action_find_automatic">Find automatic .APK, .XAPK, .APKS, .APKM</string>
-    <string name="source_action_browse_packages">Browse only packages .APK, .XAPK, .APKM, .APKS</string>
-    <string name="source_action_browse_all">Browse all files */*</string>
+    <string name="source_action_find_automatic">Find automatic</string>
+    <string name="source_action_find_automatic_sub">Scan this device for installable packages</string>
+    <string name="source_action_browse_packages">Browse packages</string>
+    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
+    <string name="source_action_browse_all">Browse all files</string>
+    <string name="source_action_browse_all_sub">Any file type — use at your own risk</string>
 
     <!-- Download (inline) -->
     <string name="source_download_header">Download from URL</string>
@@ -105,6 +118,29 @@
     <string name="find_auto_empty">No packages found on this device.</string>
     <string name="find_auto_rescan">Rescan</string>
     <string name="find_auto_count">%d packages</string>
+    <string name="find_auto_install_selected">Install %d</string>
+    <string name="find_auto_install_single">Install</string>
+    <string name="find_auto_delete">Delete</string>
+    <string name="find_auto_delete_title">Delete %d file(s)?</string>
+    <string name="find_auto_delete_message">The selected package files will be permanently removed from device storage.</string>
+    <string name="find_auto_delete_confirm">Delete</string>
+
+    <!-- Permission Center -->
+    <string name="permissions_title">App permissions</string>
+    <string name="permissions_subtitle">Review which permissions are active and grant the ones you need.</string>
+    <string name="permissions_menu_cd">Review permissions</string>
+    <string name="permissions_granted">Granted</string>
+    <string name="permissions_not_granted">Not granted</string>
+    <string name="permissions_grant">Grant</string>
+    <string name="permissions_open_settings">Open settings</string>
+    <string name="permission_install_title">Install unknown apps</string>
+    <string name="permission_install_desc">Required to install APK, XAPK, APKS and APKM packages. Without this, nothing can be installed.</string>
+    <string name="permission_storage_title">All-files access</string>
+    <string name="permission_storage_desc">Lets Find Automatic scan your device for packages and copy OBB data on Android 11+. Optional — Browse-picker still works without it.</string>
+    <string name="permission_notifications_title">Notifications</string>
+    <string name="permission_notifications_desc">Shows download, OBB copy and VirusTotal scan progress so you can leave the app during long jobs.</string>
+    <string name="permission_usage_title">Usage access</string>
+    <string name="permission_usage_desc">Optional — lets the Uninstall screen sort apps by last used and show individual app usage times.</string>
 
     <!-- Remote Download Dialog -->
     <string name="remote_download_title">Download package</string>
@@ -133,7 +169,7 @@
     <string name="apk_info_version_chip">v%s</string>
     <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d splits</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
+    <string name="apk_info_obb_chip" translatable="false">%d OBB</string>
     <string name="apk_info_obb_attach_title">Attach OBB files (optional)</string>
     <string name="apk_info_obb_attach_desc">Pick .obb files that belong to this app — they\'ll be copied to Android/obb after install.</string>
     <string name="apk_info_obb_attach_button">Add OBB file</string>
@@ -141,7 +177,7 @@
 
     <!-- OBB copy progress (shown after install succeeds) -->
     <string name="obb_copy_title">Copying OBB files…</string>
-    <string name="obb_copy_progress">%1$s / %2$s · %3$d%%</string>
+    <string name="obb_copy_progress" translatable="false">%1$s / %2$s · %3$d%%</string>
     <string name="obb_copy_done">%1$s · %2$d OBB file(s) copied</string>
     <string name="obb_copy_error">OBB copy failed: %s</string>
     <string name="obb_copy_dismiss">Dismiss</string>
@@ -153,7 +189,7 @@
     <string name="obb_notif_channel_name">OBB file copy</string>
     <string name="obb_notif_channel_description">Progress of copying OBB data files to Android/obb</string>
     <string name="obb_notif_running_title">Copying OBB · %s</string>
-    <string name="obb_notif_running_text">%d%%</string>
+    <string name="obb_notif_running_text" translatable="false">%d%%</string>
     <string name="obb_notif_done_title">OBB copied · %s</string>
     <string name="obb_notif_done_text">%d file(s) placed in Android/obb</string>
     <string name="obb_notif_failed_title">OBB copy failed · %s</string>
@@ -163,7 +199,7 @@
     <string name="apk_info_section_languages">Supported Languages (%d)</string>
     <string name="apk_info_section_permissions">Permissions (%d)</string>
     <string name="apk_info_permissions_more">… and %d more</string>
-<string name="apk_info_vt_scan_title">VirusTotal Scan</string>
+    <string name="apk_info_vt_scan_title">VirusTotal Scan</string>
     <string name="apk_info_vt_scanning">Scanning file…</string>
     <string name="apk_info_vt_clean">No threats detected</string>
     <string name="apk_info_vt_clean_detail">%1$d engines confirmed safe · %2$d undetected</string>
@@ -205,7 +241,7 @@
     <string name="uninstall_sort_usage_toast">Grant Usage access to sort by last used</string>
     <string name="uninstall_row_installed">Installed %s</string>
     <string name="uninstall_row_used">Used %s</string>
-    <string name="uninstall_current_sort_summary">%1$s %2$s</string>
+    <string name="uninstall_current_sort_summary" translatable="false">%1$s %2$s</string>
     <string name="uninstall_filter_sheet_title">Sort &amp; filter</string>
     <string name="uninstall_filter_sort_section">Sort by</string>
     <string name="uninstall_filter_filter_section">Filter</string>

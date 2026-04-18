@@ -31,6 +31,29 @@ data class AttachedObb(
     val sizeBytes: Long,
 )
 
+/** Single entry in a batch install — one APK parsed + resolved + user-toggleable. */
+data class BatchApkEntry(
+    val uri: android.net.Uri,
+    val fileName: String,
+    val apkInfo: ApkInfo,
+    /** URIs resolved from ackpine's SplitPackage — what the installer session receives. */
+    val splitUris: List<android.net.Uri>,
+    val selected: Boolean = true,
+    val parseError: String? = null,
+    /**
+     * Soft warning — e.g. another entry in the batch already targets the same package name.
+     * Unlike [parseError], the entry is still installable; the label just flags a likely conflict
+     * (downgrade, signature mismatch) so the user can deselect before committing.
+     */
+    val conflictLabel: String? = null,
+)
+
+sealed interface BatchInstallState {
+    data object Idle : BatchInstallState
+    data class Parsing(val processed: Int, val total: Int) : BatchInstallState
+    data class Ready(val entries: List<BatchApkEntry>) : BatchInstallState
+}
+
 sealed interface ObbCopyState {
     data object Idle : ObbCopyState
     data class Running(
@@ -57,4 +80,5 @@ data class InstallUiState(
     val scanState: ScanState = ScanState.Idle,
     val obbCopyState: ObbCopyState = ObbCopyState.Idle,
     val attachedObbFiles: List<AttachedObb> = emptyList(),
+    val batchState: BatchInstallState = BatchInstallState.Idle,
 )
