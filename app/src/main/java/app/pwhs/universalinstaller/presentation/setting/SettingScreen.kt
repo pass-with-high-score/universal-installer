@@ -24,8 +24,11 @@ import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.automirrored.rounded.Article
+import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
+import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.Shield
@@ -414,6 +417,12 @@ private fun SettingUi(
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
+                    LinkItem(
+                        icon = Icons.Rounded.Public,
+                        title = stringResource(R.string.setting_website_title),
+                        subtitle = stringResource(R.string.setting_website_subtitle),
+                        onClick = { uriHandler.openUri("https://universal-installer.pwhs.app/") },
+                    )
                     ListItem(
                         headlineContent = {
                             Text(stringResource(R.string.setting_github_title), style = MaterialTheme.typography.bodyLarge)
@@ -485,6 +494,18 @@ private fun SettingUi(
                             uriHandler.openUri("https://github.com/sponsors/pass-with-high-score")
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    LinkItem(
+                        icon = Icons.Rounded.Shield,
+                        title = stringResource(R.string.setting_privacy_title),
+                        subtitle = stringResource(R.string.setting_privacy_subtitle),
+                        onClick = { uriHandler.openUri("https://universal-installer.pwhs.app/privacy") },
+                    )
+                    LinkItem(
+                        icon = Icons.Rounded.Gavel,
+                        title = stringResource(R.string.setting_terms_title),
+                        subtitle = stringResource(R.string.setting_terms_subtitle),
+                        onClick = { uriHandler.openUri("https://universal-installer.pwhs.app/terms") },
                     )
                 }
             }
@@ -653,4 +674,35 @@ private fun ShizukuInstallSourceItem(
             }
         }
     }
+}
+
+@Composable
+private fun LinkItem(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
+) {
+    ListItem(
+        headlineContent = {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+        },
+        supportingContent = {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        leadingContent = {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(24.dp),
+            )
+        },
+        modifier = Modifier.clickable(onClick = onClick),
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    )
 }

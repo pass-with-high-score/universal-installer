@@ -205,6 +205,12 @@
     <string name="uninstall_sort_usage_toast">Grant Usage access to sort by last used</string>
     <string name="uninstall_row_installed">Installed %s</string>
     <string name="uninstall_row_used">Used %s</string>
+    <string name="uninstall_current_sort_summary">%1$s %2$s</string>
+    <string name="uninstall_filter_sheet_title">Sort &amp; filter</string>
+    <string name="uninstall_filter_sort_section">Sort by</string>
+    <string name="uninstall_filter_filter_section">Filter</string>
+    <string name="uninstall_show_system_apps_sub">Include preinstalled and system packages</string>
+    <string name="uninstall_scroll_top_cd">Scroll to top</string>
     <string name="uninstall_search_hint">Search apps…</string>
     <string name="uninstall_no_apps_found">No apps found</string>
     <string name="uninstall_no_match">No apps match \"%s\"</string>
@@ -291,6 +297,12 @@
     <string name="setting_telegram_subtitle">Join our community</string>
     <string name="setting_sponsor_title">Sponsor</string>
     <string name="setting_sponsor_subtitle">Support development on GitHub Sponsors</string>
+    <string name="setting_website_title">Website</string>
+    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
+    <string name="setting_privacy_title">Privacy policy</string>
+    <string name="setting_privacy_subtitle">How we handle your data</string>
+    <string name="setting_terms_title">Terms of service</string>
+    <string name="setting_terms_subtitle">Usage terms and conditions</string>
 
     <!-- Installer Mode Badge -->
     <string name="installer_mode_shizuku">Shizuku</string>

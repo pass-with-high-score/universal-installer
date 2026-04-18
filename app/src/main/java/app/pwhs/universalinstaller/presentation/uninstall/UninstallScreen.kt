@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller.presentation.uninstall
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -43,6 +44,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -81,6 +83,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.UninstallLogsScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Destination<RootGraph>
@@ -137,8 +140,24 @@ private fun UninstallUi(
     onRefreshUsageAccess: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
-    var showFilterMenu by remember { mutableStateOf(false) }
+    var showFilterSheet by remember { mutableStateOf(false) }
     var showBatchConfirm by remember { mutableStateOf(false) }
+    // Lifted so the filter FAB's long-press can drive the list (scroll to top).
+    val listState = rememberLazyListState()
+    val coroutineScope = androidx.compose.runtime.rememberCoroutineScope()
+
+    if (showFilterSheet) {
+        FilterSheet(
+            sortBy = uiState.sortBy,
+            direction = uiState.sortDirection,
+            showSystemApps = uiState.showSystemApps,
+            usageGranted = uiState.usageAccessGranted,
+            onSortChange = onSortChange,
+            onToggleSystemApps = onToggleSystemApps,
+            onRequestUsageAccess = onRequestUsageAccess,
+            onDismiss = { showFilterSheet = false },
+        )
+    }
 
     if (showBatchConfirm) {
         AlertDialog(
@@ -230,29 +249,6 @@ private fun UninstallUi(
                                 contentDescription = stringResource(R.string.uninstall_logs_cd),
                             )
                         }
-                        Box {
-                            IconButton(onClick = { showFilterMenu = true }) {
-                                Icon(
-                                    imageVector = Icons.Rounded.FilterList,
-                                    contentDescription = stringResource(R.string.uninstall_filter_cd)
-                                )
-                            }
-                            DropdownMenu(
-                                expanded = showFilterMenu,
-                                onDismissRequest = { showFilterMenu = false },
-                            ) {
-                                DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.uninstall_show_system_apps)) },
-                                    onClick = { onToggleSystemApps() },
-                                    trailingIcon = {
-                                        Switch(
-                                            checked = uiState.showSystemApps,
-                                            onCheckedChange = { onToggleSystemApps() },
-                                        )
-                                    },
-                                )
-                            }
-                        }
                     },
                     scrollBehavior = scrollBehavior,
                     colors = TopAppBarDefaults.topAppBarColors(
@@ -260,6 +256,40 @@ private fun UninstallUi(
                         scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     ),
                 )
+            }
+        },
+        floatingActionButton = {
+            if (!uiState.isSelectionMode && !uiState.isLoading) {
+                // Tap → filter sheet; long-press → scroll to top. M3's `FloatingActionButton`
+                // and clickable `Surface` only expose `onClick`, so we compose a FAB-shaped
+                // Surface and attach `combinedClickable` ourselves. Avoids a second FAB that
+                // clashed visually with the red `DeleteOutline` on each card.
+                val haptic = androidx.compose.ui.platform.LocalHapticFeedback.current
+                androidx.compose.material3.Surface(
+                    shape = androidx.compose.material3.FloatingActionButtonDefaults.shape,
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    shadowElevation = 6.dp,
+                    modifier = Modifier
+                        .size(56.dp)
+                        .combinedClickable(
+                            role = androidx.compose.ui.semantics.Role.Button,
+                            onClick = { showFilterSheet = true },
+                            onLongClick = {
+                                haptic.performHapticFeedback(
+                                    androidx.compose.ui.hapticfeedback.HapticFeedbackType.LongPress
+                                )
+                                coroutineScope.launch { listState.scrollToItem(0) }
+                            },
+                        ),
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Rounded.FilterList,
+                            contentDescription = stringResource(R.string.uninstall_filter_cd),
+                        )
+                    }
+                }
             }
         },
     ) { innerPadding ->
@@ -297,14 +327,29 @@ private fun UninstallUi(
             }
 
             if (!uiState.isSelectionMode) {
-                SortRow(
-                    sortBy = uiState.sortBy,
-                    direction = uiState.sortDirection,
-                    usageGranted = uiState.usageAccessGranted,
-                    count = uiState.filteredApps.size,
-                    onSortChange = onSortChange,
-                    onRequestUsageAccess = onRequestUsageAccess,
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.uninstall_app_count, uiState.filteredApps.size),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                    // Short sort summary so user knows current state without opening sheet.
+                    Text(
+                        text = stringResource(
+                            R.string.uninstall_current_sort_summary,
+                            stringResource(sortLabelRes(uiState.sortBy)),
+                            if (uiState.sortDirection == SortDirection.Asc) "↑" else "↓",
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
 
             // Re-check usage access when user returns from the Settings screen.
@@ -341,7 +386,6 @@ private fun UninstallUi(
                 }
 
                 else -> {
-                    val listState = rememberLazyListState()
                     // Any change in sort or filter jumps back to the top. `scrollToItem` is
                     // O(1); `animateScrollToItem` steps through every item and lags hard on
                     // 300+ apps — user already sees the chip flip, the jump doesn't need
@@ -360,7 +404,11 @@ private fun UninstallUi(
                     }
                     LazyColumn(
                         state = listState,
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                        // Extra bottom space so the FAB doesn't overlap the last card's
+                        // Uninstall button — 56dp FAB + 16dp inset + breathing room.
+                        contentPadding = PaddingValues(
+                            start = 16.dp, end = 16.dp, top = 4.dp, bottom = 96.dp,
+                        ),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
                         items(
@@ -389,44 +437,60 @@ private fun UninstallUi(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SortRow(
+private fun FilterSheet(
     sortBy: UninstallSortBy,
     direction: SortDirection,
+    showSystemApps: Boolean,
     usageGranted: Boolean,
-    count: Int,
     onSortChange: (UninstallSortBy) -> Unit,
+    onToggleSystemApps: () -> Unit,
     onRequestUsageAccess: () -> Unit,
+    onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(
+    val sheetState = androidx.compose.material3.rememberModalBottomSheetState(
+        skipPartiallyExpanded = true,
+    )
+    androidx.compose.material3.ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+        shape = MaterialTheme.shapes.extraLarge,
+    ) {
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+                .padding(horizontal = 20.dp)
+                .padding(bottom = 24.dp),
         ) {
             Text(
-                text = stringResource(R.string.uninstall_app_count, count),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                text = stringResource(R.string.uninstall_filter_sheet_title),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface,
             )
-        }
-        Row(
-            modifier = Modifier
-                .horizontalScroll(rememberScrollState())
-                .padding(horizontal = 16.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            SortChip(UninstallSortBy.Name, sortBy, direction, stringResource(R.string.uninstall_sort_name), onClick = { onSortChange(UninstallSortBy.Name) })
-            SortChip(UninstallSortBy.Size, sortBy, direction, stringResource(R.string.uninstall_sort_size), onClick = { onSortChange(UninstallSortBy.Size) })
-            SortChip(UninstallSortBy.InstalledAt, sortBy, direction, stringResource(R.string.uninstall_sort_installed), onClick = { onSortChange(UninstallSortBy.InstalledAt) })
-            SortChip(
-                axis = UninstallSortBy.LastUsed,
-                current = sortBy,
-                direction = direction,
-                label = stringResource(R.string.uninstall_sort_last_used),
-                onClick = {
+            Spacer(Modifier.height(16.dp))
+
+            Text(
+                text = stringResource(R.string.uninstall_filter_sort_section),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                SortChip(UninstallSortBy.Name, sortBy, direction, stringResource(R.string.uninstall_sort_name)) {
+                    onSortChange(UninstallSortBy.Name)
+                }
+                SortChip(UninstallSortBy.Size, sortBy, direction, stringResource(R.string.uninstall_sort_size)) {
+                    onSortChange(UninstallSortBy.Size)
+                }
+                SortChip(UninstallSortBy.InstalledAt, sortBy, direction, stringResource(R.string.uninstall_sort_installed)) {
+                    onSortChange(UninstallSortBy.InstalledAt)
+                }
+                SortChip(UninstallSortBy.LastUsed, sortBy, direction, stringResource(R.string.uninstall_sort_last_used)) {
                     if (!usageGranted) {
                         android.widget.Toast.makeText(
                             context,
@@ -437,10 +501,59 @@ private fun SortRow(
                     } else {
                         onSortChange(UninstallSortBy.LastUsed)
                     }
-                },
+                }
+            }
+
+            Spacer(Modifier.height(20.dp))
+            Text(
+                text = stringResource(R.string.uninstall_filter_filter_section),
+                style = MaterialTheme.typography.labelLarge,
+                color = MaterialTheme.colorScheme.primary,
             )
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .combinedClickableRow { onToggleSystemApps() }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.uninstall_show_system_apps),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Text(
+                        text = stringResource(R.string.uninstall_show_system_apps_sub),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Switch(
+                    checked = showSystemApps,
+                    onCheckedChange = { onToggleSystemApps() },
+                )
+            }
         }
     }
+}
+
+/**
+ * Click wrapper that doesn't require long-click semantics — the row just toggles, no need
+ * for `combinedClickable`. Pulled out so we avoid accidentally using combinedClickable in
+ * places where a plain clickable is clearer.
+ */
+@Composable
+private fun Modifier.combinedClickableRow(onClick: () -> Unit): Modifier =
+    this.then(Modifier.clickable(onClick = onClick))
+
+@Composable
+private fun sortLabelRes(sortBy: UninstallSortBy): Int = when (sortBy) {
+    UninstallSortBy.Name -> R.string.uninstall_sort_name
+    UninstallSortBy.Size -> R.string.uninstall_sort_size
+    UninstallSortBy.InstalledAt -> R.string.uninstall_sort_installed
+    UninstallSortBy.LastUsed -> R.string.uninstall_sort_last_used
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

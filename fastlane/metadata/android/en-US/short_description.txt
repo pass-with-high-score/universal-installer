@@ -1,1 +1,1 @@
-Install APK, APKS, XAPK & APKM with split APK support and silent install.
+APK/APKS/XAPK/APKM installer with OBB, URL downloads, Shizuku & VirusTotal scans
