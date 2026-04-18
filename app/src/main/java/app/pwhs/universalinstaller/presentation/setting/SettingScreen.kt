@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.DarkMode
@@ -28,9 +29,12 @@ import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.ListItem
@@ -84,6 +88,7 @@ fun SettingScreen(
         onShizukuChanged = viewModel::setUseShizuku,
         onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
         onShizukuOptionChanged = viewModel::setShizukuOption,
+        onShizukuInstallerChanged = viewModel::setShizukuInstallerPackageName,
         onDeleteApkChanged = viewModel::setDeleteApkAfterInstall,
         onLanguageClick = { navigator.navigate(LanguageScreenDestination) },
     )
@@ -98,6 +103,7 @@ private fun SettingUi(
     onShizukuChanged: (Boolean) -> Unit = {},
     onVirusTotalKeyChanged: (String) -> Unit = {},
     onShizukuOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
+    onShizukuInstallerChanged: (String) -> Unit = {},
     onDeleteApkChanged: (Boolean) -> Unit = {},
     onLanguageClick: () -> Unit = {},
 ) {
@@ -248,6 +254,12 @@ private fun SettingUi(
                             subtitle = stringResource(R.string.setting_shizuku_all_users_sub),
                             checked = uiState.shizukuOptions.allUsers,
                             onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_ALL_USERS, it) },
+                        )
+                        ShizukuInstallSourceItem(
+                            enabled = uiState.shizukuOptions.setInstallSource,
+                            installerPackageName = uiState.shizukuOptions.installerPackageName,
+                            onToggle = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE, it) },
+                            onInstallerChange = onShizukuInstallerChanged,
                         )
                     }
                 }
@@ -542,4 +554,103 @@ private fun ShizukuOptionItem(
         },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
+}
+
+private data class InstallerPreset(val packageName: String, val label: String)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ShizukuInstallSourceItem(
+    enabled: Boolean,
+    installerPackageName: String,
+    onToggle: (Boolean) -> Unit,
+    onInstallerChange: (String) -> Unit,
+) {
+    val presets = listOf(
+        InstallerPreset("com.android.vending", stringResource(R.string.setting_shizuku_installer_preset_play)),
+        InstallerPreset("com.aurora.store", stringResource(R.string.setting_shizuku_installer_preset_aurora)),
+        InstallerPreset("org.fdroid.fdroid", stringResource(R.string.setting_shizuku_installer_preset_fdroid)),
+        InstallerPreset("com.amazon.venezia", stringResource(R.string.setting_shizuku_installer_preset_amazon)),
+        InstallerPreset("com.sec.android.app.samsungapps", stringResource(R.string.setting_shizuku_installer_preset_samsung)),
+        InstallerPreset("com.huawei.appmarket", stringResource(R.string.setting_shizuku_installer_preset_huawei)),
+        InstallerPreset("com.xiaomi.market", stringResource(R.string.setting_shizuku_installer_preset_xiaomi)),
+    )
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ListItem(
+            headlineContent = {
+                Text(
+                    stringResource(R.string.setting_shizuku_set_source),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = stringResource(R.string.setting_shizuku_set_source_sub),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            trailingContent = {
+                Switch(checked = enabled, onCheckedChange = onToggle)
+            },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        )
+
+        if (enabled) {
+            var expanded by remember { mutableStateOf(false) }
+            var text by remember(installerPackageName) { mutableStateOf(installerPackageName) }
+
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            ) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = {
+                        text = it
+                        onInstallerChange(it)
+                    },
+                    modifier = Modifier
+                        .menuAnchor(androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
+                        .fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.setting_shizuku_installer_label)) },
+                    leadingIcon = {
+                        Icon(Icons.Rounded.Badge, contentDescription = null)
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    presets.forEach { preset ->
+                        DropdownMenuItem(
+                            text = {
+                                Column {
+                                    Text(preset.label, style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        text = preset.packageName,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            },
+                            onClick = {
+                                text = preset.packageName
+                                onInstallerChange(preset.packageName)
+                                expanded = false
+                            },
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

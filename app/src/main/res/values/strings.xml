@@ -195,6 +195,16 @@
     <string name="setting_shizuku_bypass_sdk_sub">Install apps targeting old SDK versions</string>
     <string name="setting_shizuku_all_users">Install for all users</string>
     <string name="setting_shizuku_all_users_sub">Install package for all device users</string>
+    <string name="setting_shizuku_set_source">Set install source</string>
+    <string name="setting_shizuku_set_source_sub">Defaults to this app when off</string>
+    <string name="setting_shizuku_installer_label">installed by (package name)</string>
+    <string name="setting_shizuku_installer_preset_play">Google Play Store</string>
+    <string name="setting_shizuku_installer_preset_aurora">Aurora Store</string>
+    <string name="setting_shizuku_installer_preset_fdroid">F-Droid</string>
+    <string name="setting_shizuku_installer_preset_amazon">Amazon Appstore</string>
+    <string name="setting_shizuku_installer_preset_samsung">Samsung Galaxy Store</string>
+    <string name="setting_shizuku_installer_preset_huawei">Huawei AppGallery</string>
+    <string name="setting_shizuku_installer_preset_xiaomi">Xiaomi GetApps</string>
     <string name="setting_section_security">Security</string>
     <string name="setting_vt_key_title">VirusTotal API Key</string>
     <string name="setting_vt_key_subtitle">Enable malware scanning before install</string>

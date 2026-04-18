@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
+import app.pwhs.universalinstaller.presentation.setting.DEFAULT_INSTALLER_PACKAGE_NAME
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.flow.first
@@ -38,6 +39,15 @@ class ShizukuInstallController(
                 requestDowngrade = prefs[PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE] ?: false
                 grantAllRequestedPermissions = prefs[PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS] ?: false
                 allUsers = prefs[PreferencesKeys.SHIZUKU_ALL_USERS] ?: false
+                // Spoof installer package (shows in PackageManager.getInstallerPackageName).
+                // Applied only when user opted in; otherwise ackpine defaults to this app.
+                // Under-the-hood API requires Android 9+ — silently ignored on older devices.
+                if (prefs[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] == true) {
+                    installerPackageName = prefs[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME]
+                        ?.trim()
+                        ?.ifBlank { DEFAULT_INSTALLER_PACKAGE_NAME }
+                        ?: DEFAULT_INSTALLER_PACKAGE_NAME
+                }
             }
         }
     }

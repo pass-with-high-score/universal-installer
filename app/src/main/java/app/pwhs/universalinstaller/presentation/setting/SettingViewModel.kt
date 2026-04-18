@@ -36,6 +36,8 @@ object PreferencesKeys {
     val SHIZUKU_REQUEST_DOWNGRADE = booleanPreferencesKey("shizuku_request_downgrade")
     val SHIZUKU_GRANT_ALL_PERMISSIONS = booleanPreferencesKey("shizuku_grant_all_permissions")
     val SHIZUKU_ALL_USERS = booleanPreferencesKey("shizuku_all_users")
+    val SHIZUKU_SET_INSTALL_SOURCE = booleanPreferencesKey("shizuku_set_install_source")
+    val SHIZUKU_INSTALLER_PACKAGE_NAME = stringPreferencesKey("shizuku_installer_package_name")
 }
 
 enum class ThemeMode(val label: String) {
@@ -59,7 +61,11 @@ data class ShizukuOptions(
     val requestDowngrade: Boolean = false,
     val grantAllPermissions: Boolean = false,
     val allUsers: Boolean = false,
+    val setInstallSource: Boolean = false,
+    val installerPackageName: String = DEFAULT_INSTALLER_PACKAGE_NAME,
 )
+
+const val DEFAULT_INSTALLER_PACKAGE_NAME = "com.android.vending"
 
 data class SettingUiState(
     val themeMode: ThemeMode = ThemeMode.System,
@@ -128,6 +134,9 @@ class SettingViewModel(
                 requestDowngrade = prefs[PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE] ?: false,
                 grantAllPermissions = prefs[PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS] ?: false,
                 allUsers = prefs[PreferencesKeys.SHIZUKU_ALL_USERS] ?: false,
+                setInstallSource = prefs[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] ?: false,
+                installerPackageName = prefs[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME]
+                    ?: DEFAULT_INSTALLER_PACKAGE_NAME,
             )
         },
         dataStore.data.map { prefs ->
@@ -217,6 +226,14 @@ class SettingViewModel(
     fun setShizukuOption(key: Preferences.Key<Boolean>, value: Boolean) {
         viewModelScope.launch {
             dataStore.edit { prefs -> prefs[key] = value }
+        }
+    }
+
+    fun setShizukuInstallerPackageName(value: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME] = value
+            }
         }
     }
 
