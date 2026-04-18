@@ -25,6 +25,12 @@ sealed interface ScanState {
     data class Ready(val files: List<FoundPackageFile>) : ScanState
 }
 
+data class AttachedObb(
+    val uri: android.net.Uri,
+    val fileName: String,
+    val sizeBytes: Long,
+)
+
 sealed interface ObbCopyState {
     data object Idle : ObbCopyState
     data class Running(
@@ -38,6 +44,8 @@ sealed interface ObbCopyState {
     }
     data class Done(val appName: String, val fileCount: Int) : ObbCopyState
     data class Error(val appName: String, val message: String) : ObbCopyState
+    /** No Shizuku + no stored SAF grant → user needs to pick `Android/obb/<pkg>/`. */
+    data class NeedSafGrant(val appName: String, val packageName: String) : ObbCopyState
 }
 
 data class InstallUiState(
@@ -48,4 +56,5 @@ data class InstallUiState(
     val downloadState: DownloadState = DownloadState.Idle,
     val scanState: ScanState = ScanState.Idle,
     val obbCopyState: ObbCopyState = ObbCopyState.Idle,
+    val attachedObbFiles: List<AttachedObb> = emptyList(),
 )

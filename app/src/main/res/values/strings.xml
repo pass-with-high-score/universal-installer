@@ -102,6 +102,10 @@
     <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d splits</string>
     <string name="apk_info_obb_chip">%d OBB</string>
+    <string name="apk_info_obb_attach_title">Attach OBB files (optional)</string>
+    <string name="apk_info_obb_attach_desc">Pick .obb files that belong to this app — they\'ll be copied to Android/obb after install.</string>
+    <string name="apk_info_obb_attach_button">Add OBB file</string>
+    <string name="apk_info_obb_attach_remove">Remove</string>
 
     <!-- OBB copy progress (shown after install succeeds) -->
     <string name="obb_copy_title">Copying OBB files…</string>
@@ -109,6 +113,9 @@
     <string name="obb_copy_done">%1$s · %2$d OBB file(s) copied</string>
     <string name="obb_copy_error">OBB copy failed: %s</string>
     <string name="obb_copy_dismiss">Dismiss</string>
+    <string name="obb_copy_need_grant_title">OBB folder access needed</string>
+    <string name="obb_copy_need_grant_body">Shizuku unavailable — grant access to Android/obb/%s/ so the app can copy OBB files there.</string>
+    <string name="obb_copy_grant_button">Grant access</string>
     <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Supported Architectures</string>

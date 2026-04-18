@@ -60,6 +60,56 @@ object ObbExtractor {
     }
 
     /**
+     * Copy standalone OBB files (user picked them via OpenDocument) into
+     * `/storage/emulated/0/Android/obb/<pkg>/`. Filenames preserved from `AttachedObb`.
+     */
+    suspend fun extractFromUris(
+        context: Context,
+        files: List<AttachedObb>,
+        packageName: String,
+        onProgress: (bytesCopied: Long, totalBytes: Long) -> Unit,
+    ): Result<Int> = withContext(Dispatchers.IO) {
+        if (files.isEmpty()) return@withContext Result.success(0)
+        val targetDir = File(Environment.getExternalStorageDirectory(), "Android/obb/$packageName")
+        if (!targetDir.exists() && !targetDir.mkdirs()) {
+            return@withContext Result.failure(IOException("Cannot create $targetDir"))
+        }
+        val totalBytes = files.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+        var bytesCopied = 0L
+        val created = mutableListOf<File>()
+        try {
+            for (file in files) {
+                coroutineContext.ensureActive()
+                val input = context.contentResolver.openInputStream(file.uri)
+                    ?: throw IOException("Cannot open ${file.fileName}")
+                val out = File(targetDir, file.fileName)
+                created.add(out)
+                input.buffered().use { ins ->
+                    out.outputStream().buffered().use { os ->
+                        val buf = ByteArray(64 * 1024)
+                        while (true) {
+                            coroutineContext.ensureActive()
+                            val n = ins.read(buf)
+                            if (n <= 0) break
+                            os.write(buf, 0, n)
+                            bytesCopied += n
+                            onProgress(bytesCopied, totalBytes)
+                        }
+                    }
+                }
+            }
+            Result.success(created.size)
+        } catch (ce: CancellationException) {
+            created.forEach { runCatching { it.delete() } }
+            throw ce
+        } catch (t: Throwable) {
+            created.forEach { runCatching { it.delete() } }
+            Timber.e(t, "Attached-OBB copy failed")
+            Result.failure(t)
+        }
+    }
+
+    /**
      * Stream OBB entries from the source zip into `/storage/emulated/0/Android/obb/<pkg>/`.
      * Deletes any partial files on failure so we don't leave a half-copied OBB behind.
      */

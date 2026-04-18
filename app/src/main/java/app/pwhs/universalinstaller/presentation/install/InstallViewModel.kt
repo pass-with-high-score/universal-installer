@@ -23,7 +23,9 @@ import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.install.controller.BaseInstallController
 import app.pwhs.universalinstaller.presentation.install.controller.DefaultInstallController
 import app.pwhs.universalinstaller.presentation.install.controller.ShizukuInstallController
+import androidx.datastore.preferences.core.edit
 import app.pwhs.universalinstaller.presentation.setting.dataStore
+import app.pwhs.universalinstaller.util.extension.getDisplayName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,6 +45,7 @@ import ru.solrudev.ackpine.splits.ZippedApkSplits
 import ru.solrudev.ackpine.splits.get
 import timber.log.Timber
 import java.io.File
+import java.io.IOException
 import java.util.UUID
 
 class InstallViewModel(
@@ -63,12 +66,26 @@ class InstallViewModel(
     private val _downloadState = MutableStateFlow<DownloadState>(DownloadState.Idle)
     private val _scanState = MutableStateFlow<ScanState>(ScanState.Idle)
     private val _obbCopyState = MutableStateFlow<ObbCopyState>(ObbCopyState.Idle)
+    private val _attachedObbFiles = MutableStateFlow<List<AttachedObb>>(emptyList())
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
     private var pendingOriginalUri: Uri? = null
     private var pendingDownloadedFile: File? = null
     private var pendingObbEntries: List<ObbEntry> = emptyList()
+
+    /**
+     * Snapshot of the most recent OBB copy job — kept around so a SAF-grant callback can
+     * resume the copy after the user grants tree access. Cleared once the copy resolves.
+     */
+    private data class ObbCopyJob(
+        val sourceUri: Uri?,
+        val entries: List<ObbEntry>,
+        val attached: List<AttachedObb>,
+        val packageName: String,
+        val appName: String,
+    )
+    private var pendingObbCopyJob: ObbCopyJob? = null
 
     private var scanJob: Job? = null
     private var scanNotifId: Int = -1
@@ -94,6 +111,7 @@ class InstallViewModel(
         _downloadState,
         _scanState,
         _obbCopyState,
+        _attachedObbFiles,
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         InstallUiState(
@@ -104,6 +122,7 @@ class InstallViewModel(
             downloadState = flows[4] as DownloadState,
             scanState = flows[5] as ScanState,
             obbCopyState = flows[6] as ObbCopyState,
+            attachedObbFiles = flows[7] as List<AttachedObb>,
         )
     }
         .onStart { activeController().restoreSessionsFromSavedState(viewModelScope) }
@@ -142,11 +161,13 @@ class InstallViewModel(
         val originalUri = pendingOriginalUri
         val apkInfo = _pendingApkInfo.value
         val obbEntries = pendingObbEntries
+        val attachedObbs = _attachedObbFiles.value
         _pendingApkInfo.value = null
         pendingApkUris = null
         pendingFileName = null
         pendingOriginalUri = null
         pendingObbEntries = emptyList()
+        _attachedObbFiles.value = emptyList()
         pendingDownloadedFile = null
 
         viewModelScope.launch {
@@ -159,11 +180,13 @@ class InstallViewModel(
                 appName = apkInfo?.appName ?: "",
                 iconPath = iconPath,
             )
-            val onSuccess: (suspend () -> Unit)? = if (obbEntries.isNotEmpty() && originalUri != null && apkInfo != null) {
+            val hasZipObbs = obbEntries.isNotEmpty() && originalUri != null
+            val hasAttachedObbs = attachedObbs.isNotEmpty()
+            val onSuccess: (suspend () -> Unit)? = if ((hasZipObbs || hasAttachedObbs) && apkInfo != null) {
                 val pkg = apkInfo.packageName
                 val appName = apkInfo.appName.ifBlank { pkg }
                 val hook: suspend () -> Unit = {
-                    copyObbFiles(application, originalUri, obbEntries, pkg, appName)
+                    copyObbFiles(application, originalUri, obbEntries, attachedObbs, pkg, appName)
                 }
                 hook
             } else null
@@ -179,36 +202,384 @@ class InstallViewModel(
         }
     }
 
+    /**
+     * Copies OBBs into `/sdcard/Android/obb/<pkg>/`. Strategy priority:
+     *   1. Pre-Android-11 → direct File I/O (legacy storage permits it).
+     *   2. Shizuku ready → stream via shell (runs as shell UID, has obb write access).
+     *   3. Stored SAF tree grant for this package → DocumentFile writer.
+     *   4. Otherwise → emit `NeedSafGrant` and remember the job so the UI-driven grant
+     *      flow can resume via [onObbTreeGranted].
+     */
     private suspend fun copyObbFiles(
         context: Context,
-        sourceUri: Uri,
+        sourceUri: Uri?,
         entries: List<ObbEntry>,
+        attached: List<AttachedObb>,
         packageName: String,
         appName: String,
     ) {
-        _obbCopyState.value = ObbCopyState.Running(
-            appName = appName,
-            packageName = packageName,
-            bytesCopied = 0L,
-            totalBytes = entries.sumOf { it.sizeBytes.coerceAtLeast(0L) },
-        )
-        val result = ObbExtractor.extract(
-            context = context,
-            uri = sourceUri,
-            entries = entries,
-            packageName = packageName,
-            onProgress = { copied, total ->
-                _obbCopyState.value = ObbCopyState.Running(appName, packageName, copied, total)
-            },
-        )
-        _obbCopyState.value = result.fold(
-            onSuccess = { count -> ObbCopyState.Done(appName, count) },
-            onFailure = { t -> ObbCopyState.Error(appName, t.message ?: "Copy failed") },
-        )
+        val zipTotal = entries.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+        val attachedTotal = attached.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+        val combinedTotal = zipTotal + attachedTotal
+        _obbCopyState.value = ObbCopyState.Running(appName, packageName, 0L, combinedTotal)
+        pendingObbCopyJob = ObbCopyJob(sourceUri, entries, attached, packageName, appName)
+
+        val strategy = selectObbStrategy(packageName)
+        when (strategy) {
+            ObbStrategy.Direct -> runObbCopyDirect(
+                context, sourceUri, entries, attached, packageName, appName, combinedTotal,
+            )
+            ObbStrategy.Shizuku -> runObbCopyShizuku(
+                context, sourceUri, entries, attached, packageName, appName, combinedTotal,
+            )
+            is ObbStrategy.Saf -> runObbCopySaf(
+                context, sourceUri, entries, attached, packageName, appName, combinedTotal,
+                strategy.treeUri,
+            )
+            ObbStrategy.NeedSafGrant -> {
+                _obbCopyState.value = ObbCopyState.NeedSafGrant(appName, packageName)
+            }
+        }
+    }
+
+    private sealed interface ObbStrategy {
+        data object Direct : ObbStrategy
+        data object Shizuku : ObbStrategy
+        data class Saf(val treeUri: Uri) : ObbStrategy
+        data object NeedSafGrant : ObbStrategy
+    }
+
+    private suspend fun selectObbStrategy(packageName: String): ObbStrategy {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return ObbStrategy.Direct
+        if (ShizukuObbWriter.isReady()) return ObbStrategy.Shizuku
+        val savedTree = readObbTreeGrant(packageName)
+        if (savedTree != null && treeUriStillGranted(savedTree)) return ObbStrategy.Saf(savedTree)
+        return ObbStrategy.NeedSafGrant
+    }
+
+    private fun treeUriStillGranted(uri: Uri): Boolean {
+        return try {
+            application.contentResolver.persistedUriPermissions.any {
+                it.uri == uri && it.isReadPermission && it.isWritePermission
+            }
+        } catch (_: Exception) { false }
+    }
+
+    private suspend fun runObbCopyDirect(
+        context: Context,
+        sourceUri: Uri?,
+        entries: List<ObbEntry>,
+        attached: List<AttachedObb>,
+        packageName: String,
+        appName: String,
+        combinedTotal: Long,
+    ) {
+        var bytesSoFar = 0L
+        var totalCopied = 0
+        if (entries.isNotEmpty() && sourceUri != null) {
+            val r = ObbExtractor.extract(
+                context = context,
+                uri = sourceUri,
+                entries = entries,
+                packageName = packageName,
+                onProgress = { copied, _ ->
+                    _obbCopyState.value = ObbCopyState.Running(
+                        appName, packageName, bytesSoFar + copied, combinedTotal,
+                    )
+                },
+            )
+            r.fold(
+                onSuccess = {
+                    totalCopied += it
+                    bytesSoFar += entries.sumOf { e -> e.sizeBytes.coerceAtLeast(0L) }
+                },
+                onFailure = { t -> return finishObbWithError(appName, t) },
+            )
+        }
+        if (attached.isNotEmpty()) {
+            val r = ObbExtractor.extractFromUris(
+                context = context,
+                files = attached,
+                packageName = packageName,
+                onProgress = { copied, _ ->
+                    _obbCopyState.value = ObbCopyState.Running(
+                        appName, packageName, bytesSoFar + copied, combinedTotal,
+                    )
+                },
+            )
+            r.fold(
+                onSuccess = { totalCopied += it },
+                onFailure = { t -> return finishObbWithError(appName, t) },
+            )
+        }
+        finishObbSuccess(appName, totalCopied)
+    }
+
+    private suspend fun runObbCopyShizuku(
+        context: Context,
+        sourceUri: Uri?,
+        entries: List<ObbEntry>,
+        attached: List<AttachedObb>,
+        packageName: String,
+        appName: String,
+        combinedTotal: Long,
+    ) {
+        var bytesSoFar = 0L
+        var totalCopied = 0
+
+        suspend fun copyOne(open: () -> java.io.InputStream?, fileName: String): Boolean {
+            val input = open() ?: run {
+                finishObbWithError(appName, IOException("Cannot open $fileName"))
+                return false
+            }
+            val r = input.use {
+                ShizukuObbWriter.copy(
+                    input = it,
+                    packageName = packageName,
+                    fileName = fileName,
+                    onBytesProgress = { fileBytes ->
+                        _obbCopyState.value = ObbCopyState.Running(
+                            appName, packageName, bytesSoFar + fileBytes, combinedTotal,
+                        )
+                    },
+                )
+            }
+            r.fold(
+                onSuccess = { totalCopied += 1 },
+                onFailure = { t -> finishObbWithError(appName, t); return false },
+            )
+            return true
+        }
+
+        // Bundle-embedded OBBs: re-read zip, pipe matching entries into Shizuku writer.
+        if (entries.isNotEmpty() && sourceUri != null) {
+            val entryPaths = entries.map { it.entryPath }.toSet()
+            try {
+                context.contentResolver.openInputStream(sourceUri)?.buffered()?.use { inputStream ->
+                    java.util.zip.ZipInputStream(inputStream).use { zis ->
+                        while (true) {
+                            val entry = zis.nextEntry ?: break
+                            if (entry.isDirectory || entry.name !in entryPaths) {
+                                zis.closeEntry(); continue
+                            }
+                            val fileName = entry.name.substringAfterLast('/')
+                            val beforeBytes = bytesSoFar
+                            val r = ShizukuObbWriter.copy(
+                                input = zis,
+                                packageName = packageName,
+                                fileName = fileName,
+                                onBytesProgress = { fileBytes ->
+                                    _obbCopyState.value = ObbCopyState.Running(
+                                        appName, packageName, beforeBytes + fileBytes, combinedTotal,
+                                    )
+                                },
+                            )
+                            r.fold(
+                                onSuccess = {
+                                    totalCopied += 1
+                                    val entryObj = entries.find { it.entryPath == entry.name }
+                                    bytesSoFar += (entryObj?.sizeBytes ?: 0L).coerceAtLeast(0L)
+                                },
+                                onFailure = { t -> return finishObbWithError(appName, t) },
+                            )
+                            zis.closeEntry()
+                        }
+                    }
+                } ?: return finishObbWithError(appName, IOException("Cannot open source"))
+            } catch (ce: kotlinx.coroutines.CancellationException) {
+                throw ce
+            } catch (t: Throwable) {
+                return finishObbWithError(appName, t)
+            }
+        }
+
+        // Attached standalone OBBs.
+        for (obb in attached) {
+            val beforeBytes = bytesSoFar
+            if (!copyOne({ context.contentResolver.openInputStream(obb.uri) }, obb.fileName)) return
+            bytesSoFar = beforeBytes + obb.sizeBytes.coerceAtLeast(0L)
+        }
+
+        finishObbSuccess(appName, totalCopied)
+    }
+
+    private suspend fun runObbCopySaf(
+        context: Context,
+        sourceUri: Uri?,
+        entries: List<ObbEntry>,
+        attached: List<AttachedObb>,
+        packageName: String,
+        appName: String,
+        combinedTotal: Long,
+        treeUri: Uri,
+    ) {
+        var bytesSoFar = 0L
+        var totalCopied = 0
+
+        if (entries.isNotEmpty() && sourceUri != null) {
+            val entryPaths = entries.map { it.entryPath }.toSet()
+            try {
+                context.contentResolver.openInputStream(sourceUri)?.buffered()?.use { inputStream ->
+                    java.util.zip.ZipInputStream(inputStream).use { zis ->
+                        while (true) {
+                            val entry = zis.nextEntry ?: break
+                            if (entry.isDirectory || entry.name !in entryPaths) {
+                                zis.closeEntry(); continue
+                            }
+                            val fileName = entry.name.substringAfterLast('/')
+                            val beforeBytes = bytesSoFar
+                            val r = SafObbWriter.copy(
+                                context = context,
+                                input = zis,
+                                treeUri = treeUri,
+                                fileName = fileName,
+                                onBytesProgress = { fileBytes ->
+                                    _obbCopyState.value = ObbCopyState.Running(
+                                        appName, packageName, beforeBytes + fileBytes, combinedTotal,
+                                    )
+                                },
+                            )
+                            r.fold(
+                                onSuccess = {
+                                    totalCopied += 1
+                                    val e = entries.find { it.entryPath == entry.name }
+                                    bytesSoFar += (e?.sizeBytes ?: 0L).coerceAtLeast(0L)
+                                },
+                                onFailure = { t -> return finishObbWithError(appName, t) },
+                            )
+                            zis.closeEntry()
+                        }
+                    }
+                } ?: return finishObbWithError(appName, IOException("Cannot open source"))
+            } catch (ce: kotlinx.coroutines.CancellationException) {
+                throw ce
+            } catch (t: Throwable) {
+                return finishObbWithError(appName, t)
+            }
+        }
+
+        for (obb in attached) {
+            val beforeBytes = bytesSoFar
+            val input = context.contentResolver.openInputStream(obb.uri)
+                ?: return finishObbWithError(appName, IOException("Cannot open ${obb.fileName}"))
+            val r = input.use {
+                SafObbWriter.copy(
+                    context = context,
+                    input = it,
+                    treeUri = treeUri,
+                    fileName = obb.fileName,
+                    onBytesProgress = { fileBytes ->
+                        _obbCopyState.value = ObbCopyState.Running(
+                            appName, packageName, beforeBytes + fileBytes, combinedTotal,
+                        )
+                    },
+                )
+            }
+            r.fold(
+                onSuccess = { totalCopied += 1; bytesSoFar = beforeBytes + obb.sizeBytes.coerceAtLeast(0L) },
+                onFailure = { t -> return finishObbWithError(appName, t) },
+            )
+        }
+
+        finishObbSuccess(appName, totalCopied)
+    }
+
+    private fun finishObbSuccess(appName: String, count: Int) {
+        pendingObbCopyJob = null
+        _obbCopyState.value = ObbCopyState.Done(appName, count)
+    }
+
+    private fun finishObbWithError(appName: String, t: Throwable) {
+        pendingObbCopyJob = null
+        _obbCopyState.value = ObbCopyState.Error(appName, t.message ?: "Copy failed")
+    }
+
+    /** User just granted (or denied) the SAF tree URI for `<pkg>`. Resume the pending job. */
+    fun onObbTreeGranted(uri: Uri?) {
+        val job = pendingObbCopyJob ?: return
+        if (uri == null) {
+            finishObbWithError(job.appName, IOException("OBB folder access not granted"))
+            return
+        }
+        if (!SafObbWriter.isTreeForObbOf(uri, job.packageName)) {
+            finishObbWithError(
+                job.appName,
+                IOException("Wrong folder picked — expected Android/obb/${job.packageName}/"),
+            )
+            return
+        }
+        try {
+            application.contentResolver.takePersistableUriPermission(
+                uri,
+                android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+            )
+        } catch (_: Exception) { /* best-effort */ }
+        viewModelScope.launch {
+            saveObbTreeGrant(job.packageName, uri)
+            copyObbFiles(
+                context = application,
+                sourceUri = job.sourceUri,
+                entries = job.entries,
+                attached = job.attached,
+                packageName = job.packageName,
+                appName = job.appName,
+            )
+        }
+    }
+
+    fun obbTreeHintUri(): Uri? {
+        val job = pendingObbCopyJob ?: return null
+        return SafObbWriter.buildObbTreeHintUri(job.packageName)
+    }
+
+    private suspend fun readObbTreeGrant(packageName: String): Uri? = try {
+        val prefs = application.dataStore.data.first()
+        val key = androidx.datastore.preferences.core.stringPreferencesKey("obb_tree_$packageName")
+        prefs[key]?.let(android.net.Uri::parse)
+    } catch (_: Exception) { null }
+
+    private suspend fun saveObbTreeGrant(packageName: String, uri: Uri) {
+        try {
+            application.dataStore.edit { prefs ->
+                val key = androidx.datastore.preferences.core.stringPreferencesKey("obb_tree_$packageName")
+                prefs[key] = uri.toString()
+            }
+        } catch (_: Exception) { /* best-effort */ }
     }
 
     fun dismissObbCopy() {
         _obbCopyState.value = ObbCopyState.Idle
+    }
+
+    /**
+     * User attached a standalone `.obb` file via the preview sheet picker. Silently ignores
+     * non-`.obb` extensions and duplicates. Takes a persistable read permission so the URI
+     * survives until install success (may be minutes later for large APKs).
+     */
+    fun attachObbFile(context: Context, uri: Uri) {
+        val displayName = context.contentResolver.getDisplayName(uri)
+        if (!displayName.lowercase().endsWith(".obb")) return
+        if (_attachedObbFiles.value.any { it.uri == uri }) return
+        try {
+            context.contentResolver.takePersistableUriPermission(
+                uri, android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+        } catch (_: Exception) { /* best-effort; some providers don't support it */ }
+        val size = try {
+            context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.SIZE), null, null, null)
+                ?.use { c ->
+                    if (c.moveToFirst()) {
+                        val idx = c.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                        if (idx >= 0) c.getLong(idx) else 0L
+                    } else 0L
+                } ?: 0L
+        } catch (_: Exception) { 0L }
+        _attachedObbFiles.value = _attachedObbFiles.value + AttachedObb(uri, displayName, size)
+    }
+
+    fun removeAttachedObb(uri: Uri) {
+        _attachedObbFiles.value = _attachedObbFiles.value.filterNot { it.uri == uri }
     }
 
     fun dismissPendingInstall() {
@@ -218,6 +589,7 @@ class InstallViewModel(
         pendingOriginalUri = null
         pendingFileName = null
         pendingObbEntries = emptyList()
+        _attachedObbFiles.value = emptyList()
         deletePendingDownloadedFile()
     }
 

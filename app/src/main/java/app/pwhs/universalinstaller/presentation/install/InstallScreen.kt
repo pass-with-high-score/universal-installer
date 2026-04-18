@@ -25,6 +25,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,8 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.pwhs.universalinstaller.IntentHandoff
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
@@ -78,6 +81,10 @@ fun InstallScreen(modifier: Modifier = Modifier, viewModel: InstallViewModel = k
         onDismissDeviceScan = viewModel::dismissDeviceScan,
         onPickFromScan = { found -> viewModel.pickFromScan(context, found) },
         onDismissObbCopy = viewModel::dismissObbCopy,
+        onAttachObb = { uri -> viewModel.attachObbFile(context, uri) },
+        onRemoveObb = { obb -> viewModel.removeAttachedObb(obb.uri) },
+        onGrantObbFolder = viewModel::onObbTreeGranted,
+        obbTreeHintUri = viewModel::obbTreeHintUri,
     )
 }
 
@@ -101,8 +108,13 @@ private fun InstallUi(
     onDismissDeviceScan: () -> Unit = {},
     onPickFromScan: (FoundPackageFile) -> Unit = {},
     onDismissObbCopy: () -> Unit = {},
+    onAttachObb: (Uri) -> Unit = {},
+    onRemoveObb: (AttachedObb) -> Unit = {},
+    onGrantObbFolder: (Uri?) -> Unit = {},
+    obbTreeHintUri: () -> Uri? = { null },
 ) {
     val context = LocalContext.current
+    val resource = LocalResources.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     // "strict" means validate extension strictly against known package types; "permissive" accepts anything.
@@ -127,7 +139,7 @@ private fun InstallUi(
             if (strictPickerMode && !isApkMime && extension !in validExtensions) {
                 Toast.makeText(
                     context,
-                    context.getString(R.string.install_unsupported_file),
+                    resource.getString(R.string.install_unsupported_file),
                     Toast.LENGTH_LONG
                 ).show()
                 return@rememberLauncherForActivityResult
@@ -157,7 +169,53 @@ private fun InstallUi(
             onFilePicked(uri, apks, displayName)
         }
 
+    // OBB picker — reuses the manifest OpenDocument contract. We don't filter MIME strictly
+    // (.obb has no standard MIME), so the VM validates extension on attach.
+    val obbPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenMultipleDocuments()
+    ) { uris ->
+        uris.forEach { onAttachObb(it) }
+    }
+
+    // SAF folder picker for granting access to /Android/obb/<pkg>/ when Shizuku isn't
+    // available. Result is passed straight to the VM which validates the chosen folder
+    // matches the target package and persists the grant.
+    val obbTreeLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocumentTree()
+    ) { uri -> onGrantObbFolder(uri) }
+
     var selectedTab by rememberSaveable { mutableStateOf(SourceTab.Local) }
+
+    // Consume URIs delivered via ACTION_VIEW (Chrome downloads, file managers, Gmail). We
+    // strict-validate the extension here because the manifest filter also accepts
+    // `application/octet-stream`, which covers many non-package binaries.
+    val pendingViewUri by IntentHandoff.pendingUri.collectAsState()
+    LaunchedEffect(pendingViewUri) {
+        val uri = pendingViewUri ?: return@LaunchedEffect
+        IntentHandoff.consume()
+        val mimeType = context.contentResolver.getType(uri)?.lowercase()
+        val displayName = context.contentResolver.getDisplayName(uri)
+        val extension = displayName.substringAfterLast('.', "").lowercase()
+        val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
+        val isApkMime = mimeType == "application/vnd.android.package-archive"
+        if (!isApkMime && extension !in validExtensions) {
+            Toast.makeText(
+                context,
+                resource.getString(R.string.install_unsupported_file),
+                Toast.LENGTH_LONG,
+            ).show()
+            return@LaunchedEffect
+        }
+        val apks = when {
+            (isApkMime || extension == "apk") -> SingletonApkSequence(uri, context).toSplitPackage()
+            extension in listOf("apks", "xapk", "apkm", "zip") -> ZippedApkSplits.getApksForUri(uri, context)
+                .validate()
+                .toSplitPackage()
+                .filterCompatible(context)
+            else -> SingletonApkSequence(uri, context).toSplitPackage()
+        }
+        onFilePicked(uri, apks, displayName)
+    }
 
     val grantPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -188,6 +246,9 @@ private fun InstallUi(
                 onInstall = onConfirmInstall,
                 onCancel = onDismissPreview,
                 onCheckVirusTotal = onCheckVirusTotal,
+                attachedObbFiles = uiState.attachedObbFiles,
+                onAttachObb = { obbPickerLauncher.launch(arrayOf("*/*")) },
+                onRemoveObb = onRemoveObb,
             )
         }
     }
@@ -227,6 +288,10 @@ private fun InstallUi(
                     ObbCopyCard(
                         state = uiState.obbCopyState,
                         onDismiss = onDismissObbCopy,
+                        onGrantFolder = {
+                            @Suppress("DEPRECATION")
+                            obbTreeLauncher.launch(obbTreeHintUri())
+                        },
                     )
                 }
             }

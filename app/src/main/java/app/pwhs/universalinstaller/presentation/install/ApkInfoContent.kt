@@ -60,6 +60,9 @@ internal fun ApkInfoContent(
     onInstall: () -> Unit,
     onCancel: () -> Unit,
     onCheckVirusTotal: () -> Unit = {},
+    attachedObbFiles: List<AttachedObb> = emptyList(),
+    onAttachObb: () -> Unit = {},
+    onRemoveObb: (AttachedObb) -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -158,6 +161,14 @@ internal fun ApkInfoContent(
                 )
             }
         }
+
+        Spacer(Modifier.height(16.dp))
+
+        ObbAttachCard(
+            attached = attachedObbFiles,
+            onAttach = onAttachObb,
+            onRemove = onRemoveObb,
+        )
 
         Spacer(Modifier.height(16.dp))
 
@@ -582,4 +593,81 @@ internal fun sdkToAndroid(sdk: Int): String = when {
     sdk >= 23 -> "6"
     sdk >= 21 -> "5"
     else -> "$sdk"
+}
+
+@Composable
+private fun ObbAttachCard(
+    attached: List<AttachedObb>,
+    onAttach: () -> Unit,
+    onRemove: (AttachedObb) -> Unit,
+) {
+    val context = LocalContext.current
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(
+                text = stringResource(R.string.apk_info_obb_attach_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = stringResource(R.string.apk_info_obb_attach_desc),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            if (attached.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                attached.forEach { obb ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Storage,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = obb.fileName,
+                                style = MaterialTheme.typography.bodyMedium,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            if (obb.sizeBytes > 0) {
+                                Text(
+                                    text = Formatter.formatShortFileSize(context, obb.sizeBytes),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                        TextButton(onClick = { onRemove(obb) }) {
+                            Text(stringResource(R.string.apk_info_obb_attach_remove))
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(10.dp))
+            OutlinedButton(
+                onClick = onAttach,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+            ) {
+                Text(stringResource(R.string.apk_info_obb_attach_button))
+            }
+        }
+    }
 }

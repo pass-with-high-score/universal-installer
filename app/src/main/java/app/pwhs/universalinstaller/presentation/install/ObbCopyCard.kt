@@ -32,6 +32,7 @@ import app.pwhs.universalinstaller.R
 internal fun ObbCopyCard(
     state: ObbCopyState,
     onDismiss: () -> Unit,
+    onGrantFolder: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     if (state is ObbCopyState.Idle) return
@@ -49,6 +50,7 @@ internal fun ObbCopyCard(
                 val (icon, tint) = when (state) {
                     is ObbCopyState.Done -> Icons.Rounded.CheckCircle to MaterialTheme.colorScheme.primary
                     is ObbCopyState.Error -> Icons.Rounded.Error to MaterialTheme.colorScheme.error
+                    is ObbCopyState.NeedSafGrant -> Icons.Rounded.Error to MaterialTheme.colorScheme.tertiary
                     else -> Icons.Rounded.FolderZip to MaterialTheme.colorScheme.primary
                 }
                 Icon(
@@ -63,6 +65,7 @@ internal fun ObbCopyCard(
                         is ObbCopyState.Running -> stringResource(R.string.obb_copy_title)
                         is ObbCopyState.Done -> stringResource(R.string.obb_copy_done, state.appName, state.fileCount)
                         is ObbCopyState.Error -> stringResource(R.string.obb_copy_error, state.message)
+                        is ObbCopyState.NeedSafGrant -> stringResource(R.string.obb_copy_need_grant_title)
                         ObbCopyState.Idle -> ""
                     }
                     Text(
@@ -86,11 +89,23 @@ internal fun ObbCopyCard(
                         )
                     }
                 }
-                if (state !is ObbCopyState.Running) {
+                if (state is ObbCopyState.NeedSafGrant) {
+                    TextButton(onClick = onGrantFolder) {
+                        Text(stringResource(R.string.obb_copy_grant_button))
+                    }
+                } else if (state !is ObbCopyState.Running) {
                     TextButton(onClick = onDismiss) {
                         Text(stringResource(R.string.obb_copy_dismiss))
                     }
                 }
+            }
+            if (state is ObbCopyState.NeedSafGrant) {
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.obb_copy_need_grant_body, state.packageName),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
             if (state is ObbCopyState.Running) {
                 Spacer(Modifier.height(10.dp))
@@ -111,5 +126,6 @@ private fun ObbCopyState.appNameOrNull(): String? = when (this) {
     is ObbCopyState.Running -> appName
     is ObbCopyState.Done -> appName
     is ObbCopyState.Error -> appName
+    is ObbCopyState.NeedSafGrant -> appName
     ObbCopyState.Idle -> null
 }

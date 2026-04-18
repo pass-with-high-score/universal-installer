@@ -2,7 +2,9 @@ package app.pwhs.universalinstaller
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -44,6 +46,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         maybeRequestNotificationPermission()
+        handleViewIntent(intent)
         setContent {
             // `remember` caches the Flow across recompositions so `map {}` isn't re-invoked
             // every frame (Detekt/Android Lint: "Flow operator functions should not be invoked
@@ -109,5 +112,25 @@ class MainActivity : ComponentActivity() {
             this, Manifest.permission.POST_NOTIFICATIONS
         ) == PackageManager.PERMISSION_GRANTED
         if (!granted) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        handleViewIntent(intent)
+    }
+
+    /**
+     * Pick up VIEW / INSTALL_PACKAGE intents (Chrome downloads, file managers, Gmail,
+     * Telegram). The manifest filter accepts `application/octet-stream` to catch Chrome's
+     * download URIs — that means we can receive unrelated binaries too, so the install
+     * screen's existing extension check is the real gatekeeper; here we just hand off.
+     */
+    private fun handleViewIntent(intent: Intent?) {
+        if (intent == null) return
+        val action = intent.action ?: return
+        if (action != Intent.ACTION_VIEW && action != Intent.ACTION_INSTALL_PACKAGE) return
+        val uri: Uri = intent.data ?: return
+        IntentHandoff.post(uri)
     }
 }
