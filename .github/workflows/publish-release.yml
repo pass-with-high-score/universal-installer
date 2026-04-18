@@ -66,7 +66,12 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
+      # Play Store upload is allowed to fail (e.g. metadata/changelog/permission policy
+      # rejection) without blocking the GitHub release — we still want the signed artifacts
+      # published so users on side-load tracks can grab them.
       - name: Deploy to internal track
+        id: play_store
+        continue-on-error: true
         run: bundle exec fastlane internal
 
       - name: Build release APK
@@ -82,7 +87,8 @@ jobs:
             app/build/outputs/apk/release/app-release.apk
           retention-days: 30
 
-      # Upload assets to existing GitHub Release (or create if missing)
+      # Upload assets to existing GitHub Release (or create if missing). Both APK and AAB
+      # are attached so users can grab the bundle for manual testing / sideload.
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -90,5 +96,7 @@ jobs:
           name: ${{ env.VERSION_NAME }}
           draft: false
           prerelease: false
-          files: app/build/outputs/apk/release/app-release.apk
+          files: |
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/bundle/release/app-release.aab
           token: ${{ secrets.GITHUB_TOKEN }}
