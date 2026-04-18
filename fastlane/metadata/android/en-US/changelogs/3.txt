@@ -1,10 +1,8 @@
-- Download packages directly from any URL, with a new Download History screen
-- OBB file support (bundled XAPK/APKS + standalone .obb), copied via Shizuku or SAF
+- Download packages from any URL, with a Download History screen
+- OBB support (XAPK/APKS + standalone .obb) via Shizuku or SAF
 - Set installer source on install (Shizuku)
-- Batch install: multi-pick from the picker or share menu, plus scanner multi-select
-- Redesigned Packages-on-device sheet with delete, select-all and detail rows
-- New Permission Center in the top bar — see what's granted and grant what isn't
-- Uninstall screen: filter FAB, sort (name / size / installed / last used), usage times
-- Per-app metadata (size, install date, last-used) across install/uninstall
-- Refreshed Browse/Find source cards with clearer layout
-- Many bug fixes and new translations
+- Batch install: multi-pick from picker or share menu
+- Redesigned on-device scanner: multi-select, delete, select-all
+- Permission Center in the top bar
+- Uninstall: filter, sort, usage times
+- Many bug fixes and translations
