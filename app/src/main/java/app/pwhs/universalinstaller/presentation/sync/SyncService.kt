@@ -16,6 +16,7 @@ import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 import java.net.Inet4Address
 import java.net.NetworkInterface
@@ -26,6 +27,23 @@ object SyncManager {
     val pinCode = MutableStateFlow<String?>("1234")
     val activeConnections = MutableStateFlow(0)
     val sharedFiles = MutableStateFlow<List<java.io.File>>(emptyList())
+
+    private val connectionCounter = java.util.concurrent.atomic.AtomicInteger(0)
+
+    fun incrementConnections() {
+        val newVal = connectionCounter.incrementAndGet()
+        activeConnections.update { newVal }
+    }
+
+    fun decrementConnections() {
+        val newVal = connectionCounter.decrementAndGet().coerceAtLeast(0)
+        activeConnections.update { newVal }
+    }
+
+    fun resetConnections() {
+        connectionCounter.set(0)
+        activeConnections.update { 0 }
+    }
 }
 
 enum class SyncState { STOPPED, STARTING, RUNNING, ERROR }
@@ -59,7 +77,8 @@ class SyncService : Service() {
                 server?.stop()
 
                 server = ApkHttpServer(this@SyncService, port, requirePin, pin) { delta ->
-                    SyncManager.activeConnections.value += delta
+                    if (delta > 0) SyncManager.incrementConnections()
+                    else SyncManager.decrementConnections()
                 }
                 server?.start()
                 
@@ -129,7 +148,7 @@ class SyncService : Service() {
         server?.stop()
         SyncManager.state.value = SyncState.STOPPED
         SyncManager.serverUrl.value = null
-        SyncManager.activeConnections.value = 0
+        SyncManager.resetConnections()
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

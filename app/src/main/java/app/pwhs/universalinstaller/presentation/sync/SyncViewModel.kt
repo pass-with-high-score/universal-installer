@@ -55,15 +55,20 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
 
     fun copyFilesToShareFolder(uris: List<android.net.Uri>) {
         val app = getApplication<Application>()
-        Toast.makeText(app, "Copying files to shared folder...", Toast.LENGTH_SHORT).show()
 
         viewModelScope.launch(Dispatchers.IO) {
             if (!baseDir.exists()) baseDir.mkdirs()
 
             var successCount = 0
+            var skippedCount = 0
             uris.forEach { uri ->
                 try {
                     val displayName = getDisplayName(uri)
+                    val ext = displayName.substringAfterLast('.', "").lowercase()
+                    if (ext !in validExtensions) {
+                        skippedCount++
+                        return@forEach
+                    }
                     val targetFile = File(baseDir, displayName)
                     app.contentResolver.openInputStream(uri)?.use { input ->
                         targetFile.outputStream().use { output ->
@@ -80,10 +85,15 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
             refreshSharedFiles()
 
             withContext(Dispatchers.Main) {
-                if (successCount > 0) {
-                    Toast.makeText(app, "Added $successCount file(s) to Sync Folder", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(app, "Failed to copy files", Toast.LENGTH_SHORT).show()
+                when {
+                    successCount > 0 && skippedCount > 0 ->
+                        Toast.makeText(app, "Added $successCount file(s), skipped $skippedCount unsupported", Toast.LENGTH_LONG).show()
+                    successCount > 0 ->
+                        Toast.makeText(app, "Added $successCount file(s) to Sync Folder", Toast.LENGTH_SHORT).show()
+                    skippedCount > 0 ->
+                        Toast.makeText(app, "No supported package files selected (apk, apks, xapk, apkm, zip)", Toast.LENGTH_LONG).show()
+                    else ->
+                        Toast.makeText(app, "Failed to copy files", Toast.LENGTH_SHORT).show()
                 }
             }
         }

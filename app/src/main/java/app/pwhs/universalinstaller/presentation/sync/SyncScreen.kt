@@ -13,6 +13,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.Cloud
 import androidx.compose.material.icons.rounded.FolderOpen
 import androidx.compose.material.icons.rounded.Key
@@ -426,6 +427,7 @@ private fun SharedFileItem(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     Surface(
         shape = MaterialTheme.shapes.medium,
         color = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -434,10 +436,35 @@ private fun SharedFileItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
+                .padding(start = 12.dp, top = 8.dp, bottom = 8.dp, end = 4.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "📦", fontSize = 28.sp)
+            Box(
+                modifier = Modifier.size(44.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                coil3.compose.SubcomposeAsyncImage(
+                    model = coil3.request.ImageRequest.Builder(context)
+                        .data(app.pwhs.universalinstaller.util.ApkFileIconData(file.absolutePath))
+                        .build(),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    error = {
+                        Icon(
+                            imageVector = Icons.Rounded.Android,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(32.dp),
+                        )
+                    },
+                    loading = {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    },
+                )
+            }
             Spacer(Modifier.width(12.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(

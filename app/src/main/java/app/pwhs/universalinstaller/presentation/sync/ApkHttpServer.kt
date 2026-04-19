@@ -5,6 +5,8 @@ import android.os.Environment
 import fi.iki.elonen.NanoHTTPD
 import java.io.File
 import java.io.FileInputStream
+import java.io.FilterInputStream
+import java.io.InputStream
 import java.net.URLEncoder
 
 class ApkHttpServer(
@@ -79,21 +81,22 @@ class ApkHttpServer(
                 else -> "application/octet-stream"
             }
             
-            // Notify when download starts
+            val fis = FileInputStream(file)
+            // Wrap with tracking to detect download start/finish
             onConnectionChange(1)
-            
-            val trackingFis = object : FileInputStream(file) {
-                override fun close() {
-                    super.close()
-                    onConnectionChange(-1) // Notify when download finishes
-                }
+            val trackingStream = TrackingInputStream(fis) {
+                onConnectionChange(-1)
             }
             
-            val response = newChunkedResponse(Response.Status.OK, mime, trackingFis)
-            response.addHeader("Content-Disposition", "attachment; filename=\"${URLEncoder.encode(file.name, "UTF-8").replace("+", "%20")}\"")
+            val response = newChunkedResponse(Response.Status.OK, mime, trackingStream)
+            // Use RFC 5987 filename* for proper encoding of special characters like ()
+            val safeFilename = file.name.replace("\"", "\\\"")
+            val encodedFilename = URLEncoder.encode(file.name, "UTF-8").replace("+", "%20")
+            response.addHeader("Content-Disposition", "attachment; filename=\"$safeFilename\"; filename*=UTF-8''$encodedFilename")
             response.addHeader("Content-Length", file.length().toString())
             return response
         } catch (e: Exception) {
+            onConnectionChange(-1) // Ensure decrement on error
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Error reading file.")
         }
     }
@@ -153,6 +156,30 @@ class ApkHttpServer(
             mb >= 1.0 -> "%.1f MB".format(mb)
             kb >= 1.0 -> "%.0f KB".format(kb)
             else -> "$bytes B"
+        }
+    }
+}
+
+/**
+ * A stream wrapper that fires [onClose] exactly once when the stream is closed.
+ * NanoHTTPD always closes the response data stream after sending, so this
+ * reliably tracks when a download finishes (or the client disconnects).
+ */
+private class TrackingInputStream(
+    stream: InputStream,
+    private val onClose: () -> Unit
+) : FilterInputStream(stream) {
+    @Volatile
+    private var closed = false
+
+    override fun close() {
+        if (!closed) {
+            closed = true
+            try {
+                super.close()
+            } finally {
+                onClose()
+            }
         }
     }
 }
