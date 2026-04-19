@@ -1,6 +1,9 @@
 package app.pwhs.universalinstaller.presentation.install
 
 import android.text.format.Formatter
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -17,14 +21,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.CheckBox
 import androidx.compose.material.icons.rounded.CheckBoxOutlineBlank
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.FolderOff
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -37,6 +45,8 @@ import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,16 +56,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.util.ApkFileIconData
+import coil3.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImageContent
 import java.text.DateFormat
 import java.util.Date
 
@@ -75,7 +92,7 @@ internal fun FoundApksSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
-        shape = MaterialTheme.shapes.extraLarge,
+        shape = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
     ) {
         // Intentionally no horizontal padding on the outer Column — each body applies its
         // own so the Ready state's bottom bar can span edge-to-edge.
@@ -155,7 +172,7 @@ private fun PermissionBody(onGrant: () -> Unit) {
             text = stringResource(R.string.find_auto_permission_body),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
         )
         Spacer(Modifier.height(16.dp))
         OutlinedButton(
@@ -201,7 +218,7 @@ private fun ResultsBody(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 32.dp),
-            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            textAlign = TextAlign.Center,
         )
         return
     }
@@ -210,19 +227,84 @@ private fun ResultsBody(
     // UI state that resets every time the sheet opens.
     var selected by remember(files) { mutableStateOf(setOf<String>()) }
     var showDeleteDialog by remember { mutableStateOf(false) }
+    var searchQuery by rememberSaveable { mutableStateOf("") }
+    val keyboardController = LocalSoftwareKeyboardController.current
+
+    // Filter files based on search query (case-insensitive, matches name or path).
+    val filteredFiles = remember(files, searchQuery) {
+        if (searchQuery.isBlank()) files
+        else {
+            val q = searchQuery.trim().lowercase()
+            files.filter { f ->
+                f.name.lowercase().contains(q) || f.path.lowercase().contains(q)
+            }
+        }
+    }
+
     val selectedFiles = files.filter { it.path in selected }
     val selectedBytes = selectedFiles.sumOf { it.sizeBytes.coerceAtLeast(0L) }
     val hasSelection = selected.isNotEmpty()
-    val toggleState = when (selected.size) {
-        0 -> ToggleableState.Off
-        files.size -> ToggleableState.On
+
+    // Toggle state considers only visible (filtered) files.
+    val filteredSelected = filteredFiles.count { it.path in selected }
+    val toggleState = when {
+        filteredFiles.isEmpty() -> ToggleableState.Off
+        filteredSelected == 0 -> ToggleableState.Off
+        filteredSelected == filteredFiles.size -> ToggleableState.On
         else -> ToggleableState.Indeterminate
     }
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        // Select-all row: only the TriStateCheckbox is clickable (per request — the whole
-        // Row used to be a click target, which felt unintentional). The "N / total" label is
-        // plain text beside it.
+        // ── Search bar ──────────────────────────────────────
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = { searchQuery = it },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            placeholder = {
+                Text(
+                    text = stringResource(R.string.find_auto_search_hint),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Search,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            trailingIcon = {
+                AnimatedVisibility(
+                    visible = searchQuery.isNotEmpty(),
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    IconButton(onClick = { searchQuery = "" }) {
+                        Icon(
+                            imageVector = Icons.Rounded.Clear,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            },
+            singleLine = true,
+            shape = RoundedCornerShape(16.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
+            ),
+            textStyle = MaterialTheme.typography.bodyMedium,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { keyboardController?.hide() }),
+        )
+        Spacer(Modifier.height(8.dp))
+
+        // Select-all row: toggles only the currently visible (filtered) items.
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -232,35 +314,53 @@ private fun ResultsBody(
             TriStateCheckbox(
                 state = toggleState,
                 onClick = {
-                    selected = if (toggleState == ToggleableState.On) emptySet()
-                               else files.map { it.path }.toSet()
+                    val visiblePaths = filteredFiles.map { it.path }.toSet()
+                    selected = if (toggleState == ToggleableState.On) {
+                        selected - visiblePaths
+                    } else {
+                        selected + visiblePaths
+                    }
                 },
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                text = "${selected.size} / ${files.size}",
+                text = if (searchQuery.isBlank()) "${selected.size} / ${files.size}"
+                       else "${filteredSelected} / ${filteredFiles.size}",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface,
             )
         }
         Spacer(Modifier.height(4.dp))
 
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(max = 420.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
-        ) {
-            items(files, key = { it.path }) { file ->
-                FoundRow(
-                    file = file,
-                    selected = file.path in selected,
-                    onToggle = {
-                        selected = if (file.path in selected) selected - file.path
-                                   else selected + file.path
-                    },
-                )
+        if (filteredFiles.isEmpty() && searchQuery.isNotBlank()) {
+            // No matches — show empty state.
+            Text(
+                text = stringResource(R.string.find_auto_no_match, searchQuery),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 32.dp),
+                textAlign = TextAlign.Center,
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = 380.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
+            ) {
+                items(filteredFiles, key = { it.path }) { file ->
+                    FoundRow(
+                        file = file,
+                        selected = file.path in selected,
+                        onToggle = {
+                            selected = if (file.path in selected) selected - file.path
+                                       else selected + file.path
+                        },
+                    )
+                }
             }
         }
 
@@ -342,10 +442,9 @@ private fun ResultsBody(
             },
             confirmButton = {
                 TextButton(onClick = {
-                    val toDelete = selectedFiles
                     showDeleteDialog = false
                     selected = emptySet()
-                    onDeleteMany(toDelete)
+                    onDeleteMany(selectedFiles)
                 }) {
                     Text(
                         text = stringResource(R.string.find_auto_delete_confirm),
@@ -387,10 +486,20 @@ private fun FoundRow(
                 modifier = Modifier.size(40.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.Android,
+                SubcomposeAsyncImage(
+                    model = coil3.request.ImageRequest.Builder(context)
+                        .data(ApkFileIconData(file.path))
+                        .build(),
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.fillMaxSize(),
+                    error = {
+                        Icon(
+                            imageVector = Icons.Rounded.Android,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                        )
+                    },
+                    success = { SubcomposeAsyncImageContent() }
                 )
             }
             Spacer(Modifier.size(12.dp))

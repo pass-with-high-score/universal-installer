@@ -124,6 +124,8 @@
     <string name="find_auto_delete_title">Delete %d file(s)?</string>
     <string name="find_auto_delete_message">The selected package files will be permanently removed from device storage.</string>
     <string name="find_auto_delete_confirm">Delete</string>
+    <string name="find_auto_search_hint">Search packages…</string>
+    <string name="find_auto_no_match">No packages match "%s"</string>
 
     <!-- Permission Center -->
     <string name="permissions_title">App permissions</string>
