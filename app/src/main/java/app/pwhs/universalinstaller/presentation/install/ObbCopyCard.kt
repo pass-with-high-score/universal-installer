@@ -1,7 +1,6 @@
 package app.pwhs.universalinstaller.presentation.install
 
 import android.text.format.Formatter
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,10 +29,10 @@ import app.pwhs.universalinstaller.R
 
 @Composable
 internal fun ObbCopyCard(
+    modifier: Modifier = Modifier,
     state: ObbCopyState,
     onDismiss: () -> Unit,
     onGrantFolder: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     if (state is ObbCopyState.Idle) return
     val context = LocalContext.current

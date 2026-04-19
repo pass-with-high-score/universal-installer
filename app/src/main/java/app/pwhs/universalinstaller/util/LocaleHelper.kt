@@ -6,6 +6,7 @@ import android.content.res.Configuration
 import android.os.Build
 import android.os.LocaleList
 import java.util.Locale
+import androidx.core.content.edit
 
 /**
  * Per-app language.
@@ -30,9 +31,9 @@ object LocaleHelper {
     fun setAppLanguage(context: Context, tag: String) {
         context.applicationContext
             .getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-            .edit()
-            .putString(KEY_LANG, tag)
-            .apply()
+            .edit {
+                putString(KEY_LANG, tag)
+            }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val localeList = if (tag.isEmpty()) LocaleList.getEmptyLocaleList()

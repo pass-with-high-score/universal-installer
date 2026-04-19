@@ -276,7 +276,7 @@ private fun UninstallLogCard(
         if (canExpand) {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
             ErrorBlock(
-                message = log.errorMessage.orEmpty(),
+                message = log.errorMessage,
                 expanded = expanded,
             )
         }

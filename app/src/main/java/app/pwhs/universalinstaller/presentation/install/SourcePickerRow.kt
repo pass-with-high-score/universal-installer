@@ -41,7 +41,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +52,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.platform.LocalResources
 import androidx.core.content.getSystemService
 import app.pwhs.universalinstaller.R
 
@@ -293,6 +293,7 @@ private fun DownloadSourceContent(
     onOpenHistory: () -> Unit,
 ) {
     val context = LocalContext.current
+    val resource = LocalResources.current
     var url by rememberSaveable { mutableStateOf("") }
     val running = downloadState as? DownloadState.Running
     val error = (downloadState as? DownloadState.Error)?.message
@@ -364,7 +365,7 @@ private fun DownloadSourceContent(
                     pasteFromClipboard(context)?.let { url = it }
                         ?: Toast.makeText(
                             context,
-                            context.getString(R.string.remote_download_clipboard_empty),
+                            resource.getString(R.string.remote_download_clipboard_empty),
                             Toast.LENGTH_SHORT,
                         ).show()
                 },

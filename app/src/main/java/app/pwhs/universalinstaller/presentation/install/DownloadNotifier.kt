@@ -45,7 +45,7 @@ class DownloadNotifier(private val context: Context) {
         val nm = nm ?: return
         val now = android.os.SystemClock.elapsedRealtime()
         // Always let the first (0 B) and last (complete) updates through; throttle the middle.
-        val isEdge = bytesRead == 0L || (totalBytes > 0 && bytesRead >= totalBytes)
+        val isEdge = bytesRead == 0L || (totalBytes in 1..bytesRead)
         if (!isEdge && now - lastProgressMs < 500L) return
         lastProgressMs = now
         val indeterminate = totalBytes <= 0L

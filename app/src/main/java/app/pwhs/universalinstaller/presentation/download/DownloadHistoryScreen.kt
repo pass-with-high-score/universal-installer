@@ -50,6 +50,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -76,6 +77,7 @@ fun DownloadHistoryScreen(
     viewModel: DownloadHistoryViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val resource = LocalResources.current
     val items by viewModel.items.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showClearDialog by remember { mutableStateOf(false) }
@@ -165,7 +167,7 @@ fun DownloadHistoryScreen(
                             if (!file.exists()) {
                                 Toast.makeText(
                                     context,
-                                    context.getString(R.string.download_history_file_missing),
+                                    resource.getString(R.string.download_history_file_missing),
                                     Toast.LENGTH_SHORT,
                                 ).show()
                                 return@DownloadRow
@@ -184,7 +186,7 @@ fun DownloadHistoryScreen(
                             cb?.setPrimaryClip(ClipData.newPlainText("url", entry.url))
                             Toast.makeText(
                                 context,
-                                context.getString(R.string.download_history_url_copied),
+                                resource.getString(R.string.download_history_url_copied),
                                 Toast.LENGTH_SHORT,
                             ).show()
                         },

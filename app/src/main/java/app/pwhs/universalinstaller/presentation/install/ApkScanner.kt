@@ -9,10 +9,10 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.File
-import kotlin.coroutines.coroutineContext
 
 data class FoundPackageFile(
     val path: String,
@@ -66,12 +66,12 @@ object ApkScanner {
         depth: Int,
         maxDepth: Int,
     ) {
-        coroutineContext.ensureActive()
+        currentCoroutineContext().ensureActive()
         if (depth > maxDepth) return
         if (!dir.exists() || !dir.canRead()) return
         val children = runCatching { dir.listFiles() }.getOrNull() ?: return
         for (child in children) {
-            coroutineContext.ensureActive()
+            currentCoroutineContext().ensureActive()
             if (child.isDirectory) {
                 val name = child.name
                 // Skip dotfiles, app-scoped dirs (restricted even with MANAGE access), and thumbnails.

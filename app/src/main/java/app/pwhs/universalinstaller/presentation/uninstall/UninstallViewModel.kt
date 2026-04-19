@@ -304,11 +304,9 @@ class UninstallViewModel(
                     // Smart-cast requires re-reading the params as locals — Kotlin can't track
                     // the nullability of method/executor across the suspend boundary otherwise.
                     if (runSystem) {
-                        val m = systemMethod ?: return@launch
-                        val e = executor ?: return@launch
                         for ((pkg, name) in systemPkgs) {
                             notifier.notifyBatchProgress(notifId, completed = processed, total = totalToRun, currentAppName = name)
-                            if (performSystemUninstall(pkg, name, m, e)) successful++ else failed++
+                            if (performSystemUninstall(pkg, name, systemMethod, executor)) successful++ else failed++
                             processed++
                         }
                     }

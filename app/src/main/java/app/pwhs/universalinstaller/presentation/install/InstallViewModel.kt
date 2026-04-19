@@ -267,8 +267,7 @@ class InstallViewModel(
         _obbCopyState.value = ObbCopyState.Running(appName, packageName, 0L, combinedTotal)
         pendingObbCopyJob = ObbCopyJob(sourceUri, entries, attached, packageName, appName)
 
-        val strategy = selectObbStrategy(packageName)
-        when (strategy) {
+        when (val strategy = selectObbStrategy(packageName)) {
             ObbStrategy.Direct -> enqueueObbWorker(
                 ObbCopyWorker.STRATEGY_DIRECT, null, sourceUri, entries, attached, packageName, appName,
             )
@@ -462,7 +461,7 @@ class InstallViewModel(
                     } else 0L
                 } ?: 0L
         } catch (_: Exception) { 0L }
-        _attachedObbFiles.value = _attachedObbFiles.value + AttachedObb(uri, displayName, size)
+        _attachedObbFiles.value += AttachedObb(uri, displayName, size)
     }
 
     fun removeAttachedObb(uri: Uri) {
@@ -685,7 +684,7 @@ class InstallViewModel(
     private fun uniqueFileName(dir: File, desired: String): String {
         if (!File(dir, desired).exists()) return desired
         val dot = desired.lastIndexOf('.')
-        val stem = if (dot > 0) desired.substring(0, dot) else desired
+        val stem = if (dot > 0) desired.take(dot) else desired
         val ext = if (dot > 0) desired.substring(dot) else ""
         var i = 1
         while (File(dir, "$stem ($i)$ext").exists()) i++

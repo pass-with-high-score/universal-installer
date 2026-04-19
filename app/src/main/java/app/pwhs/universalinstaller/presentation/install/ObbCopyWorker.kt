@@ -101,7 +101,7 @@ class ObbCopyWorker(
 
         val onBytes: suspend (Long) -> Unit = { bytes ->
             val now = android.os.SystemClock.elapsedRealtime()
-            val atEnd = combinedTotal > 0 && bytes >= combinedTotal
+            val atEnd = combinedTotal in 1..bytes
             if (atEnd || now - lastReportMs >= progressThrottleMs) {
                 lastReportMs = now
                 val percent = if (combinedTotal > 0) {

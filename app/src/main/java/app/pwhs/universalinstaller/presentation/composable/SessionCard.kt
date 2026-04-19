@@ -45,11 +45,11 @@ import java.io.File
 
 @Composable
 fun SessionCard(
+    modifier: Modifier = Modifier,
     sessionData: SessionData,
     sessionProgress: SessionProgress?,
     onCancel: () -> Unit,
     onRetry: () -> Unit = {},
-    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val errorText = sessionData.error.resolve(context)

@@ -10,7 +10,6 @@ import timber.log.Timber
 import java.io.IOException
 import java.io.InputStream
 import java.lang.reflect.Method
-import kotlin.coroutines.coroutineContext
 
 /**
  * OBB copy via Shizuku. Android 11+ blocks `Android/obb/<other-pkg>/` even with

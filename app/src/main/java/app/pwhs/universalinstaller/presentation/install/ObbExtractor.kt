@@ -8,8 +8,6 @@ import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.zip.ZipInputStream
-import kotlin.coroutines.coroutineContext
-
 data class ObbEntry(
     val entryPath: String,   // path inside the zip (e.g. "Android/obb/com.foo/main.1.com.foo.obb")
     val fileName: String,    // just the filename (e.g. "main.1.com.foo.obb")

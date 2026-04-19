@@ -230,8 +230,7 @@ class VirusTotalService(
 
     private fun parseAnalysisResponse(body: String, analysisId: String): VtResult = try {
         val attributes = JSONObject(body).getJSONObject("data").getJSONObject("attributes")
-        val apiStatus = attributes.optString("status", "queued")
-        when (apiStatus) {
+        when (val apiStatus = attributes.optString("status", "queued")) {
             "queued" -> VtResult(status = VtStatus.QUEUED, analysisId = analysisId)
             "in-progress" -> VtResult(status = VtStatus.ANALYZING, analysisId = analysisId)
             "completed" -> {

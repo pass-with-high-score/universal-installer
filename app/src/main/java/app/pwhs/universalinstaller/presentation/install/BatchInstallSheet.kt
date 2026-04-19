@@ -42,7 +42,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -357,7 +356,7 @@ private fun EntryRow(
                 )
                 Text(
                     text = when {
-                        failed -> entry.parseError.orEmpty()
+                        failed -> entry.parseError
                         warning -> "${entry.conflictLabel} · ${entry.apkInfo.packageName}"
                         else -> entry.apkInfo.packageName
                     },

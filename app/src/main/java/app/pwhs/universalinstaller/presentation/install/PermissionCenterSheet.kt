@@ -43,7 +43,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -83,7 +83,7 @@ internal fun PermissionCenterSheet(
 
     // Refresh state whenever the sheet returns to the foreground — the user may have toggled
     // a permission in system settings while we were in the background.
-    var tick by remember { mutableStateOf(0) }
+    var tick by remember { mutableIntStateOf(0) }
     LifecycleResumeEffect(Unit) {
         tick += 1
         onPauseOrDispose {}
