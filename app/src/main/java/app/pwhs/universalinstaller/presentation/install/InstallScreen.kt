@@ -53,6 +53,8 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootGraph
 import com.ramcosta.composedestinations.generated.destinations.DownloadHistoryScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.yield
 import org.koin.androidx.compose.koinViewModel
 import ru.solrudev.ackpine.splits.ApkSplits.validate
 import ru.solrudev.ackpine.splits.SplitPackage
@@ -234,28 +236,41 @@ private fun InstallUi(
     LaunchedEffect(pendingViewUri) {
         val uri = pendingViewUri ?: return@LaunchedEffect
         IntentHandoff.consume()
-        val mimeType = context.contentResolver.getType(uri)?.lowercase()
-        val displayName = context.contentResolver.getDisplayName(uri)
-        val extension = displayName.substringAfterLast('.', "").lowercase()
-        val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
-        val isApkMime = mimeType == "application/vnd.android.package-archive"
-        if (!isApkMime && extension !in validExtensions) {
+        // Yield to let the composable tree finish its first layout pass so the bottom
+        // sheet (driven by uiState.pendingApkInfo) can actually render.
+        yield()
+        delay(500)
+        try {
+            val mimeType = context.contentResolver.getType(uri)?.lowercase()
+            val displayName = context.contentResolver.getDisplayName(uri)
+            val extension = displayName.substringAfterLast('.', "").lowercase()
+            val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
+            val isApkMime = mimeType == "application/vnd.android.package-archive"
+            if (!isApkMime && extension !in validExtensions) {
+                Toast.makeText(
+                    context,
+                    resource.getString(R.string.install_unsupported_file),
+                    Toast.LENGTH_LONG,
+                ).show()
+                return@LaunchedEffect
+            }
+            val apks = when {
+                (isApkMime || extension == "apk") -> SingletonApkSequence(uri, context).toSplitPackage()
+                extension in listOf("apks", "xapk", "apkm", "zip") -> ZippedApkSplits.getApksForUri(uri, context)
+                    .validate()
+                    .toSplitPackage()
+                    .filterCompatible(context)
+                else -> SingletonApkSequence(uri, context).toSplitPackage()
+            }
+            onFilePicked(uri, apks, displayName)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to process intent URI: $uri")
             Toast.makeText(
                 context,
                 resource.getString(R.string.install_unsupported_file),
                 Toast.LENGTH_LONG,
             ).show()
-            return@LaunchedEffect
         }
-        val apks = when {
-            (isApkMime || extension == "apk") -> SingletonApkSequence(uri, context).toSplitPackage()
-            extension in listOf("apks", "xapk", "apkm", "zip") -> ZippedApkSplits.getApksForUri(uri, context)
-                .validate()
-                .toSplitPackage()
-                .filterCompatible(context)
-            else -> SingletonApkSequence(uri, context).toSplitPackage()
-        }
-        onFilePicked(uri, apks, displayName)
     }
 
     // Batch share (`ACTION_SEND_MULTIPLE`) — hand the URIs to the VM's batch parser.
@@ -263,6 +278,7 @@ private fun InstallUi(
     LaunchedEffect(pendingViewUris) {
         val uris = pendingViewUris ?: return@LaunchedEffect
         IntentHandoff.consumeBatch()
+        yield()
         if (uris.size >= 2) onBatchPicked(uris)
     }
 

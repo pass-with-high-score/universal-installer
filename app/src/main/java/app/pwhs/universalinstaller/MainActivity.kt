@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,11 +43,24 @@ class MainActivity : ComponentActivity() {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
     }
 
+    /** True when the launch intent is a file-open action (VIEW / INSTALL / SEND). */
+    private fun isFileOpenIntent(intent: Intent?): Boolean {
+        return intent?.action in setOf(
+            Intent.ACTION_VIEW,
+            Intent.ACTION_INSTALL_PACKAGE,
+            Intent.ACTION_SEND,
+            Intent.ACTION_SEND_MULTIPLE,
+        )
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         maybeRequestNotificationPermission()
-        handleViewIntent(intent)
+
+        // Determine if we should skip splash: when launched from a file-open intent,
+        // the user expects to see the install preview immediately.
+        val skipSplash = isFileOpenIntent(intent)
         setContent {
             // `remember` caches the Flow across recompositions so `map {}` isn't re-invoked
             // every frame (Detekt/Android Lint: "Flow operator functions should not be invoked
@@ -89,7 +103,15 @@ class MainActivity : ComponentActivity() {
                 onDispose {}
             }
 
-            var currentRoute by remember { mutableStateOf(AppRoute.Splash) }
+            var currentRoute by remember {
+                mutableStateOf(if (skipSplash) AppRoute.Main else AppRoute.Splash)
+            }
+
+            // Post the intent URI AFTER the composable tree is set up, so InstallScreen
+            // is already composed (when skipSplash == true) and can process it immediately.
+            LaunchedEffect(Unit) {
+                handleViewIntent(intent)
+            }
 
             UniversalInstallerTheme(darkTheme = darkTheme) {
                 when (currentRoute) {
