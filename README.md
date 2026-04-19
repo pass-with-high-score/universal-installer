@@ -12,7 +12,7 @@
   </a>
   <br><br>
   <h4>Download</h4>
-  <a href="https://play.google.com/store/apps/details?id=com.apero.universal.installer">
+  <a href="https://play.google.com/store/apps/details?id=app.pwhs.universalinstaller">
     <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80">
   </a>
   <a href="https://github.com/pass-with-high-score/universal-installer/releases">
