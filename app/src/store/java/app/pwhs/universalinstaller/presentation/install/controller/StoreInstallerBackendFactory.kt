@@ -25,4 +25,11 @@ class StoreInstallerBackendFactory : InstallerBackendFactory {
         sessionDataRepository: SessionDataRepository,
         historyDao: InstallHistoryDao,
     ): BaseInstallController? = null
+
+    override suspend fun uninstallSystemAppViaRoot(
+        packageName: String,
+        method: SystemAppMethod,
+    ): Result<String> = Result.failure(
+        UnsupportedOperationException("Root not available in this build"),
+    )
 }

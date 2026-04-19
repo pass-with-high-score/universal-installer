@@ -69,4 +69,42 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
     ): BaseInstallController = RootInstallController(
         application, packageInstaller, sessionDataRepository, historyDao,
     )
+
+    /**
+     * Shells out to `pm` directly. The quoting is trivial because package names match
+     * `[A-Za-z0-9._]+` — no shell metacharacters can appear. We still verify before
+     * passing to make refactors obvious if that assumption changes.
+     */
+    override suspend fun uninstallSystemAppViaRoot(
+        packageName: String,
+        method: SystemAppMethod,
+    ): Result<String> = withContext(Dispatchers.IO) {
+        require(packageName.matches(Regex("^[A-Za-z0-9._]+$"))) {
+            "Refusing to shell out with suspicious package name: $packageName"
+        }
+        val cmd = when (method) {
+            SystemAppMethod.UninstallForUser0 -> "pm uninstall --user 0 $packageName"
+            SystemAppMethod.Disable -> "pm disable-user --user 0 $packageName"
+        }
+        runCatching {
+            val result = Shell.cmd(cmd).exec()
+            val stdout = result.out.joinToString("\n")
+            val stderr = result.err.joinToString("\n")
+            // `pm` returns non-zero on real failures AND prints a distinctive success string
+            // per subcommand. We verify both because some ROMs return 0 for soft failures
+            // like `Failure [NOT_INSTALLED_FOR_USER]`. The string token differs per command:
+            //   `pm uninstall --user 0` → "Success"
+            //   `pm disable-user --user 0` → "new state: disabled-user"
+            val successToken = when (method) {
+                SystemAppMethod.UninstallForUser0 -> "Success"
+                SystemAppMethod.Disable -> "new state: disabled"
+            }
+            if (!result.isSuccess || !stdout.contains(successToken, ignoreCase = true)) {
+                throw RuntimeException(
+                    "pm command failed: ${stdout.ifBlank { stderr }.ifBlank { "no output" }}",
+                )
+            }
+            stdout
+        }
+    }
 }

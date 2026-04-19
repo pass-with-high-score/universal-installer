@@ -42,4 +42,25 @@ interface InstallerBackendFactory {
         sessionDataRepository: SessionDataRepository,
         historyDao: InstallHistoryDao,
     ): BaseInstallController?
+
+    /**
+     * Shell-out wrapper for system-app removal. Ackpine's libsu plugin routes through
+     * `IPackageInstaller.uninstall` which rejects system apps with DELETE_FAILED_INTERNAL_ERROR,
+     * so for `/system` packages we bypass ackpine and call `pm` directly via the root shell.
+     *
+     * Safe to call only when [probeRootState] returned [RootState.READY]; otherwise this
+     * returns `Result.failure`. Store flavor always returns failure.
+     */
+    suspend fun uninstallSystemAppViaRoot(
+        packageName: String,
+        method: SystemAppMethod,
+    ): Result<String>
+}
+
+enum class SystemAppMethod {
+    /** `pm uninstall --user 0 <pkg>` — hides package for user 0; reversible via `cmd package install-existing`. */
+    UninstallForUser0,
+
+    /** `pm disable-user --user 0 <pkg>` — freezes package; reversible via `pm enable`. */
+    Disable,
 }

@@ -27,3 +27,10 @@
 -keep class com.topjohnwu.superuser.** { *; }
 -keep class com.topjohnwu.superuser.internal.** { *; }
 -dontwarn com.topjohnwu.superuser.**
+
+# Shizuku.newProcess is package-private; we reach it via reflection to run one-shot `pm`
+# commands without building a full UserService/AIDL layer. R8 would otherwise rename the
+# method and break ShizukuShellExecutor silently in release builds.
+-keepclassmembers class rikka.shizuku.Shizuku {
+    private static *** newProcess(...);
+}

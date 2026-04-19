@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller.presentation.uninstall
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -72,6 +73,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMethod
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.ImageRequest
@@ -119,6 +121,8 @@ fun UninstallScreen(
             }
         },
         onRefreshUsageAccess = viewModel::refreshUsageAccess,
+        onConfirmSystemApp = viewModel::confirmSystemAppPrompt,
+        onDismissSystemApp = viewModel::dismissSystemAppPrompt,
     )
 }
 
@@ -138,6 +142,8 @@ private fun UninstallUi(
     onSortChange: (UninstallSortBy) -> Unit = {},
     onRequestUsageAccess: () -> Unit = {},
     onRefreshUsageAccess: () -> Unit = {},
+    onConfirmSystemApp: (SystemAppMethod?) -> Unit = {},
+    onDismissSystemApp: () -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showFilterSheet by remember { mutableStateOf(false) }
@@ -189,6 +195,14 @@ private fun UninstallUi(
         )
     }
 
+    uiState.systemAppPrompt?.let { prompt ->
+        SystemAppDialog(
+            prompt = prompt,
+            onConfirm = onConfirmSystemApp,
+            onDismiss = onDismissSystemApp,
+        )
+    }
+
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
@@ -215,7 +229,15 @@ private fun UninstallUi(
                                     MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
-                        IconButton(onClick = { showBatchConfirm = true }) {
+                        IconButton(onClick = {
+                            // Skip the generic confirm dialog when any system app is in the
+                            // selection — the system-app dialog below covers confirmation and
+                            // method choice in one place, so the user doesn't see two dialogs.
+                            val hasSystem = uiState.apps
+                                .filter { it.packageName in uiState.selectedPackages }
+                                .any { it.isSystemApp }
+                            if (hasSystem) onUninstallSelected() else showBatchConfirm = true
+                        }) {
                             Icon(
                                 Icons.Rounded.DeleteOutline,
                                 contentDescription = stringResource(R.string.uninstall_selected_action),
@@ -646,7 +668,14 @@ private fun AppCard(
             .clip(MaterialTheme.shapes.large)
             .combinedClickable(
                 onClick = {
-                    if (isSelectionMode) onToggleSelect() else showConfirmDialog = true
+                    when {
+                        isSelectionMode -> onToggleSelect()
+                        // Route system apps straight to the ViewModel so the root-aware
+                        // method dialog appears — avoids the generic confirm firing first
+                        // and the user seeing two dialogs back-to-back.
+                        app.isSystemApp -> onUninstall()
+                        else -> showConfirmDialog = true
+                    }
                 },
                 onLongClick = onLongClick,
             ),
@@ -695,13 +724,30 @@ private fun AppCard(
 
             // App info
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = app.appName,
-                    style = MaterialTheme.typography.titleSmall,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(
+                        text = app.appName,
+                        style = MaterialTheme.typography.titleSmall,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.weight(1f, fill = false),
+                    )
+                    if (app.isSystemApp) {
+                        Text(
+                            text = stringResource(R.string.uninstall_system_badge),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onTertiaryContainer,
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.small)
+                                .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                        )
+                    }
+                }
                 Text(
                     text = app.packageName,
                     style = MaterialTheme.typography.bodySmall,
@@ -763,7 +809,11 @@ private fun AppCard(
             // Delete button (only in normal mode)
             if (!isSelectionMode) {
                 FilledTonalIconButton(
-                    onClick = { showConfirmDialog = true },
+                    onClick = {
+                        // System apps bypass the normal confirm — let the ViewModel surface
+                        // the root-aware dialog directly so the user sees the right options.
+                        if (app.isSystemApp) onUninstall() else showConfirmDialog = true
+                    },
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.DeleteOutline,
@@ -775,4 +825,215 @@ private fun AppCard(
             }
         }
     }
+}
+
+// ── System-app dialog ────────────────────────────────────────────────────────
+
+@Composable
+private fun SystemAppDialog(
+    prompt: SystemAppPrompt,
+    onConfirm: (SystemAppMethod?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    when (prompt) {
+        is SystemAppPrompt.Single -> SystemAppMethodDialog(
+            title = stringResource(R.string.uninstall_system_dialog_title_single),
+            warning = stringResource(R.string.uninstall_system_warning_single, prompt.appName),
+            allowSkip = false,
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+        )
+        is SystemAppPrompt.Batch -> SystemAppMethodDialog(
+            title = stringResource(R.string.uninstall_system_dialog_title_batch),
+            warning = stringResource(
+                R.string.uninstall_system_warning_batch,
+                prompt.systemApps.size + prompt.userApps.size,
+                prompt.userApps.size,
+                prompt.systemApps.size,
+            ),
+            systemAppsPreview = prompt.systemApps,
+            allowSkip = prompt.userApps.isNotEmpty(),
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+        )
+        is SystemAppPrompt.PrivilegedRequired -> SystemAppPrivilegedRequiredDialog(
+            prompt = prompt,
+            onConfirm = onConfirm,
+            onDismiss = onDismiss,
+        )
+    }
+}
+
+/**
+ * Single shared implementation for the Single and Batch variants. `allowSkip=true` exposes
+ * the third radio option ("Skip system apps") which makes sense only when the user also
+ * has regular apps in the selection that can still be uninstalled normally.
+ */
+@Composable
+private fun SystemAppMethodDialog(
+    title: String,
+    warning: String,
+    allowSkip: Boolean,
+    onConfirm: (SystemAppMethod?) -> Unit,
+    onDismiss: () -> Unit,
+    systemAppsPreview: List<Pair<String, String>> = emptyList(),
+) {
+    // Sealed local type to let the radio group include "Skip" alongside real methods
+    // without polluting the shared enum.
+    var selection by remember { mutableStateOf<Choice>(Choice.Method(SystemAppMethod.UninstallForUser0)) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.DeleteOutline,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+            )
+        },
+        title = { Text(title) },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = warning,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                if (systemAppsPreview.isNotEmpty()) {
+                    val shown = systemAppsPreview.take(4).joinToString(", ") { it.second }
+                    val more = (systemAppsPreview.size - 4).coerceAtLeast(0)
+                    Text(
+                        text = if (more > 0) "$shown, +$more" else shown,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.uninstall_system_method_header),
+                    style = MaterialTheme.typography.labelLarge,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+                SystemMethodRadio(
+                    title = stringResource(R.string.uninstall_system_method_per_user_title),
+                    subtitle = stringResource(R.string.uninstall_system_method_per_user_sub),
+                    selected = selection == Choice.Method(SystemAppMethod.UninstallForUser0),
+                    onClick = { selection = Choice.Method(SystemAppMethod.UninstallForUser0) },
+                )
+                SystemMethodRadio(
+                    title = stringResource(R.string.uninstall_system_method_disable_title),
+                    subtitle = stringResource(R.string.uninstall_system_method_disable_sub),
+                    selected = selection == Choice.Method(SystemAppMethod.Disable),
+                    onClick = { selection = Choice.Method(SystemAppMethod.Disable) },
+                )
+                if (allowSkip) {
+                    SystemMethodRadio(
+                        title = stringResource(R.string.uninstall_system_method_skip_title),
+                        subtitle = stringResource(R.string.uninstall_system_method_skip_sub),
+                        selected = selection == Choice.Skip,
+                        onClick = { selection = Choice.Skip },
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = {
+                onConfirm(when (val c = selection) {
+                    is Choice.Method -> c.method
+                    Choice.Skip -> null
+                })
+            }) {
+                Text(
+                    text = stringResource(R.string.uninstall_system_continue),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+    )
+}
+
+private sealed interface Choice {
+    data class Method(val method: SystemAppMethod) : Choice
+    data object Skip : Choice
+}
+
+@Composable
+private fun SystemMethodRadio(
+    title: String,
+    subtitle: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        androidx.compose.material3.RadioButton(
+            selected = selected,
+            onClick = onClick,
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.bodyMedium)
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SystemAppPrivilegedRequiredDialog(
+    prompt: SystemAppPrompt.PrivilegedRequired,
+    onConfirm: (SystemAppMethod?) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val hasRegular = prompt.userAppsAvailable.isNotEmpty()
+    val body = when {
+        prompt.systemApps.size == 1 && !hasRegular ->
+            stringResource(R.string.uninstall_system_privileged_required_body_single, prompt.systemApps.first().second)
+        hasRegular ->
+            stringResource(
+                R.string.uninstall_system_privileged_required_body_batch,
+                prompt.systemApps.size,
+                prompt.userAppsAvailable.size,
+            )
+        else ->
+            stringResource(R.string.uninstall_system_privileged_required_body_batch_only_system, prompt.systemApps.size)
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        icon = {
+            Icon(
+                imageVector = Icons.Rounded.DeleteOutline,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.error,
+            )
+        },
+        title = { Text(stringResource(R.string.uninstall_system_privileged_required_title)) },
+        text = { Text(body, style = MaterialTheme.typography.bodyMedium) },
+        confirmButton = {
+            if (hasRegular) {
+                TextButton(onClick = { onConfirm(null) }) {
+                    Text(stringResource(R.string.uninstall_system_proceed_user_only))
+                }
+            } else {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        },
+        dismissButton = if (hasRegular) {
+            { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
+        } else null,
+    )
 }

@@ -9,6 +9,10 @@ import androidx.lifecycle.viewModelScope
 import app.pwhs.universalinstaller.data.local.UninstallLogDao
 import app.pwhs.universalinstaller.data.local.UninstallLogEntity
 import app.pwhs.universalinstaller.domain.model.InstalledApp
+import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
+import app.pwhs.universalinstaller.presentation.install.controller.RootState
+import app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor
+import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMethod
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.Dispatchers
@@ -31,6 +35,25 @@ import timber.log.Timber
 enum class UninstallSortBy { Name, Size, InstalledAt, LastUsed }
 enum class SortDirection { Asc, Desc }
 
+/**
+ * Surfaced to the UI when the pending uninstall touches one or more system apps. The UI
+ * renders either a single-app warning (with 2 method options) or a batch breakdown
+ * ("N user + K system apps — pick method for system").
+ */
+sealed interface SystemAppPrompt {
+    data class Single(val pkg: String, val appName: String) : SystemAppPrompt
+    data class Batch(
+        val systemApps: List<Pair<String, String>>,   // pkg → appName
+        val userApps: List<Pair<String, String>>,
+    ) : SystemAppPrompt
+
+    /** Shown when neither Root nor Shizuku is ready to handle system-app removal. */
+    data class PrivilegedRequired(
+        val systemApps: List<Pair<String, String>>,
+        val userAppsAvailable: List<String>,         // optional normal uninstall path
+    ) : SystemAppPrompt
+}
+
 data class UninstallUiState(
     val apps: List<InstalledApp> = emptyList(),
     val filteredApps: List<InstalledApp> = emptyList(),
@@ -43,12 +66,14 @@ data class UninstallUiState(
     val sortBy: UninstallSortBy = UninstallSortBy.Name,
     val sortDirection: SortDirection = SortDirection.Asc,
     val usageAccessGranted: Boolean = false,
+    val systemAppPrompt: SystemAppPrompt? = null,
 )
 
 class UninstallViewModel(
     private val application: Application,
     private val packageUninstaller: PackageUninstaller,
     private val uninstallLogDao: UninstallLogDao,
+    private val backendFactory: InstallerBackendFactory,
 ) : ViewModel() {
 
     private val notifier = UninstallNotifier(application)
@@ -61,10 +86,11 @@ class UninstallViewModel(
     private val _sortBy = MutableStateFlow(UninstallSortBy.Name)
     private val _sortDirection = MutableStateFlow(SortDirection.Asc)
     private val _usageAccess = MutableStateFlow(false)
+    private val _systemAppPrompt = MutableStateFlow<SystemAppPrompt?>(null)
 
     val uiState: StateFlow<UninstallUiState> = combine(
         listOf(_apps, _searchQuery, _isLoading, _showSystemApps, _selectedPackages,
-            _sortBy, _sortDirection, _usageAccess)
+            _sortBy, _sortDirection, _usageAccess, _systemAppPrompt)
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         val apps = flows[0] as List<InstalledApp>
@@ -76,6 +102,7 @@ class UninstallViewModel(
         val sortBy = flows[5] as UninstallSortBy
         val direction = flows[6] as SortDirection
         val usage = flows[7] as Boolean
+        val prompt = flows[8] as SystemAppPrompt?
         val filtered = apps
             .filter { app ->
                 if (!showSystem && app.isSystemApp) return@filter false
@@ -96,6 +123,7 @@ class UninstallViewModel(
             sortBy = sortBy,
             sortDirection = direction,
             usageAccessGranted = usage,
+            systemAppPrompt = prompt,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UninstallUiState())
 
@@ -182,36 +210,203 @@ class UninstallViewModel(
 
     fun uninstallSelected() {
         val packages = _selectedPackages.value.toList()
-        _selectedPackages.value = emptySet()
         if (packages.isEmpty()) return
         if (packages.size == 1) {
+            _selectedPackages.value = emptySet()
             uninstallApp(packages.first())
+            return
+        }
+
+        val (systemApps, userApps) = partitionByKind(packages)
+        if (systemApps.isEmpty()) {
+            // Normal batch flow — clear selection and run.
+            _selectedPackages.value = emptySet()
+            viewModelScope.launch { runBatchUninstall(userApps.map { it.first }) }
+            return
+        }
+
+        // Keep selection visible behind the dialog — user may cancel and want to edit.
+        viewModelScope.launch {
+            _systemAppPrompt.value = if (resolvePrivilegedExecutor() == null) {
+                SystemAppPrompt.PrivilegedRequired(
+                    systemApps = systemApps,
+                    userAppsAvailable = userApps.map { it.first },
+                )
+            } else {
+                SystemAppPrompt.Batch(systemApps = systemApps, userApps = userApps)
+            }
+        }
+    }
+
+    fun uninstallApp(packageName: String) {
+        val app = _apps.value.firstOrNull { it.packageName == packageName }
+        if (app != null && app.isSystemApp) {
+            viewModelScope.launch {
+                _systemAppPrompt.value = if (resolvePrivilegedExecutor() == null) {
+                    SystemAppPrompt.PrivilegedRequired(
+                        systemApps = listOf(packageName to app.appName),
+                        userAppsAvailable = emptyList(),
+                    )
+                } else {
+                    SystemAppPrompt.Single(pkg = packageName, appName = app.appName)
+                }
+            }
             return
         }
 
         viewModelScope.launch {
             val opts = readUninstallOptions()
-            val total = packages.size
-            val notifId = notifier.notifyBatchStart(total)
-            var successful = 0
-            var failed = 0
-            packages.forEachIndexed { index, pkg ->
-                val appName = _apps.value.firstOrNull { it.packageName == pkg }?.appName ?: pkg
-                notifier.notifyBatchProgress(notifId, completed = index, total = total, currentAppName = appName)
-                val ok = performUninstall(pkg, opts)
-                if (ok) successful++ else failed++
-            }
-            notifier.notifyBatchDone(notifId, successful = successful, failed = failed)
-        }
-    }
-
-    fun uninstallApp(packageName: String) {
-        viewModelScope.launch {
-            val opts = readUninstallOptions()
-            val appName = _apps.value.firstOrNull { it.packageName == packageName }?.appName ?: packageName
+            val appName = app?.appName ?: packageName
             val notifId = notifier.notifySingleStart(appName)
             val ok = performUninstall(packageName, opts)
             notifier.notifySingleResult(notifId, appName, success = ok)
+        }
+    }
+
+    /** UI calls this when the user picks a method + confirms the system-app dialog. */
+    fun confirmSystemAppPrompt(systemMethod: SystemAppMethod?) {
+        val prompt = _systemAppPrompt.value ?: return
+        _systemAppPrompt.value = null
+        _selectedPackages.value = emptySet()
+
+        viewModelScope.launch {
+            // Resolve once up front so the batch doesn't ping the shell state mid-loop.
+            // Null is possible if the user revoked Root/Shizuku access between opening the
+            // dialog and pressing Continue — we bail cleanly in that case.
+            val executor = resolvePrivilegedExecutor()
+            when (prompt) {
+                is SystemAppPrompt.Single -> {
+                    if (systemMethod == null || executor == null) return@launch
+                    val notifId = notifier.notifySingleStart(prompt.appName)
+                    val ok = performSystemUninstall(prompt.pkg, prompt.appName, systemMethod, executor)
+                    notifier.notifySingleResult(notifId, prompt.appName, success = ok)
+                }
+                is SystemAppPrompt.Batch -> {
+                    val userPkgs = prompt.userApps.map { it.first }
+                    val systemPkgs = prompt.systemApps
+                    val runSystem = systemMethod != null && executor != null
+                    val totalToRun = userPkgs.size + (if (runSystem) systemPkgs.size else 0)
+                    if (totalToRun == 0) return@launch
+                    val notifId = notifier.notifyBatchStart(totalToRun)
+                    var successful = 0
+                    var failed = 0
+                    var processed = 0
+
+                    // Regular uninstalls first — faster, and if the privileged path fails later
+                    // the user still got the easy work done.
+                    val opts = readUninstallOptions()
+                    for (pkg in userPkgs) {
+                        val name = _apps.value.firstOrNull { it.packageName == pkg }?.appName ?: pkg
+                        notifier.notifyBatchProgress(notifId, completed = processed, total = totalToRun, currentAppName = name)
+                        if (performUninstall(pkg, opts)) successful++ else failed++
+                        processed++
+                    }
+                    // Smart-cast requires re-reading the params as locals — Kotlin can't track
+                    // the nullability of method/executor across the suspend boundary otherwise.
+                    if (runSystem) {
+                        val m = systemMethod ?: return@launch
+                        val e = executor ?: return@launch
+                        for ((pkg, name) in systemPkgs) {
+                            notifier.notifyBatchProgress(notifId, completed = processed, total = totalToRun, currentAppName = name)
+                            if (performSystemUninstall(pkg, name, m, e)) successful++ else failed++
+                            processed++
+                        }
+                    }
+                    notifier.notifyBatchDone(notifId, successful = successful, failed = failed)
+                }
+                is SystemAppPrompt.PrivilegedRequired -> {
+                    // systemMethod is ignored — the UI only surfaces "proceed with user apps"
+                    // or "cancel". Pure system selections without a privileged backend no-op.
+                    if (prompt.userAppsAvailable.isNotEmpty()) {
+                        runBatchUninstall(prompt.userAppsAvailable)
+                    }
+                }
+            }
+        }
+    }
+
+    fun dismissSystemAppPrompt() {
+        _systemAppPrompt.value = null
+    }
+
+    private suspend fun runBatchUninstall(packages: List<String>) {
+        val opts = readUninstallOptions()
+        val total = packages.size
+        val notifId = notifier.notifyBatchStart(total)
+        var successful = 0
+        var failed = 0
+        packages.forEachIndexed { index, pkg ->
+            val appName = _apps.value.firstOrNull { it.packageName == pkg }?.appName ?: pkg
+            notifier.notifyBatchProgress(notifId, completed = index, total = total, currentAppName = appName)
+            val ok = performUninstall(pkg, opts)
+            if (ok) successful++ else failed++
+        }
+        notifier.notifyBatchDone(notifId, successful = successful, failed = failed)
+    }
+
+    private fun partitionByKind(packages: List<String>): Pair<
+        List<Pair<String, String>>,  // system: pkg → appName
+        List<Pair<String, String>>,  // user
+    > {
+        val lookup = _apps.value.associateBy { it.packageName }
+        val system = mutableListOf<Pair<String, String>>()
+        val user = mutableListOf<Pair<String, String>>()
+        for (pkg in packages) {
+            val app = lookup[pkg]
+            val entry = pkg to (app?.appName ?: pkg)
+            if (app?.isSystemApp == true) system += entry else user += entry
+        }
+        return system to user
+    }
+
+    private enum class PrivilegedExecutor { Root, Shizuku }
+
+    /**
+     * Pick the strongest privileged backend that's currently ready. Root wins over Shizuku
+     * when both are available — libsu's shell is already warm and doesn't cross a binder,
+     * so it's faster end-to-end for batch operations.
+     */
+    private suspend fun resolvePrivilegedExecutor(): PrivilegedExecutor? {
+        if (backendFactory.rootSupportCompiledIn) {
+            val usingRoot = readPref(PreferencesKeys.USE_ROOT)
+            if (usingRoot && backendFactory.probeRootState() == RootState.READY) {
+                return PrivilegedExecutor.Root
+            }
+        }
+        val usingShizuku = readPref(PreferencesKeys.USE_SHIZUKU)
+        if (usingShizuku && ShizukuShellExecutor.isReady()) {
+            return PrivilegedExecutor.Shizuku
+        }
+        return null
+    }
+
+    private suspend fun readPref(key: androidx.datastore.preferences.core.Preferences.Key<Boolean>): Boolean = try {
+        application.dataStore.data.first()[key] ?: false
+    } catch (_: Exception) { false }
+
+    private suspend fun performSystemUninstall(
+        packageName: String,
+        appName: String,
+        method: SystemAppMethod,
+        executor: PrivilegedExecutor,
+    ): Boolean {
+        val result = when (executor) {
+            PrivilegedExecutor.Root -> backendFactory.uninstallSystemAppViaRoot(packageName, method)
+            PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.uninstallSystemApp(packageName, method)
+        }
+        return if (result.isSuccess) {
+            Timber.d("System app removed via $executor/$method: $packageName")
+            // `pm uninstall --user 0` keeps the PackageManager entry around (it's still in
+            // /system) so getInstalledApplications keeps returning it. We hide it locally
+            // so the list feels responsive; it'll reappear on next reload if still present.
+            _apps.value = _apps.value.filter { it.packageName != packageName }
+            saveLog(packageName, appName, success = true, errorMessage = null)
+            true
+        } else {
+            val err = result.exceptionOrNull()?.message ?: "Privileged shell command failed"
+            Timber.e("System app removal failed ($executor/$method) for $packageName: $err")
+            saveLog(packageName, appName, success = false, errorMessage = err)
+            false
         }
     }
 

@@ -264,6 +264,26 @@
     <string name="uninstall_confirm_single_text">This will remove %1$s (%2$s) from your device.</string>
     <string name="uninstall_app_cd">Uninstall %s</string>
 
+    <!-- System-app uninstall dialog (full flavor + Root) -->
+    <string name="uninstall_system_badge">System app</string>
+    <string name="uninstall_system_dialog_title_single">Remove system app?</string>
+    <string name="uninstall_system_dialog_title_batch">Mixed selection</string>
+    <string name="uninstall_system_warning_single">%s is part of the operating system. Choose how to remove it — both options are reversible.</string>
+    <string name="uninstall_system_warning_batch">You selected %1$d apps: %2$d regular + %3$d system. Regular apps uninstall normally. Pick how to handle system apps (all methods are reversible):</string>
+    <string name="uninstall_system_method_header">Method for system apps</string>
+    <string name="uninstall_system_method_per_user_title">Uninstall for user 0</string>
+    <string name="uninstall_system_method_per_user_sub">Hides the app for the current user. Restore via factory reset or \"cmd package install-existing\".</string>
+    <string name="uninstall_system_method_disable_title">Disable (freeze)</string>
+    <string name="uninstall_system_method_disable_sub">Freezes the app without removing it. Re-enable via root shell \"pm enable\".</string>
+    <string name="uninstall_system_method_skip_title">Skip system apps</string>
+    <string name="uninstall_system_method_skip_sub">Uninstall only the regular apps in this selection.</string>
+    <string name="uninstall_system_continue">Continue</string>
+    <string name="uninstall_system_privileged_required_title">Privileged access required</string>
+    <string name="uninstall_system_privileged_required_body_single">%s is a system app. Enable Shizuku or Root in Settings to remove it.</string>
+    <string name="uninstall_system_privileged_required_body_batch">%1$d system app(s) in this selection cannot be removed without Shizuku or Root. Proceed with the remaining %2$d regular apps?</string>
+    <string name="uninstall_system_privileged_required_body_batch_only_system">%d system app(s) selected. Enable Shizuku or Root in Settings to remove them.</string>
+    <string name="uninstall_system_proceed_user_only">Proceed with regular apps</string>
+
     <!-- Uninstall Logs Screen -->
     <string name="logs_screen_title">Uninstall Logs</string>
     <string name="logs_clear_all_dialog_title">Clear all logs?</string>
