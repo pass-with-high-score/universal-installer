@@ -262,6 +262,8 @@ private fun UninstallUi(
                                 style = MaterialTheme.typography.headlineMedium,
                             )
                             InstallerModeBadge()
+                            Spacer(modifier = Modifier.height(12.dp))
+
                         }
                     },
                     actions = {
