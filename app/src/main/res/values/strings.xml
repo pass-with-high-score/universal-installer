@@ -435,4 +435,11 @@
     <string name="onboarding_page2_desc">Browse installed apps, uninstall unwanted ones, and manage your device effortlessly.</string>
     <string name="onboarding_page3_title">Allow Installation</string>
     <string name="onboarding_page3_desc">To install packages, the app needs permission to install from unknown sources. Tap the button below to grant it.</string>
+
+    <!-- Sync settings -->
+    <string name="setting_section_sync">Sync &amp; Share</string>
+    <string name="setting_sync_require_pin_title">Require PIN code</string>
+    <string name="setting_sync_require_pin_subtitle">Secure file downloads with a 4-8 digit PIN</string>
+    <string name="setting_sync_pin_code_title">PIN Code</string>
+    <string name="setting_sync_port_title">Server Port</string>
 </resources>

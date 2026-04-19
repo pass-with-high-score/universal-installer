@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Universal Installer — Authentication</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+            background: #0f0f13;
+            color: #e4e4e7;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .card {
+            background: #1c1c22;
+            border: 1px solid #2a2a32;
+            border-radius: 24px;
+            padding: 40px 32px 36px;
+            text-align: center;
+            max-width: 360px;
+            width: 100%;
+        }
+        .logo-icon {
+            width: 64px; height: 64px;
+            background: linear-gradient(135deg, #FB923C, #EA580C);
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        .logo-icon::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 50%;
+            background: rgba(255,255,255,0.12);
+            pointer-events: none;
+        }
+        .logo-icon svg { width: 36px; height: 36px; position: relative; z-index: 1; }
+        h2 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #fafafa;
+            margin-bottom: 6px;
+            letter-spacing: -0.02em;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #71717a;
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+        .app-link {
+            color: #FB923C;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .app-link:hover { text-decoration: underline; }
+        input[type="number"] {
+            width: 100%;
+            padding: 16px;
+            background: #0f0f13;
+            border: 1px solid #2a2a32;
+            border-radius: 14px;
+            font-size: 24px;
+            color: #fafafa;
+            text-align: center;
+            letter-spacing: 8px;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+            -moz-appearance: textfield;
+        }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"]:focus {
+            border-color: #FB923C;
+            box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.15);
+        }
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 16px;
+            background: linear-gradient(135deg, #FB923C, #EA580C);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+            letter-spacing: -0.01em;
+        }
+        button:hover { opacity: 0.9; }
+        button:active { transform: scale(0.98); }
+        .lock-icon {
+            display: inline-block;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <form class="card" method="POST">
+        <div class="logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="9" y="3" width="6" height="11" rx="1.5" fill="white"/>
+                <path d="M7.5 12.5L12 18L16.5 12.5H7.5Z" fill="white"/>
+                <path d="M5 17V19.5C5 20.3 5.7 21 6.5 21H17.5C18.3 21 19 20.3 19 19.5V17" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+        </div>
+        <h2>Universal Installer</h2>
+        <p class="subtitle">
+            This session is secured.<br>
+            Enter PIN to access shared files.
+        </p>
+        <input type="number" name="pin" autofocus required autocomplete="off" placeholder="····">
+        <button type="submit">
+            <span class="lock-icon">🔓</span> Unlock
+        </button>
+        <p style="margin-top: 20px; font-size: 12px; color: #3f3f46;">
+            <a class="app-link" href="https://universal-installer.pwhs.app/" target="_blank">universal-installer.pwhs.app</a>
+        </p>
+    </form>
+</body>
+</html>

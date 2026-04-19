@@ -21,6 +21,7 @@ import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Key
@@ -100,6 +101,9 @@ fun SettingScreen(
         onRootRetry = viewModel::retryRootProbe,
         onRootOptionChanged = viewModel::setRootOption,
         onRootInstallerChanged = viewModel::setRootInstallerPackageName,
+        onSyncRequirePinChanged = viewModel::setSyncRequirePin,
+        onSyncPinCodeChanged = viewModel::setSyncPinCode,
+        onSyncServerPortChanged = viewModel::setSyncServerPort,
     )
 }
 
@@ -119,6 +123,9 @@ private fun SettingUi(
     onRootRetry: () -> Unit = {},
     onRootOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
     onRootInstallerChanged: (String) -> Unit = {},
+    onSyncRequirePinChanged: (Boolean) -> Unit = {},
+    onSyncPinCodeChanged: (String) -> Unit = {},
+    onSyncServerPortChanged: (String) -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -390,6 +397,93 @@ private fun SettingUi(
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(24.dp),
                             )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                }
+            }
+
+            // ── Sync & Share Section ────────────────────────
+            item {
+                SettingsSection(title = stringResource(R.string.setting_section_sync), icon = Icons.Default.WifiTethering) {
+                    var portInput by remember(uiState.syncOptions.serverPort) {
+                        mutableStateOf(uiState.syncOptions.serverPort)
+                    }
+                    var pinInput by remember(uiState.syncOptions.pinCode) {
+                        mutableStateOf(uiState.syncOptions.pinCode)
+                    }
+
+                    ListItem(
+                        headlineContent = {
+                            Text(stringResource(R.string.setting_sync_require_pin_title), style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = stringResource(R.string.setting_sync_require_pin_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = uiState.syncOptions.requirePin,
+                                onCheckedChange = onSyncRequirePinChanged,
+                            )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+
+                    if (uiState.syncOptions.requirePin) {
+                        ListItem(
+                            headlineContent = {
+                                Text(stringResource(R.string.setting_sync_pin_code_title), style = MaterialTheme.typography.bodyLarge)
+                            },
+                            supportingContent = {
+                                Column {
+                                    Spacer(Modifier.height(8.dp))
+                                    OutlinedTextField(
+                                        value = pinInput,
+                                        onValueChange = {
+                                            // Limit to 4-8 digits
+                                            if (it.length <= 8 && it.all { char -> char.isDigit() }) {
+                                                pinInput = it
+                                                onSyncPinCodeChanged(it)
+                                            }
+                                        },
+                                        placeholder = { Text("1234") },
+                                        singleLine = true,
+                                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                                        modifier = Modifier.fillMaxWidth(),
+                                        shape = MaterialTheme.shapes.medium,
+                                    )
+                                }
+                            },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        )
+                    }
+
+                    ListItem(
+                        headlineContent = {
+                            Text(stringResource(R.string.setting_sync_port_title), style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Column {
+                                Spacer(Modifier.height(8.dp))
+                                OutlinedTextField(
+                                    value = portInput,
+                                    onValueChange = {
+                                        if (it.length <= 5 && it.all { char -> char.isDigit() }) {
+                                            portInput = it
+                                            onSyncServerPortChanged(it)
+                                        }
+                                    },
+                                    placeholder = { Text("8080") },
+                                    singleLine = true,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    modifier = Modifier.fillMaxWidth(),
+                                    shape = MaterialTheme.shapes.medium,
+                                )
+                            }
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )

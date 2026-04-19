@@ -12,6 +12,7 @@ import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.download.DownloadHistoryViewModel
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
+import app.pwhs.universalinstaller.presentation.sync.SyncViewModel
 import app.pwhs.universalinstaller.presentation.uninstall.UninstallViewModel
 import app.pwhs.universalinstaller.presentation.uninstall.logs.UninstallLogsViewModel
 import io.ktor.client.HttpClient
@@ -78,4 +79,5 @@ val appModule = module {
     viewModelOf(::SettingViewModel)
     viewModelOf(::UninstallLogsViewModel)
     viewModelOf(::DownloadHistoryViewModel)
+    viewModelOf(::SyncViewModel)
 }

@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.WifiTethering
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -107,6 +108,7 @@ fun InstallScreen(
         onBatchToggleAll = viewModel::setBatchAllSelected,
         onBatchConfirm = viewModel::confirmBatchInstall,
         onBatchDismiss = viewModel::dismissBatchInstall,
+        onOpenSyncServer = { navigator.navigate(com.ramcosta.composedestinations.generated.destinations.SyncScreenDestination) }
     )
 }
 
@@ -142,6 +144,7 @@ private fun InstallUi(
     onBatchToggleAll: (Boolean) -> Unit = {},
     onBatchConfirm: () -> Unit = {},
     onBatchDismiss: () -> Unit = {},
+    onOpenSyncServer: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -353,6 +356,12 @@ private fun InstallUi(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onOpenSyncServer) {
+                        Icon(
+                            imageVector = Icons.Rounded.WifiTethering,
+                            contentDescription = stringResource(R.string.setting_section_sync),
+                        )
+                    }
                     IconButton(onClick = { showPermissions = true }) {
                         Icon(
                             imageVector = Icons.Rounded.Shield,

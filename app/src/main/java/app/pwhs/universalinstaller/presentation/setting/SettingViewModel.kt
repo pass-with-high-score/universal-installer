@@ -56,7 +56,18 @@ object PreferencesKeys {
     val ROOT_ALL_USERS = booleanPreferencesKey("root_all_users")
     val ROOT_SET_INSTALL_SOURCE = booleanPreferencesKey("root_set_install_source")
     val ROOT_INSTALLER_PACKAGE_NAME = stringPreferencesKey("root_installer_package_name")
+
+    // Sync options
+    val SYNC_REQUIRE_PIN = booleanPreferencesKey("sync_require_pin")
+    val SYNC_PIN_CODE = stringPreferencesKey("sync_pin_code")
+    val SYNC_SERVER_PORT = stringPreferencesKey("sync_server_port")
 }
+
+data class SyncOptions(
+    val requirePin: Boolean = true,
+    val pinCode: String = "",
+    val serverPort: String = "8080"
+)
 
 enum class ThemeMode(val label: String) {
     System("System"),
@@ -110,6 +121,7 @@ data class SettingUiState(
     val rootSupported: Boolean = false,
     val rootState: RootState = RootState.UNAVAILABLE,
     val rootOptions: RootOptions = RootOptions(),
+    val syncOptions: SyncOptions = SyncOptions(),
     val appVersion: String = "",
 )
 
@@ -201,6 +213,13 @@ class SettingViewModel(
                     ?: DEFAULT_INSTALLER_PACKAGE_NAME,
             )
         },
+        dataStore.data.map { prefs ->
+            SyncOptions(
+                requirePin = prefs[PreferencesKeys.SYNC_REQUIRE_PIN] ?: true,
+                pinCode = prefs[PreferencesKeys.SYNC_PIN_CODE] ?: "",
+                serverPort = prefs[PreferencesKeys.SYNC_SERVER_PORT] ?: "8080"
+            )
+        },
     ) { flows ->
         val theme = flows[0] as ThemeMode
         val useShizuku = flows[1] as Boolean
@@ -211,6 +230,7 @@ class SettingViewModel(
         val useRoot = flows[6] as Boolean
         val rootState = flows[7] as RootState
         val rootOpts = flows[8] as RootOptions
+        val syncOpts = flows[9] as SyncOptions
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
@@ -230,6 +250,7 @@ class SettingViewModel(
             rootSupported = backendFactory.rootSupportCompiledIn,
             rootState = rootState,
             rootOptions = rootOpts,
+            syncOptions = syncOpts,
             appVersion = versionName,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingUiState())
@@ -363,6 +384,30 @@ class SettingViewModel(
         viewModelScope.launch {
             dataStore.edit { prefs ->
                 prefs[PreferencesKeys.VIRUSTOTAL_API_KEY] = key
+            }
+        }
+    }
+
+    fun setSyncRequirePin(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.SYNC_REQUIRE_PIN] = enabled
+            }
+        }
+    }
+
+    fun setSyncPinCode(code: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.SYNC_PIN_CODE] = code
+            }
+        }
+    }
+
+    fun setSyncServerPort(port: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.SYNC_SERVER_PORT] = port
             }
         }
     }

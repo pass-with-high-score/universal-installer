@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Universal Installer — Sync</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', system-ui, sans-serif;
+            background: #0f0f13;
+            color: #e4e4e7;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #FB923C 0%, #EA580C 100%);
+            padding: 28px 20px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        .header-content { position: relative; z-index: 1; }
+        .logo-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 6px; }
+        .logo-icon {
+            width: 44px; height: 44px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+        .logo-icon svg { width: 28px; height: 28px; }
+        .app-name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
+        .header-subtitle { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 4px; }
+
+        /* Container */
+        .container {
+            max-width: 520px;
+            margin: -16px auto 0;
+            padding: 0 16px 32px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .stat-chip {
+            flex: 1;
+            background: #1c1c22;
+            border: 1px solid #2a2a32;
+            border-radius: 12px;
+            padding: 12px 14px;
+            text-align: center;
+        }
+        .stat-value { font-size: 20px; font-weight: 700; color: #FB923C; }
+        .stat-label { font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+        /* File List */
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #71717a;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 16px 4px 10px;
+        }
+        .file-list {
+            background: #1c1c22;
+            border: 1px solid #2a2a32;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: inherit;
+            border-bottom: 1px solid #2a2a32;
+            transition: background 0.15s ease;
+        }
+        .file-item:last-child { border-bottom: none; }
+        .file-item:hover { background: #22222a; }
+        .file-item:active { background: #28283a; }
+        .file-icon {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, #FB923C22, #EA580C22);
+            border: 1px solid #FB923C33;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .file-info { flex: 1; min-width: 0; padding: 0 14px; }
+        .file-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #e4e4e7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .file-size { font-size: 12px; color: #71717a; margin-top: 2px; }
+        .download-btn {
+            width: 36px; height: 36px;
+            background: #FB923C;
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .download-btn svg { width: 18px; height: 18px; fill: #fff; }
+
+        /* Empty state */
+        .empty {
+            padding: 48px 20px;
+            text-align: center;
+            color: #52525b;
+        }
+        .empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+        .empty-text { font-size: 14px; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 24px 16px 32px;
+        }
+        .footer a {
+            color: #FB923C;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+        }
+        .footer a:hover { text-decoration: underline; }
+        .footer-note {
+            font-size: 11px;
+            color: #3f3f46;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo-row">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="9" y="3" width="6" height="11" rx="1.5" fill="white"/>
+                        <path d="M7.5 12.5L12 18L16.5 12.5H7.5Z" fill="white"/>
+                        <path d="M5 17V19.5C5 20.3 5.7 21 6.5 21H17.5C18.3 21 19 20.3 19 19.5V17" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                    </svg>
+                </div>
+                <span class="app-name">Universal Installer</span>
+            </div>
+            <div class="header-subtitle">LAN File Sharing — Sync Server</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-bar">
+            <div class="stat-chip">
+                <div class="stat-value">{{fileCount}}</div>
+                <div class="stat-label">Files</div>
+            </div>
+            <div class="stat-chip">
+                <div class="stat-value">{{totalSize}}</div>
+                <div class="stat-label">Total Size</div>
+            </div>
+        </div>
+
+        <div class="section-title">Available Downloads</div>
+        <div class="file-list">
+            {{listHtml}}
+        </div>
+
+        <div class="footer">
+            <a href="https://universal-installer.pwhs.app/" target="_blank">universal-installer.pwhs.app</a>
+            <div class="footer-note">Powered by Universal Installer for Android</div>
+        </div>
+    </div>
+</body>
+</html>
