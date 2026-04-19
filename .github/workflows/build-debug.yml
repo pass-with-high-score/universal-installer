@@ -29,11 +29,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Gradle Build
-        run: ./gradlew assembleDebug
+        run: ./gradlew assembleStoreDebug assembleFullDebug
 
-      - name: Upload debug APK
+      - name: Upload debug APKs
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
-          path: app/build/outputs/apk/debug/*.apk
+          name: debug-apks
+          path: |
+            app/build/outputs/apk/store/debug/*.apk
+            app/build/outputs/apk/full/debug/*.apk
           retention-days: 14

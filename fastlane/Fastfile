@@ -7,28 +7,30 @@ platform :android do
     gradle(task: "test")
   end
 
-  desc "Build debug APK"
+  desc "Build debug APKs for both flavors"
   lane :build_debug do
-    gradle(
-      task: "assembleDebug"
-    )
+    gradle(task: "assembleStoreDebug")
+    gradle(task: "assembleFullDebug")
   end
 
-  desc "Build release AAB (Android App Bundle)"
+  # Play builds must use the `store` flavor — the `full` flavor ships libsu and would
+  # likely fail Play's "device abuse" review. All Play-facing lanes point at storeRelease.
+  desc "Build store release AAB for Play"
   lane :build_release do
-    gradle(
-      task: "bundleRelease"
-    )
+    gradle(task: "bundleStoreRelease")
+  end
+
+  desc "Build full release APK for GitHub distribution"
+  lane :build_full_release do
+    gradle(task: "assembleFullRelease")
   end
 
   desc "Deploy internal testing track"
   lane :internal do
-    gradle(
-      task: "bundleRelease"
-    )
+    gradle(task: "bundleStoreRelease")
     upload_to_play_store(
       track: "internal",
-      aab: "app/build/outputs/bundle/release/app-release.aab",
+      aab: "app/build/outputs/bundle/storeRelease/app-store-release.aab",
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true,
@@ -50,12 +52,10 @@ platform :android do
 
   desc "Deploy to production"
   lane :production do
-    gradle(
-      task: "bundleRelease"
-    )
+    gradle(task: "bundleStoreRelease")
     upload_to_play_store(
       track: "production",
-      aab: "app/build/outputs/bundle/release/app-release.aab",
+      aab: "app/build/outputs/bundle/storeRelease/app-store-release.aab",
       json_key: "fastlane/play-store-key.json",
       skip_upload_metadata: false,
       skip_upload_images: false,

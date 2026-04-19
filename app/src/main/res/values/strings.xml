@@ -290,6 +290,12 @@
     <string name="setting_delete_apk_title">Delete APK after install</string>
     <string name="setting_delete_apk_subtitle">Automatically delete the source file after successful installation</string>
     <string name="setting_section_shizuku_options">Shizuku Options</string>
+    <string name="setting_shizuku_options_install_group">Install</string>
+    <string name="setting_shizuku_options_uninstall_group">Uninstall</string>
+    <string name="setting_shizuku_uninstall_keep_data">Keep app data</string>
+    <string name="setting_shizuku_uninstall_keep_data_sub">Preserve user data and cache when uninstalling (pm uninstall -k)</string>
+    <string name="setting_shizuku_uninstall_all_users">Uninstall for all users</string>
+    <string name="setting_shizuku_uninstall_all_users_sub">Remove the package from every user on the device</string>
     <string name="setting_shizuku_replace">Replace existing</string>
     <string name="setting_shizuku_replace_sub">Replace already installed packages</string>
     <string name="setting_shizuku_downgrade">Allow downgrade</string>
@@ -342,8 +348,34 @@
 
     <!-- Installer Mode Badge -->
     <string name="installer_mode_shizuku">Shizuku</string>
+    <string name="installer_mode_root">Root</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Using %s</string>
+
+    <!-- Root backend -->
+    <string name="setting_root_backend">Root Backend</string>
+    <string name="setting_root_unavailable">Unavailable in this build</string>
+    <string name="setting_root_unknown">Tap to check root access</string>
+    <string name="setting_root_not_rooted">No root manager detected</string>
+    <string name="setting_root_denied">Access denied — tap Retry after granting in Magisk/KernelSU</string>
+    <string name="setting_root_ready">Silent install via su</string>
+    <string name="setting_root_retry">Retry</string>
+    <string name="setting_section_root_options">Root Options</string>
+    <string name="setting_root_replace">Replace existing</string>
+    <string name="setting_root_replace_sub">Replace already installed packages</string>
+    <string name="setting_root_downgrade">Allow downgrade</string>
+    <string name="setting_root_downgrade_sub">Allow installing older version over newer</string>
+    <string name="setting_root_grant_permissions">Grant all permissions</string>
+    <string name="setting_root_grant_permissions_sub">Auto-grant all requested permissions</string>
+    <string name="setting_root_allow_test">Allow test packages</string>
+    <string name="setting_root_allow_test_sub">Allow installing debug/test APKs</string>
+    <string name="setting_root_bypass_sdk">Bypass low target SDK block</string>
+    <string name="setting_root_bypass_sdk_sub">Install apps targeting old SDK versions</string>
+    <string name="setting_root_all_users">Install for all users</string>
+    <string name="setting_root_all_users_sub">Install package for all device users</string>
+    <string name="setting_root_set_source">Set install source</string>
+    <string name="setting_root_set_source_sub">Defaults to this app when off</string>
+    <string name="setting_root_installer_label">installed by (package name)</string>
 
     <!-- Install error messages -->
     <string name="install_error_cancelled_title">Installation cancelled</string>

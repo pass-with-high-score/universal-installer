@@ -12,11 +12,18 @@ import ru.solrudev.ackpine.DelicateAckpineApi
 import ru.solrudev.ackpine.installer.InstallFailure
 import ru.solrudev.ackpine.installer.PackageInstaller
 import ru.solrudev.ackpine.installer.createSession
+import ru.solrudev.ackpine.libsu.libsu
 import ru.solrudev.ackpine.session.ProgressSession
 import ru.solrudev.ackpine.session.parameters.Confirmation
-import ru.solrudev.ackpine.shizuku.shizuku
 
-class ShizukuInstallController(
+/**
+ * Root-backed installer built on ackpine's libsu plugin. Only compiled into the `full`
+ * flavor — `store` uses the no-op factory instead.
+ *
+ * Flags mirror [ShizukuInstallController] so users carry the same mental model between
+ * the two privileged backends; separate DataStore keys keep the two toggleable independently.
+ */
+class RootInstallController(
     private val application: Application,
     packageInstaller: PackageInstaller,
     sessionDataRepository: SessionDataRepository,
@@ -32,18 +39,15 @@ class ShizukuInstallController(
         return packageInstaller.createSession(uris) {
             this.name = name
             confirmation = Confirmation.IMMEDIATE
-            shizuku {
-                bypassLowTargetSdkBlock = prefs[PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK] ?: false
-                allowTest = prefs[PreferencesKeys.SHIZUKU_ALLOW_TEST] ?: false
-                replaceExisting = prefs[PreferencesKeys.SHIZUKU_REPLACE_EXISTING] ?: false
-                requestDowngrade = prefs[PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE] ?: false
-                grantAllRequestedPermissions = prefs[PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS] ?: false
-                allUsers = prefs[PreferencesKeys.SHIZUKU_ALL_USERS] ?: false
-                // Spoof installer package (shows in PackageManager.getInstallerPackageName).
-                // Applied only when user opted in; otherwise ackpine defaults to this app.
-                // Under-the-hood API requires Android 9+ — silently ignored on older devices.
-                if (prefs[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] == true) {
-                    installerPackageName = prefs[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME]
+            libsu {
+                bypassLowTargetSdkBlock = prefs[PreferencesKeys.ROOT_BYPASS_LOW_TARGET_SDK] ?: false
+                allowTest = prefs[PreferencesKeys.ROOT_ALLOW_TEST] ?: false
+                replaceExisting = prefs[PreferencesKeys.ROOT_REPLACE_EXISTING] ?: false
+                requestDowngrade = prefs[PreferencesKeys.ROOT_REQUEST_DOWNGRADE] ?: false
+                grantAllRequestedPermissions = prefs[PreferencesKeys.ROOT_GRANT_ALL_PERMISSIONS] ?: false
+                allUsers = prefs[PreferencesKeys.ROOT_ALL_USERS] ?: false
+                if (prefs[PreferencesKeys.ROOT_SET_INSTALL_SOURCE] == true) {
+                    installerPackageName = prefs[PreferencesKeys.ROOT_INSTALLER_PACKAGE_NAME]
                         ?.trim()
                         ?.ifBlank { DEFAULT_INSTALLER_PACKAGE_NAME }
                         ?: DEFAULT_INSTALLER_PACKAGE_NAME

@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Android
+import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -29,19 +30,33 @@ import kotlinx.coroutines.flow.map
 @Composable
 fun InstallerModeBadge(modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    val useShizukuFlow = remember(context) {
-        context.dataStore.data.map { prefs -> prefs[PreferencesKeys.USE_SHIZUKU] ?: false }
+    val modeFlow = remember(context) {
+        context.dataStore.data.map { prefs ->
+            when {
+                prefs[PreferencesKeys.USE_ROOT] == true -> Mode.Root
+                prefs[PreferencesKeys.USE_SHIZUKU] == true -> Mode.Shizuku
+                else -> Mode.Default
+            }
+        }
     }
-    val useShizuku by useShizukuFlow.collectAsState(initial = false)
+    val mode by modeFlow.collectAsState(initial = Mode.Default)
 
-    val label = if (useShizuku) stringResource(R.string.installer_mode_shizuku)
-                else stringResource(R.string.installer_mode_package_installer)
-    val icon = if (useShizuku) Icons.Rounded.AdminPanelSettings else Icons.Rounded.Android
-    val container = if (useShizuku)
+    val label = when (mode) {
+        Mode.Root -> stringResource(R.string.installer_mode_root)
+        Mode.Shizuku -> stringResource(R.string.installer_mode_shizuku)
+        Mode.Default -> stringResource(R.string.installer_mode_package_installer)
+    }
+    val icon = when (mode) {
+        Mode.Root -> Icons.Rounded.Key
+        Mode.Shizuku -> Icons.Rounded.AdminPanelSettings
+        Mode.Default -> Icons.Rounded.Android
+    }
+    val privileged = mode == Mode.Root || mode == Mode.Shizuku
+    val container = if (privileged)
         MaterialTheme.colorScheme.primaryContainer
     else
         MaterialTheme.colorScheme.surfaceContainerHigh
-    val content = if (useShizuku)
+    val content = if (privileged)
         MaterialTheme.colorScheme.onPrimaryContainer
     else
         MaterialTheme.colorScheme.onSurfaceVariant
@@ -67,3 +82,5 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
         )
     }
 }
+
+private enum class Mode { Default, Shizuku, Root }

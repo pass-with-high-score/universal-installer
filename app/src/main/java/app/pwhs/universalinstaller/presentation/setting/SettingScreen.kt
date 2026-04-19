@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.DarkMode
 import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Info
+import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.automirrored.rounded.Article
 import androidx.compose.material.icons.rounded.Gavel
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
@@ -66,6 +68,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.datastore.preferences.core.Preferences
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
@@ -94,6 +97,10 @@ fun SettingScreen(
         onShizukuInstallerChanged = viewModel::setShizukuInstallerPackageName,
         onDeleteApkChanged = viewModel::setDeleteApkAfterInstall,
         onLanguageClick = { navigator.navigate(LanguageScreenDestination) },
+        onRootChanged = viewModel::setUseRoot,
+        onRootRetry = viewModel::retryRootProbe,
+        onRootOptionChanged = viewModel::setRootOption,
+        onRootInstallerChanged = viewModel::setRootInstallerPackageName,
     )
 }
 
@@ -109,6 +116,10 @@ private fun SettingUi(
     onShizukuInstallerChanged: (String) -> Unit = {},
     onDeleteApkChanged: (Boolean) -> Unit = {},
     onLanguageClick: () -> Unit = {},
+    onRootChanged: (Boolean) -> Unit = {},
+    onRootRetry: () -> Unit = {},
+    onRootOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
+    onRootInstallerChanged: (String) -> Unit = {},
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
@@ -185,6 +196,14 @@ private fun SettingUi(
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
+                    if (uiState.rootSupported) {
+                        RootBackendListItem(
+                            state = uiState.rootState,
+                            enabled = uiState.useRoot,
+                            onToggle = onRootChanged,
+                            onRetry = onRootRetry,
+                        )
+                    }
                     ListItem(
                         headlineContent = {
                             Text(stringResource(R.string.setting_delete_apk_title), style = MaterialTheme.typography.bodyLarge)
@@ -222,6 +241,7 @@ private fun SettingUi(
             if (uiState.useShizuku) {
                 item {
                     SettingsSection(title = stringResource(R.string.setting_section_shizuku_options), icon = Icons.Rounded.AdminPanelSettings) {
+                        ShizukuGroupHeader(text = stringResource(R.string.setting_shizuku_options_install_group))
                         ShizukuOptionItem(
                             title = stringResource(R.string.setting_shizuku_replace),
                             subtitle = stringResource(R.string.setting_shizuku_replace_sub),
@@ -263,6 +283,69 @@ private fun SettingUi(
                             installerPackageName = uiState.shizukuOptions.installerPackageName,
                             onToggle = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE, it) },
                             onInstallerChange = onShizukuInstallerChanged,
+                        )
+                        ShizukuGroupHeader(text = stringResource(R.string.setting_shizuku_options_uninstall_group))
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_shizuku_uninstall_keep_data),
+                            subtitle = stringResource(R.string.setting_shizuku_uninstall_keep_data_sub),
+                            checked = uiState.shizukuOptions.uninstallKeepData,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_UNINSTALL_KEEP_DATA, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_shizuku_uninstall_all_users),
+                            subtitle = stringResource(R.string.setting_shizuku_uninstall_all_users_sub),
+                            checked = uiState.shizukuOptions.uninstallAllUsers,
+                            onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS, it) },
+                        )
+                    }
+                }
+            }
+
+            // ── Root Options Section (only in full flavor and when Root enabled) ──
+            if (uiState.rootSupported && uiState.useRoot) {
+                item {
+                    SettingsSection(title = stringResource(R.string.setting_section_root_options), icon = Icons.Rounded.Key) {
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_root_replace),
+                            subtitle = stringResource(R.string.setting_root_replace_sub),
+                            checked = uiState.rootOptions.replaceExisting,
+                            onCheckedChange = { onRootOptionChanged(PreferencesKeys.ROOT_REPLACE_EXISTING, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_root_downgrade),
+                            subtitle = stringResource(R.string.setting_root_downgrade_sub),
+                            checked = uiState.rootOptions.requestDowngrade,
+                            onCheckedChange = { onRootOptionChanged(PreferencesKeys.ROOT_REQUEST_DOWNGRADE, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_root_grant_permissions),
+                            subtitle = stringResource(R.string.setting_root_grant_permissions_sub),
+                            checked = uiState.rootOptions.grantAllPermissions,
+                            onCheckedChange = { onRootOptionChanged(PreferencesKeys.ROOT_GRANT_ALL_PERMISSIONS, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_root_allow_test),
+                            subtitle = stringResource(R.string.setting_root_allow_test_sub),
+                            checked = uiState.rootOptions.allowTest,
+                            onCheckedChange = { onRootOptionChanged(PreferencesKeys.ROOT_ALLOW_TEST, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_root_bypass_sdk),
+                            subtitle = stringResource(R.string.setting_root_bypass_sdk_sub),
+                            checked = uiState.rootOptions.bypassLowTargetSdk,
+                            onCheckedChange = { onRootOptionChanged(PreferencesKeys.ROOT_BYPASS_LOW_TARGET_SDK, it) },
+                        )
+                        ShizukuOptionItem(
+                            title = stringResource(R.string.setting_root_all_users),
+                            subtitle = stringResource(R.string.setting_root_all_users_sub),
+                            checked = uiState.rootOptions.allUsers,
+                            onCheckedChange = { onRootOptionChanged(PreferencesKeys.ROOT_ALL_USERS, it) },
+                        )
+                        RootInstallSourceItem(
+                            enabled = uiState.rootOptions.setInstallSource,
+                            installerPackageName = uiState.rootOptions.installerPackageName,
+                            onToggle = { onRootOptionChanged(PreferencesKeys.ROOT_SET_INSTALL_SOURCE, it) },
+                            onInstallerChange = onRootInstallerChanged,
                         )
                     }
                 }
@@ -553,6 +636,16 @@ private fun SettingsSection(
 }
 
 @Composable
+private fun ShizukuGroupHeader(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+    )
+}
+
+@Composable
 private fun ShizukuOptionItem(
     title: String,
     subtitle: String,
@@ -640,6 +733,163 @@ private fun ShizukuInstallSourceItem(
                         .fillMaxWidth(),
                     singleLine = true,
                     label = { Text(stringResource(R.string.setting_shizuku_installer_label)) },
+                    leadingIcon = {
+                        Icon(Icons.Rounded.Badge, contentDescription = null)
+                    },
+                    trailingIcon = {
+                        ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                    },
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false },
+                ) {
+                    presets.forEach { preset ->
+                        DropdownMenuItem(
+                            text = {
+                                Column {
+                                    Text(preset.label, style = MaterialTheme.typography.bodyMedium)
+                                    Text(
+                                        text = preset.packageName,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            },
+                            onClick = {
+                                text = preset.packageName
+                                onInstallerChange(preset.packageName)
+                                expanded = false
+                            },
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RootBackendListItem(
+    state: RootState,
+    enabled: Boolean,
+    onToggle: (Boolean) -> Unit,
+    onRetry: () -> Unit,
+) {
+    val statusText = when (state) {
+        RootState.UNAVAILABLE -> stringResource(R.string.setting_root_unavailable)
+        RootState.UNKNOWN -> stringResource(R.string.setting_root_unknown)
+        RootState.NOT_ROOTED -> stringResource(R.string.setting_root_not_rooted)
+        RootState.DENIED -> stringResource(R.string.setting_root_denied)
+        RootState.READY -> stringResource(R.string.setting_root_ready)
+    }
+    val statusColor = when (state) {
+        RootState.READY -> MaterialTheme.colorScheme.primary
+        RootState.DENIED -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val available = state == RootState.READY || state == RootState.UNKNOWN || state == RootState.DENIED
+    ListItem(
+        headlineContent = {
+            Text(stringResource(R.string.setting_root_backend), style = MaterialTheme.typography.bodyLarge)
+        },
+        supportingContent = {
+            Column {
+                Text(
+                    text = statusText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = statusColor,
+                )
+                if (state == RootState.DENIED) {
+                    TextButton(onClick = onRetry) {
+                        Text(stringResource(R.string.setting_root_retry))
+                    }
+                }
+            }
+        },
+        leadingContent = {
+            Icon(
+                imageVector = Icons.Rounded.Key,
+                contentDescription = null,
+                tint = if (state == RootState.READY)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(24.dp),
+            )
+        },
+        trailingContent = {
+            Switch(
+                checked = enabled,
+                onCheckedChange = onToggle,
+                enabled = available,
+            )
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RootInstallSourceItem(
+    enabled: Boolean,
+    installerPackageName: String,
+    onToggle: (Boolean) -> Unit,
+    onInstallerChange: (String) -> Unit,
+) {
+    val presets = listOf(
+        InstallerPreset("com.android.vending", stringResource(R.string.setting_shizuku_installer_preset_play)),
+        InstallerPreset("com.aurora.store", stringResource(R.string.setting_shizuku_installer_preset_aurora)),
+        InstallerPreset("org.fdroid.fdroid", stringResource(R.string.setting_shizuku_installer_preset_fdroid)),
+        InstallerPreset("com.amazon.venezia", stringResource(R.string.setting_shizuku_installer_preset_amazon)),
+        InstallerPreset("com.sec.android.app.samsungapps", stringResource(R.string.setting_shizuku_installer_preset_samsung)),
+        InstallerPreset("com.huawei.appmarket", stringResource(R.string.setting_shizuku_installer_preset_huawei)),
+        InstallerPreset("com.xiaomi.market", stringResource(R.string.setting_shizuku_installer_preset_xiaomi)),
+    )
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        ListItem(
+            headlineContent = {
+                Text(
+                    stringResource(R.string.setting_root_set_source),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = stringResource(R.string.setting_root_set_source_sub),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            },
+            trailingContent = {
+                Switch(checked = enabled, onCheckedChange = onToggle)
+            },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        )
+
+        if (enabled) {
+            var expanded by remember { mutableStateOf(false) }
+            var text by remember(installerPackageName) { mutableStateOf(installerPackageName) }
+
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 4.dp),
+            ) {
+                OutlinedTextField(
+                    value = text,
+                    onValueChange = {
+                        text = it
+                        onInstallerChange(it)
+                    },
+                    modifier = Modifier
+                        .menuAnchor(androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
+                        .fillMaxWidth(),
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.setting_root_installer_label)) },
                     leadingIcon = {
                         Icon(Icons.Rounded.Badge, contentDescription = null)
                     },

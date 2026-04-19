@@ -74,8 +74,11 @@ jobs:
         continue-on-error: true
         run: bundle exec fastlane internal
 
-      - name: Build release APK
-        run: ./gradlew assembleRelease
+      # Play got the `store` AAB above. For GitHub we ship the `full` APK — it's the one
+      # users want because it has Root support. The store AAB is attached too so power
+      # users can rebuild / verify if they care.
+      - name: Build full release APK
+        run: ./gradlew assembleFullRelease
 
       # Artifacts
       - name: Upload release AAB & APK
@@ -83,12 +86,12 @@ jobs:
         with:
           name: release-build
           path: |
-            app/build/outputs/bundle/release/app-release.aab
-            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/bundle/storeRelease/app-store-release.aab
+            app/build/outputs/apk/full/release/app-full-release.apk
           retention-days: 30
 
-      # Upload assets to existing GitHub Release (or create if missing). Both APK and AAB
-      # are attached so users can grab the bundle for manual testing / sideload.
+      # GitHub release gets the full-flavor APK (with Root). Keeping the store AAB
+      # as an extra asset is handy for anyone auditing what Play received.
       - name: Create GitHub Release
         id: create_release
         uses: softprops/action-gh-release@v1
@@ -97,6 +100,6 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            app/build/outputs/apk/release/app-release.apk
-            app/build/outputs/bundle/release/app-release.aab
+            app/build/outputs/apk/full/release/app-full-release.apk
+            app/build/outputs/bundle/storeRelease/app-store-release.aab
           token: ${{ secrets.GITHUB_TOKEN }}

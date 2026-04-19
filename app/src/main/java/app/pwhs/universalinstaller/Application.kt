@@ -4,6 +4,7 @@ import android.app.Application
 import coil3.ImageLoader
 import coil3.SingletonImageLoader
 import app.pwhs.universalinstaller.di.appModule
+import app.pwhs.universalinstaller.di.flavorModule
 import app.pwhs.universalinstaller.util.AppIconFetcher
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -19,7 +20,7 @@ class App : Application(), SingletonImageLoader.Factory {
         startKoin{
             androidLogger()
             androidContext(this@App)
-            modules(appModule)
+            modules(appModule, flavorModule)
         }
     }
 

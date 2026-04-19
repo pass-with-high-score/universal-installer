@@ -11,6 +11,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
+import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +28,7 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 object PreferencesKeys {
     val THEME_MODE = stringPreferencesKey("theme_mode")
     val USE_SHIZUKU = booleanPreferencesKey("use_shizuku")
+    val USE_ROOT = booleanPreferencesKey("use_root")
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")
     val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
 
@@ -38,6 +41,21 @@ object PreferencesKeys {
     val SHIZUKU_ALL_USERS = booleanPreferencesKey("shizuku_all_users")
     val SHIZUKU_SET_INSTALL_SOURCE = booleanPreferencesKey("shizuku_set_install_source")
     val SHIZUKU_INSTALLER_PACKAGE_NAME = stringPreferencesKey("shizuku_installer_package_name")
+
+    // Shizuku uninstall options (pm uninstall -k / --user all)
+    val SHIZUKU_UNINSTALL_KEEP_DATA = booleanPreferencesKey("shizuku_uninstall_keep_data")
+    val SHIZUKU_UNINSTALL_ALL_USERS = booleanPreferencesKey("shizuku_uninstall_all_users")
+
+    // Root (libsu) install options — full flavor only, but the keys live here so common
+    // code can read them unconditionally. On the store flavor these stay at their defaults.
+    val ROOT_BYPASS_LOW_TARGET_SDK = booleanPreferencesKey("root_bypass_low_target_sdk")
+    val ROOT_ALLOW_TEST = booleanPreferencesKey("root_allow_test")
+    val ROOT_REPLACE_EXISTING = booleanPreferencesKey("root_replace_existing")
+    val ROOT_REQUEST_DOWNGRADE = booleanPreferencesKey("root_request_downgrade")
+    val ROOT_GRANT_ALL_PERMISSIONS = booleanPreferencesKey("root_grant_all_permissions")
+    val ROOT_ALL_USERS = booleanPreferencesKey("root_all_users")
+    val ROOT_SET_INSTALL_SOURCE = booleanPreferencesKey("root_set_install_source")
+    val ROOT_INSTALLER_PACKAGE_NAME = stringPreferencesKey("root_installer_package_name")
 }
 
 enum class ThemeMode(val label: String) {
@@ -63,28 +81,49 @@ data class ShizukuOptions(
     val allUsers: Boolean = false,
     val setInstallSource: Boolean = false,
     val installerPackageName: String = DEFAULT_INSTALLER_PACKAGE_NAME,
+    val uninstallKeepData: Boolean = false,
+    val uninstallAllUsers: Boolean = false,
 )
 
 const val DEFAULT_INSTALLER_PACKAGE_NAME = "com.android.vending"
 
+data class RootOptions(
+    val bypassLowTargetSdk: Boolean = false,
+    val allowTest: Boolean = false,
+    val replaceExisting: Boolean = false,
+    val requestDowngrade: Boolean = false,
+    val grantAllPermissions: Boolean = false,
+    val allUsers: Boolean = false,
+    val setInstallSource: Boolean = false,
+    val installerPackageName: String = DEFAULT_INSTALLER_PACKAGE_NAME,
+)
+
 data class SettingUiState(
     val themeMode: ThemeMode = ThemeMode.System,
     val useShizuku: Boolean = false,
+    val useRoot: Boolean = false,
     val virusTotalApiKey: String = "",
     val deleteApkAfterInstall: Boolean = false,
     val shizukuState: ShizukuState = ShizukuState.NOT_INSTALLED,
     val shizukuAvailable: Boolean = false,
     val shizukuOptions: ShizukuOptions = ShizukuOptions(),
+    val rootSupported: Boolean = false,
+    val rootState: RootState = RootState.UNAVAILABLE,
+    val rootOptions: RootOptions = RootOptions(),
     val appVersion: String = "",
 )
 
 class SettingViewModel(
     private val application: Application,
+    private val backendFactory: InstallerBackendFactory,
 ) : ViewModel() {
 
     private val dataStore = application.dataStore
 
     private val _shizukuState = MutableStateFlow(ShizukuState.NOT_INSTALLED)
+    private val _rootState = MutableStateFlow(
+        if (backendFactory.rootSupportCompiledIn) RootState.UNKNOWN else RootState.UNAVAILABLE,
+    )
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
         Timber.d("Shizuku binder received")
@@ -106,6 +145,7 @@ class SettingViewModel(
                 viewModelScope.launch {
                     dataStore.edit { prefs ->
                         prefs[PreferencesKeys.USE_SHIZUKU] = true
+                        prefs[PreferencesKeys.USE_ROOT] = false
                     }
                 }
             } else {
@@ -137,10 +177,29 @@ class SettingViewModel(
                 setInstallSource = prefs[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] ?: false,
                 installerPackageName = prefs[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME]
                     ?: DEFAULT_INSTALLER_PACKAGE_NAME,
+                uninstallKeepData = prefs[PreferencesKeys.SHIZUKU_UNINSTALL_KEEP_DATA] ?: false,
+                uninstallAllUsers = prefs[PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS] ?: false,
             )
         },
         dataStore.data.map { prefs ->
             prefs[PreferencesKeys.DELETE_APK_AFTER_INSTALL] ?: false
+        },
+        dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.USE_ROOT] ?: false
+        },
+        _rootState,
+        dataStore.data.map { prefs ->
+            RootOptions(
+                bypassLowTargetSdk = prefs[PreferencesKeys.ROOT_BYPASS_LOW_TARGET_SDK] ?: false,
+                allowTest = prefs[PreferencesKeys.ROOT_ALLOW_TEST] ?: false,
+                replaceExisting = prefs[PreferencesKeys.ROOT_REPLACE_EXISTING] ?: false,
+                requestDowngrade = prefs[PreferencesKeys.ROOT_REQUEST_DOWNGRADE] ?: false,
+                grantAllPermissions = prefs[PreferencesKeys.ROOT_GRANT_ALL_PERMISSIONS] ?: false,
+                allUsers = prefs[PreferencesKeys.ROOT_ALL_USERS] ?: false,
+                setInstallSource = prefs[PreferencesKeys.ROOT_SET_INSTALL_SOURCE] ?: false,
+                installerPackageName = prefs[PreferencesKeys.ROOT_INSTALLER_PACKAGE_NAME]
+                    ?: DEFAULT_INSTALLER_PACKAGE_NAME,
+            )
         },
     ) { flows ->
         val theme = flows[0] as ThemeMode
@@ -149,6 +208,9 @@ class SettingViewModel(
         val shizukuState = flows[3] as ShizukuState
         val shizukuOpts = flows[4] as ShizukuOptions
         val deleteApk = flows[5] as Boolean
+        val useRoot = flows[6] as Boolean
+        val rootState = flows[7] as RootState
+        val rootOpts = flows[8] as RootOptions
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
@@ -157,6 +219,7 @@ class SettingViewModel(
         SettingUiState(
             themeMode = theme,
             useShizuku = useShizuku && shizukuState == ShizukuState.READY,
+            useRoot = useRoot && rootState == RootState.READY,
             virusTotalApiKey = vtKey,
             deleteApkAfterInstall = deleteApk,
             shizukuState = shizukuState,
@@ -164,6 +227,9 @@ class SettingViewModel(
             shizukuAvailable = shizukuState == ShizukuState.READY ||
                     shizukuState == ShizukuState.NO_PERMISSION,
             shizukuOptions = shizukuOpts,
+            rootSupported = backendFactory.rootSupportCompiledIn,
+            rootState = rootState,
+            rootOptions = rootOpts,
             appVersion = versionName,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingUiState())
@@ -199,7 +265,10 @@ class SettingViewModel(
             }
             ShizukuState.READY -> {
                 viewModelScope.launch {
-                    dataStore.edit { prefs -> prefs[PreferencesKeys.USE_SHIZUKU] = true }
+                    dataStore.edit { prefs ->
+                        prefs[PreferencesKeys.USE_SHIZUKU] = true
+                        prefs[PreferencesKeys.USE_ROOT] = false
+                    }
                 }
             }
             ShizukuState.NO_PERMISSION -> try {
@@ -237,6 +306,59 @@ class SettingViewModel(
         }
     }
 
+    /**
+     * Toggle the Root backend. When turning on, probe then actively request a shell —
+     * that may trigger a SuperUser prompt. Also flips USE_SHIZUKU off in the same write
+     * so the two privileged backends stay mutually exclusive.
+     */
+    fun setUseRoot(enabled: Boolean) {
+        if (!backendFactory.rootSupportCompiledIn) return
+
+        if (!enabled) {
+            viewModelScope.launch {
+                dataStore.edit { prefs -> prefs[PreferencesKeys.USE_ROOT] = false }
+            }
+            return
+        }
+
+        viewModelScope.launch {
+            // Active probe — may surface Magisk/KernelSU's permission sheet.
+            val result = backendFactory.requestRoot()
+            _rootState.value = result
+            if (result == RootState.READY) {
+                dataStore.edit { prefs ->
+                    prefs[PreferencesKeys.USE_ROOT] = true
+                    prefs[PreferencesKeys.USE_SHIZUKU] = false
+                }
+            } else {
+                Timber.d("Cannot enable Root: state=$result")
+            }
+        }
+    }
+
+    /** User tapped "Retry" after DENIED — drop the cached shell and re-request. */
+    fun retryRootProbe() {
+        if (!backendFactory.rootSupportCompiledIn) return
+        viewModelScope.launch {
+            backendFactory.resetCachedShell()
+            _rootState.value = backendFactory.requestRoot()
+        }
+    }
+
+    fun setRootOption(key: Preferences.Key<Boolean>, value: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs -> prefs[key] = value }
+        }
+    }
+
+    fun setRootInstallerPackageName(value: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.ROOT_INSTALLER_PACKAGE_NAME] = value
+            }
+        }
+    }
+
     fun setVirusTotalApiKey(key: String) {
         viewModelScope.launch {
             dataStore.edit { prefs ->
@@ -254,6 +376,13 @@ class SettingViewModel(
         // Resolve state up front — covers the case where the sticky listener does NOT fire
         // (no binder yet) and we need to differentiate NOT_INSTALLED vs NOT_RUNNING.
         updateShizukuState()
+
+        // Cheap non-blocking root probe — does not trigger a SuperUser prompt.
+        if (backendFactory.rootSupportCompiledIn) {
+            viewModelScope.launch {
+                _rootState.value = backendFactory.probeRootState()
+            }
+        }
     }
 
     override fun onCleared() {

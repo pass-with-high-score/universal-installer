@@ -19,3 +19,11 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# libsu (com.topjohnwu.superuser) — full flavor only. Harmless on store (no-op when
+# the class is absent). Kept defensively because JitPack-built artifacts occasionally
+# drop consumer-rules in ways that break reflective shell plumbing under R8. If a
+# release `full` build ever regresses to "NOT_ROOTED" while debug works, look here first.
+-keep class com.topjohnwu.superuser.** { *; }
+-keep class com.topjohnwu.superuser.internal.** { *; }
+-dontwarn com.topjohnwu.superuser.**

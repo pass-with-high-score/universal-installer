@@ -4,12 +4,12 @@ import android.app.Application
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.universalinstaller.data.local.UninstallLogDao
 import app.pwhs.universalinstaller.data.local.UninstallLogEntity
 import app.pwhs.universalinstaller.domain.model.InstalledApp
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +25,7 @@ import ru.solrudev.ackpine.uninstaller.createSession
 import ru.solrudev.ackpine.session.await
 import ru.solrudev.ackpine.session.Session
 import ru.solrudev.ackpine.session.parameters.Confirmation
-import ru.solrudev.ackpine.shizuku.useShizuku
+import ru.solrudev.ackpine.shizuku.shizuku
 import timber.log.Timber
 
 enum class UninstallSortBy { Name, Size, InstalledAt, LastUsed }
@@ -190,7 +190,7 @@ class UninstallViewModel(
         }
 
         viewModelScope.launch {
-            val useShizuku = readShizukuPref()
+            val opts = readUninstallOptions()
             val total = packages.size
             val notifId = notifier.notifyBatchStart(total)
             var successful = 0
@@ -198,7 +198,7 @@ class UninstallViewModel(
             packages.forEachIndexed { index, pkg ->
                 val appName = _apps.value.firstOrNull { it.packageName == pkg }?.appName ?: pkg
                 notifier.notifyBatchProgress(notifId, completed = index, total = total, currentAppName = appName)
-                val ok = performUninstall(pkg, useShizuku)
+                val ok = performUninstall(pkg, opts)
                 if (ok) successful++ else failed++
             }
             notifier.notifyBatchDone(notifId, successful = successful, failed = failed)
@@ -207,21 +207,30 @@ class UninstallViewModel(
 
     fun uninstallApp(packageName: String) {
         viewModelScope.launch {
-            val useShizuku = readShizukuPref()
+            val opts = readUninstallOptions()
             val appName = _apps.value.firstOrNull { it.packageName == packageName }?.appName ?: packageName
             val notifId = notifier.notifySingleStart(appName)
-            val ok = performUninstall(packageName, useShizuku)
+            val ok = performUninstall(packageName, opts)
             notifier.notifySingleResult(notifId, appName, success = ok)
         }
     }
 
-    private suspend fun performUninstall(packageName: String, useShizuku: Boolean): Boolean {
+    private data class UninstallOptions(
+        val useShizuku: Boolean,
+        val keepData: Boolean,
+        val allUsers: Boolean,
+    )
+
+    private suspend fun performUninstall(packageName: String, opts: UninstallOptions): Boolean {
         val appName = _apps.value.firstOrNull { it.packageName == packageName }?.appName ?: packageName
         return try {
             val session = packageUninstaller.createSession(packageName) {
                 confirmation = Confirmation.IMMEDIATE
-                if (useShizuku) {
-                    useShizuku {}
+                if (opts.useShizuku) {
+                    shizuku {
+                        keepData = opts.keepData
+                        allUsers = opts.allUsers
+                    }
                 }
             }
             when (val result = session.await()) {
@@ -266,12 +275,19 @@ class UninstallViewModel(
         }
     }
 
-    private suspend fun readShizukuPref(): Boolean {
+    private suspend fun readUninstallOptions(): UninstallOptions {
         return try {
             val prefs = application.dataStore.data.first()
-            prefs[booleanPreferencesKey("use_shizuku")] ?: false
+            val useShizuku = prefs[PreferencesKeys.USE_SHIZUKU] ?: false
+            UninstallOptions(
+                useShizuku = useShizuku,
+                // Keep-data / all-users are Shizuku-only flags — the stock PackageInstaller
+                // session has no equivalent, so we ignore them when Shizuku is off.
+                keepData = useShizuku && (prefs[PreferencesKeys.SHIZUKU_UNINSTALL_KEEP_DATA] ?: false),
+                allUsers = useShizuku && (prefs[PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS] ?: false),
+            )
         } catch (_: Exception) {
-            false
+            UninstallOptions(useShizuku = false, keepData = false, allUsers = false)
         }
     }
 

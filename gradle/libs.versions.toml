@@ -10,7 +10,7 @@ kspVersion = "2.3.0"
 lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.13.0"
 composeBom = "2026.03.01"
-ackpine = "0.22.0"
+ackpine = "0.22.5"
 koin-bom = "4.2.1"
 ksp = "2.3.6"
 datastorePreferences = "1.2.1"
@@ -18,6 +18,7 @@ coil = "3.4.0"
 ktor = "3.4.2"
 room = "2.8.4"
 shizuku = "13.1.5"
+libsu = "6.0.0"
 timber = "5.0.1"
 
 [libraries]
@@ -84,6 +85,10 @@ ackpine-test = { module = "ru.solrudev.ackpine:ackpine-test", version.ref = "ack
 shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizuku" }
 shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizuku" }
 
+# topjohnwu libsu — only pulled into the `full` flavor. Used directly for
+# `Shell.getCachedShell()?.close()` recovery and for `Shell.isAppGrantedRoot()` probing.
+libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu" }
+
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
 koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
@@ -98,6 +103,7 @@ kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "ko
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 
 [bundles]
+# Shared across both flavors — no libsu here so the `store` build is libsu-free.
 ackpine = [
     "ackpine-core",
     "ackpine-ktx",
@@ -106,7 +112,11 @@ ackpine = [
     "ackpine-assets",
     "ackpine-shizuku",
     "ackpine-shizuku-ktx",
-#    "ackpine-libsu",
-#    "ackpine-libsu-ktx"
+]
+
+# Pulled in only by the `full` flavor via fullImplementation(libs.bundles.ackpine.libsu).
+ackpine-libsu = [
+    "ackpine-libsu",
+    "ackpine-libsu-ktx",
 ]
 

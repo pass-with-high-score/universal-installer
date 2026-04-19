@@ -54,6 +54,25 @@ android {
             }
         }
     }
+
+    // Two distribution flavors share one codebase:
+    //   store — goes to Google Play; no libsu / root code compiled in, keeping the APK
+    //           clean of anything Play's static analysis flags as "device abuse."
+    //   full  — distributed on GitHub; pulls in ackpine-libsu for real Root install support.
+    // Same applicationId + signing key, so a user cab sideload the full build on top of
+    // their Play install without losing data.
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("store") {
+            dimension = "distribution"
+            isDefault = true
+            buildConfigField("boolean", "HAS_ROOT_SUPPORT", "false")
+        }
+        create("full") {
+            dimension = "distribution"
+            buildConfigField("boolean", "HAS_ROOT_SUPPORT", "true")
+        }
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -120,4 +139,9 @@ dependencies {
 
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
+
+    // Root installer plugin — flavor-scoped. The store build literally does not see these
+    // types or native libraries, so Play Protect / static analysis has nothing to flag.
+    "fullImplementation"(libs.bundles.ackpine.libsu)
+    "fullImplementation"(libs.libsu.core)
 }

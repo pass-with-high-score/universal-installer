@@ -22,11 +22,13 @@ import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.install.controller.BaseInstallController
 import app.pwhs.universalinstaller.presentation.install.controller.DefaultInstallController
+import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.universalinstaller.presentation.install.controller.ShizukuInstallController
 import androidx.datastore.preferences.core.edit
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import kotlinx.coroutines.Dispatchers
@@ -60,10 +62,16 @@ class InstallViewModel(
     private val packageDownloadService: PackageDownloadService,
     private val historyDao: InstallHistoryDao,
     private val downloadHistoryDao: app.pwhs.universalinstaller.data.local.DownloadHistoryDao,
+    private val backendFactory: InstallerBackendFactory,
 ) : ViewModel() {
 
     private val defaultController = DefaultInstallController(application, packageInstaller, sessionDataRepository, historyDao)
     private val shizukuController = ShizukuInstallController(application, packageInstaller, sessionDataRepository, historyDao)
+
+    // Null on the store flavor — activeController() silently skips the Root branch there.
+    private val rootController: BaseInstallController? = backendFactory.createRootController(
+        application, packageInstaller, sessionDataRepository, historyDao,
+    )
 
     private val _isLoading = MutableStateFlow(false)
     private val _pendingApkInfo = MutableStateFlow<ApkInfo?>(null)
@@ -1058,7 +1066,22 @@ class InstallViewModel(
     // ── Private helpers ─────────────────────────────────
 
     private suspend fun activeController(): BaseInstallController {
-        return if (readShizukuPref()) shizukuController else defaultController
+        // Root wins over Shizuku if both are enabled (the settings UI enforces mutual
+        // exclusion, but handle the race cleanly by preferring the stronger backend).
+        val prefs = try { application.dataStore.data.first() } catch (_: Exception) { null }
+        val useRoot = prefs?.get(PreferencesKeys.USE_ROOT) ?: false
+        if (useRoot && rootController != null) {
+            // Verify root is still granted — user may have revoked in Magisk/KernelSU
+            // between toggling the pref and actually installing. Without this check the
+            // install crashes deep in libsu instead of falling back to the stock installer.
+            val state = backendFactory.probeRootState()
+            if (state == app.pwhs.universalinstaller.presentation.install.controller.RootState.READY) {
+                return rootController
+            }
+            Timber.w("USE_ROOT set but root probe=$state — falling back to next backend")
+        }
+        val useShizuku = prefs?.get(PreferencesKeys.USE_SHIZUKU) ?: false
+        return if (useShizuku) shizukuController else defaultController
     }
 
     private suspend fun readDeleteApkPref(): Boolean {
@@ -1066,15 +1089,6 @@ class InstallViewModel(
             val prefs = application.dataStore.data.first()
             prefs[androidx.datastore.preferences.core.booleanPreferencesKey("delete_apk_after_install")] ?: false
         } catch (_: Exception) { false }
-    }
-
-    private suspend fun readShizukuPref(): Boolean {
-        return try {
-            val prefs = application.dataStore.data.first()
-            prefs[androidx.datastore.preferences.core.booleanPreferencesKey("use_shizuku")] ?: false
-        } catch (_: Exception) {
-            false
-        }
     }
 
     private suspend fun cacheIcon(apkInfo: ApkInfo?): String? {
