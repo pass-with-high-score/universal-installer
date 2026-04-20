@@ -35,6 +35,7 @@
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.jpg" width="200">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" width="200">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" width="200">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpg" width="200">
 </div>
 
 ---
@@ -65,13 +66,20 @@
 * **VirusTotal integration** — Auto SHA-256 hash lookup on every picked file; if VirusTotal doesn't know the file yet, optionally upload it for a full multi-engine scan (supports files up to 650 MB via VirusTotal's large-file endpoint)
 * **Clear verdict** — See engine counts (malicious / suspicious / harmless / undetected) before you install
 
-### Shizuku power-user features
+### Shizuku & Root power-user features
 
-When Shizuku is enabled, unlocks:
+When Root access or Shizuku is enabled, unlocks:
 
 * **Silent install / uninstall** — No system confirmation prompt
 * **Replace existing**, **Allow downgrade**, **Grant all requested permissions**, **Allow test packages**, **Bypass low target SDK block**, **Install for all users**
 * **Set install source** — Spoof the installer package name (Google Play, Aurora, F-Droid, Amazon, Samsung, Huawei, Xiaomi presets, or custom) so apps with "installed from Play Store" checks accept your sideload
+
+### Sync & Share (LAN File Server)
+
+* **Built-in HTTP server** — Share and manage your packages across a local Wi-Fi network from any browser
+* **Web dashboard** — Download APKs straight to your PC or upload new packages directly to your phone
+* **Live tracking** — Real-time progress updates visible inside the app as files transfer
+* **PIN security** — Set an optional 4–8 digit PIN code to restrict local access to your shared folder
 
 ### Uninstall / app manager
 
@@ -131,12 +139,16 @@ When Shizuku is enabled, unlocks:
 
 ### Gradle
 
-```bash
-# Debug build
-./gradlew assembleDebug
+Universal Installer uses two product flavors: `store` (F-Droid/Play Store compliant, no bundled Root binaries) and `full` (All features, including Root backend).
 
-# Release build
-./gradlew assembleRelease
+```bash
+# Debug builds
+./gradlew assembleStoreDebug
+./gradlew assembleFullDebug
+
+# Release builds
+./gradlew assembleStoreRelease
+./gradlew assembleFullRelease
 ```
 
 ### Fastlane

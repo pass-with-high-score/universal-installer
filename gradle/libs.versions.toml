@@ -1,6 +1,7 @@
 [versions]
 agp = "8.11.2"
 core = "2.3.0"
+coreVersion = "3.5.4"
 kotlin = "2.3.20"
 coreKtx = "1.18.0"
 junit = "4.13.2"
@@ -16,6 +17,7 @@ ksp = "2.3.6"
 datastorePreferences = "1.2.1"
 coil = "3.4.0"
 ktor = "3.4.2"
+nanohttpd = "2.3.1"
 room = "2.8.4"
 shizuku = "13.1.5"
 libsu = "6.0.0"
@@ -45,6 +47,7 @@ androidx-documentfile = { group = "androidx.documentfile", name = "documentfile"
 androidx-work-runtime = { group = "androidx.work", name = "work-runtime-ktx", version = "2.9.1" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 
+nanohttpd = { module = "org.nanohttpd:nanohttpd", version.ref = "nanohttpd" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
@@ -94,6 +97,7 @@ koin-core = { module = "io.insert-koin:koin-core" }
 koin-android = { module = "io.insert-koin:koin-android" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose" }
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+zxing-core = { module = "com.google.zxing:core", version.ref = "coreVersion" }
 
 
 [plugins]

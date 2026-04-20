@@ -145,6 +145,6 @@ dependencies {
     "fullImplementation"(libs.bundles.ackpine.libsu)
     "fullImplementation"(libs.libsu.core)
 
-    implementation("org.nanohttpd:nanohttpd:2.3.1")
-    implementation("com.google.zxing:core:3.5.3")
+    implementation(libs.nanohttpd)
+    implementation(libs.zxing.core)
 }
