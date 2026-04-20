@@ -389,4 +389,6 @@
     <string name="setting_sync_require_pin_subtitle">Secure file downloads with a 4–8 digit PIN</string>
     <string name="setting_sync_pin_code_title">PIN Code</string>
     <string name="setting_sync_port_title">Server Port</string>
+    <!-- Quick Settings Tile -->
+    <string name="qs_tile_sync_label">Sync &amp; Share</string>
 </resources>
