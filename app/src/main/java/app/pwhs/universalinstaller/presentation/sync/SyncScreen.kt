@@ -1,8 +1,13 @@
 package app.pwhs.universalinstaller.presentation.sync
 
+import android.content.Intent
+import android.os.Build
+import android.os.Environment
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
@@ -28,6 +33,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -35,6 +41,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.core.net.toUri
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.composable.QrCode
 import com.ramcosta.composedestinations.annotation.Destination
@@ -50,11 +58,73 @@ fun SyncScreen(
     modifier: Modifier = Modifier,
     viewModel: SyncViewModel = koinViewModel()
 ) {
+    val context = LocalContext.current
     val state by viewModel.state.collectAsState()
     val serverUrl by viewModel.serverUrl.collectAsState()
     val pinCode by viewModel.pinCode.collectAsState()
     val activeConnections by viewModel.activeConnections.collectAsState()
     val sharedFiles by viewModel.sharedFiles.collectAsState()
+    val activeTransfers by viewModel.activeTransfers.collectAsState()
+
+    // Storage permission check
+    var hasStoragePermission by remember { mutableStateOf(checkStoragePermission()) }
+    var showStorageDialog by remember { mutableStateOf(false) }
+
+    // Refresh permission state when returning from settings
+    LifecycleResumeEffect(Unit) {
+        hasStoragePermission = checkStoragePermission()
+        onPauseOrDispose {}
+    }
+
+    val settingsLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) {
+        hasStoragePermission = checkStoragePermission()
+    }
+
+    // Storage permission dialog
+    if (showStorageDialog) {
+        AlertDialog(
+            onDismissRequest = { showStorageDialog = false },
+            icon = {
+                Icon(
+                    Icons.Rounded.FolderOpen,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            },
+            title = { Text("Storage Permission Required") },
+            text = {
+                Text(
+                    "Sync Server needs full storage access to share and manage APK files. " +
+                    "Please grant \"All files access\" in Settings.",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showStorageDialog = false
+                    val intent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION).apply {
+                            data = "package:${context.packageName}".toUri()
+                        }
+                    } else {
+                        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = "package:${context.packageName}".toUri()
+                        }
+                    }
+                    settingsLauncher.launch(intent)
+                }) {
+                    Text("Open Settings")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showStorageDialog = false }) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
 
     val filePickerLauncher = rememberLauncherForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uris ->
         if (uris.isNotEmpty()) {
@@ -69,11 +139,32 @@ fun SyncScreen(
         pinCode = pinCode,
         activeConnections = activeConnections,
         sharedFiles = sharedFiles,
+        activeTransfers = activeTransfers,
         onBack = { navigator.navigateUp() },
-        onToggle = { viewModel.toggleServer(it) },
-        onPickFiles = { filePickerLauncher.launch(arrayOf("*/*")) },
+        onToggle = { enabled ->
+            if (enabled && !hasStoragePermission) {
+                showStorageDialog = true
+            } else {
+                viewModel.toggleServer(enabled)
+            }
+        },
+        onPickFiles = {
+            if (!hasStoragePermission) {
+                showStorageDialog = true
+            } else {
+                filePickerLauncher.launch(arrayOf("*/*"))
+            }
+        },
         onDeleteFile = { viewModel.deleteSharedFile(it) },
     )
+}
+
+private fun checkStoragePermission(): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        Environment.isExternalStorageManager()
+    } else {
+        true // On older versions, manifest permission is enough
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,6 +176,7 @@ private fun SyncUi(
     pinCode: String? = null,
     activeConnections: Int = 0,
     sharedFiles: List<File> = emptyList(),
+    activeTransfers: Map<String, TransferProgress> = emptyMap(),
     onBack: () -> Unit = {},
     onToggle: (Boolean) -> Unit = {},
     onPickFiles: () -> Unit = {},
@@ -166,8 +258,13 @@ private fun SyncUi(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding),
-            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp),
+                .padding(top = padding.calculateTopPadding()),
+            contentPadding = PaddingValues(
+                start = 24.dp,
+                end = 24.dp,
+                top = 16.dp,
+                bottom = 16.dp + padding.calculateBottomPadding()
+            ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Hero section
@@ -341,6 +438,79 @@ private fun SyncUi(
                                         Icon(Icons.Rounded.Key, contentDescription = null)
                                     },
                                     colors = ListItemDefaults.colors(containerColor = Color.Transparent)
+                                )
+                            }
+                        }
+                    }
+                }
+
+                // Transfer progress cards (supports multiple concurrent transfers)
+                if (activeTransfers.isNotEmpty()) {
+                    item(key = "transfers_header") {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                Icons.Rounded.Cloud,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = if (activeTransfers.size == 1) "Active Transfer" else "Active Transfers (${activeTransfers.size})",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+
+                    items(
+                        items = activeTransfers.entries.toList(),
+                        key = { it.key }
+                    ) { (_, progress) ->
+                        Surface(
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .animateItem()
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Text(
+                                        text = progress.fileName,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.Medium,
+                                        maxLines = 1,
+                                        overflow = TextOverflow.Ellipsis,
+                                        modifier = Modifier.weight(1f),
+                                    )
+                                    Spacer(Modifier.width(12.dp))
+                                    Text(
+                                        text = "${progress.percentage}%",
+                                        style = MaterialTheme.typography.titleMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.primary,
+                                    )
+                                }
+                                LinearProgressIndicator(
+                                    progress = { progress.percentage / 100f },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(6.dp),
+                                    trackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                )
+                                Text(
+                                    text = "${formatFileSize(progress.bytesTransferred)} / ${formatFileSize(progress.totalBytes)}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }

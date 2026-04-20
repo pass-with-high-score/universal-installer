@@ -80,20 +80,29 @@ class ApkHttpServer(
                 fileName.endsWith(".xapk", true) -> "application/vnd.xapk"
                 else -> "application/octet-stream"
             }
-            
+
+            val totalBytes = file.length()
             val fis = FileInputStream(file)
-            // Wrap with tracking to detect download start/finish
+            // Wrap with tracking to detect download start/finish and report progress
             onConnectionChange(1)
-            val trackingStream = TrackingInputStream(fis) {
-                onConnectionChange(-1)
-            }
+            val transferId = SyncManager.nextTransferId()
+            val trackingStream = TrackingInputStream(
+                stream = fis,
+                transferId = transferId,
+                fileName = file.name,
+                totalBytes = totalBytes,
+                onClose = {
+                    SyncManager.removeTransfer(transferId)
+                    onConnectionChange(-1)
+                }
+            )
             
             val response = newChunkedResponse(Response.Status.OK, mime, trackingStream)
             // Use RFC 5987 filename* for proper encoding of special characters like ()
             val safeFilename = file.name.replace("\"", "\\\"")
             val encodedFilename = URLEncoder.encode(file.name, "UTF-8").replace("+", "%20")
             response.addHeader("Content-Disposition", "attachment; filename=\"$safeFilename\"; filename*=UTF-8''$encodedFilename")
-            response.addHeader("Content-Length", file.length().toString())
+            response.addHeader("Content-Length", totalBytes.toString())
             return response
         } catch (e: Exception) {
             onConnectionChange(-1) // Ensure decrement on error
@@ -161,16 +170,50 @@ class ApkHttpServer(
 }
 
 /**
- * A stream wrapper that fires [onClose] exactly once when the stream is closed.
+ * A stream wrapper that fires [onClose] exactly once when the stream is closed
+ * and reports transfer progress to [SyncManager].
  * NanoHTTPD always closes the response data stream after sending, so this
  * reliably tracks when a download finishes (or the client disconnects).
  */
 private class TrackingInputStream(
     stream: InputStream,
-    private val onClose: () -> Unit
+    private val transferId: String,
+    private val fileName: String,
+    private val totalBytes: Long,
+    private val onClose: () -> Unit,
 ) : FilterInputStream(stream) {
     @Volatile
     private var closed = false
+    private var bytesRead: Long = 0L
+    private var lastReportedPercent: Int = -1
+
+    override fun read(): Int {
+        val b = super.read()
+        if (b != -1) {
+            bytesRead++
+            reportProgress()
+        }
+        return b
+    }
+
+    override fun read(b: ByteArray, off: Int, len: Int): Int {
+        val count = super.read(b, off, len)
+        if (count > 0) {
+            bytesRead += count
+            reportProgress()
+        }
+        return count
+    }
+
+    private fun reportProgress() {
+        if (totalBytes <= 0) return
+        val percent = ((bytesRead * 100) / totalBytes).toInt().coerceIn(0, 100)
+        // Only update when percentage actually changes to avoid flooding
+        if (percent != lastReportedPercent) {
+            lastReportedPercent = percent
+            SyncManager.updateProgress(transferId, fileName, bytesRead, totalBytes)
+        }
+    }
 
     override fun close() {
         if (!closed) {

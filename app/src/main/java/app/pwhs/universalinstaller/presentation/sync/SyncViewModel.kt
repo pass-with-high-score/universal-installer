@@ -18,6 +18,7 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
     val pinCode: StateFlow<String?> = SyncManager.pinCode
     val activeConnections: StateFlow<Int> = SyncManager.activeConnections
     val sharedFiles: StateFlow<List<File>> = SyncManager.sharedFiles
+    val activeTransfers: StateFlow<Map<String, TransferProgress>> = SyncManager.activeTransfers
 
     private val baseDir = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
