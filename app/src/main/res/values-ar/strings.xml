@@ -39,7 +39,6 @@
 
     <string name="file_picker_parsing">جاري تحليل الحزمة…</string>
     <string name="file_picker_select">حدد حزمة</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
 
     <string name="session_installed_success">تم التثبيت بنجاح</string>
     <string name="session_installing_progress">%d%% جاري التثبيت…</string>
@@ -50,7 +49,6 @@
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d Split</string>
     <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
@@ -131,14 +129,10 @@
     <string name="setting_theme_title">السمة</string>
     <string name="setting_theme_subtitle">اختر السمة المفضلة لديك</string>
     <string name="setting_section_about">حول</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">الإصدار %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">كود المصدر والمساهمات</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">انضم إلى مجتمعنا</string>
 
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">باستخدام %s</string>
 
@@ -217,7 +211,6 @@
     <string name="download_notif_channel_name">تنزيلات الحزم</string>
     <string name="download_notif_channel_description">تقدم تنزيل ملفات APK/XAPK/APKS من رابط</string>
     <string name="download_notif_running_title">جاري تنزيل %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">تم تنزيل %s</string>
     <string name="download_notif_done_title">اكتمل التنزيل</string>
     <string name="download_notif_done_text">%s · افتح التطبيق للتثبيت</string>
@@ -248,7 +241,6 @@
     <string name="source_action_find_automatic">بحث تلقائي</string>
     <string name="source_action_find_automatic_sub">فحص هذا الجهاز بحثًا عن الحزم القابلة للتثبيت</string>
     <string name="source_action_browse_packages">تصفح الحزم</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">تصفح جميع الملفات</string>
     <string name="source_action_browse_all_sub">أي نوع ملف — استخدمه على مسؤوليتك الخاصة</string>
 
@@ -289,7 +281,6 @@
     <string name="permission_usage_desc">اختياري — يتيح لشاشة "إلغاء التثبيت" ترتيب التطبيقات حسب آخر استخدام وعرض أوقات استخدام كل تطبيق على حدة.</string>
 
     <string name="remote_download_title">تنزيل الحزمة</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">لصق</string>
     <string name="remote_download_clipboard_empty">الحافظة فارغة</string>
     <string name="remote_download_clipboard_invalid">الحافظة لا تحتوي على رابط</string>
@@ -300,7 +291,6 @@
     <string name="remote_download_progress">جاري التنزيل… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">فشل التنزيل: %s</string>
     <string name="remote_download_unsupported">الملف الذي تم تنزيله ليس حزمة مدعومة</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
     <string name="apk_info_obb_attach_title">إرفاق ملفات OBB (اختياري)</string>
     <string name="apk_info_obb_attach_desc">اختر ملفات .obb التي تنتمي إلى هذا التطبيق — سيتم نسخها إلى Android/obb بعد التثبيت.</string>
     <string name="apk_info_obb_attach_button">إضافة ملف OBB</string>
@@ -338,7 +328,6 @@
     <string name="setting_shizuku_set_source_sub">يتم تعيينه افتراضيًا على هذا التطبيق عند الإيقاف</string>
     <string name="setting_shizuku_installer_label">تم التثبيت بواسطة (اسم الحزمة)</string>
     <string name="setting_website_title">الموقع الإلكتروني</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">سياسة الخصوصية</string>
     <string name="setting_privacy_subtitle">كيف نتعامل مع بياناتك</string>
     <string name="setting_terms_title">شروط الخدمة</string>

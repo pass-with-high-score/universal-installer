@@ -99,7 +99,7 @@
     <string name="source_action_find_automatic">Find automatic</string>
     <string name="source_action_find_automatic_sub">Scan this device for installable packages</string>
     <string name="source_action_browse_packages">Browse packages</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
+    <string name="source_action_browse_packages_sub" translatable="false">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Browse all files</string>
     <string name="source_action_browse_all_sub">Any file type — use at your own risk</string>
 
@@ -146,7 +146,7 @@
 
     <!-- Remote Download Dialog -->
     <string name="remote_download_title">Download package</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
+    <string name="remote_download_hint" translatable="false">https://example.com/app.apks</string>
     <string name="remote_download_paste">Paste</string>
     <string name="remote_download_clipboard_empty">Clipboard is empty</string>
     <string name="remote_download_clipboard_invalid">Clipboard does not contain a URL</string>
@@ -169,7 +169,7 @@
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
+    <string name="apk_info_min_sdk_chip" translatable="false">Android %s+</string>
     <string name="apk_info_splits_count">%d splits</string>
     <string name="apk_info_obb_chip" translatable="false">%d OBB</string>
     <string name="apk_info_obb_attach_title">Attach OBB files (optional)</string>
@@ -195,7 +195,7 @@
     <string name="obb_notif_done_title">OBB copied · %s</string>
     <string name="obb_notif_done_text">%d file(s) placed in Android/obb</string>
     <string name="obb_notif_failed_title">OBB copy failed · %s</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
+    <string name="apk_info_version_detail" translatable="false">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Supported Architectures</string>
     <string name="apk_info_section_languages">Supported Languages (%d)</string>
@@ -353,24 +353,24 @@
     <string name="back_cd">Back</string>
     <string name="done_cd">Done</string>
     <string name="setting_section_about">About</string>
-    <string name="setting_about_app_name">Universal Installer</string>
+    <string name="setting_about_app_name" translatable="false">Universal Installer</string>
     <string name="setting_version">Version %s</string>
-    <string name="setting_github_title">GitHub</string>
+    <string name="setting_github_title" translatable="false">GitHub</string>
     <string name="setting_github_subtitle">Source code &amp; contributions</string>
-    <string name="setting_telegram_title">Telegram</string>
+    <string name="setting_telegram_title" translatable="false">Telegram</string>
     <string name="setting_telegram_subtitle">Join our community</string>
     <string name="setting_sponsor_title">Sponsor</string>
     <string name="setting_sponsor_subtitle">Support development on GitHub Sponsors</string>
     <string name="setting_website_title">Website</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
+    <string name="setting_website_subtitle" translatable="false">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">Privacy policy</string>
     <string name="setting_privacy_subtitle">How we handle your data</string>
     <string name="setting_terms_title">Terms of service</string>
     <string name="setting_terms_subtitle">Usage terms and conditions</string>
 
     <!-- Installer Mode Badge -->
-    <string name="installer_mode_shizuku">Shizuku</string>
-    <string name="installer_mode_root">Root</string>
+    <string name="installer_mode_shizuku" translatable="false">Shizuku</string>
+    <string name="installer_mode_root" translatable="false">Root</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Using %s</string>
 
@@ -439,7 +439,7 @@
     <!-- Sync settings -->
     <string name="setting_section_sync">Sync &amp; Share</string>
     <string name="setting_sync_require_pin_title">Require PIN code</string>
-    <string name="setting_sync_require_pin_subtitle">Secure file downloads with a 4-8 digit PIN</string>
+    <string name="setting_sync_require_pin_subtitle">Secure file downloads with a 4–8 digit PIN</string>
     <string name="setting_sync_pin_code_title">PIN Code</string>
     <string name="setting_sync_port_title">Server Port</string>
 </resources>
