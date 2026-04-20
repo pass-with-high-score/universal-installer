@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">تثبيت</string>
     <string name="txt_uninstall">إلغاء التثبيت</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">إظهار تطبيقات النظام</string>
     <string name="uninstall_search_hint">البحث في التطبيقات…</string>
     <string name="uninstall_no_apps_found">لم يتم العثور على تطبيقات</string>
-    <string name="uninstall_no_match">لا توجد تطبيقات تطابق \"%s\"</string>
+    <string name="uninstall_no_match">لا توجد تطبيقات تطابق \&quot;%s\&quot;</string>
     <string name="uninstall_no_user_apps">لم يتم العثور على تطبيقات مثبتة من قبل المستخدم</string>
     <string name="uninstall_n_selected">%d محدد</string>
     <string name="uninstall_confirm_batch_title">إلغاء تثبيت %d تطبيقات؟</string>
@@ -119,7 +119,7 @@
     <string name="install_error_blocked_title">تم حظر التثبيت</string>
     <string name="install_error_blocked_guidance">حظرت سياسة جهازك أو إعدادات الأمان هذا التثبيت. تحقق مما إذا كان مسموحًا بالمصادر غير المعروفة في الإعدادات &gt; التطبيقات &gt; وصول خاص.</string>
     <string name="install_error_conflict_title">تعارض في الحزمة</string>
-    <string name="install_error_conflict_guidance">تم تثبيت إصدار متعارض بالفعل. قم بإلغاء تثبيت التطبيق الحالي أولاً، أو قم بتمكين \"استبدال الحالي\" في خيارات Shizuku.</string>
+    <string name="install_error_conflict_guidance">تم تثبيت إصدار متعارض بالفعل. قم بإلغاء تثبيت التطبيق الحالي أولاً، أو قم بتمكين \&quot;استبدال الحالي\&quot; في خيارات Shizuku.</string>
     <string name="install_error_incompatible_title">حزمة غير متوافقة</string>
     <string name="install_error_incompatible_guidance">ملف APK هذا غير متوافق مع جهازك. قد يتطلب معمارية وحدة معالجة مركزية مختلفة، أو إصدار Android، أو ميزة أجهزة مفقودة.</string>
     <string name="install_error_invalid_title">حزمة غير صالحة</string>
@@ -237,11 +237,11 @@
     <string name="permission_install_title">تثبيت التطبيقات غير المعروفة</string>
     <string name="permission_install_desc">مطلوب لتثبيت حزم APK و XAPK و APKS و APKM. بدون هذا، لا يمكن تثبيت أي شيء.</string>
     <string name="permission_storage_title">الوصول إلى جميع الملفات</string>
-    <string name="permission_storage_desc">يتيح ميزة "البحث التلقائي" فحص جهازك بحثًا عن الحزم ونسخ بيانات OBB على نظام Android 11 والإصدارات الأحدث. اختياري — لا يزال منتقي التصفح يعمل بدونه.</string>
+    <string name="permission_storage_desc">يتيح ميزة &quot;البحث التلقائي&quot; فحص جهازك بحثًا عن الحزم ونسخ بيانات OBB على نظام Android 11 والإصدارات الأحدث. اختياري — لا يزال منتقي التصفح يعمل بدونه.</string>
     <string name="permission_notifications_title">الإشعارات</string>
     <string name="permission_notifications_desc">يعرض تقدم التنزيل ونسخ OBB وفحص VirusTotal حتى تتمكن من مغادرة التطبيق أثناء المهام الطويلة.</string>
     <string name="permission_usage_title">الوصول إلى بيانات الاستخدام</string>
-    <string name="permission_usage_desc">اختياري — يتيح لشاشة "إلغاء التثبيت" ترتيب التطبيقات حسب آخر استخدام وعرض أوقات استخدام كل تطبيق على حدة.</string>
+    <string name="permission_usage_desc">اختياري — يتيح لشاشة &quot;إلغاء التثبيت&quot; ترتيب التطبيقات حسب آخر استخدام وعرض أوقات استخدام كل تطبيق على حدة.</string>
     <string name="remote_download_clipboard_empty">الحافظة فارغة</string>
     <string name="remote_download_invalid_url">رابط غير صالح. يجب أن يبدأ بـ http:// أو https://</string>
     <string name="remote_download_cancel">إلغاء</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">شروط الخدمة</string>
     <string name="setting_terms_subtitle">شروط وأحكام الاستخدام</string>
     <string name="find_auto_search_hint">البحث عن الحزم…</string>
-    <string name="find_auto_no_match">لا توجد حزم تطابق \"%s\"</string>
+    <string name="find_auto_no_match">لا توجد حزم تطابق \&quot;%s\&quot;</string>
     <string name="uninstall_system_badge">تطبيق نظام</string>
     <string name="uninstall_system_dialog_title_single">إزالة تطبيق النظام؟</string>
     <string name="uninstall_system_dialog_title_batch">تحديد مختلط</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">لقد قمت بتحديد %1$d تطبيق(تطبيقات): %2$d عادية + %3$d نظام. التطبيقات العادية يتم إلغاء تثبيتها بشكل طبيعي. اختر كيفية التعامل مع تطبيقات النظام (جميع الطرق يمكن التراجع عنها):</string>
     <string name="uninstall_system_method_header">طريقة إزالة تطبيقات النظام</string>
     <string name="uninstall_system_method_per_user_title">إلغاء التثبيت للمستخدم 0 (User 0)</string>
-    <string name="uninstall_system_method_per_user_sub">يخفي التطبيق للمستخدم الحالي. يمكنك الاستعادة عبر إعادة ضبط المصنع أو \"cmd package install-existing\".</string>
+    <string name="uninstall_system_method_per_user_sub">يخفي التطبيق للمستخدم الحالي. يمكنك الاستعادة عبر إعادة ضبط المصنع أو \&quot;cmd package install-existing\&quot;.</string>
     <string name="uninstall_system_method_disable_title">تعطيل (تجميد)</string>
-    <string name="uninstall_system_method_disable_sub">يجمّد التطبيق دون إزالته. أعد التمكين عبر root shell باستخدام \"pm enable\".</string>
+    <string name="uninstall_system_method_disable_sub">يجمّد التطبيق دون إزالته. أعد التمكين عبر root shell باستخدام \&quot;pm enable\&quot;.</string>
     <string name="uninstall_system_method_skip_title">تخطي تطبيقات النظام</string>
     <string name="uninstall_system_method_skip_sub">إلغاء تثبيت التطبيقات العادية فقط في هذا التحديد.</string>
     <string name="uninstall_system_continue">متابعة</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">تأمين تنزيلات الملفات برمز PIN مكون من 4 إلى 8 أرقام</string>
     <string name="setting_sync_pin_code_title">رمز PIN</string>
     <string name="setting_sync_port_title">منفذ الخادم (Server Port)</string>
+    <string name="setting_rate_subtitle">قيّمنا على Google Play</string>
+    <string name="qs_tile_sync_label">المزامنة والمشاركة</string>
 </resources>

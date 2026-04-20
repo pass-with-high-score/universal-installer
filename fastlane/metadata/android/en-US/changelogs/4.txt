@@ -1,0 +1,5 @@
+- Sync & Share: Local network file server to share and download packages
+- Root backend support: Silent install, uninstall, and system app removal
+- Uninstall: Refresh button added
+- Improved real-time download progress tracking
+- Fixed adaptive launcher icon and notification icon rendering

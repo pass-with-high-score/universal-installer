@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Yükle</string>
     <string name="txt_uninstall">Kaldır</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">Sistem uygulamalarını göster</string>
     <string name="uninstall_search_hint">Uygulamalarda ara…</string>
     <string name="uninstall_no_apps_found">Uygulama bulunamadı</string>
-    <string name="uninstall_no_match">\"%s\" ile eşleşen uygulama yok</string>
+    <string name="uninstall_no_match">\&quot;%s\&quot; ile eşleşen uygulama yok</string>
     <string name="uninstall_no_user_apps">Kullanıcı tarafından yüklenen uygulama bulunamadı</string>
     <string name="uninstall_n_selected">%d seçildi</string>
     <string name="uninstall_confirm_batch_title">%d uygulama kaldırılsın mı?</string>
@@ -119,7 +119,7 @@
     <string name="install_error_blocked_title">Yükleme engellendi</string>
     <string name="install_error_blocked_guidance">Cihaz politikanız veya güvenlik ayarlarınız bu yüklemeyi engelledi. Ayarlar &gt; Uygulamalar &gt; Özel erişim bölümünden bilinmeyen kaynaklara izin verilip verilmediğini kontrol edin.</string>
     <string name="install_error_conflict_title">Paket çakışması</string>
-    <string name="install_error_conflict_guidance">Çakışan bir sürüm zaten yüklü. Önce mevcut uygulamayı kaldırın veya Shizuku seçeneklerinden \"Mevcut olanı değiştir\"i etkinleştirin.</string>
+    <string name="install_error_conflict_guidance">Çakışan bir sürüm zaten yüklü. Önce mevcut uygulamayı kaldırın veya Shizuku seçeneklerinden \&quot;Mevcut olanı değiştir\&quot;i etkinleştirin.</string>
     <string name="install_error_incompatible_title">Uyumsuz paket</string>
     <string name="install_error_incompatible_guidance">Bu APK cihazınızla uyumlu değil. Farklı bir CPU mimarisi, Android sürümü veya eksik bir donanım özelliği gerektirebilir.</string>
     <string name="install_error_invalid_title">Geçersiz paket</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">Hizmet şartları</string>
     <string name="setting_terms_subtitle">Kullanım şartları ve koşulları</string>
     <string name="find_auto_search_hint">Paketleri ara…</string>
-    <string name="find_auto_no_match">\"%s\" ile eşleşen paket yok</string>
+    <string name="find_auto_no_match">\&quot;%s\&quot; ile eşleşen paket yok</string>
     <string name="uninstall_system_badge">Sistem uygulaması</string>
     <string name="uninstall_system_dialog_title_single">Sistem uygulaması kaldırılsın mı?</string>
     <string name="uninstall_system_dialog_title_batch">Karma seçim</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">%1$d uygulama seçtiniz: %2$d normal + %3$d sistem. Normal uygulamalar normal şekilde kaldırılır. Sistem uygulamalarının nasıl işleneceğini seçin (tüm yöntemler geri alınabilir):</string>
     <string name="uninstall_system_method_header">Sistem uygulamaları için yöntem</string>
     <string name="uninstall_system_method_per_user_title">Kullanıcı 0 için kaldır</string>
-    <string name="uninstall_system_method_per_user_sub">Uygulamayı mevcut kullanıcı için gizler. Fabrika ayarlarına sıfırlama veya \"cmd package install-existing\" yoluyla geri yükleyin.</string>
+    <string name="uninstall_system_method_per_user_sub">Uygulamayı mevcut kullanıcı için gizler. Fabrika ayarlarına sıfırlama veya \&quot;cmd package install-existing\&quot; yoluyla geri yükleyin.</string>
     <string name="uninstall_system_method_disable_title">Devre dışı bırak (dondur)</string>
-    <string name="uninstall_system_method_disable_sub">Uygulamayı kaldırmadan dondurur. Root kabuğu \"pm enable\" yoluyla yeniden etkinleştirin.</string>
+    <string name="uninstall_system_method_disable_sub">Uygulamayı kaldırmadan dondurur. Root kabuğu \&quot;pm enable\&quot; yoluyla yeniden etkinleştirin.</string>
     <string name="uninstall_system_method_skip_title">Sistem uygulamalarını atla</string>
     <string name="uninstall_system_method_skip_sub">Bu seçimde yalnızca normal uygulamaları kaldırın.</string>
     <string name="uninstall_system_continue">Devam et</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">Dosya indirmelerini 4–8 haneli bir PIN ile güvence altına alın</string>
     <string name="setting_sync_pin_code_title">PIN Kodu</string>
     <string name="setting_sync_port_title">Sunucu Portu</string>
+    <string name="setting_rate_subtitle">Bizi Google Play\'de değerlendirin</string>
+    <string name="qs_tile_sync_label">Senkronize Et ve Paylaş</string>
 </resources>

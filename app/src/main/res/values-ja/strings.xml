@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">インストール</string>
     <string name="txt_uninstall">アンインストール</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">システムアプリを表示</string>
     <string name="uninstall_search_hint">アプリを検索…</string>
     <string name="uninstall_no_apps_found">アプリが見つかりません</string>
-    <string name="uninstall_no_match">\"%s\" に一致するアプリはありません</string>
+    <string name="uninstall_no_match">\&quot;%s\&quot; に一致するアプリはありません</string>
     <string name="uninstall_no_user_apps">ユーザーがインストールしたアプリが見つかりません</string>
     <string name="uninstall_n_selected">%d 件選択中</string>
     <string name="uninstall_confirm_batch_title">%d 個のアプリをアンインストールしますか？</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">利用規約</string>
     <string name="setting_terms_subtitle">利用条件</string>
     <string name="find_auto_search_hint">パッケージを検索…</string>
-    <string name="find_auto_no_match">\"%s\"に一致するパッケージはありません</string>
+    <string name="find_auto_no_match">\&quot;%s\&quot;に一致するパッケージはありません</string>
     <string name="uninstall_system_badge">システムアプリ</string>
     <string name="uninstall_system_dialog_title_single">システムアプリを削除しますか？</string>
     <string name="uninstall_system_dialog_title_batch">混在した選択</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">%1$d個のアプリを選択しました: %2$d個の通常のアプリ ＋ %3$d個のシステムアプリ。通常のアプリは通常通りアンインストールされます。システムアプリの処理方法を選択してください（すべての方法は元に戻せます）:</string>
     <string name="uninstall_system_method_header">システムアプリの処理方法</string>
     <string name="uninstall_system_method_per_user_title">ユーザー 0 からアンインストール</string>
-    <string name="uninstall_system_method_per_user_sub">現在のユーザーからアプリを非表示にします。初期化または \"cmd package install-existing\" で復元できます。</string>
+    <string name="uninstall_system_method_per_user_sub">現在のユーザーからアプリを非表示にします。初期化または \&quot;cmd package install-existing\&quot; で復元できます。</string>
     <string name="uninstall_system_method_disable_title">無効化（凍結）</string>
-    <string name="uninstall_system_method_disable_sub">アプリを削除せずに凍結します。rootシェル \"pm enable\" で再有効化できます。</string>
+    <string name="uninstall_system_method_disable_sub">アプリを削除せずに凍結します。rootシェル \&quot;pm enable\&quot; で再有効化できます。</string>
     <string name="uninstall_system_method_skip_title">システムアプリをスキップ</string>
     <string name="uninstall_system_method_skip_sub">この選択内の通常のアプリのみをアンインストールします。</string>
     <string name="uninstall_system_continue">続行</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">4〜8桁のPINでファイルのダウンロードを保護する</string>
     <string name="setting_sync_pin_code_title">PINコード</string>
     <string name="setting_sync_port_title">サーバーポート</string>
+    <string name="setting_rate_subtitle">Google Playでレビューする</string>
+    <string name="qs_tile_sync_label">同期と共有</string>
 </resources>

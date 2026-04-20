@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Cài đặt</string>
     <string name="txt_uninstall">Gỡ cài đặt</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">Hiển thị ứng dụng hệ thống</string>
     <string name="uninstall_search_hint">Tìm kiếm ứng dụng…</string>
     <string name="uninstall_no_apps_found">Không tìm thấy ứng dụng nào</string>
-    <string name="uninstall_no_match">Không có ứng dụng nào khớp với \"%s\"</string>
+    <string name="uninstall_no_match">Không có ứng dụng nào khớp với \&quot;%s\&quot;</string>
     <string name="uninstall_no_user_apps">Không tìm thấy ứng dụng nào do người dùng cài đặt</string>
     <string name="uninstall_n_selected">Đã chọn %d</string>
     <string name="uninstall_confirm_batch_title">Gỡ cài đặt %d ứng dụng?</string>
@@ -119,7 +119,7 @@
     <string name="install_error_blocked_title">Cài đặt bị chặn</string>
     <string name="install_error_blocked_guidance">Chính sách thiết bị hoặc cài đặt bảo mật của bạn đã chặn bản cài đặt này. Hãy kiểm tra xem các nguồn không xác định có được cho phép trong Cài đặt &gt; Ứng dụng &gt; Quyền truy cập đặc biệt hay không.</string>
     <string name="install_error_conflict_title">Xung đột gói</string>
-    <string name="install_error_conflict_guidance">Một phiên bản xung đột đã được cài đặt. Trước tiên, hãy gỡ cài đặt ứng dụng hiện có hoặc bật \"Thay thế bản hiện tại\" trong các tùy chọn Shizuku.</string>
+    <string name="install_error_conflict_guidance">Một phiên bản xung đột đã được cài đặt. Trước tiên, hãy gỡ cài đặt ứng dụng hiện có hoặc bật \&quot;Thay thế bản hiện tại\&quot; trong các tùy chọn Shizuku.</string>
     <string name="install_error_incompatible_title">Gói không tương thích</string>
     <string name="install_error_incompatible_guidance">APK này không tương thích với thiết bị của bạn. Nó có thể yêu cầu một kiến trúc CPU khác, phiên bản Android khác hoặc thiếu tính năng phần cứng.</string>
     <string name="install_error_invalid_title">Gói không hợp lệ</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">Điều khoản dịch vụ</string>
     <string name="setting_terms_subtitle">Các điều khoản và điều kiện sử dụng</string>
     <string name="find_auto_search_hint">Tìm kiếm gói ứng dụng…</string>
-    <string name="find_auto_no_match">Không có gói nào khớp với \"%s\"</string>
+    <string name="find_auto_no_match">Không có gói nào khớp với \&quot;%s\&quot;</string>
     <string name="uninstall_system_badge">Ứng dụng hệ thống</string>
     <string name="uninstall_system_dialog_title_single">Xóa ứng dụng hệ thống?</string>
     <string name="uninstall_system_dialog_title_batch">Lựa chọn hỗn hợp</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">Bạn đã chọn %1$d ứng dụng: %2$d thông thường + %3$d hệ thống. Các ứng dụng thông thường sẽ gỡ cài đặt bình thường. Chọn cách xử lý các ứng dụng hệ thống (tất cả các phương pháp đều có thể hoàn tác):</string>
     <string name="uninstall_system_method_header">Phương thức cho ứng dụng hệ thống</string>
     <string name="uninstall_system_method_per_user_title">Gỡ cài đặt cho người dùng 0</string>
-    <string name="uninstall_system_method_per_user_sub">Ẩn ứng dụng với người dùng hiện tại. Khôi phục qua khôi phục cài đặt gốc hoặc lệnh \"cmd package install-existing\".</string>
+    <string name="uninstall_system_method_per_user_sub">Ẩn ứng dụng với người dùng hiện tại. Khôi phục qua khôi phục cài đặt gốc hoặc lệnh \&quot;cmd package install-existing\&quot;.</string>
     <string name="uninstall_system_method_disable_title">Vô hiệu hóa (đóng băng)</string>
-    <string name="uninstall_system_method_disable_sub">Đóng băng ứng dụng mà không xóa nó. Kích hoạt lại qua lệnh root shell \"pm enable\".</string>
+    <string name="uninstall_system_method_disable_sub">Đóng băng ứng dụng mà không xóa nó. Kích hoạt lại qua lệnh root shell \&quot;pm enable\&quot;.</string>
     <string name="uninstall_system_method_skip_title">Bỏ qua ứng dụng hệ thống</string>
     <string name="uninstall_system_method_skip_sub">Chỉ gỡ cài đặt các ứng dụng thông thường trong lựa chọn này.</string>
     <string name="uninstall_system_continue">Tiếp tục</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">Bảo mật việc tải tệp xuống bằng mã PIN từ 4–8 chữ số</string>
     <string name="setting_sync_pin_code_title">Mã PIN</string>
     <string name="setting_sync_port_title">Cổng máy chủ</string>
+    <string name="setting_rate_subtitle">Đánh giá chúng tôi trên Google Play</string>
+    <string name="qs_tile_sync_label">Đồng bộ &amp; Chia sẻ</string>
 </resources>

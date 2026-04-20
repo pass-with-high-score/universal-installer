@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">इंस्टॉल करें</string>
     <string name="txt_uninstall">अनइंस्टॉल करें</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">सिस्टम ऐप्स दिखाएं</string>
     <string name="uninstall_search_hint">ऐप्स खोजें…</string>
     <string name="uninstall_no_apps_found">कोई ऐप नहीं मिले</string>
-    <string name="uninstall_no_match">\"%s\" से मेल खाने वाले कोई ऐप नहीं</string>
+    <string name="uninstall_no_match">\&quot;%s\&quot; से मेल खाने वाले कोई ऐप नहीं</string>
     <string name="uninstall_no_user_apps">उपयोगकर्ता द्वारा इंस्टॉल किए गए कोई ऐप नहीं मिले</string>
     <string name="uninstall_n_selected">%d चयनित</string>
     <string name="uninstall_confirm_batch_title">%d ऐप्स अनइंस्टॉल करें?</string>
@@ -119,7 +119,7 @@
     <string name="install_error_blocked_title">इंस्टॉलेशन ब्लॉक हो गया</string>
     <string name="install_error_blocked_guidance">आपकी डिवाइस नीति या सुरक्षा सेटिंग्स ने इस इंस्टॉल को ब्लॉक कर दिया है। जांचें कि सेटिंग्स &gt; ऐप्स &gt; विशेष एक्सेस में अज्ञात स्रोतों की अनुमति है या नहीं।</string>
     <string name="install_error_conflict_title">पैकेज में विरोध</string>
-    <string name="install_error_conflict_guidance">विरोध करने वाला वर्ज़न पहले से ही इंस्टॉल है। पहले मौजूदा ऐप को अनइंस्टॉल करें, या Shizuku विकल्पों में \"मौजूदा को बदलें\" सक्षम करें।</string>
+    <string name="install_error_conflict_guidance">विरोध करने वाला वर्ज़न पहले से ही इंस्टॉल है। पहले मौजूदा ऐप को अनइंस्टॉल करें, या Shizuku विकल्पों में \&quot;मौजूदा को बदलें\&quot; सक्षम करें।</string>
     <string name="install_error_incompatible_title">असंगत पैकेज</string>
     <string name="install_error_incompatible_guidance">यह APK आपके डिवाइस के अनुकूल नहीं है। इसे एक अलग CPU आर्किटेक्चर, Android वर्ज़न, या अनुपलब्ध हार्डवेयर सुविधा की आवश्यकता हो सकती है।</string>
     <string name="install_error_invalid_title">अमान्य पैकेज</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">सेवा की शर्तें</string>
     <string name="setting_terms_subtitle">उपयोग के नियम और शर्तें</string>
     <string name="find_auto_search_hint">पैकेज खोजें…</string>
-    <string name="find_auto_no_match">कोई पैकेज \"%s\" से मेल नहीं खाता</string>
+    <string name="find_auto_no_match">कोई पैकेज \&quot;%s\&quot; से मेल नहीं खाता</string>
     <string name="uninstall_system_badge">सिस्टम ऐप</string>
     <string name="uninstall_system_dialog_title_single">सिस्टम ऐप हटाएँ?</string>
     <string name="uninstall_system_dialog_title_batch">मिश्रित चयन</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">आपने %1$d ऐप्स चुने हैं: %2$d नियमित + %3$d सिस्टम। नियमित ऐप्स सामान्य रूप से अनइंस्टॉल हो जाते हैं। चुनें कि सिस्टम ऐप्स को कैसे हैंडल करना है (सभी तरीकों को पलटा जा सकता है):</string>
     <string name="uninstall_system_method_header">सिस्टम ऐप्स के लिए तरीका</string>
     <string name="uninstall_system_method_per_user_title">उपयोगकर्ता 0 के लिए अनइंस्टॉल करें</string>
-    <string name="uninstall_system_method_per_user_sub">वर्तमान उपयोगकर्ता के लिए ऐप छुपाता है। फ़ैक्टरी रीसेट या \"cmd package install-existing\" के माध्यम से पुनर्स्थापित करें।</string>
+    <string name="uninstall_system_method_per_user_sub">वर्तमान उपयोगकर्ता के लिए ऐप छुपाता है। फ़ैक्टरी रीसेट या \&quot;cmd package install-existing\&quot; के माध्यम से पुनर्स्थापित करें।</string>
     <string name="uninstall_system_method_disable_title">अक्षम करें (फ़्रीज़ करें)</string>
-    <string name="uninstall_system_method_disable_sub">ऐप को हटाए बिना उसे फ़्रीज़ कर देता है। रूट शेल \"pm enable\" के ज़रिए फिर से सक्षम करें।</string>
+    <string name="uninstall_system_method_disable_sub">ऐप को हटाए बिना उसे फ़्रीज़ कर देता है। रूट शेल \&quot;pm enable\&quot; के ज़रिए फिर से सक्षम करें।</string>
     <string name="uninstall_system_method_skip_title">सिस्टम ऐप्स छोड़ें</string>
     <string name="uninstall_system_method_skip_sub">इस चयन में केवल नियमित ऐप्स को अनइंस्टॉल करें।</string>
     <string name="uninstall_system_continue">जारी रखें</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">4-8 अंकों के पिन के साथ फ़ाइल डाउनलोड सुरक्षित करें</string>
     <string name="setting_sync_pin_code_title">पिन कोड (PIN Code)</string>
     <string name="setting_sync_port_title">सर्वर पोर्ट (Server Port)</string>
+    <string name="setting_rate_subtitle">Google Play पर हमारी समीक्षा करें</string>
+    <string name="qs_tile_sync_label">सिंक और शेयर</string>
 </resources>

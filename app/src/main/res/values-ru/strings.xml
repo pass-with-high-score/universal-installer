@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Установить</string>
     <string name="txt_uninstall">Удалить</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">Показать системные приложения</string>
     <string name="uninstall_search_hint">Поиск приложений…</string>
     <string name="uninstall_no_apps_found">Приложения не найдены</string>
-    <string name="uninstall_no_match">Нет приложений, совпадающих с \"%s\"</string>
+    <string name="uninstall_no_match">Нет приложений, совпадающих с \&quot;%s\&quot;</string>
     <string name="uninstall_no_user_apps">Установленные пользователем приложения не найдены</string>
     <string name="uninstall_n_selected">Выбрано: %d</string>
     <string name="uninstall_confirm_batch_title">Удалить %d приложений?</string>
@@ -119,7 +119,7 @@
     <string name="install_error_blocked_title">Установка заблокирована</string>
     <string name="install_error_blocked_guidance">Политика вашего устройства или настройки безопасности заблокировали эту установку. Проверьте, разрешены ли неизвестные источники в Настройки &gt; Приложения &gt; Специальный доступ.</string>
     <string name="install_error_conflict_title">Конфликт пакетов</string>
-    <string name="install_error_conflict_guidance">Конфликтующая версия уже установлена. Сначала удалите существующее приложение или включите \"Заменить существующие\" в опциях Shizuku.</string>
+    <string name="install_error_conflict_guidance">Конфликтующая версия уже установлена. Сначала удалите существующее приложение или включите \&quot;Заменить существующие\&quot; в опциях Shizuku.</string>
     <string name="install_error_incompatible_title">Несовместимый пакет</string>
     <string name="install_error_incompatible_guidance">Этот APK несовместим с вашим устройством. Может потребоваться другая архитектура процессора, версия Android или отсутствующая аппаратная функция.</string>
     <string name="install_error_invalid_title">Недействительный пакет</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">Условия обслуживания</string>
     <string name="setting_terms_subtitle">Условия и положения использования</string>
     <string name="find_auto_search_hint">Поиск пакетов…</string>
-    <string name="find_auto_no_match">Нет пакетов, соответствующих \"%s\"</string>
+    <string name="find_auto_no_match">Нет пакетов, соответствующих \&quot;%s\&quot;</string>
     <string name="uninstall_system_badge">Системное приложение</string>
     <string name="uninstall_system_dialog_title_single">Удалить системное приложение?</string>
     <string name="uninstall_system_dialog_title_batch">Смешанный выбор</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">Вы выбрали %1$d приложений: %2$d обычных + %3$d системных. Обычные приложения удаляются как обычно. Выберите, что делать с системными приложениями (все методы обратимы):</string>
     <string name="uninstall_system_method_header">Метод для системных приложений</string>
     <string name="uninstall_system_method_per_user_title">Удалить для пользователя 0</string>
-    <string name="uninstall_system_method_per_user_sub">Скрывает приложение для текущего пользователя. Восстановление через сброс до заводских настроек или \"cmd package install-existing\".</string>
+    <string name="uninstall_system_method_per_user_sub">Скрывает приложение для текущего пользователя. Восстановление через сброс до заводских настроек или \&quot;cmd package install-existing\&quot;.</string>
     <string name="uninstall_system_method_disable_title">Отключить (заморозить)</string>
-    <string name="uninstall_system_method_disable_sub">Замораживает приложение без его удаления. Повторное включение через root shell \"pm enable\".</string>
+    <string name="uninstall_system_method_disable_sub">Замораживает приложение без его удаления. Повторное включение через root shell \&quot;pm enable\&quot;.</string>
     <string name="uninstall_system_method_skip_title">Пропустить системные приложения</string>
     <string name="uninstall_system_method_skip_sub">Удалить только обычные приложения в этом выборе.</string>
     <string name="uninstall_system_continue">Продолжить</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">Защитить загрузку файлов с помощью PIN-кода из 4–8 цифр</string>
     <string name="setting_sync_pin_code_title">PIN-код</string>
     <string name="setting_sync_port_title">Порт сервера</string>
+    <string name="setting_rate_subtitle">Оцените нас в Google Play</string>
+    <string name="qs_tile_sync_label">Синхронизация и обмен</string>
 </resources>

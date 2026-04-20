@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Instalar</string>
     <string name="txt_uninstall">Desinstalar</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">Mostrar aplicaciones del sistema</string>
     <string name="uninstall_search_hint">Buscar aplicaciones…</string>
     <string name="uninstall_no_apps_found">No se encontraron aplicaciones</string>
-    <string name="uninstall_no_match">No hay aplicaciones que coincidan con \"%s\"</string>
+    <string name="uninstall_no_match">No hay aplicaciones que coincidan con \&quot;%s\&quot;</string>
     <string name="uninstall_no_user_apps">No se encontraron aplicaciones instaladas por el usuario</string>
     <string name="uninstall_n_selected">%d seleccionadas</string>
     <string name="uninstall_confirm_batch_title">¿Desinstalar %d aplicaciones?</string>
@@ -119,7 +119,7 @@
     <string name="install_error_blocked_title">Instalación bloqueada</string>
     <string name="install_error_blocked_guidance">La política de tu dispositivo o la configuración de seguridad bloquearon esta instalación. Comprueba si se permiten orígenes desconocidos en Configuración &gt; Aplicaciones &gt; Acceso especial.</string>
     <string name="install_error_conflict_title">Conflicto de paquete</string>
-    <string name="install_error_conflict_guidance">Ya hay instalada una versión conflictiva. Desinstala primero la aplicación existente o habilita \"Reemplazar existente\" en las opciones de Shizuku.</string>
+    <string name="install_error_conflict_guidance">Ya hay instalada una versión conflictiva. Desinstala primero la aplicación existente o habilita \&quot;Reemplazar existente\&quot; en las opciones de Shizuku.</string>
     <string name="install_error_incompatible_title">Paquete incompatible</string>
     <string name="install_error_incompatible_guidance">Esta APK no es compatible con tu dispositivo. Puede requerir una arquitectura de CPU diferente, una versión de Android o una característica de hardware faltante.</string>
     <string name="install_error_invalid_title">Paquete no válido</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">Términos de servicio</string>
     <string name="setting_terms_subtitle">Términos y condiciones de uso</string>
     <string name="find_auto_search_hint">Buscar paquetes…</string>
-    <string name="find_auto_no_match">Ningún paquete coincide con \"%s\"</string>
+    <string name="find_auto_no_match">Ningún paquete coincide con \&quot;%s\&quot;</string>
     <string name="uninstall_system_badge">App del sistema</string>
     <string name="uninstall_system_dialog_title_single">¿Eliminar app del sistema?</string>
     <string name="uninstall_system_dialog_title_batch">Selección mixta</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">Seleccionaste %1$d apps: %2$d regulares + %3$d del sistema. Las apps regulares se desinstalan normalmente. Elige cómo manejar las apps del sistema (todos los métodos son reversibles):</string>
     <string name="uninstall_system_method_header">Método para apps del sistema</string>
     <string name="uninstall_system_method_per_user_title">Desinstalar para el usuario 0</string>
-    <string name="uninstall_system_method_per_user_sub">Oculta la app para el usuario actual. Restáurala mediante un restablecimiento de fábrica o \"cmd package install-existing\".</string>
+    <string name="uninstall_system_method_per_user_sub">Oculta la app para el usuario actual. Restáurala mediante un restablecimiento de fábrica o \&quot;cmd package install-existing\&quot;.</string>
     <string name="uninstall_system_method_disable_title">Deshabilitar (congelar)</string>
-    <string name="uninstall_system_method_disable_sub">Congela la app sin eliminarla. Vuelve a habilitarla mediante una shell root con \"pm enable\".</string>
+    <string name="uninstall_system_method_disable_sub">Congela la app sin eliminarla. Vuelve a habilitarla mediante una shell root con \&quot;pm enable\&quot;.</string>
     <string name="uninstall_system_method_skip_title">Omitir apps del sistema</string>
     <string name="uninstall_system_method_skip_sub">Desinstalar solo las apps regulares en esta selección.</string>
     <string name="uninstall_system_continue">Continuar</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">Asegurar las descargas de archivos con un PIN de 4 a 8 dígitos</string>
     <string name="setting_sync_pin_code_title">Código PIN</string>
     <string name="setting_sync_port_title">Puerto del servidor</string>
+    <string name="setting_rate_subtitle">Califícanos en Google Play</string>
+    <string name="qs_tile_sync_label">Sincronizar y compartir</string>
 </resources>

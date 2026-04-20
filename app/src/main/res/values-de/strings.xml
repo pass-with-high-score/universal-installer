@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Installieren</string>
     <string name="txt_uninstall">Deinstallieren</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">System-Apps anzeigen</string>
     <string name="uninstall_search_hint">Apps suchen…</string>
     <string name="uninstall_no_apps_found">Keine Apps gefunden</string>
-    <string name="uninstall_no_match">Keine Treffer für \"%s\"</string>
+    <string name="uninstall_no_match">Keine Treffer für \&quot;%s\&quot;</string>
     <string name="uninstall_no_user_apps">Keine benutzerinstallierten Apps gefunden</string>
     <string name="uninstall_n_selected">%d ausgewählt</string>
     <string name="uninstall_confirm_batch_title">%d Apps deinstallieren?</string>
@@ -119,7 +119,7 @@
     <string name="install_error_blocked_title">Installation blockiert</string>
     <string name="install_error_blocked_guidance">Deine Geräterichtlinien oder Sicherheitseinstellungen haben diese Installation blockiert. Überprüfe in den Einstellungen &gt; Apps &gt; Spezieller Zugriff, ob unbekannte Quellen zugelassen sind.</string>
     <string name="install_error_conflict_title">Paketkonflikt</string>
-    <string name="install_error_conflict_guidance">Eine inkompatible Version ist bereits installiert. Deinstalliere zuerst die vorhandene App oder aktiviere \"Vorhandene ersetzen\" in den Shizuku-Optionen.</string>
+    <string name="install_error_conflict_guidance">Eine inkompatible Version ist bereits installiert. Deinstalliere zuerst die vorhandene App oder aktiviere \&quot;Vorhandene ersetzen\&quot; in den Shizuku-Optionen.</string>
     <string name="install_error_incompatible_title">Inkompatibles Paket</string>
     <string name="install_error_incompatible_guidance">Diese APK ist mit deinem Gerät nicht kompatibel. Möglicherweise erfordert sie eine andere CPU-Architektur, Android-Version oder es fehlt eine Hardwarefunktion.</string>
     <string name="install_error_invalid_title">Ungültiges Paket</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">Nutzungsbedingungen</string>
     <string name="setting_terms_subtitle">Nutzungsbedingungen und Richtlinien</string>
     <string name="find_auto_search_hint">Pakete suchen…</string>
-    <string name="find_auto_no_match">Keine Pakete entsprechen \"%s\"</string>
+    <string name="find_auto_no_match">Keine Pakete entsprechen \&quot;%s\&quot;</string>
     <string name="uninstall_system_badge">System-App</string>
     <string name="uninstall_system_dialog_title_single">System-App entfernen?</string>
     <string name="uninstall_system_dialog_title_batch">Gemischte Auswahl</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">Du hast %1$d Apps ausgewählt: %2$d reguläre + %3$d System-Apps. Reguläre Apps werden normal deinstalliert. Wähle, wie System-Apps behandelt werden sollen (alle Methoden sind umkehrbar):</string>
     <string name="uninstall_system_method_header">Methode für System-Apps</string>
     <string name="uninstall_system_method_per_user_title">Für Nutzer 0 deinstallieren</string>
-    <string name="uninstall_system_method_per_user_sub">Verbirgt die App für den aktuellen Nutzer. Wiederherstellung über Werkseinstellungen oder \"cmd package install-existing\".</string>
+    <string name="uninstall_system_method_per_user_sub">Verbirgt die App für den aktuellen Nutzer. Wiederherstellung über Werkseinstellungen oder \&quot;cmd package install-existing\&quot;.</string>
     <string name="uninstall_system_method_disable_title">Deaktivieren (einfrieren)</string>
-    <string name="uninstall_system_method_disable_sub">Friert die App ein, ohne sie zu entfernen. Wieder aktivieren über Root-Shell \"pm enable\".</string>
+    <string name="uninstall_system_method_disable_sub">Friert die App ein, ohne sie zu entfernen. Wieder aktivieren über Root-Shell \&quot;pm enable\&quot;.</string>
     <string name="uninstall_system_method_skip_title">System-Apps überspringen</string>
     <string name="uninstall_system_method_skip_sub">Nur die regulären Apps in dieser Auswahl deinstallieren.</string>
     <string name="uninstall_system_continue">Weiter</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">Datei-Downloads mit einer 4- bis 8-stelligen PIN sichern</string>
     <string name="setting_sync_pin_code_title">PIN-Code</string>
     <string name="setting_sync_port_title">Server-Port</string>
+    <string name="setting_rate_subtitle">Bewerte uns auf Google Play</string>
+    <string name="qs_tile_sync_label">Synchronisieren &amp; Teilen</string>
 </resources>

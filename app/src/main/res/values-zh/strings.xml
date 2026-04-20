@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">安装</string>
     <string name="txt_uninstall">卸载</string>
@@ -52,7 +52,7 @@
     <string name="uninstall_show_system_apps">显示系统应用</string>
     <string name="uninstall_search_hint">搜索应用…</string>
     <string name="uninstall_no_apps_found">未找到应用</string>
-    <string name="uninstall_no_match">没有与 \"%s\" 匹配的应用</string>
+    <string name="uninstall_no_match">没有与 \&quot;%s\&quot; 匹配的应用</string>
     <string name="uninstall_no_user_apps">未找到用户安装的应用</string>
     <string name="uninstall_n_selected">已选择 %d 个</string>
     <string name="uninstall_confirm_batch_title">卸载 %d 个应用？</string>
@@ -286,7 +286,7 @@
     <string name="setting_terms_title">服务条款</string>
     <string name="setting_terms_subtitle">使用条款和条件</string>
     <string name="find_auto_search_hint">搜索包…</string>
-    <string name="find_auto_no_match">没有与 \"%s\" 匹配的包</string>
+    <string name="find_auto_no_match">没有与 \&quot;%s\&quot; 匹配的包</string>
     <string name="uninstall_system_badge">系统应用</string>
     <string name="uninstall_system_dialog_title_single">移除系统应用？</string>
     <string name="uninstall_system_dialog_title_batch">混合选择</string>
@@ -294,9 +294,9 @@
     <string name="uninstall_system_warning_batch">您选择了 %1$d 个应用：%2$d 个常规应用 + %3$d 个系统应用。常规应用会正常卸载。请选择如何处理系统应用（所有方法都是可逆的）：</string>
     <string name="uninstall_system_method_header">系统应用的处理方法</string>
     <string name="uninstall_system_method_per_user_title">为用户 0 卸载</string>
-    <string name="uninstall_system_method_per_user_sub">为当前用户隐藏该应用。可通过恢复出厂设置或 \"cmd package install-existing\" 来恢复。</string>
+    <string name="uninstall_system_method_per_user_sub">为当前用户隐藏该应用。可通过恢复出厂设置或 \&quot;cmd package install-existing\&quot; 来恢复。</string>
     <string name="uninstall_system_method_disable_title">禁用 (冻结)</string>
-    <string name="uninstall_system_method_disable_sub">冻结应用但不移除。可通过 root shell \"pm enable\" 重新启用。</string>
+    <string name="uninstall_system_method_disable_sub">冻结应用但不移除。可通过 root shell \&quot;pm enable\&quot; 重新启用。</string>
     <string name="uninstall_system_method_skip_title">跳过系统应用</string>
     <string name="uninstall_system_method_skip_sub">仅卸载此选择中的常规应用。</string>
     <string name="uninstall_system_continue">继续</string>
@@ -339,4 +339,6 @@
     <string name="setting_sync_require_pin_subtitle">使用 4–8 位 PIN 码保护文件下载</string>
     <string name="setting_sync_pin_code_title">PIN 码</string>
     <string name="setting_sync_port_title">服务器端口</string>
+    <string name="setting_rate_subtitle">在 Google Play 上评价我们</string>
+    <string name="qs_tile_sync_label">同步与分享</string>
 </resources>
