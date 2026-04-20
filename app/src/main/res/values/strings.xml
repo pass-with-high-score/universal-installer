@@ -1,25 +1,13 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
     <string name="txt_uninstall">Uninstall</string>
     <string name="txt_setting">Settings</string>
-    <string name="default_percentage" translatable="false">0%</string>
-    <string name="percentage" translatable="false">%d%%</string>
-    <string name="screen_title_install">Install</string>
     <string name="screen_title_uninstall">Uninstall</string>
     <string name="cancel">Cancel</string>
     <string name="fab_install">Install Package</string>
     <string name="uninstall">Uninstall</string>
-    <string name="session_error">Installation failed</string>
-    <string name="session_error_with_reason">Installation failed: %s</string>
-    <string name="no_install_sessions">No install sessions</string>
-    <string name="no_installed_applications">No installed applications</string>
-    <string name="error_no_base_apk">No base APK found in this package</string>
-    <string name="error_conflicting_base_apk">More than one base APK found</string>
-    <string name="error_conflicting_split_name">Conflicting split name: %s</string>
-    <string name="error_conflicting_package_name">Conflicting package name. Expected: %1$s, found: %2$s, name: %3$s</string>
-    <string name="error_conflicting_version_code">Conflicting version code. Expected: %1$s, found: %2$s, name: %3$s</string>
-
     <!-- Uninstall notifications -->
     <string name="uninstall_notif_channel_name">Uninstall progress</string>
     <string name="uninstall_notif_channel_description">Shows progress while apps are being uninstalled</string>
@@ -32,11 +20,9 @@
     <string name="uninstall_notif_batch_done">Uninstall complete</string>
     <string name="uninstall_notif_batch_done_with_errors">Uninstall finished with errors</string>
     <string name="uninstall_notif_batch_done_text">%1$d succeeded · %2$d failed</string>
-
     <!-- Shared status labels -->
     <string name="status_success">Success</string>
     <string name="status_failed">Failed</string>
-
     <!-- Install Screen -->
     <string name="install_storage_title">Storage</string>
     <string name="install_storage_value">%1$s free / %2$s</string>
@@ -45,17 +31,13 @@
     <string name="install_history_clear">Clear</string>
     <string name="install_unsupported_file">Unsupported file. Please select an APK, APKS, XAPK, or APKM file.</string>
     <string name="install_no_splits_error">Couldn\'t parse the package. File may be corrupt, truncated, or not compatible with this device.</string>
-
     <!-- Batch install -->
     <string name="batch_install_title">Batch install</string>
     <string name="batch_install_summary">%1$d packages · %2$s selected</string>
     <string name="batch_install_parsing">Analyzing %1$d / %2$d…</string>
-    <string name="batch_install_select_all">Select all</string>
-    <string name="batch_install_deselect_all">Deselect all</string>
     <string name="batch_install_failed_chip">%d failed</string>
     <string name="batch_install_action">Install %1$d · %2$s</string>
     <string name="batch_install_dup_package">Duplicate package</string>
-
     <!-- Download notifications -->
     <string name="download_notif_channel_name">Package downloads</string>
     <string name="download_notif_channel_description">Progress of downloading APK/XAPK/APKS files from a URL</string>
@@ -65,7 +47,6 @@
     <string name="download_notif_done_title">Download complete</string>
     <string name="download_notif_done_text">%s · open the app to install</string>
     <string name="download_notif_failed_title">Download failed</string>
-
     <!-- Download history screen -->
     <string name="download_history_title">Download history</string>
     <string name="download_history_empty">No downloaded packages yet.</string>
@@ -84,16 +65,11 @@
     <string name="download_history_delete_message">Removes %s from disk and from history.</string>
     <string name="download_history_delete_confirm">Delete</string>
     <string name="download_history_open_button">Download history</string>
-
     <!-- File Picker Card -->
     <string name="file_picker_parsing">Parsing package…</string>
-    <string name="file_picker_select">Select a package</string>
-    <string name="file_picker_formats" translatable="false">APK, APKS, XAPK, APKM</string>
-
     <!-- Source Picker (Local vs Download) -->
     <string name="source_tab_local">Local</string>
     <string name="source_tab_download">Download</string>
-
     <!-- Local source actions -->
     <string name="source_local_header">Select File</string>
     <string name="source_action_find_automatic">Find automatic</string>
@@ -102,13 +78,11 @@
     <string name="source_action_browse_packages_sub" translatable="false">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Browse all files</string>
     <string name="source_action_browse_all_sub">Any file type — use at your own risk</string>
-
     <!-- Download (inline) -->
     <string name="source_download_header">Download from URL</string>
     <string name="source_download_hint">Enter or paste the URL here…</string>
     <string name="source_download_start">Download</string>
     <string name="source_download_paste">Paste</string>
-
     <!-- Find automatic -->
     <string name="find_auto_sheet_title">Packages on this device</string>
     <string name="find_auto_permission_title">All-files access required</string>
@@ -126,13 +100,11 @@
     <string name="find_auto_delete_confirm">Delete</string>
     <string name="find_auto_search_hint">Search packages…</string>
     <string name="find_auto_no_match">No packages match "%s"</string>
-
     <!-- Permission Center -->
     <string name="permissions_title">App permissions</string>
     <string name="permissions_subtitle">Review which permissions are active and grant the ones you need.</string>
     <string name="permissions_menu_cd">Review permissions</string>
     <string name="permissions_granted">Granted</string>
-    <string name="permissions_not_granted">Not granted</string>
     <string name="permissions_grant">Grant</string>
     <string name="permissions_open_settings">Open settings</string>
     <string name="permission_install_title">Install unknown apps</string>
@@ -143,26 +115,16 @@
     <string name="permission_notifications_desc">Shows download, OBB copy and VirusTotal scan progress so you can leave the app during long jobs.</string>
     <string name="permission_usage_title">Usage access</string>
     <string name="permission_usage_desc">Optional — lets the Uninstall screen sort apps by last used and show individual app usage times.</string>
-
     <!-- Remote Download Dialog -->
-    <string name="remote_download_title">Download package</string>
-    <string name="remote_download_hint" translatable="false">https://example.com/app.apks</string>
-    <string name="remote_download_paste">Paste</string>
     <string name="remote_download_clipboard_empty">Clipboard is empty</string>
-    <string name="remote_download_clipboard_invalid">Clipboard does not contain a URL</string>
     <string name="remote_download_invalid_url">Invalid URL. Must start with http:// or https://</string>
-    <string name="remote_download_start">Download</string>
     <string name="remote_download_cancel">Cancel</string>
-    <string name="remote_download_progress_unknown">Downloading… %s</string>
-    <string name="remote_download_progress">Downloading… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">Download failed: %s</string>
     <string name="remote_download_unsupported">Downloaded file is not a supported package</string>
-
     <!-- Session Card -->
     <string name="session_installed_success">Installed successfully</string>
     <string name="session_installing_progress">%d%% installing…</string>
     <string name="session_retry">Retry</string>
-
     <!-- APK Info Bottom Sheet -->
     <string name="apk_info_label_package">Package</string>
     <string name="apk_info_label_version">Version</string>
@@ -176,7 +138,6 @@
     <string name="apk_info_obb_attach_desc">Pick .obb files that belong to this app — they\'ll be copied to Android/obb after install.</string>
     <string name="apk_info_obb_attach_button">Add OBB file</string>
     <string name="apk_info_obb_attach_remove">Remove</string>
-
     <!-- OBB copy progress (shown after install succeeds) -->
     <string name="obb_copy_title">Copying OBB files…</string>
     <string name="obb_copy_progress" translatable="false">%1$s / %2$s · %3$d%%</string>
@@ -186,7 +147,6 @@
     <string name="obb_copy_need_grant_title">OBB folder access needed</string>
     <string name="obb_copy_need_grant_body">Shizuku unavailable — grant access to Android/obb/%s/ so the app can copy OBB files there.</string>
     <string name="obb_copy_grant_button">Grant access</string>
-
     <!-- OBB copy worker notifications -->
     <string name="obb_notif_channel_name">OBB file copy</string>
     <string name="obb_notif_channel_description">Progress of copying OBB data files to Android/obb</string>
@@ -216,10 +176,8 @@
     <string name="apk_info_vt_queued">Queued on VirusTotal…</string>
     <string name="apk_info_vt_analyzing">Analyzing across engines…</string>
     <string name="apk_info_vt_too_large">File too large (%1$s). VirusTotal accepts up to %2$d MB.</string>
-    <string name="apk_info_vt_large_hint">File over 32 MB — uploading via VirusTotal\'s large-file endpoint. This may take several minutes.</string>
     <string name="apk_info_vt_check_button">Check with VirusTotal</string>
     <string name="apk_info_vt_rescan_button">Scan again</string>
-
     <!-- VirusTotal notifications -->
     <string name="vt_notif_channel_name">VirusTotal scans</string>
     <string name="vt_notif_channel_description">Progress of VirusTotal uploads and analyses</string>
@@ -232,7 +190,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: suspicious</string>
     <string name="vt_notif_result_done">VirusTotal scan complete</string>
     <string name="vt_notif_result_error">VirusTotal scan failed</string>
-
     <!-- Uninstall Screen -->
     <string name="uninstall_show_system_apps">Show system apps</string>
     <string name="uninstall_app_count">%d apps</string>
@@ -248,7 +205,6 @@
     <string name="uninstall_filter_sort_section">Sort by</string>
     <string name="uninstall_filter_filter_section">Filter</string>
     <string name="uninstall_show_system_apps_sub">Include preinstalled and system packages</string>
-    <string name="uninstall_scroll_top_cd">Scroll to top</string>
     <string name="uninstall_search_hint">Search apps…</string>
     <string name="uninstall_no_apps_found">No apps found</string>
     <string name="uninstall_no_match">No apps match \"%s\"</string>
@@ -265,7 +221,6 @@
     <string name="uninstall_confirm_single_title">Uninstall %s?</string>
     <string name="uninstall_confirm_single_text">This will remove %1$s (%2$s) from your device.</string>
     <string name="uninstall_app_cd">Uninstall %s</string>
-
     <!-- System-app uninstall dialog (full flavor + Root) -->
     <string name="uninstall_system_badge">System app</string>
     <string name="uninstall_system_dialog_title_single">Remove system app?</string>
@@ -285,7 +240,6 @@
     <string name="uninstall_system_privileged_required_body_batch">%1$d system app(s) in this selection cannot be removed without Shizuku or Root. Proceed with the remaining %2$d regular apps?</string>
     <string name="uninstall_system_privileged_required_body_batch_only_system">%d system app(s) selected. Enable Shizuku or Root in Settings to remove them.</string>
     <string name="uninstall_system_proceed_user_only">Proceed with regular apps</string>
-
     <!-- Uninstall Logs Screen -->
     <string name="logs_screen_title">Uninstall Logs</string>
     <string name="logs_clear_all_dialog_title">Clear all logs?</string>
@@ -299,7 +253,6 @@
     <string name="logs_expand_cd">Expand</string>
     <string name="logs_collapse_cd">Collapse</string>
     <string name="logs_delete_entry_cd">Delete entry</string>
-
     <!-- Settings Screen -->
     <string name="setting_title">Settings</string>
     <string name="setting_section_installation">Installation</string>
@@ -367,13 +320,11 @@
     <string name="setting_privacy_subtitle">How we handle your data</string>
     <string name="setting_terms_title">Terms of service</string>
     <string name="setting_terms_subtitle">Usage terms and conditions</string>
-
     <!-- Installer Mode Badge -->
     <string name="installer_mode_shizuku" translatable="false">Shizuku</string>
     <string name="installer_mode_root" translatable="false">Root</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Using %s</string>
-
     <!-- Root backend -->
     <string name="setting_root_backend">Root Backend</string>
     <string name="setting_root_unavailable">Unavailable in this build</string>
@@ -398,7 +349,6 @@
     <string name="setting_root_set_source">Set install source</string>
     <string name="setting_root_set_source_sub">Defaults to this app when off</string>
     <string name="setting_root_installer_label">installed by (package name)</string>
-
     <!-- Install error messages -->
     <string name="install_error_cancelled_title">Installation cancelled</string>
     <string name="install_error_cancelled_guidance">The installation was cancelled by the user or system. Tap Retry to try again.</string>
@@ -419,10 +369,8 @@
     <string name="install_error_failed_title">Installation failed</string>
     <string name="install_error_unknown_guidance">An unknown error occurred. Tap Retry to try again.</string>
     <string name="install_error_unknown_guidance_short">An unknown error occurred.</string>
-
     <!-- Splash Screen -->
     <string name="splash_tagline">Install anything, anywhere</string>
-
     <!-- Onboarding Screen -->
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_next">Next</string>
@@ -435,7 +383,6 @@
     <string name="onboarding_page2_desc">Browse installed apps, uninstall unwanted ones, and manage your device effortlessly.</string>
     <string name="onboarding_page3_title">Allow Installation</string>
     <string name="onboarding_page3_desc">To install packages, the app needs permission to install from unknown sources. Tap the button below to grant it.</string>
-
     <!-- Sync settings -->
     <string name="setting_section_sync">Sync &amp; Share</string>
     <string name="setting_sync_require_pin_title">Require PIN code</string>
