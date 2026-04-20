@@ -15,8 +15,15 @@
   <a href="https://play.google.com/store/apps/details?id=app.pwhs.universalinstaller">
     <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" height="80">
   </a>
+  <a href="https://f-droid.org/packages/app.pwhs.universalinstaller">
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="80">
+  </a>
   <a href="https://github.com/pass-with-high-score/universal-installer/releases">
     <img src="https://raw.githubusercontent.com/NeoApplications/Neo-Backup/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png" height="80">
+  </a>
+  <br><br>
+  <a href="https://apt.izzysoft.de/fdroid/index/apk/app.pwhs.universalinstaller">
+    <img src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroidButtonGreyBorder_nofont.png" height="54" alt="Get it at IzzyOnDroid">
   </a>
   <br><br>
   <a href="https://universal-installer.pwhs.app/">Website</a>

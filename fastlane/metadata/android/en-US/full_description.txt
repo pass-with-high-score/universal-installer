@@ -1,37 +1,37 @@
 Universal Installer is a modern Android package manager that handles what the default installer can't — split APKs, bundled archives with OBB data, silent installs, and downloads from URLs. All wrapped in a clean Material 3 UI.
 
-<b>Supported Formats</b>
+Supported Formats
 
 - APK — Standard Android packages
 - APKS — Split APK bundles
 - XAPK — Compressed split bundles (APKPure format) with OBB
 - APKM — Split bundles (APKMirror format)
 
-<b>Install From Anywhere</b>
+Install From Anywhere
 
 - Local file picker — Three modes: auto-scan device storage, browse packages only, or browse all files
 - Remote download — Paste a URL; the package lands in Download/UniversalInstaller/ with its real filename, visible in any file manager
 - Download history — Re-install from history, copy source URLs, manage files without digging through file managers
 - Chrome / Gmail / Telegram integration — Open downloaded APKs from any source, even when the URL has no extension
 
-<b>Preview Before Installing</b>
+Preview Before Installing
 See app name, icon, version, package, file size, min/target SDK, supported CPU architectures, languages, permissions, split count, and OBB count — all before you commit.
 
-<b>OBB Support</b>
+OBB Support
 
 - Bundled OBBs inside XAPK/APKM are detected and copied automatically to Android/obb/
 - Standalone .obb files can be attached to any APK via the preview sheet (great for apps split across multiple sources)
 - Runs as a foreground worker with progress notification — keeps copying even if you leave the app
 - Smart fallback: direct I/O → Shizuku → SAF (per-package folder grant)
 
-<b>Root & Shizuku Power User Features</b>
+Root & Shizuku Power User Features
 With Root access or Shizuku enabled:
 
 - Silent install / uninstall (no system prompts)
 - Replace existing, allow downgrade, grant all permissions, allow test/debug packages, bypass low target SDK block, install for all users
-- <b>Set Install Source</b> — Spoof the installer package (Google Play, Aurora, F-Droid, Amazon, Samsung, Huawei, Xiaomi, or custom) so apps with "installed from Play Store" checks accept your sideload
+- Set Install Source — Spoof the installer package (Google Play, Aurora, F-Droid, Amazon, Samsung, Huawei, Xiaomi, or custom) so apps with "installed from Play Store" checks accept your sideload
 
-<b>App Manager</b>
+App Manager
 
 - Full list with APK size, install date, last-used time
 - Sort by Name / Size / Installed / Last used — ascending or descending
@@ -39,26 +39,26 @@ With Root access or Shizuku enabled:
 - Filter FAB for quick sort/filter; long-press FAB to scroll to top
 - Uninstall logs with success/failure reason
 
-<b>Sync & Share (LAN File Server)</b>
+Sync & Share (LAN File Server)
 
 - Built-in HTTP server to share and manage your packages across a local network (Wi-Fi)
 - Beautiful web dashboard to download APKs to PC or upload new ones directly to your phone
 - Real-time download progress and transfer tracking directly in the app
 - Optional PIN protection to secure your file sharing sessions
 
-<b>Security</b>
+Security
 
 - VirusTotal hash lookup runs automatically on every picked file
 - Optional full upload + multi-engine scan for unknown files (up to 650 MB)
 - Clear verdict with malicious / suspicious / harmless / undetected engine counts
 
-<b>Device Utilities</b>
+Device Utilities
 
 - Storage card on the Install screen — free / total space at a glance
 - Install history with per-app success/failure and error reasons
 - Progress notifications for downloads, installs, and OBB copy
 
-<b>Privacy</b>
+Privacy
 
 - No internet required for core functionality
 - VirusTotal scanning is optional and uses your own API key
