@@ -484,6 +484,10 @@ class UninstallViewModel(
         }
     }
 
+    fun refreshApps() {
+        loadInstalledApps()
+    }
+
     private fun loadInstalledApps() {
         viewModelScope.launch {
             _isLoading.value = true

@@ -31,6 +31,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.material.icons.rounded.SelectAll
@@ -109,6 +110,7 @@ fun UninstallScreen(
         onToggleSelectAll = viewModel::toggleSelectAll,
         onUninstallSelected = viewModel::uninstallSelected,
         onOpenLogs = { navigator.navigate(UninstallLogsScreenDestination) },
+        onRefresh = viewModel::refreshApps,
         onSortChange = viewModel::setSort,
         onRequestUsageAccess = {
             // Send user to the system Usage Access settings — we re-check on resume via
@@ -139,6 +141,7 @@ private fun UninstallUi(
     onToggleSelectAll: () -> Unit = {},
     onUninstallSelected: () -> Unit = {},
     onOpenLogs: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onSortChange: (UninstallSortBy) -> Unit = {},
     onRequestUsageAccess: () -> Unit = {},
     onRefreshUsageAccess: () -> Unit = {},
@@ -267,6 +270,12 @@ private fun UninstallUi(
                         }
                     },
                     actions = {
+                        IconButton(onClick = onRefresh) {
+                            Icon(
+                                imageVector = Icons.Rounded.Refresh,
+                                contentDescription = "Refresh",
+                            )
+                        }
                         IconButton(onClick = onOpenLogs) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Rounded.ReceiptLong,

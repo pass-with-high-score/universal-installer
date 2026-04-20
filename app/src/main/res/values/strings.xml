@@ -316,6 +316,8 @@
     <string name="setting_sponsor_subtitle">Support development on GitHub Sponsors</string>
     <string name="setting_website_title">Website</string>
     <string name="setting_website_subtitle" translatable="false">universal-installer.pwhs.app</string>
+    <string name="setting_rate_title" translatable="false">Rate App</string>
+    <string name="setting_rate_subtitle">Review us on Google Play</string>
     <string name="setting_privacy_title">Privacy policy</string>
     <string name="setting_privacy_subtitle">How we handle your data</string>
     <string name="setting_terms_title">Terms of service</string>

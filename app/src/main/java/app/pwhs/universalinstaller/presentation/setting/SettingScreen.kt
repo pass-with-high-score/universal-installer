@@ -649,6 +649,30 @@ private fun SettingUi(
                     )
                     ListItem(
                         headlineContent = {
+                            Text(stringResource(R.string.setting_rate_title), style = MaterialTheme.typography.bodyLarge)
+                        },
+                        supportingContent = {
+                            Text(
+                                text = stringResource(R.string.setting_rate_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                painter = painterResource(R.drawable.ic_google_play_circle),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        modifier = Modifier.clickable {
+                            uriHandler.openUri("https://play.google.com/store/apps/details?id=app.pwhs.universalinstaller")
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    ListItem(
+                        headlineContent = {
                             Text(stringResource(R.string.setting_sponsor_title), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
