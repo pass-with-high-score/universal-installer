@@ -24,8 +24,8 @@ See app name, icon, version, package, file size, min/target SDK, supported CPU a
 - Runs as a foreground worker with progress notification — keeps copying even if you leave the app
 - Smart fallback: direct I/O → Shizuku → SAF (per-package folder grant)
 
-<b>Shizuku Power User Features</b>
-With Shizuku installed and enabled:
+<b>Root & Shizuku Power User Features</b>
+With Root access or Shizuku enabled:
 
 - Silent install / uninstall (no system prompts)
 - Replace existing, allow downgrade, grant all permissions, allow test/debug packages, bypass low target SDK block, install for all users
@@ -38,6 +38,13 @@ With Shizuku installed and enabled:
 - Batch select via long-press
 - Filter FAB for quick sort/filter; long-press FAB to scroll to top
 - Uninstall logs with success/failure reason
+
+<b>Sync & Share (LAN File Server)</b>
+
+- Built-in HTTP server to share and manage your packages across a local network (Wi-Fi)
+- Beautiful web dashboard to download APKs to PC or upload new ones directly to your phone
+- Real-time download progress and transfer tracking directly in the app
+- Optional PIN protection to secure your file sharing sessions
 
 <b>Security</b>
 
