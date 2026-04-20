@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">Instal</string>
     <string name="txt_uninstall">Copot Pemasangan</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">Nama split bertentangan: %s</string>
     <string name="error_conflicting_package_name">Nama paket bertentangan. Diharapkan: %1$s, ditemukan: %2$s, nama: %3$s</string>
     <string name="error_conflicting_version_code">Kode versi bertentangan. Diharapkan: %1$s, ditemukan: %2$s, nama: %3$s</string>
-
     <string name="uninstall_notif_channel_name">Progres pencopotan</string>
     <string name="uninstall_notif_channel_description">Menampilkan progres saat aplikasi dicopot pemasangannya</string>
     <string name="uninstall_notif_single_title">Mencopot pemasangan…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">Pencopotan selesai</string>
     <string name="uninstall_notif_batch_done_with_errors">Pencopotan selesai dengan kesalahan</string>
     <string name="uninstall_notif_batch_done_text">%1$d berhasil · %2$d gagal</string>
-
     <string name="status_success">Berhasil</string>
     <string name="status_failed">Gagal</string>
-
     <string name="install_sessions_header">Sesi</string>
     <string name="install_history_header">Riwayat</string>
     <string name="install_history_clear">Hapus</string>
     <string name="install_unsupported_file">Berkas tidak didukung. Silakan pilih berkas APK, APKS, XAPK, atau APKM.</string>
-
     <string name="file_picker_parsing">Memilah paket…</string>
     <string name="file_picker_select">Pilih paket</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">Berhasil diinstal</string>
     <string name="session_installing_progress">%d%% menginstal…</string>
     <string name="session_retry">Coba lagi</string>
-
     <string name="apk_info_label_package">Paket</string>
     <string name="apk_info_label_version">Versi</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d split</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Arsitektur yang Didukung</string>
     <string name="apk_info_section_languages">Bahasa yang Didukung (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d mencurigakan · %2$d tidak berbahaya · %3$d tidak terdeteksi</string>
     <string name="apk_info_vt_not_found">Berkas tidak ditemukan dalam basis data VirusTotal</string>
     <string name="apk_info_vt_error">Kesalahan pemindaian: %s</string>
-
     <string name="uninstall_show_system_apps">Tampilkan aplikasi sistem</string>
     <string name="uninstall_search_hint">Cari aplikasi…</string>
     <string name="uninstall_no_apps_found">Tidak ada aplikasi yang ditemukan</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">Copot %s?</string>
     <string name="uninstall_confirm_single_text">Ini akan menghapus %1$s (%2$s) dari perangkat Anda.</string>
     <string name="uninstall_app_cd">Copot %s</string>
-
     <string name="logs_screen_title">Log Pencopotan</string>
     <string name="logs_clear_all_dialog_title">Hapus semua log?</string>
     <string name="logs_clear_all_dialog_text">Ini akan menghapus riwayat log pencopotan di perangkat ini secara permanen.</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">Perluas</string>
     <string name="logs_collapse_cd">Tutup</string>
     <string name="logs_delete_entry_cd">Hapus entri</string>
-
     <string name="setting_title">Pengaturan</string>
     <string name="setting_section_installation">Instalasi</string>
     <string name="setting_shizuku_backend">Backend Shizuku</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">Tema</string>
     <string name="setting_theme_subtitle">Pilih tema pilihan Anda</string>
     <string name="setting_section_about">Tentang</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">Versi %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">Kode sumber &amp; kontribusi</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">Bergabung dengan komunitas kami</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Menggunakan %s</string>
-
     <string name="install_error_cancelled_title">Instalasi dibatalkan</string>
     <string name="install_error_cancelled_guidance">Instalasi dibatalkan oleh pengguna atau sistem. Ketuk Coba lagi untuk mencoba kembali.</string>
     <string name="install_error_blocked_title">Instalasi diblokir</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">Instalasi gagal</string>
     <string name="install_error_unknown_guidance">Terjadi kesalahan yang tidak diketahui. Ketuk Coba lagi untuk mencoba kembali.</string>
     <string name="install_error_unknown_guidance_short">Terjadi kesalahan yang tidak diketahui.</string>
-
     <string name="splash_tagline">Instal apa saja, di mana saja</string>
-
     <string name="onboarding_skip">Lewati</string>
     <string name="onboarding_next">Selanjutnya</string>
     <string name="onboarding_get_started">Mulai</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">Berkas lebih dari 32 MB — mengunggah melalui endpoint berkas besar VirusTotal. Ini mungkin memakan waktu beberapa menit.</string>
     <string name="apk_info_vt_check_button">Periksa dengan VirusTotal</string>
     <string name="apk_info_vt_rescan_button">Pindai lagi</string>
-
     <string name="vt_notif_channel_name">Pemindaian VirusTotal</string>
     <string name="vt_notif_channel_description">Progres unggahan dan analisis VirusTotal</string>
     <string name="vt_notif_hashing">Melakukan hashing pada berkas…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">Penyimpanan</string>
     <string name="install_storage_value">%1$s bebas / %2$s</string>
     <string name="install_no_splits_error">Tidak dapat mengurai paket. Berkas mungkin rusak, terpotong, atau tidak kompatibel dengan perangkat ini.</string>
-
     <string name="batch_install_title">Instalasi massal</string>
     <string name="batch_install_summary">%1$d paket · %2$s dipilih</string>
     <string name="batch_install_parsing">Menganalisis %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d gagal</string>
     <string name="batch_install_action">Instal %1$d · %2$s</string>
     <string name="batch_install_dup_package">Paket duplikat</string>
-
     <string name="download_notif_channel_name">Unduhan paket</string>
     <string name="download_notif_channel_description">Progres mengunduh berkas APK/XAPK/APKS dari URL</string>
     <string name="download_notif_running_title">Mengunduh %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">Telah diunduh %s</string>
     <string name="download_notif_done_title">Unduhan selesai</string>
     <string name="download_notif_done_text">%s · buka aplikasi untuk menginstal</string>
     <string name="download_notif_failed_title">Unduhan gagal</string>
-
     <string name="download_history_title">Riwayat unduhan</string>
     <string name="download_history_empty">Belum ada paket yang diunduh.</string>
     <string name="download_history_clear_cd">Hapus semua</string>
@@ -240,23 +216,18 @@
     <string name="download_history_delete_message">Menghapus %s dari penyimpanan dan riwayat.</string>
     <string name="download_history_delete_confirm">Hapus</string>
     <string name="download_history_open_button">Riwayat unduhan</string>
-
     <string name="source_tab_local">Lokal</string>
     <string name="source_tab_download">Unduhan</string>
-
     <string name="source_local_header">Pilih Berkas</string>
     <string name="source_action_find_automatic">Cari otomatis</string>
     <string name="source_action_find_automatic_sub">Pindai perangkat ini untuk mencari paket yang dapat diinstal</string>
     <string name="source_action_browse_packages">Jelajahi paket</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Jelajahi semua berkas</string>
     <string name="source_action_browse_all_sub">Semua jenis berkas — gunakan dengan risiko ditanggung sendiri</string>
-
     <string name="source_download_header">Unduh dari URL</string>
     <string name="source_download_hint">Masukkan atau tempel URL di sini…</string>
     <string name="source_download_start">Unduh</string>
     <string name="source_download_paste">Tempel</string>
-
     <string name="find_auto_sheet_title">Paket di perangkat ini</string>
     <string name="find_auto_permission_title">Diperlukan akses semua berkas</string>
     <string name="find_auto_permission_body">Untuk memindai paket di perangkat Anda, izinkan akses semua berkas di pengaturan sistem.</string>
@@ -271,7 +242,6 @@
     <string name="find_auto_delete_title">Hapus %d berkas?</string>
     <string name="find_auto_delete_message">Berkas paket yang dipilih akan dihapus secara permanen dari penyimpanan perangkat.</string>
     <string name="find_auto_delete_confirm">Hapus</string>
-
     <string name="permissions_title">Izin aplikasi</string>
     <string name="permissions_subtitle">Tinjau izin mana yang aktif dan berikan izin yang Anda butuhkan.</string>
     <string name="permissions_menu_cd">Tinjau izin</string>
@@ -287,9 +257,7 @@
     <string name="permission_notifications_desc">Menampilkan progres unduhan, salin OBB, dan pemindaian VirusTotal agar Anda dapat meninggalkan aplikasi selama tugas yang panjang.</string>
     <string name="permission_usage_title">Akses penggunaan</string>
     <string name="permission_usage_desc">Opsional — memungkinkan layar Copot pemasangan mengurutkan aplikasi berdasarkan yang terakhir digunakan dan menampilkan waktu penggunaan aplikasi masing-masing.</string>
-
     <string name="remote_download_title">Unduh paket</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">Tempel</string>
     <string name="remote_download_clipboard_empty">Papan klip kosong</string>
     <string name="remote_download_clipboard_invalid">Papan klip tidak berisi URL</string>
@@ -300,12 +268,10 @@
     <string name="remote_download_progress">Mengunduh… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">Unduhan gagal: %s</string>
     <string name="remote_download_unsupported">Berkas yang diunduh bukan paket yang didukung</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
     <string name="apk_info_obb_attach_title">Lampirkan berkas OBB (opsional)</string>
     <string name="apk_info_obb_attach_desc">Pilih berkas .obb milik aplikasi ini — akan disalin ke Android/obb setelah instalasi.</string>
     <string name="apk_info_obb_attach_button">Tambahkan berkas OBB</string>
     <string name="apk_info_obb_attach_remove">Hapus</string>
-
     <string name="obb_copy_title">Menyalin berkas OBB…</string>
     <string name="obb_copy_done">%1$s · %2$d berkas OBB disalin</string>
     <string name="obb_copy_error">Salin OBB gagal: %s</string>
@@ -313,7 +279,6 @@
     <string name="obb_copy_need_grant_title">Akses folder OBB diperlukan</string>
     <string name="obb_copy_need_grant_body">Shizuku tidak tersedia — berikan akses ke Android/obb/%s/ agar aplikasi dapat menyalin berkas OBB ke sana.</string>
     <string name="obb_copy_grant_button">Berikan akses</string>
-
     <string name="obb_notif_channel_name">Salin berkas OBB</string>
     <string name="obb_notif_channel_description">Progres menyalin berkas data OBB ke Android/obb</string>
     <string name="obb_notif_running_title">Menyalin OBB · %s</string>
@@ -338,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">Tetapkan aplikasi ini sebagai default saat nonaktif</string>
     <string name="setting_shizuku_installer_label">diinstal oleh (nama paket)</string>
     <string name="setting_website_title">Situs web</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">Kebijakan privasi</string>
     <string name="setting_privacy_subtitle">Cara kami menangani data Anda</string>
     <string name="setting_terms_title">Persyaratan layanan</string>

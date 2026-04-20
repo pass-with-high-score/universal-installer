@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">Instalar</string>
     <string name="txt_uninstall">Desinstalar</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">Nombre de split conflictivo: %s</string>
     <string name="error_conflicting_package_name">Nombre de paquete conflictivo. Esperado: %1$s, encontrado: %2$s, nombre: %3$s</string>
     <string name="error_conflicting_version_code">Código de versión conflictivo. Esperado: %1$s, encontrado: %2$s, nombre: %3$s</string>
-
     <string name="uninstall_notif_channel_name">Progreso de desinstalación</string>
     <string name="uninstall_notif_channel_description">Muestra el progreso mientras se desinstalan las aplicaciones</string>
     <string name="uninstall_notif_single_title">Desinstalando…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">Desinstalación completa</string>
     <string name="uninstall_notif_batch_done_with_errors">La desinstalación finalizó con errores</string>
     <string name="uninstall_notif_batch_done_text">%1$d exitosos · %2$d fallidos</string>
-
     <string name="status_success">Éxito</string>
     <string name="status_failed">Fallido</string>
-
     <string name="install_sessions_header">Sesiones</string>
     <string name="install_history_header">Historial</string>
     <string name="install_history_clear">Borrar</string>
     <string name="install_unsupported_file">Archivo no compatible. Selecciona un archivo APK, APKS, XAPK o APKM.</string>
-
     <string name="file_picker_parsing">Analizando paquete…</string>
     <string name="file_picker_select">Selecciona un paquete</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">Instalado correctamente</string>
     <string name="session_installing_progress">%d%% instalando…</string>
     <string name="session_retry">Reintentar</string>
-
     <string name="apk_info_label_package">Paquete</string>
     <string name="apk_info_label_version">Versión</string>
     <string name="apk_info_label_min_sdk">SDK mínimo</string>
     <string name="apk_info_label_target_sdk">SDK objetivo</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Arquitecturas compatibles</string>
     <string name="apk_info_section_languages">Idiomas compatibles (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d sospechosos · %2$d inofensivos · %3$d no detectados</string>
     <string name="apk_info_vt_not_found">Archivo no encontrado en la base de datos de VirusTotal</string>
     <string name="apk_info_vt_error">Error de análisis: %s</string>
-
     <string name="uninstall_show_system_apps">Mostrar aplicaciones del sistema</string>
     <string name="uninstall_search_hint">Buscar aplicaciones…</string>
     <string name="uninstall_no_apps_found">No se encontraron aplicaciones</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">¿Desinstalar %s?</string>
     <string name="uninstall_confirm_single_text">Esto eliminará %1$s (%2$s) de tu dispositivo.</string>
     <string name="uninstall_app_cd">Desinstalar %s</string>
-
     <string name="logs_screen_title">Registros de desinstalación</string>
     <string name="logs_clear_all_dialog_title">¿Borrar todos los registros?</string>
     <string name="logs_clear_all_dialog_text">Esto eliminará permanentemente el historial de registros de desinstalación en este dispositivo.</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">Expandir</string>
     <string name="logs_collapse_cd">Contraer</string>
     <string name="logs_delete_entry_cd">Eliminar entrada</string>
-
     <string name="setting_title">Configuración</string>
     <string name="setting_section_installation">Instalación</string>
     <string name="setting_shizuku_backend">Backend de Shizuku</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">Tema</string>
     <string name="setting_theme_subtitle">Elige tu tema preferido</string>
     <string name="setting_section_about">Acerca de</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">Versión %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">Código fuente y contribuciones</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">Únete a nuestra comunidad</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Usando %s</string>
-
     <string name="install_error_cancelled_title">Instalación cancelada</string>
     <string name="install_error_cancelled_guidance">La instalación fue cancelada por el usuario o el sistema. Toca Reintentar para volver a intentarlo.</string>
     <string name="install_error_blocked_title">Instalación bloqueada</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">Error de instalación</string>
     <string name="install_error_unknown_guidance">Ocurrió un error desconocido. Toca Reintentar para volver a intentarlo.</string>
     <string name="install_error_unknown_guidance_short">Ocurrió un error desconocido.</string>
-
     <string name="splash_tagline">Instala cualquier cosa, en cualquier lugar</string>
-
     <string name="onboarding_skip">Omitir</string>
     <string name="onboarding_next">Siguiente</string>
     <string name="onboarding_get_started">Comenzar</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">Archivo de más de 32 MB — subiendo a través del endpoint para archivos grandes de VirusTotal. Esto puede tardar varios minutos.</string>
     <string name="apk_info_vt_check_button">Comprobar con VirusTotal</string>
     <string name="apk_info_vt_rescan_button">Analizar de nuevo</string>
-
     <string name="vt_notif_channel_name">Análisis de VirusTotal</string>
     <string name="vt_notif_channel_description">Progreso de subidas y análisis de VirusTotal</string>
     <string name="vt_notif_hashing">Calculando hash del archivo…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">Almacenamiento</string>
     <string name="install_storage_value">%1$s libres / %2$s</string>
     <string name="install_no_splits_error">No se pudo analizar el paquete. El archivo puede estar corrupto, truncado o no ser compatible con este dispositivo.</string>
-
     <string name="batch_install_title">Instalación por lotes</string>
     <string name="batch_install_summary">%1$d paquetes · %2$s seleccionados</string>
     <string name="batch_install_parsing">Analizando %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d fallidos</string>
     <string name="batch_install_action">Instalar %1$d · %2$s</string>
     <string name="batch_install_dup_package">Paquete duplicado</string>
-
     <string name="download_notif_channel_name">Descargas de paquetes</string>
     <string name="download_notif_channel_description">Progreso de la descarga de archivos APK/XAPK/APKS desde una URL</string>
     <string name="download_notif_running_title">Descargando %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">Descargado %s</string>
     <string name="download_notif_done_title">Descarga completada</string>
     <string name="download_notif_done_text">%s · abre la aplicación para instalar</string>
     <string name="download_notif_failed_title">Descarga fallida</string>
-
     <string name="download_history_title">Historial de descargas</string>
     <string name="download_history_empty">Aún no hay paquetes descargados.</string>
     <string name="download_history_clear_cd">Borrar todo</string>
@@ -240,23 +216,18 @@
     <string name="download_history_delete_message">Elimina %s del disco y del historial.</string>
     <string name="download_history_delete_confirm">Eliminar</string>
     <string name="download_history_open_button">Historial de descargas</string>
-
     <string name="source_tab_local">Local</string>
     <string name="source_tab_download">Descarga</string>
-
     <string name="source_local_header">Seleccionar Archivo</string>
     <string name="source_action_find_automatic">Búsqueda automática</string>
     <string name="source_action_find_automatic_sub">Escanear este dispositivo en busca de paquetes instalables</string>
     <string name="source_action_browse_packages">Explorar paquetes</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Explorar todos los archivos</string>
     <string name="source_action_browse_all_sub">Cualquier tipo de archivo — úsalo bajo tu propio riesgo</string>
-
     <string name="source_download_header">Descargar desde URL</string>
     <string name="source_download_hint">Ingresa o pega la URL aquí…</string>
     <string name="source_download_start">Descargar</string>
     <string name="source_download_paste">Pegar</string>
-
     <string name="find_auto_sheet_title">Paquetes en este dispositivo</string>
     <string name="find_auto_permission_title">Se requiere acceso a todos los archivos</string>
     <string name="find_auto_permission_body">Para escanear tu dispositivo en busca de paquetes, permite el acceso a todos los archivos en la configuración del sistema.</string>
@@ -271,7 +242,6 @@
     <string name="find_auto_delete_title">¿Eliminar %d archivo(s)?</string>
     <string name="find_auto_delete_message">Los archivos de paquetes seleccionados se eliminarán permanentemente del almacenamiento del dispositivo.</string>
     <string name="find_auto_delete_confirm">Eliminar</string>
-
     <string name="permissions_title">Permisos de la aplicación</string>
     <string name="permissions_subtitle">Revisa qué permisos están activos y concede los que necesites.</string>
     <string name="permissions_menu_cd">Revisar permisos</string>
@@ -287,9 +257,7 @@
     <string name="permission_notifications_desc">Muestra el progreso de descargas, copias OBB y análisis de VirusTotal para que puedas salir de la aplicación durante tareas largas.</string>
     <string name="permission_usage_title">Acceso de uso</string>
     <string name="permission_usage_desc">Opcional — permite que la pantalla de Desinstalación ordene las aplicaciones por el último uso y muestre los tiempos de uso individuales de las aplicaciones.</string>
-
     <string name="remote_download_title">Descargar paquete</string>
-    <string name="remote_download_hint">https://ejemplo.com/app.apks</string>
     <string name="remote_download_paste">Pegar</string>
     <string name="remote_download_clipboard_empty">El portapapeles está vacío</string>
     <string name="remote_download_clipboard_invalid">El portapapeles no contiene una URL</string>
@@ -300,12 +268,10 @@
     <string name="remote_download_progress">Descargando… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">Descarga fallida: %s</string>
     <string name="remote_download_unsupported">El archivo descargado no es un paquete soportado</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
     <string name="apk_info_obb_attach_title">Adjuntar archivos OBB (opcional)</string>
     <string name="apk_info_obb_attach_desc">Elige los archivos .obb que pertenecen a esta aplicación — se copiarán a Android/obb después de la instalación.</string>
     <string name="apk_info_obb_attach_button">Agregar archivo OBB</string>
     <string name="apk_info_obb_attach_remove">Eliminar</string>
-
     <string name="obb_copy_title">Copiando archivos OBB…</string>
     <string name="obb_copy_done">%1$s · %2$d archivo(s) OBB copiado(s)</string>
     <string name="obb_copy_error">Fallo al copiar OBB: %s</string>
@@ -313,7 +279,6 @@
     <string name="obb_copy_need_grant_title">Se necesita acceso a la carpeta OBB</string>
     <string name="obb_copy_need_grant_body">Shizuku no disponible — concede acceso a Android/obb/%s/ para que la aplicación pueda copiar los archivos OBB allí.</string>
     <string name="obb_copy_grant_button">Conceder acceso</string>
-
     <string name="obb_notif_channel_name">Copia de archivo OBB</string>
     <string name="obb_notif_channel_description">Progreso de la copia de archivos de datos OBB a Android/obb</string>
     <string name="obb_notif_running_title">Copiando OBB · %s</string>
@@ -338,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">Se establece por defecto en esta aplicación cuando está apagado</string>
     <string name="setting_shizuku_installer_label">instalado por (nombre del paquete)</string>
     <string name="setting_website_title">Sitio web</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">Política de privacidad</string>
     <string name="setting_privacy_subtitle">Cómo manejamos tus datos</string>
     <string name="setting_terms_title">Términos de servicio</string>

@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">설치</string>
     <string name="txt_uninstall">제거</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">충돌하는 Split 이름: %s</string>
     <string name="error_conflicting_package_name">충돌하는 패키지 이름. 예상: %1$s, 발견: %2$s, 이름: %3$s</string>
     <string name="error_conflicting_version_code">충돌하는 버전 코드. 예상: %1$s, 발견: %2$s, 이름: %3$s</string>
-
     <string name="uninstall_notif_channel_name">제거 진행률</string>
     <string name="uninstall_notif_channel_description">앱 제거 중 진행률을 표시합니다</string>
     <string name="uninstall_notif_single_title">제거 중…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">제거 완료</string>
     <string name="uninstall_notif_batch_done_with_errors">오류와 함께 제거 완료</string>
     <string name="uninstall_notif_batch_done_text">%1$d개 성공 · %2$d개 실패</string>
-
     <string name="status_success">성공</string>
     <string name="status_failed">실패</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">기록</string>
     <string name="install_history_clear">지우기</string>
     <string name="install_unsupported_file">지원되지 않는 파일입니다. APK, APKS, XAPK 또는 APKM 파일을 선택하세요.</string>
-
     <string name="file_picker_parsing">패키지 파싱 중…</string>
     <string name="file_picker_select">패키지 선택</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">성공적으로 설치됨</string>
     <string name="session_installing_progress">%d%% 설치 중…</string>
     <string name="session_retry">다시 시도</string>
-
     <string name="apk_info_label_package">패키지</string>
     <string name="apk_info_label_version">버전</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d Splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">지원되는 아키텍처</string>
     <string name="apk_info_section_languages">지원되는 언어 (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d개 의심 · %2$d개 무해 · %3$d개 미탐지</string>
     <string name="apk_info_vt_not_found">VirusTotal 데이터베이스에서 파일을 찾을 수 없음</string>
     <string name="apk_info_vt_error">스캔 오류: %s</string>
-
     <string name="uninstall_show_system_apps">시스템 앱 표시</string>
     <string name="uninstall_search_hint">앱 검색…</string>
     <string name="uninstall_no_apps_found">앱을 찾을 수 없습니다</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">%s 앱을 제거하시겠습니까?</string>
     <string name="uninstall_confirm_single_text">%1$s (%2$s) 앱이 기기에서 삭제됩니다.</string>
     <string name="uninstall_app_cd">%s 제거</string>
-
     <string name="logs_screen_title">제거 로그</string>
     <string name="logs_clear_all_dialog_title">모든 로그를 지우시겠습니까?</string>
     <string name="logs_clear_all_dialog_text">이 기기의 제거 로그 기록이 영구적으로 삭제됩니다.</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">펼치기</string>
     <string name="logs_collapse_cd">접기</string>
     <string name="logs_delete_entry_cd">항목 삭제</string>
-
     <string name="setting_title">설정</string>
     <string name="setting_section_installation">설치</string>
     <string name="setting_shizuku_backend">Shizuku 백엔드</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">테마</string>
     <string name="setting_theme_subtitle">선호하는 테마 선택</string>
     <string name="setting_section_about">정보</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">버전 %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">소스 코드 및 기여</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">커뮤니티 참여</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">%s 사용 중</string>
-
     <string name="install_error_cancelled_title">설치 취소됨</string>
     <string name="install_error_cancelled_guidance">사용자 또는 시스템에 의해 설치가 취소되었습니다. 다시 시도를 탭하여 다시 시도하세요.</string>
     <string name="install_error_blocked_title">설치 차단됨</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">설치 실패</string>
     <string name="install_error_unknown_guidance">알 수 없는 오류가 발생했습니다. 다시 시도를 탭하여 다시 시도하세요.</string>
     <string name="install_error_unknown_guidance_short">알 수 없는 오류가 발생했습니다.</string>
-
     <string name="splash_tagline">어디서나 무엇이든 설치하세요</string>
-
     <string name="onboarding_skip">건너뛰기</string>
     <string name="onboarding_next">다음</string>
     <string name="onboarding_get_started">시작하기</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">파일이 32MB를 초과합니다. VirusTotal의 대용량 파일 엔드포인트를 통해 업로드 중입니다. 몇 분 정도 걸릴 수 있습니다.</string>
     <string name="apk_info_vt_check_button">VirusTotal로 확인</string>
     <string name="apk_info_vt_rescan_button">다시 스캔</string>
-
     <string name="vt_notif_channel_name">VirusTotal 스캔</string>
     <string name="vt_notif_channel_description">VirusTotal 업로드 및 분석 진행률</string>
     <string name="vt_notif_hashing">파일 해시 중…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">저장 공간</string>
     <string name="install_storage_value">%1$s 여유 / %2$s</string>
     <string name="install_no_splits_error">패키지를 파싱할 수 없습니다. 파일이 손상되었거나 잘렸거나 이 기기와 호환되지 않을 수 있습니다.</string>
-
     <string name="batch_install_title">일괄 설치</string>
     <string name="batch_install_summary">패키지 %1$d개 · %2$s 선택됨</string>
     <string name="batch_install_parsing">분석 중 %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d개 실패</string>
     <string name="batch_install_action">%1$d개 설치 · %2$s</string>
     <string name="batch_install_dup_package">중복된 패키지</string>
-
     <string name="download_notif_channel_name">패키지 다운로드</string>
     <string name="download_notif_channel_description">URL에서 APK/XAPK/APKS 파일을 다운로드하는 진행률</string>
     <string name="download_notif_running_title">%s 다운로드 중</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">%s 다운로드됨</string>
     <string name="download_notif_done_title">다운로드 완료</string>
     <string name="download_notif_done_text">%s · 앱을 열어 설치하세요</string>
     <string name="download_notif_failed_title">다운로드 실패</string>
-
     <string name="download_history_title">다운로드 기록</string>
     <string name="download_history_empty">아직 다운로드한 패키지가 없습니다.</string>
     <string name="download_history_clear_cd">모두 지우기</string>
@@ -240,23 +216,18 @@
     <string name="download_history_delete_message">디스크 및 기록에서 %s 파일을 삭제합니다.</string>
     <string name="download_history_delete_confirm">삭제</string>
     <string name="download_history_open_button">다운로드 기록</string>
-
     <string name="source_tab_local">로컬</string>
     <string name="source_tab_download">다운로드</string>
-
     <string name="source_local_header">파일 선택</string>
     <string name="source_action_find_automatic">자동 찾기</string>
     <string name="source_action_find_automatic_sub">이 기기에서 설치 가능한 패키지 스캔</string>
     <string name="source_action_browse_packages">패키지 찾아보기</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">모든 파일 찾아보기</string>
     <string name="source_action_browse_all_sub">모든 파일 유형 — 사용에 따른 책임은 사용자에게 있습니다</string>
-
     <string name="source_download_header">URL에서 다운로드</string>
     <string name="source_download_hint">여기에 URL을 입력하거나 붙여넣으세요…</string>
     <string name="source_download_start">다운로드</string>
     <string name="source_download_paste">붙여넣기</string>
-
     <string name="find_auto_sheet_title">이 기기의 패키지</string>
     <string name="find_auto_permission_title">모든 파일에 대한 접근 권한 필요</string>
     <string name="find_auto_permission_body">기기에서 패키지를 스캔하려면 시스템 설정에서 모든 파일에 대한 접근을 허용하세요.</string>
@@ -271,7 +242,6 @@
     <string name="find_auto_delete_title">파일 %d개를 삭제하시겠습니까?</string>
     <string name="find_auto_delete_message">선택한 패키지 파일은 기기 저장소에서 영구적으로 삭제됩니다.</string>
     <string name="find_auto_delete_confirm">삭제</string>
-
     <string name="permissions_title">앱 권한</string>
     <string name="permissions_subtitle">활성화된 권한을 검토하고 필요한 권한을 부여하세요.</string>
     <string name="permissions_menu_cd">권한 검토</string>
@@ -287,9 +257,7 @@
     <string name="permission_notifications_desc">작업이 길어질 때 앱을 벗어날 수 있도록 다운로드, OBB 복사 및 VirusTotal 스캔 진행률을 표시합니다.</string>
     <string name="permission_usage_title">사용 정보 접근 권한</string>
     <string name="permission_usage_desc">선택 사항 — 제거 화면에서 최근에 사용한 순으로 앱을 정렬하고 개별 앱 사용 시간을 표시할 수 있습니다.</string>
-
     <string name="remote_download_title">패키지 다운로드</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">붙여넣기</string>
     <string name="remote_download_clipboard_empty">클립보드가 비어 있습니다</string>
     <string name="remote_download_clipboard_invalid">클립보드에 URL이 없습니다</string>
@@ -300,12 +268,10 @@
     <string name="remote_download_progress">다운로드 중… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">다운로드 실패: %s</string>
     <string name="remote_download_unsupported">다운로드한 파일은 지원되는 패키지가 아닙니다</string>
-    <string name="apk_info_obb_chip">OBB %d개</string>
     <string name="apk_info_obb_attach_title">OBB 파일 첨부 (선택 사항)</string>
     <string name="apk_info_obb_attach_desc">이 앱에 속하는 .obb 파일을 선택하세요 — 설치 후 Android/obb로 복사됩니다.</string>
     <string name="apk_info_obb_attach_button">OBB 파일 추가</string>
     <string name="apk_info_obb_attach_remove">제거</string>
-
     <string name="obb_copy_title">OBB 파일 복사 중…</string>
     <string name="obb_copy_done">%1$s · OBB 파일 %2$d개 복사됨</string>
     <string name="obb_copy_error">OBB 복사 실패: %s</string>
@@ -313,7 +279,6 @@
     <string name="obb_copy_need_grant_title">OBB 폴더 접근 권한 필요</string>
     <string name="obb_copy_need_grant_body">Shizuku를 사용할 수 없습니다 — 앱이 OBB 파일을 해당 위치에 복사할 수 있도록 Android/obb/%s/ 에 대한 접근 권한을 부여하세요.</string>
     <string name="obb_copy_grant_button">권한 부여</string>
-
     <string name="obb_notif_channel_name">OBB 파일 복사</string>
     <string name="obb_notif_channel_description">OBB 데이터 파일을 Android/obb로 복사하는 진행률</string>
     <string name="obb_notif_running_title">OBB 복사 중 · %s</string>
@@ -338,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">꺼져 있을 때 이 앱이 기본값입니다</string>
     <string name="setting_shizuku_installer_label">다음에 의해 설치됨 (패키지 이름)</string>
     <string name="setting_website_title">웹사이트</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">개인정보 처리방침</string>
     <string name="setting_privacy_subtitle">사용자 데이터 처리 방법</string>
     <string name="setting_terms_title">서비스 약관</string>

@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">تثبيت</string>
     <string name="txt_uninstall">إلغاء التثبيت</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">تعارض في اسم Split: %s</string>
     <string name="error_conflicting_package_name">تعارض في اسم الحزمة. المتوقع: %1$s، الموجود: %2$s، الاسم: %3$s</string>
     <string name="error_conflicting_version_code">تعارض في كود الإصدار. المتوقع: %1$s، الموجود: %2$s، الاسم: %3$s</string>
-
     <string name="uninstall_notif_channel_name">تقدم إلغاء التثبيت</string>
     <string name="uninstall_notif_channel_description">يعرض التقدم أثناء إلغاء تثبيت التطبيقات</string>
     <string name="uninstall_notif_single_title">جاري إلغاء التثبيت…</string>
@@ -28,29 +28,23 @@
     <string name="uninstall_notif_batch_done">اكتمل إلغاء التثبيت</string>
     <string name="uninstall_notif_batch_done_with_errors">انتهى إلغاء التثبيت مع وجود أخطاء</string>
     <string name="uninstall_notif_batch_done_text">%1$d نجح · %2$d فشل</string>
-
     <string name="status_success">نجاح</string>
     <string name="status_failed">فشل</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">السجل</string>
     <string name="install_history_clear">مسح</string>
     <string name="install_unsupported_file">ملف غير مدعوم. يرجى تحديد ملف APK أو APKS أو XAPK أو APKM.</string>
-
     <string name="file_picker_parsing">جاري تحليل الحزمة…</string>
     <string name="file_picker_select">حدد حزمة</string>
-
     <string name="session_installed_success">تم التثبيت بنجاح</string>
     <string name="session_installing_progress">%d%% جاري التثبيت…</string>
     <string name="session_retry">إعادة المحاولة</string>
-
     <string name="apk_info_label_package">الحزمة</string>
     <string name="apk_info_label_version">الإصدار</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
     <string name="apk_info_splits_count">%d Split</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">المعماريات المدعومة</string>
     <string name="apk_info_section_languages">اللغات المدعومة (%d)</string>
@@ -66,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d مشبوه · %2$d غير ضار · %3$d لم يتم اكتشافه</string>
     <string name="apk_info_vt_not_found">لم يتم العثور على الملف في قاعدة بيانات VirusTotal</string>
     <string name="apk_info_vt_error">خطأ في الفحص: %s</string>
-
     <string name="uninstall_show_system_apps">إظهار تطبيقات النظام</string>
     <string name="uninstall_search_hint">البحث في التطبيقات…</string>
     <string name="uninstall_no_apps_found">لم يتم العثور على تطبيقات</string>
@@ -84,7 +77,6 @@
     <string name="uninstall_confirm_single_title">إلغاء تثبيت %s؟</string>
     <string name="uninstall_confirm_single_text">سيؤدي هذا إلى إزالة %1$s (%2$s) من جهازك.</string>
     <string name="uninstall_app_cd">إلغاء تثبيت %s</string>
-
     <string name="logs_screen_title">سجلات إلغاء التثبيت</string>
     <string name="logs_clear_all_dialog_title">مسح كل السجلات؟</string>
     <string name="logs_clear_all_dialog_text">سيؤدي هذا إلى إزالة سجل إلغاء التثبيت نهائيًا من هذا الجهاز.</string>
@@ -97,7 +89,6 @@
     <string name="logs_expand_cd">توسيع</string>
     <string name="logs_collapse_cd">طي</string>
     <string name="logs_delete_entry_cd">حذف الإدخال</string>
-
     <string name="setting_title">الإعدادات</string>
     <string name="setting_section_installation">التثبيت</string>
     <string name="setting_shizuku_backend">Shizuku Backend</string>
@@ -132,10 +123,8 @@
     <string name="setting_version">الإصدار %s</string>
     <string name="setting_github_subtitle">كود المصدر والمساهمات</string>
     <string name="setting_telegram_subtitle">انضم إلى مجتمعنا</string>
-
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">باستخدام %s</string>
-
     <string name="install_error_cancelled_title">تم إلغاء التثبيت</string>
     <string name="install_error_cancelled_guidance">تم إلغاء التثبيت بواسطة المستخدم أو النظام. اضغط على إعادة المحاولة للمحاولة مرة أخرى.</string>
     <string name="install_error_blocked_title">تم حظر التثبيت</string>
@@ -155,9 +144,7 @@
     <string name="install_error_failed_title">فشل التثبيت</string>
     <string name="install_error_unknown_guidance">حدث خطأ غير معروف. اضغط على إعادة المحاولة للمحاولة مرة أخرى.</string>
     <string name="install_error_unknown_guidance_short">حدث خطأ غير معروف.</string>
-
     <string name="splash_tagline">قم بتثبيت أي شيء، في أي مكان</string>
-
     <string name="onboarding_skip">تخطي</string>
     <string name="onboarding_next">التالي</string>
     <string name="onboarding_get_started">البدء</string>
@@ -181,7 +168,6 @@
     <string name="apk_info_vt_large_hint">حجم الملف يتجاوز 32 ميغابايت — جاري الرفع عبر نقطة نهاية الملفات الكبيرة لـ VirusTotal. قد يستغرق هذا عدة دقائق.</string>
     <string name="apk_info_vt_check_button">تحقق باستخدام VirusTotal</string>
     <string name="apk_info_vt_rescan_button">فحص مرة أخرى</string>
-
     <string name="vt_notif_channel_name">فحوصات VirusTotal</string>
     <string name="vt_notif_channel_description">تقدم عمليات الرفع والتحليل في VirusTotal</string>
     <string name="vt_notif_hashing">جاري تجزئة الملف…</string>
@@ -198,7 +184,6 @@
     <string name="install_storage_title">مساحة التخزين</string>
     <string name="install_storage_value">%1$s فارغة / %2$s</string>
     <string name="install_no_splits_error">تعذر تحليل الحزمة. قد يكون الملف تالفًا أو غير مكتمل أو غير متوافق مع هذا الجهاز.</string>
-
     <string name="batch_install_title">تثبيت دفعي</string>
     <string name="batch_install_summary">%1$d حزمة · تم تحديد %2$s</string>
     <string name="batch_install_parsing">جاري تحليل %1$d / %2$d…</string>
@@ -207,7 +192,6 @@
     <string name="batch_install_failed_chip">فشل %d</string>
     <string name="batch_install_action">تثبيت %1$d · %2$s</string>
     <string name="batch_install_dup_package">حزمة مكررة</string>
-
     <string name="download_notif_channel_name">تنزيلات الحزم</string>
     <string name="download_notif_channel_description">تقدم تنزيل ملفات APK/XAPK/APKS من رابط</string>
     <string name="download_notif_running_title">جاري تنزيل %s</string>
@@ -215,7 +199,6 @@
     <string name="download_notif_done_title">اكتمل التنزيل</string>
     <string name="download_notif_done_text">%s · افتح التطبيق للتثبيت</string>
     <string name="download_notif_failed_title">فشل التنزيل</string>
-
     <string name="download_history_title">سجل التنزيلات</string>
     <string name="download_history_empty">لا توجد حزم تم تنزيلها بعد.</string>
     <string name="download_history_clear_cd">مسح الكل</string>
@@ -233,22 +216,18 @@
     <string name="download_history_delete_message">يزيل %s من الجهاز ومن السجل.</string>
     <string name="download_history_delete_confirm">حذف</string>
     <string name="download_history_open_button">سجل التنزيلات</string>
-
     <string name="source_tab_local">محلي</string>
     <string name="source_tab_download">تنزيل</string>
-
     <string name="source_local_header">اختر ملفًا</string>
     <string name="source_action_find_automatic">بحث تلقائي</string>
     <string name="source_action_find_automatic_sub">فحص هذا الجهاز بحثًا عن الحزم القابلة للتثبيت</string>
     <string name="source_action_browse_packages">تصفح الحزم</string>
     <string name="source_action_browse_all">تصفح جميع الملفات</string>
     <string name="source_action_browse_all_sub">أي نوع ملف — استخدمه على مسؤوليتك الخاصة</string>
-
     <string name="source_download_header">تنزيل من رابط</string>
     <string name="source_download_hint">أدخل أو الصق الرابط هنا…</string>
     <string name="source_download_start">تنزيل</string>
     <string name="source_download_paste">لصق</string>
-
     <string name="find_auto_sheet_title">الحزم الموجودة على هذا الجهاز</string>
     <string name="find_auto_permission_title">مطلوب إذن الوصول إلى جميع الملفات</string>
     <string name="find_auto_permission_body">لفحص جهازك بحثًا عن الحزم، اسمح بالوصول إلى جميع الملفات في إعدادات النظام.</string>
@@ -263,7 +242,6 @@
     <string name="find_auto_delete_title">حذف %d ملف(ملفات)؟</string>
     <string name="find_auto_delete_message">ستتم إزالة ملفات الحزم المحددة نهائيًا من مساحة تخزين الجهاز.</string>
     <string name="find_auto_delete_confirm">حذف</string>
-
     <string name="permissions_title">أذونات التطبيق</string>
     <string name="permissions_subtitle">راجع الأذونات النشطة وامنح الأذونات التي تحتاجها.</string>
     <string name="permissions_menu_cd">مراجعة الأذونات</string>
@@ -279,7 +257,6 @@
     <string name="permission_notifications_desc">يعرض تقدم التنزيل ونسخ OBB وفحص VirusTotal حتى تتمكن من مغادرة التطبيق أثناء المهام الطويلة.</string>
     <string name="permission_usage_title">الوصول إلى بيانات الاستخدام</string>
     <string name="permission_usage_desc">اختياري — يتيح لشاشة "إلغاء التثبيت" ترتيب التطبيقات حسب آخر استخدام وعرض أوقات استخدام كل تطبيق على حدة.</string>
-
     <string name="remote_download_title">تنزيل الحزمة</string>
     <string name="remote_download_paste">لصق</string>
     <string name="remote_download_clipboard_empty">الحافظة فارغة</string>
@@ -295,7 +272,6 @@
     <string name="apk_info_obb_attach_desc">اختر ملفات .obb التي تنتمي إلى هذا التطبيق — سيتم نسخها إلى Android/obb بعد التثبيت.</string>
     <string name="apk_info_obb_attach_button">إضافة ملف OBB</string>
     <string name="apk_info_obb_attach_remove">إزالة</string>
-
     <string name="obb_copy_title">جاري نسخ ملفات OBB…</string>
     <string name="obb_copy_done">%1$s · تم نسخ %2$d ملف(ملفات) OBB</string>
     <string name="obb_copy_error">فشل نسخ OBB: %s</string>
@@ -303,7 +279,6 @@
     <string name="obb_copy_need_grant_title">مطلوب إذن الوصول إلى مجلد OBB</string>
     <string name="obb_copy_need_grant_body">Shizuku غير متاح — امنح الوصول إلى Android/obb/%s/ حتى يتمكن التطبيق من نسخ ملفات OBB إلى هناك.</string>
     <string name="obb_copy_grant_button">منح الوصول</string>
-
     <string name="obb_notif_channel_name">نسخ ملف OBB</string>
     <string name="obb_notif_channel_description">تقدم نسخ ملفات بيانات OBB إلى Android/obb</string>
     <string name="obb_notif_running_title">جاري نسخ OBB · %s</string>

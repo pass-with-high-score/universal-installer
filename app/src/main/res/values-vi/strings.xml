@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">Cài đặt</string>
     <string name="txt_uninstall">Gỡ cài đặt</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">Tên Split xung đột: %s</string>
     <string name="error_conflicting_package_name">Tên gói xung đột. Mong đợi: %1$s, tìm thấy: %2$s, tên: %3$s</string>
     <string name="error_conflicting_version_code">Mã phiên bản xung đột. Mong đợi: %1$s, tìm thấy: %2$s, tên: %3$s</string>
-
     <string name="uninstall_notif_channel_name">Tiến trình gỡ cài đặt</string>
     <string name="uninstall_notif_channel_description">Hiển thị tiến trình khi các ứng dụng đang được gỡ cài đặt</string>
     <string name="uninstall_notif_single_title">Đang gỡ cài đặt…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">Hoàn tất gỡ cài đặt</string>
     <string name="uninstall_notif_batch_done_with_errors">Gỡ cài đặt kết thúc với các lỗi</string>
     <string name="uninstall_notif_batch_done_text">%1$d thành công · %2$d thất bại</string>
-
     <string name="status_success">Thành công</string>
     <string name="status_failed">Thất bại</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">Lịch sử</string>
     <string name="install_history_clear">Xóa</string>
     <string name="install_unsupported_file">Tệp không được hỗ trợ. Vui lòng chọn tệp APK, APKS, XAPK hoặc APKM.</string>
-
     <string name="file_picker_parsing">Đang phân tích gói…</string>
     <string name="file_picker_select">Chọn một gói</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">Đã cài đặt thành công</string>
     <string name="session_installing_progress">Đang cài đặt %d%%…</string>
     <string name="session_retry">Thử lại</string>
-
     <string name="apk_info_label_package">Gói</string>
     <string name="apk_info_label_version">Phiên bản</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d Splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Kiến trúc Hỗ trợ</string>
     <string name="apk_info_section_languages">Ngôn ngữ Hỗ trợ (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d đáng ngờ · %2$d vô hại · %3$d không phát hiện</string>
     <string name="apk_info_vt_not_found">Không tìm thấy tệp trong cơ sở dữ liệu VirusTotal</string>
     <string name="apk_info_vt_error">Lỗi quét: %s</string>
-
     <string name="uninstall_show_system_apps">Hiển thị ứng dụng hệ thống</string>
     <string name="uninstall_search_hint">Tìm kiếm ứng dụng…</string>
     <string name="uninstall_no_apps_found">Không tìm thấy ứng dụng nào</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">Gỡ cài đặt %s?</string>
     <string name="uninstall_confirm_single_text">Hành động này sẽ xóa %1$s (%2$s) khỏi thiết bị của bạn.</string>
     <string name="uninstall_app_cd">Gỡ cài đặt %s</string>
-
     <string name="logs_screen_title">Nhật ký Gỡ cài đặt</string>
     <string name="logs_clear_all_dialog_title">Xóa tất cả nhật ký?</string>
     <string name="logs_clear_all_dialog_text">Hành động này sẽ xóa vĩnh viễn lịch sử nhật ký gỡ cài đặt trên thiết bị này.</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">Mở rộng</string>
     <string name="logs_collapse_cd">Thu gọn</string>
     <string name="logs_delete_entry_cd">Xóa mục</string>
-
     <string name="setting_title">Cài đặt</string>
     <string name="setting_section_installation">Cài đặt</string>
     <string name="setting_shizuku_backend">Backend Shizuku</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">Chủ đề</string>
     <string name="setting_theme_subtitle">Chọn chủ đề bạn ưa thích</string>
     <string name="setting_section_about">Giới thiệu</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">Phiên bản %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">Mã nguồn &amp; đóng góp</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">Tham gia cộng đồng của chúng tôi</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Đang sử dụng %s</string>
-
     <string name="install_error_cancelled_title">Đã hủy cài đặt</string>
     <string name="install_error_cancelled_guidance">Quá trình cài đặt đã bị người dùng hoặc hệ thống hủy. Nhấn Thử lại để thử lại.</string>
     <string name="install_error_blocked_title">Cài đặt bị chặn</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">Cài đặt thất bại</string>
     <string name="install_error_unknown_guidance">Đã xảy ra một lỗi không xác định. Nhấn Thử lại để thử lại.</string>
     <string name="install_error_unknown_guidance_short">Đã xảy ra một lỗi không xác định.</string>
-
     <string name="splash_tagline">Cài đặt mọi thứ, ở mọi nơi</string>
-
     <string name="onboarding_skip">Bỏ qua</string>
     <string name="onboarding_next">Tiếp theo</string>
     <string name="onboarding_get_started">Bắt đầu</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">Tệp trên 32 MB — đang tải lên qua điểm cuối tệp lớn của VirusTotal. Quá trình này có thể mất vài phút.</string>
     <string name="apk_info_vt_check_button">Kiểm tra với VirusTotal</string>
     <string name="apk_info_vt_rescan_button">Quét lại</string>
-
     <string name="vt_notif_channel_name">Quét VirusTotal</string>
     <string name="vt_notif_channel_description">Tiến trình tải lên và phân tích của VirusTotal</string>
     <string name="vt_notif_hashing">Đang băm tệp…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">Bộ nhớ</string>
     <string name="install_storage_value">Trống %1$s / %2$s</string>
     <string name="install_no_splits_error">Không thể phân tích gói. Tệp có thể bị hỏng, bị cắt ngắn hoặc không tương thích với thiết bị này.</string>
-
     <string name="batch_install_title">Cài đặt hàng loạt</string>
     <string name="batch_install_summary">%1$d gói · Đã chọn %2$s</string>
     <string name="batch_install_parsing">Đang phân tích %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d thất bại</string>
     <string name="batch_install_action">Cài đặt %1$d · %2$s</string>
     <string name="batch_install_dup_package">Gói bị trùng lặp</string>
-
     <string name="download_notif_channel_name">Tải xuống gói</string>
     <string name="download_notif_channel_description">Tiến trình tải xuống tệp APK/XAPK/APKS từ URL</string>
     <string name="download_notif_running_title">Đang tải xuống %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">Đã tải xuống %s</string>
     <string name="download_notif_done_title">Tải xuống hoàn tất</string>
     <string name="download_notif_done_text">%s · mở ứng dụng để cài đặt</string>
     <string name="download_notif_failed_title">Tải xuống thất bại</string>
-
     <string name="download_history_title">Lịch sử tải xuống</string>
     <string name="download_history_empty">Chưa có gói nào được tải xuống.</string>
     <string name="download_history_clear_cd">Xóa tất cả</string>
@@ -242,20 +218,16 @@
     <string name="download_history_open_button">Lịch sử tải xuống</string>
     <string name="source_tab_local">Cục bộ</string>
     <string name="source_tab_download">Tải xuống</string>
-
     <string name="source_local_header">Chọn tệp</string>
     <string name="source_action_find_automatic">Tự động tìm</string>
     <string name="source_action_find_automatic_sub">Quét thiết bị này để tìm các gói có thể cài đặt</string>
     <string name="source_action_browse_packages">Duyệt các gói</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Duyệt tất cả các tệp</string>
     <string name="source_action_browse_all_sub">Bất kỳ loại tệp nào — bạn tự chịu rủi ro khi sử dụng</string>
-
     <string name="source_download_header">Tải xuống từ URL</string>
     <string name="source_download_hint">Nhập hoặc dán URL vào đây…</string>
     <string name="source_download_start">Tải xuống</string>
     <string name="source_download_paste">Dán</string>
-
     <string name="find_auto_sheet_title">Các gói trên thiết bị này</string>
     <string name="find_auto_permission_title">Yêu cầu quyền truy cập tất cả các tệp</string>
     <string name="find_auto_permission_body">Để quét thiết bị của bạn tìm các gói, hãy cho phép quyền truy cập tất cả các tệp trong cài đặt hệ thống.</string>
@@ -270,7 +242,6 @@
     <string name="find_auto_delete_title">Xóa %d tệp?</string>
     <string name="find_auto_delete_message">Các tệp gói đã chọn sẽ bị xóa vĩnh viễn khỏi bộ nhớ thiết bị.</string>
     <string name="find_auto_delete_confirm">Xóa</string>
-
     <string name="permissions_title">Quyền của ứng dụng</string>
     <string name="permissions_subtitle">Xem lại các quyền đang hoạt động và cấp những quyền bạn cần.</string>
     <string name="permissions_menu_cd">Xem lại quyền</string>
@@ -286,9 +257,7 @@
     <string name="permission_notifications_desc">Hiển thị tiến trình tải xuống, sao chép OBB và quét VirusTotal để bạn có thể rời khỏi ứng dụng trong các tác vụ dài.</string>
     <string name="permission_usage_title">Truy cập dữ liệu sử dụng</string>
     <string name="permission_usage_desc">Tùy chọn — cho phép màn hình Gỡ cài đặt sắp xếp ứng dụng theo lần sử dụng cuối và hiển thị thời gian sử dụng từng ứng dụng.</string>
-
     <string name="remote_download_title">Tải xuống gói</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">Dán</string>
     <string name="remote_download_clipboard_empty">Bộ nhớ tạm trống</string>
     <string name="remote_download_clipboard_invalid">Bộ nhớ tạm không chứa URL</string>
@@ -299,12 +268,10 @@
     <string name="remote_download_progress">Đang tải xuống… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">Tải xuống thất bại: %s</string>
     <string name="remote_download_unsupported">Tệp đã tải xuống không phải là gói được hỗ trợ</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
     <string name="apk_info_obb_attach_title">Đính kèm các tệp OBB (tùy chọn)</string>
     <string name="apk_info_obb_attach_desc">Chọn các tệp .obb thuộc về ứng dụng này — chúng sẽ được sao chép vào Android/obb sau khi cài đặt.</string>
     <string name="apk_info_obb_attach_button">Thêm tệp OBB</string>
     <string name="apk_info_obb_attach_remove">Xóa</string>
-
     <string name="obb_copy_title">Đang sao chép các tệp OBB…</string>
     <string name="obb_copy_done">%1$s · %2$d tệp OBB đã được sao chép</string>
     <string name="obb_copy_error">Sao chép OBB thất bại: %s</string>
@@ -312,7 +279,6 @@
     <string name="obb_copy_need_grant_title">Cần quyền truy cập thư mục OBB</string>
     <string name="obb_copy_need_grant_body">Shizuku không khả dụng — hãy cấp quyền truy cập vào Android/obb/%s/ để ứng dụng có thể sao chép các tệp OBB vào đó.</string>
     <string name="obb_copy_grant_button">Cấp quyền truy cập</string>
-
     <string name="obb_notif_channel_name">Sao chép tệp OBB</string>
     <string name="obb_notif_channel_description">Tiến trình sao chép tệp dữ liệu OBB vào Android/obb</string>
     <string name="obb_notif_running_title">Đang sao chép OBB · %s</string>
@@ -337,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">Mặc định là ứng dụng này khi tắt</string>
     <string name="setting_shizuku_installer_label">được cài đặt bởi (tên gói)</string>
     <string name="setting_website_title">Trang web</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">Chính sách bảo mật</string>
     <string name="setting_privacy_subtitle">Cách chúng tôi xử lý dữ liệu của bạn</string>
     <string name="setting_terms_title">Điều khoản dịch vụ</string>

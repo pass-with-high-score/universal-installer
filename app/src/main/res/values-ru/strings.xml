@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">Установить</string>
     <string name="txt_uninstall">Удалить</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">Конфликт имени Split: %s</string>
     <string name="error_conflicting_package_name">Конфликт имени пакета. Ожидалось: %1$s, найдено: %2$s, имя: %3$s</string>
     <string name="error_conflicting_version_code">Конфликт кода версии. Ожидалось: %1$s, найдено: %2$s, имя: %3$s</string>
-
     <string name="uninstall_notif_channel_name">Прогресс удаления</string>
     <string name="uninstall_notif_channel_description">Показывает прогресс удаления приложений</string>
     <string name="uninstall_notif_single_title">Удаление…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">Удаление завершено</string>
     <string name="uninstall_notif_batch_done_with_errors">Удаление завершено с ошибками</string>
     <string name="uninstall_notif_batch_done_text">%1$d успешно · %2$d ошибка</string>
-
     <string name="status_success">Успешно</string>
     <string name="status_failed">Ошибка</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">История</string>
     <string name="install_history_clear">Очистить</string>
     <string name="install_unsupported_file">Неподдерживаемый файл. Выберите файл APK, APKS, XAPK или APKM.</string>
-
     <string name="file_picker_parsing">Анализ пакета…</string>
     <string name="file_picker_select">Выберите пакет</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">Успешно установлено</string>
     <string name="session_installing_progress">%d%% установка…</string>
     <string name="session_retry">Повторить</string>
-
     <string name="apk_info_label_package">Пакет</string>
     <string name="apk_info_label_version">Версия</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d Splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Поддерживаемые архитектуры</string>
     <string name="apk_info_section_languages">Поддерживаемые языки (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d подозрительных · %2$d безопасных · %3$d не обнаружили</string>
     <string name="apk_info_vt_not_found">Файл не найден в базе данных VirusTotal</string>
     <string name="apk_info_vt_error">Ошибка сканирования: %s</string>
-
     <string name="uninstall_show_system_apps">Показать системные приложения</string>
     <string name="uninstall_search_hint">Поиск приложений…</string>
     <string name="uninstall_no_apps_found">Приложения не найдены</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">Удалить %s?</string>
     <string name="uninstall_confirm_single_text">Это удалит %1$s (%2$s) с вашего устройства.</string>
     <string name="uninstall_app_cd">Удалить %s</string>
-
     <string name="logs_screen_title">Журналы удаления</string>
     <string name="logs_clear_all_dialog_title">Очистить все журналы?</string>
     <string name="logs_clear_all_dialog_text">Это навсегда удалит историю журналов удаления на этом устройстве.</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">Развернуть</string>
     <string name="logs_collapse_cd">Свернуть</string>
     <string name="logs_delete_entry_cd">Удалить запись</string>
-
     <string name="setting_title">Настройки</string>
     <string name="setting_section_installation">Установка</string>
     <string name="setting_shizuku_backend">Бэкенд Shizuku</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">Тема</string>
     <string name="setting_theme_subtitle">Выберите предпочитаемую тему</string>
     <string name="setting_section_about">О приложении</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">Версия %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">Исходный код и участие</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">Присоединяйтесь к нашему сообществу</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Используется %s</string>
-
     <string name="install_error_cancelled_title">Установка отменена</string>
     <string name="install_error_cancelled_guidance">Установка была отменена пользователем или системой. Нажмите Повторить для повторной попытки.</string>
     <string name="install_error_blocked_title">Установка заблокирована</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">Сбой установки</string>
     <string name="install_error_unknown_guidance">Произошла неизвестная ошибка. Нажмите Повторить для повторной попытки.</string>
     <string name="install_error_unknown_guidance_short">Произошла неизвестная ошибка.</string>
-
     <string name="splash_tagline">Устанавливайте что угодно и где угодно</string>
-
     <string name="onboarding_skip">Пропустить</string>
     <string name="onboarding_next">Далее</string>
     <string name="onboarding_get_started">Начать</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">Файл больше 32 МБ — загрузка через эндпоинт VirusTotal для больших файлов. Это может занять несколько минут.</string>
     <string name="apk_info_vt_check_button">Проверить с помощью VirusTotal</string>
     <string name="apk_info_vt_rescan_button">Сканировать снова</string>
-
     <string name="vt_notif_channel_name">Сканирования VirusTotal</string>
     <string name="vt_notif_channel_description">Прогресс загрузок и анализа VirusTotal</string>
     <string name="vt_notif_hashing">Хеширование файла…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">Память</string>
     <string name="install_storage_value">Свободно %1$s / %2$s</string>
     <string name="install_no_splits_error">Не удалось проанализировать пакет. Файл может быть поврежден, усечен или несовместим с этим устройством.</string>
-
     <string name="batch_install_title">Пакетная установка</string>
     <string name="batch_install_summary">%1$d пакетов · выбрано %2$s</string>
     <string name="batch_install_parsing">Анализ %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d с ошибкой</string>
     <string name="batch_install_action">Установить %1$d · %2$s</string>
     <string name="batch_install_dup_package">Дублирующийся пакет</string>
-
     <string name="download_notif_channel_name">Загрузки пакетов</string>
     <string name="download_notif_channel_description">Прогресс загрузки файлов APK/XAPK/APKS по URL-адресу</string>
     <string name="download_notif_running_title">Загрузка %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">Загружено %s</string>
     <string name="download_notif_done_title">Загрузка завершена</string>
     <string name="download_notif_done_text">%s · откройте приложение для установки</string>
     <string name="download_notif_failed_title">Ошибка загрузки</string>
-
     <string name="download_history_title">История загрузок</string>
     <string name="download_history_empty">Пока нет загруженных пакетов.</string>
     <string name="download_history_clear_cd">Очистить все</string>
@@ -240,23 +216,18 @@
     <string name="download_history_delete_message">Удаляет %s с диска и из истории.</string>
     <string name="download_history_delete_confirm">Удалить</string>
     <string name="download_history_open_button">История загрузок</string>
-
     <string name="source_tab_local">Локально</string>
     <string name="source_tab_download">Загрузка</string>
-
     <string name="source_local_header">Выбрать файл</string>
     <string name="source_action_find_automatic">Автоматический поиск</string>
     <string name="source_action_find_automatic_sub">Сканировать это устройство на наличие устанавливаемых пакетов</string>
     <string name="source_action_browse_packages">Обзор пакетов</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Обзор всех файлов</string>
     <string name="source_action_browse_all_sub">Любой тип файла — используйте на свой страх и риск</string>
-
     <string name="source_download_header">Загрузить по URL</string>
     <string name="source_download_hint">Введите или вставьте URL здесь…</string>
     <string name="source_download_start">Загрузить</string>
     <string name="source_download_paste">Вставить</string>
-
     <string name="find_auto_sheet_title">Пакеты на этом устройстве</string>
     <string name="find_auto_permission_title">Требуется доступ ко всем файлам</string>
     <string name="find_auto_permission_body">Чтобы сканировать устройство на наличие пакетов, разрешите доступ ко всем файлам в настройках системы.</string>
@@ -271,7 +242,6 @@
     <string name="find_auto_delete_title">Удалить %d файл(ов)?</string>
     <string name="find_auto_delete_message">Выбранные файлы пакетов будут безвозвратно удалены из памяти устройства.</string>
     <string name="find_auto_delete_confirm">Удалить</string>
-
     <string name="permissions_title">Разрешения приложения</string>
     <string name="permissions_subtitle">Проверьте активные разрешения и предоставьте те, которые вам нужны.</string>
     <string name="permissions_menu_cd">Проверить разрешения</string>
@@ -287,9 +257,7 @@
     <string name="permission_notifications_desc">Показывает прогресс загрузки, копирования OBB и сканирования VirusTotal, чтобы вы могли выйти из приложения во время долгих задач.</string>
     <string name="permission_usage_title">Доступ к истории использования</string>
     <string name="permission_usage_desc">Необязательно — позволяет экрану Удаления сортировать приложения по времени последнего использования и показывать время использования каждого приложения.</string>
-
     <string name="remote_download_title">Загрузить пакет</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">Вставить</string>
     <string name="remote_download_clipboard_empty">Буфер обмена пуст</string>
     <string name="remote_download_clipboard_invalid">Буфер обмена не содержит URL</string>
@@ -300,12 +268,10 @@
     <string name="remote_download_progress">Загрузка… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">Ошибка загрузки: %s</string>
     <string name="remote_download_unsupported">Загруженный файл не является поддерживаемым пакетом</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
     <string name="apk_info_obb_attach_title">Прикрепить файлы OBB (необязательно)</string>
     <string name="apk_info_obb_attach_desc">Выберите файлы .obb, принадлежащие этому приложению — они будут скопированы в Android/obb после установки.</string>
     <string name="apk_info_obb_attach_button">Добавить файл OBB</string>
     <string name="apk_info_obb_attach_remove">Удалить</string>
-
     <string name="obb_copy_title">Копирование файлов OBB…</string>
     <string name="obb_copy_done">%1$s · %2$d файл(ов) OBB скопировано</string>
     <string name="obb_copy_error">Ошибка копирования OBB: %s</string>
@@ -313,7 +279,6 @@
     <string name="obb_copy_need_grant_title">Требуется доступ к папке OBB</string>
     <string name="obb_copy_need_grant_body">Shizuku недоступен — предоставьте доступ к Android/obb/%s/, чтобы приложение могло скопировать туда файлы OBB.</string>
     <string name="obb_copy_grant_button">Предоставить доступ</string>
-
     <string name="obb_notif_channel_name">Копирование файла OBB</string>
     <string name="obb_notif_channel_description">Прогресс копирования файлов данных OBB в Android/obb</string>
     <string name="obb_notif_running_title">Копирование OBB · %s</string>
@@ -338,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">По умолчанию это приложение, когда выключено</string>
     <string name="setting_shizuku_installer_label">установлено через (имя пакета)</string>
     <string name="setting_website_title">Веб-сайт</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">Политика конфиденциальности</string>
     <string name="setting_privacy_subtitle">Как мы обрабатываем ваши данные</string>
     <string name="setting_terms_title">Условия обслуживания</string>

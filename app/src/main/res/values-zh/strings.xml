@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">安装</string>
     <string name="txt_uninstall">卸载</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">冲突的 Split 名称：%s</string>
     <string name="error_conflicting_package_name">包名冲突。预期：%1$s，实际：%2$s，名称：%3$s</string>
     <string name="error_conflicting_version_code">版本号冲突。预期：%1$s，实际：%2$s，名称：%3$s</string>
-
     <string name="uninstall_notif_channel_name">卸载进度</string>
     <string name="uninstall_notif_channel_description">显示应用卸载时的进度</string>
     <string name="uninstall_notif_single_title">正在卸载…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">卸载完成</string>
     <string name="uninstall_notif_batch_done_with_errors">卸载结束，但发生错误</string>
     <string name="uninstall_notif_batch_done_text">成功 %1$d 个 · 失败 %2$d 个</string>
-
     <string name="status_success">成功</string>
     <string name="status_failed">失败</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">历史记录</string>
     <string name="install_history_clear">清除</string>
     <string name="install_unsupported_file">不支持的文件。请选择 APK、APKS、XAPK 或 APKM 文件。</string>
-
     <string name="file_picker_parsing">正在解析包…</string>
     <string name="file_picker_select">选择一个安装包</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">安装成功</string>
     <string name="session_installing_progress">%d%% 安装中…</string>
     <string name="session_retry">重试</string>
-
     <string name="apk_info_label_package">包名</string>
     <string name="apk_info_label_version">版本</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d 个 Splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">支持的架构</string>
     <string name="apk_info_section_languages">支持的语言 (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d 个可疑 · %2$d 个无害 · %3$d 个未检测到</string>
     <string name="apk_info_vt_not_found">在 VirusTotal 数据库中未找到该文件</string>
     <string name="apk_info_vt_error">扫描错误：%s</string>
-
     <string name="uninstall_show_system_apps">显示系统应用</string>
     <string name="uninstall_search_hint">搜索应用…</string>
     <string name="uninstall_no_apps_found">未找到应用</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">卸载 %s？</string>
     <string name="uninstall_confirm_single_text">这将从您的设备中移除 %1$s (%2$s)。</string>
     <string name="uninstall_app_cd">卸载 %s</string>
-
     <string name="logs_screen_title">卸载日志</string>
     <string name="logs_clear_all_dialog_title">清除所有日志？</string>
     <string name="logs_clear_all_dialog_text">这将永久清除此设备上的卸载日志记录。</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">展开</string>
     <string name="logs_collapse_cd">折叠</string>
     <string name="logs_delete_entry_cd">删除条目</string>
-
     <string name="setting_title">设置</string>
     <string name="setting_section_installation">安装</string>
     <string name="setting_shizuku_backend">Shizuku 后端</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">主题</string>
     <string name="setting_theme_subtitle">选择您喜欢的主题</string>
     <string name="setting_section_about">关于</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">版本 %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">源代码与贡献</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">加入我们的社区</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">正在使用 %s</string>
-
     <string name="install_error_cancelled_title">安装已取消</string>
     <string name="install_error_cancelled_guidance">用户或系统取消了安装。请点击“重试”以重新尝试。</string>
     <string name="install_error_blocked_title">安装被拦截</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">安装失败</string>
     <string name="install_error_unknown_guidance">发生未知错误。请点击“重试”以重新尝试。</string>
     <string name="install_error_unknown_guidance_short">发生未知错误。</string>
-
     <string name="splash_tagline">随时随地，安装一切</string>
-
     <string name="onboarding_skip">跳过</string>
     <string name="onboarding_next">下一步</string>
     <string name="onboarding_get_started">开始使用</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">文件超过 32 MB — 正在通过 VirusTotal 的大文件端点上传。这可能需要几分钟。</string>
     <string name="apk_info_vt_check_button">使用 VirusTotal 检查</string>
     <string name="apk_info_vt_rescan_button">重新扫描</string>
-
     <string name="vt_notif_channel_name">VirusTotal 扫描</string>
     <string name="vt_notif_channel_description">VirusTotal 上传和分析进度</string>
     <string name="vt_notif_hashing">正在计算文件哈希…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">存储空间</string>
     <string name="install_storage_value">剩余 %1$s / 共 %2$s</string>
     <string name="install_no_splits_error">无法解析该包。文件可能已损坏、被截断或与此设备不兼容。</string>
-
     <string name="batch_install_title">批量安装</string>
     <string name="batch_install_summary">%1$d 个包 · 已选择 %2$s</string>
     <string name="batch_install_parsing">正在分析 %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d 个失败</string>
     <string name="batch_install_action">安装 %1$d 个 · %2$s</string>
     <string name="batch_install_dup_package">重复的包</string>
-
     <string name="download_notif_channel_name">包下载</string>
     <string name="download_notif_channel_description">从 URL 下载 APK/XAPK/APKS 文件的进度</string>
     <string name="download_notif_running_title">正在下载 %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">已下载 %s</string>
     <string name="download_notif_done_title">下载完成</string>
     <string name="download_notif_done_text">%s · 打开应用进行安装</string>
     <string name="download_notif_failed_title">下载失败</string>
-
     <string name="download_history_title">下载历史记录</string>
     <string name="download_history_empty">暂无下载的包。</string>
     <string name="download_history_clear_cd">全部清除</string>
@@ -240,23 +216,18 @@
     <string name="download_history_delete_message">从磁盘和历史记录中移除 %s。</string>
     <string name="download_history_delete_confirm">删除</string>
     <string name="download_history_open_button">下载历史记录</string>
-
     <string name="source_tab_local">本地</string>
     <string name="source_tab_download">下载</string>
-
     <string name="source_local_header">选择文件</string>
     <string name="source_action_find_automatic">自动查找</string>
     <string name="source_action_find_automatic_sub">扫描此设备以查找可安装的包</string>
     <string name="source_action_browse_packages">浏览包</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">浏览所有文件</string>
     <string name="source_action_browse_all_sub">任何文件类型 — 风险自负</string>
-
     <string name="source_download_header">从 URL 下载</string>
     <string name="source_download_hint">在此处输入或粘贴 URL…</string>
     <string name="source_download_start">下载</string>
     <string name="source_download_paste">粘贴</string>
-
     <string name="find_auto_sheet_title">此设备上的包</string>
     <string name="find_auto_permission_title">需要所有文件访问权限</string>
     <string name="find_auto_permission_body">要扫描设备上的包，请在系统设置中允许所有文件访问权限。</string>
@@ -271,7 +242,6 @@
     <string name="find_auto_delete_title">删除 %d 个文件？</string>
     <string name="find_auto_delete_message">选定的包文件将从设备存储中永久移除。</string>
     <string name="find_auto_delete_confirm">删除</string>
-
     <string name="permissions_title">应用权限</string>
     <string name="permissions_subtitle">查看哪些权限处于活动状态，并授予您需要的权限。</string>
     <string name="permissions_menu_cd">查看权限</string>
@@ -287,9 +257,7 @@
     <string name="permission_notifications_desc">显示下载、OBB 复制和 VirusTotal 扫描进度，以便您在执行耗时任务时可以离开应用。</string>
     <string name="permission_usage_title">使用情况访问权限</string>
     <string name="permission_usage_desc">可选 — 允许卸载屏幕按最近使用时间对应用进行排序，并显示各个应用的使用时长。</string>
-
     <string name="remote_download_title">下载包</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">粘贴</string>
     <string name="remote_download_clipboard_empty">剪贴板为空</string>
     <string name="remote_download_clipboard_invalid">剪贴板不包含 URL</string>
@@ -300,12 +268,10 @@
     <string name="remote_download_progress">正在下载… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">下载失败：%s</string>
     <string name="remote_download_unsupported">下载的文件不是受支持的包</string>
-    <string name="apk_info_obb_chip">%d 个 OBB</string>
     <string name="apk_info_obb_attach_title">附加 OBB 文件 (可选)</string>
     <string name="apk_info_obb_attach_desc">选择属于该应用的 .obb 文件 — 它们将在安装后被复制到 Android/obb。</string>
     <string name="apk_info_obb_attach_button">添加 OBB 文件</string>
     <string name="apk_info_obb_attach_remove">移除</string>
-
     <string name="obb_copy_title">正在复制 OBB 文件…</string>
     <string name="obb_copy_done">%1$s · 已复制 %2$d 个 OBB 文件</string>
     <string name="obb_copy_error">OBB 复制失败：%s</string>
@@ -313,7 +279,6 @@
     <string name="obb_copy_need_grant_title">需要 OBB 文件夹访问权限</string>
     <string name="obb_copy_need_grant_body">Shizuku 不可用 — 请授予对 Android/obb/%s/ 的访问权限，以便应用可以将 OBB 文件复制到该处。</string>
     <string name="obb_copy_grant_button">授予权限</string>
-
     <string name="obb_notif_channel_name">OBB 文件复制</string>
     <string name="obb_notif_channel_description">将 OBB 数据文件复制到 Android/obb 的进度</string>
     <string name="obb_notif_running_title">正在复制 OBB · %s</string>
@@ -338,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">关闭时默认使用此应用</string>
     <string name="setting_shizuku_installer_label">安装来源 (包名)</string>
     <string name="setting_website_title">网站</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">隐私政策</string>
     <string name="setting_privacy_subtitle">我们如何处理您的数据</string>
     <string name="setting_terms_title">服务条款</string>

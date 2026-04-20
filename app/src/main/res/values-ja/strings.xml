@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">インストール</string>
     <string name="txt_uninstall">アンインストール</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">競合する Split 名: %s</string>
     <string name="error_conflicting_package_name">競合するパッケージ名。期待値: %1$s、実際の値: %2$s、名前: %3$s</string>
     <string name="error_conflicting_version_code">競合するバージョンコード。期待値: %1$s、実際の値: %2$s、名前: %3$s</string>
-
     <string name="uninstall_notif_channel_name">アンインストールの進行状況</string>
     <string name="uninstall_notif_channel_description">アプリのアンインストール中の進行状況を表示します</string>
     <string name="uninstall_notif_single_title">アンインストール中…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">アンインストールが完了しました</string>
     <string name="uninstall_notif_batch_done_with_errors">エラーでアンインストールが終了しました</string>
     <string name="uninstall_notif_batch_done_text">成功: %1$d · 失敗: %2$d</string>
-
     <string name="status_success">成功</string>
     <string name="status_failed">失敗</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">履歴</string>
     <string name="install_history_clear">クリア</string>
     <string name="install_unsupported_file">サポートされていないファイルです。APK、APKS、XAPK、または APKM ファイルを選択してください。</string>
-
     <string name="file_picker_parsing">パッケージを解析中…</string>
     <string name="file_picker_select">パッケージを選択</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">インストールが完了しました</string>
     <string name="session_installing_progress">%d%% インストール中…</string>
     <string name="session_retry">再試行</string>
-
     <string name="apk_info_label_package">パッケージ</string>
     <string name="apk_info_label_version">バージョン</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d Splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">対応アーキテクチャ</string>
     <string name="apk_info_section_languages">対応言語 (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d 疑わしい · %2$d 無害 · %3$d 未検出</string>
     <string name="apk_info_vt_not_found">VirusTotal データベースにファイルが見つかりません</string>
     <string name="apk_info_vt_error">スキャンエラー: %s</string>
-
     <string name="uninstall_show_system_apps">システムアプリを表示</string>
     <string name="uninstall_search_hint">アプリを検索…</string>
     <string name="uninstall_no_apps_found">アプリが見つかりません</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">%s をアンインストールしますか？</string>
     <string name="uninstall_confirm_single_text">%1$s (%2$s) がデバイスから削除されます。</string>
     <string name="uninstall_app_cd">%s をアンインストール</string>
-
     <string name="logs_screen_title">アンインストールログ</string>
     <string name="logs_clear_all_dialog_title">すべてのログをクリアしますか？</string>
     <string name="logs_clear_all_dialog_text">このデバイスのアンインストールログ履歴が完全に削除されます。</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">展開</string>
     <string name="logs_collapse_cd">折りたたむ</string>
     <string name="logs_delete_entry_cd">エントリを削除</string>
-
     <string name="setting_title">設定</string>
     <string name="setting_section_installation">インストール</string>
     <string name="setting_shizuku_backend">Shizuku バックエンド</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">テーマ</string>
     <string name="setting_theme_subtitle">お好みのテーマを選択してください</string>
     <string name="setting_section_about">概要</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">バージョン %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">ソースコードとコントリビューション</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">コミュニティに参加する</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">%s を使用中</string>
-
     <string name="install_error_cancelled_title">インストールがキャンセルされました</string>
     <string name="install_error_cancelled_guidance">ユーザーまたはシステムによってインストールがキャンセルされました。「再試行」をタップしてもう一度お試しください。</string>
     <string name="install_error_blocked_title">インストールがブロックされました</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">インストールに失敗しました</string>
     <string name="install_error_unknown_guidance">不明なエラーが発生しました。「再試行」をタップしてもう一度お試しください。</string>
     <string name="install_error_unknown_guidance_short">不明なエラーが発生しました。</string>
-
     <string name="splash_tagline">何でも、どこでもインストール</string>
-
     <string name="onboarding_skip">スキップ</string>
     <string name="onboarding_next">次へ</string>
     <string name="onboarding_get_started">はじめる</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">ファイルが 32 MB を超えています。VirusTotal の大容量ファイル エンドポイント経由でアップロードしています。これには数分かかる場合があります。</string>
     <string name="apk_info_vt_check_button">VirusTotal で確認する</string>
     <string name="apk_info_vt_rescan_button">もう一度スキャン</string>
-
     <string name="vt_notif_channel_name">VirusTotal スキャン</string>
     <string name="vt_notif_channel_description">VirusTotal のアップロードと分析の進行状況</string>
     <string name="vt_notif_hashing">ファイルのハッシュを計算中…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">ストレージ</string>
     <string name="install_storage_value">空き容量 %1$s / %2$s</string>
     <string name="install_no_splits_error">パッケージを解析できませんでした。ファイルが破損しているか、不完全であるか、このデバイスと互換性がない可能性があります。</string>
-
     <string name="batch_install_title">一括インストール</string>
     <string name="batch_install_summary">%1$d 個のパッケージ · %2$s を選択中</string>
     <string name="batch_install_parsing">解析中 %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d 件失敗</string>
     <string name="batch_install_action">インストール %1$d · %2$s</string>
     <string name="batch_install_dup_package">重複するパッケージ</string>
-
     <string name="download_notif_channel_name">パッケージのダウンロード</string>
     <string name="download_notif_channel_description">URLからのAPK/XAPK/APKSファイルのダウンロードの進行状況</string>
     <string name="download_notif_running_title">%s をダウンロード中</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">%s をダウンロードしました</string>
     <string name="download_notif_done_title">ダウンロード完了</string>
     <string name="download_notif_done_text">%s · アプリを開いてインストールしてください</string>
     <string name="download_notif_failed_title">ダウンロードに失敗しました</string>
-
     <string name="download_history_title">ダウンロード履歴</string>
     <string name="download_history_empty">まだダウンロードされたパッケージはありません。</string>
     <string name="download_history_clear_cd">すべてクリア</string>
@@ -240,23 +216,18 @@
     <string name="download_history_delete_message">%s をディスクおよび履歴から削除します。</string>
     <string name="download_history_delete_confirm">削除</string>
     <string name="download_history_open_button">ダウンロード履歴</string>
-
     <string name="source_tab_local">ローカル</string>
     <string name="source_tab_download">ダウンロード</string>
-
     <string name="source_local_header">ファイルを選択</string>
     <string name="source_action_find_automatic">自動検索</string>
     <string name="source_action_find_automatic_sub">このデバイスをスキャンしてインストール可能なパッケージを探す</string>
     <string name="source_action_browse_packages">パッケージを参照</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">すべてのファイルを参照</string>
     <string name="source_action_browse_all_sub">すべてのファイルタイプ — 自己責任で使用してください</string>
-
     <string name="source_download_header">URLからダウンロード</string>
     <string name="source_download_hint">ここにURLを入力または貼り付け…</string>
     <string name="source_download_start">ダウンロード</string>
     <string name="source_download_paste">貼り付け</string>
-
     <string name="find_auto_sheet_title">このデバイス上のパッケージ</string>
     <string name="find_auto_permission_title">すべてのファイルへのアクセスが必要です</string>
     <string name="find_auto_permission_body">デバイス内のパッケージをスキャンするには、システム設定で「すべてのファイルへのアクセス」を許可してください。</string>
@@ -271,7 +242,6 @@
     <string name="find_auto_delete_title">%d 個のファイルを削除しますか？</string>
     <string name="find_auto_delete_message">選択したパッケージファイルはデバイスのストレージから完全に削除されます。</string>
     <string name="find_auto_delete_confirm">削除</string>
-
     <string name="permissions_title">アプリの権限</string>
     <string name="permissions_subtitle">有効な権限を確認し、必要な権限を許可してください。</string>
     <string name="permissions_menu_cd">権限を確認</string>
@@ -287,9 +257,7 @@
     <string name="permission_notifications_desc">ダウンロード、OBBのコピー、VirusTotalスキャンの進行状況を表示するため、時間のかかるタスク中もアプリを離れることができます。</string>
     <string name="permission_usage_title">使用状況へのアクセス</string>
     <string name="permission_usage_desc">任意 — アンインストール画面でアプリを最終使用順に並べ替え、個々のアプリの利用時間を表示できるようにします。</string>
-
     <string name="remote_download_title">パッケージをダウンロード</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">貼り付け</string>
     <string name="remote_download_clipboard_empty">クリップボードが空です</string>
     <string name="remote_download_clipboard_invalid">クリップボードにURLが含まれていません</string>
@@ -300,12 +268,10 @@
     <string name="remote_download_progress">ダウンロード中… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">ダウンロードに失敗しました: %s</string>
     <string name="remote_download_unsupported">ダウンロードしたファイルはサポートされているパッケージではありません</string>
-    <string name="apk_info_obb_chip">%d 個のOBB</string>
     <string name="apk_info_obb_attach_title">OBBファイルを添付 (任意)</string>
     <string name="apk_info_obb_attach_desc">このアプリに属する .obb ファイルを選択してください — インストール後に Android/obb にコピーされます。</string>
     <string name="apk_info_obb_attach_button">OBBファイルを追加</string>
     <string name="apk_info_obb_attach_remove">削除</string>
-
     <string name="obb_copy_title">OBBファイルをコピー中…</string>
     <string name="obb_copy_done">%1$s · %2$d 個のOBBファイルをコピーしました</string>
     <string name="obb_copy_error">OBBのコピーに失敗しました: %s</string>
@@ -313,7 +279,6 @@
     <string name="obb_copy_need_grant_title">OBBフォルダへのアクセスが必要です</string>
     <string name="obb_copy_need_grant_body">Shizukuが利用できません — アプリがOBBファイルをコピーできるように、Android/obb/%s/ へのアクセスを許可してください。</string>
     <string name="obb_copy_grant_button">アクセスを許可</string>
-
     <string name="obb_notif_channel_name">OBBファイルのコピー</string>
     <string name="obb_notif_channel_description">OBBデータファイルを Android/obb にコピーする進行状況</string>
     <string name="obb_notif_running_title">OBBをコピー中 · %s</string>
@@ -338,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">オフの場合はこのアプリがデフォルトになります</string>
     <string name="setting_shizuku_installer_label">(パッケージ名) によってインストール</string>
     <string name="setting_website_title">ウェブサイト</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">プライバシーポリシー</string>
     <string name="setting_privacy_subtitle">データの取り扱いについて</string>
     <string name="setting_terms_title">利用規約</string>

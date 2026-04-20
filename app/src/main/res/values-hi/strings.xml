@@ -1,3 +1,4 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">इंस्टॉल करें</string>
     <string name="txt_uninstall">अनइंस्टॉल करें</string>
@@ -16,7 +17,6 @@
     <string name="error_conflicting_split_name">विरोधी Split नाम: %s</string>
     <string name="error_conflicting_package_name">विरोधी पैकेज नाम। अपेक्षित: %1$s, मिला: %2$s, नाम: %3$s</string>
     <string name="error_conflicting_version_code">विरोधी वर्ज़न कोड। अपेक्षित: %1$s, मिला: %2$s, नाम: %3$s</string>
-
     <string name="uninstall_notif_channel_name">अनइंस्टॉल प्रगति</string>
     <string name="uninstall_notif_channel_description">ऐप्स अनइंस्टॉल होने के दौरान प्रगति दिखाता है</string>
     <string name="uninstall_notif_single_title">अनइंस्टॉल हो रहा है…</string>
@@ -28,31 +28,23 @@
     <string name="uninstall_notif_batch_done">अनइंस्टॉल पूरा हुआ</string>
     <string name="uninstall_notif_batch_done_with_errors">त्रुटियों के साथ अनइंस्टॉल समाप्त हुआ</string>
     <string name="uninstall_notif_batch_done_text">%1$d सफल · %2$d विफल</string>
-
     <string name="status_success">सफल</string>
     <string name="status_failed">विफल</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">इतिहास</string>
     <string name="install_history_clear">साफ़ करें</string>
     <string name="install_unsupported_file">असमर्थित फ़ाइल। कृपया APK, APKS, XAPK, या APKM फ़ाइल चुनें।</string>
-
     <string name="file_picker_parsing">पैकेज पार्स हो रहा है…</string>
     <string name="file_picker_select">एक पैकेज चुनें</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">सफलतापूर्वक इंस्टॉल हुआ</string>
     <string name="session_installing_progress">%d%% इंस्टॉल हो रहा है…</string>
     <string name="session_retry">पुनः प्रयास करें</string>
-
     <string name="apk_info_label_package">पैकेज</string>
     <string name="apk_info_label_version">वर्ज़न</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d Splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">समर्थित आर्किटेक्चर</string>
     <string name="apk_info_section_languages">समर्थित भाषाएँ (%d)</string>
@@ -68,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d संदिग्ध · %2$d हानिरहित · %3$d में कुछ नहीं मिला</string>
     <string name="apk_info_vt_not_found">VirusTotal डेटाबेस में फ़ाइल नहीं मिली</string>
     <string name="apk_info_vt_error">स्कैन त्रुटि: %s</string>
-
     <string name="uninstall_show_system_apps">सिस्टम ऐप्स दिखाएं</string>
     <string name="uninstall_search_hint">ऐप्स खोजें…</string>
     <string name="uninstall_no_apps_found">कोई ऐप नहीं मिले</string>
@@ -86,7 +77,6 @@
     <string name="uninstall_confirm_single_title">%s अनइंस्टॉल करें?</string>
     <string name="uninstall_confirm_single_text">यह आपके डिवाइस से %1$s (%2$s) को हटा देगा।</string>
     <string name="uninstall_app_cd">%s अनइंस्टॉल करें</string>
-
     <string name="logs_screen_title">अनइंस्टॉल लॉग</string>
     <string name="logs_clear_all_dialog_title">सभी लॉग साफ़ करें?</string>
     <string name="logs_clear_all_dialog_text">यह इस डिवाइस से अनइंस्टॉल लॉग इतिहास को स्थायी रूप से हटा देगा।</string>
@@ -99,7 +89,6 @@
     <string name="logs_expand_cd">विस्तृत करें</string>
     <string name="logs_collapse_cd">छोटा करें</string>
     <string name="logs_delete_entry_cd">प्रविष्टि हटाएं</string>
-
     <string name="setting_title">सेटिंग्स</string>
     <string name="setting_section_installation">इंस्टॉलेशन</string>
     <string name="setting_shizuku_backend">Shizuku Backend</string>
@@ -131,17 +120,11 @@
     <string name="setting_theme_title">थीम</string>
     <string name="setting_theme_subtitle">अपनी पसंदीदा थीम चुनें</string>
     <string name="setting_section_about">के बारे में</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">वर्ज़न %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">सोर्स कोड और योगदान</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">हमारे समुदाय में शामिल हों</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">%s का उपयोग कर रहा है</string>
-
     <string name="install_error_cancelled_title">इंस्टॉलेशन रद्द हो गया</string>
     <string name="install_error_cancelled_guidance">इंस्टॉलेशन को उपयोगकर्ता या सिस्टम द्वारा रद्द कर दिया गया था। पुनः प्रयास करने के लिए \'पुनः प्रयास करें\' पर टैप करें।</string>
     <string name="install_error_blocked_title">इंस्टॉलेशन ब्लॉक हो गया</string>
@@ -161,9 +144,7 @@
     <string name="install_error_failed_title">इंस्टॉलेशन विफल</string>
     <string name="install_error_unknown_guidance">एक अज्ञात त्रुटि हुई। पुनः प्रयास करने के लिए \'पुनः प्रयास करें\' पर टैप करें।</string>
     <string name="install_error_unknown_guidance_short">एक अज्ञात त्रुटि हुई।</string>
-
     <string name="splash_tagline">कुछ भी इंस्टॉल करें, कहीं भी</string>
-
     <string name="onboarding_skip">छोड़ें</string>
     <string name="onboarding_next">अगला</string>
     <string name="onboarding_get_started">शुरू करें</string>
@@ -187,7 +168,6 @@
     <string name="apk_info_vt_large_hint">फ़ाइल 32 MB से अधिक है — VirusTotal के बड़े-फ़ाइल एंडपॉइंट के माध्यम से अपलोड हो रहा है। इसमें कुछ मिनट लग सकते हैं।</string>
     <string name="apk_info_vt_check_button">VirusTotal के साथ जांचें</string>
     <string name="apk_info_vt_rescan_button">फिर से स्कैन करें</string>
-
     <string name="vt_notif_channel_name">VirusTotal स्कैन</string>
     <string name="vt_notif_channel_description">VirusTotal अपलोड और विश्लेषण की प्रगति</string>
     <string name="vt_notif_hashing">फ़ाइल को हैश किया जा रहा है…</string>
@@ -204,7 +184,6 @@
     <string name="install_storage_title">स्टोरेज</string>
     <string name="install_storage_value">%1$s खाली / %2$s</string>
     <string name="install_no_splits_error">पैकेज को पार्स नहीं किया जा सका। फ़ाइल भ्रष्ट, अधूरी या इस डिवाइस के अनुकूल नहीं हो सकती है।</string>
-
     <string name="batch_install_title">बैच इंस्टॉल</string>
     <string name="batch_install_summary">%1$d पैकेज · %2$s चयनित</string>
     <string name="batch_install_parsing">विश्लेषण किया जा रहा है %1$d / %2$d…</string>
@@ -213,16 +192,13 @@
     <string name="batch_install_failed_chip">%d विफल</string>
     <string name="batch_install_action">इंस्टॉल करें %1$d · %2$s</string>
     <string name="batch_install_dup_package">डुप्लिकेट पैकेज</string>
-
     <string name="download_notif_channel_name">पैकेज डाउनलोड</string>
     <string name="download_notif_channel_description">URL से APK/XAPK/APKS फ़ाइलें डाउनलोड करने की प्रगति</string>
     <string name="download_notif_running_title">डाउनलोड हो रहा है %s</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">डाउनलोड किया गया %s</string>
     <string name="download_notif_done_title">डाउनलोड पूर्ण</string>
     <string name="download_notif_done_text">%s · इंस्टॉल करने के लिए ऐप खोलें</string>
     <string name="download_notif_failed_title">डाउनलोड विफल रहा</string>
-
     <string name="download_history_title">डाउनलोड इतिहास</string>
     <string name="download_history_empty">अभी तक कोई डाउनलोड किया गया पैकेज नहीं है।</string>
     <string name="download_history_clear_cd">सभी साफ़ करें</string>
@@ -240,23 +216,18 @@
     <string name="download_history_delete_message">डिस्क और इतिहास से %s को हटाता है।</string>
     <string name="download_history_delete_confirm">हटाएं</string>
     <string name="download_history_open_button">डाउनलोड इतिहास</string>
-
     <string name="source_tab_local">स्थानीय</string>
     <string name="source_tab_download">डाउनलोड</string>
-
     <string name="source_local_header">फ़ाइल चुनें</string>
     <string name="source_action_find_automatic">स्वचालित रूप से खोजें</string>
     <string name="source_action_find_automatic_sub">इंस्टॉल करने योग्य पैकेजों के लिए इस डिवाइस को स्कैन करें</string>
     <string name="source_action_browse_packages">पैकेज ब्राउज़ करें</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">सभी फ़ाइलें ब्राउज़ करें</string>
     <string name="source_action_browse_all_sub">कोई भी फ़ाइल प्रकार — अपने जोखिम पर उपयोग करें</string>
-
     <string name="source_download_header">URL से डाउनलोड करें</string>
     <string name="source_download_hint">यहां URL दर्ज करें या पेस्ट करें…</string>
     <string name="source_download_start">डाउनलोड</string>
     <string name="source_download_paste">पेस्ट करें</string>
-
     <string name="find_auto_sheet_title">इस डिवाइस पर पैकेज</string>
     <string name="find_auto_permission_title">सभी फ़ाइलों तक पहुंच आवश्यक है</string>
     <string name="find_auto_permission_body">पैकेजों के लिए अपने डिवाइस को स्कैन करने के लिए, सिस्टम सेटिंग्स में सभी फ़ाइलों तक पहुंच की अनुमति दें।</string>
@@ -271,7 +242,6 @@
     <string name="find_auto_delete_title">%d फ़ाइल(फ़ाइलें) हटाएं?</string>
     <string name="find_auto_delete_message">चयनित पैकेज फ़ाइलें डिवाइस स्टोरेज से स्थायी रूप से हटा दी जाएंगी।</string>
     <string name="find_auto_delete_confirm">हटाएं</string>
-
     <string name="permissions_title">ऐप अनुमतियां</string>
     <string name="permissions_subtitle">समीक्षा करें कि कौन सी अनुमतियां सक्रिय हैं और जिनकी आपको आवश्यकता है उन्हें प्रदान करें।</string>
     <string name="permissions_menu_cd">अनुमतियों की समीक्षा करें</string>
@@ -287,9 +257,7 @@
     <string name="permission_notifications_desc">डाउनलोड, OBB कॉपी और VirusTotal स्कैन प्रगति दिखाता है ताकि आप लंबे कार्यों के दौरान ऐप को छोड़ सकें।</string>
     <string name="permission_usage_title">उपयोग पहुंच</string>
     <string name="permission_usage_desc">वैकल्पिक — अनइंस्टॉल स्क्रीन को अंतिम बार उपयोग किए गए ऐप्स को क्रमबद्ध करने दें और व्यक्तिगत ऐप उपयोग समय दिखाएं।</string>
-
     <string name="remote_download_title">पैकेज डाउनलोड करें</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">पेस्ट करें</string>
     <string name="remote_download_clipboard_empty">क्लिपबोर्ड खाली है</string>
     <string name="remote_download_clipboard_invalid">क्लिपबोर्ड में URL नहीं है</string>
@@ -300,12 +268,10 @@
     <string name="remote_download_progress">डाउनलोड हो रहा है… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">डाउनलोड विफल: %s</string>
     <string name="remote_download_unsupported">डाउनलोड की गई फ़ाइल एक समर्थित पैकेज नहीं है</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
     <string name="apk_info_obb_attach_title">OBB फ़ाइलें संलग्न करें (वैकल्पिक)</string>
     <string name="apk_info_obb_attach_desc">इस ऐप से संबंधित .obb फ़ाइलें चुनें — वे इंस्टॉल के बाद Android/obb में कॉपी हो जाएंगी।</string>
     <string name="apk_info_obb_attach_button">OBB फ़ाइल जोड़ें</string>
     <string name="apk_info_obb_attach_remove">हटाएं</string>
-
     <string name="obb_copy_title">OBB फ़ाइलें कॉपी की जा रही हैं…</string>
     <string name="obb_copy_done">%1$s · %2$d OBB फ़ाइल(फ़ाइलें) कॉपी की गईं</string>
     <string name="obb_copy_error">OBB कॉपी विफल: %s</string>
@@ -313,7 +279,6 @@
     <string name="obb_copy_need_grant_title">OBB फ़ोल्डर तक पहुंच आवश्यक है</string>
     <string name="obb_copy_need_grant_body">Shizuku अनुपलब्ध — Android/obb/%s/ तक पहुंच प्रदान करें ताकि ऐप वहां OBB फ़ाइलें कॉपी कर सके।</string>
     <string name="obb_copy_grant_button">पहुंच प्रदान करें</string>
-
     <string name="obb_notif_channel_name">OBB फ़ाइल कॉपी</string>
     <string name="obb_notif_channel_description">OBB डेटा फ़ाइलों को Android/obb में कॉपी करने की प्रगति</string>
     <string name="obb_notif_running_title">OBB कॉपी किया जा रहा है · %s</string>
@@ -338,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">बंद होने पर डिफ़ॉल्ट रूप से यह ऐप होता है</string>
     <string name="setting_shizuku_installer_label">(पैकेज नाम) द्वारा इंस्टॉल किया गया</string>
     <string name="setting_website_title">वेबसाइट</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">गोपनीयता नीति</string>
     <string name="setting_privacy_subtitle">हम आपके डेटा को कैसे संभालते हैं</string>
     <string name="setting_terms_title">सेवा की शर्तें</string>

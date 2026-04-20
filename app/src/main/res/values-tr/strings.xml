@@ -1,9 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
 <resources>
     <string name="txt_install">Yükle</string>
     <string name="txt_uninstall">Kaldır</string>
     <string name="txt_setting">Ayarlar</string>
-    <string name="default_percentage" translatable="false">0%</string>
-    <string name="percentage" translatable="false">%d%%</string>
     <string name="screen_title_install">Yükle</string>
     <string name="screen_title_uninstall">Kaldır</string>
     <string name="cancel">İptal</string>
@@ -18,7 +17,6 @@
     <string name="error_conflicting_split_name">Çakışan Split adı: %s</string>
     <string name="error_conflicting_package_name">Çakışan paket adı. Beklenen: %1$s, bulunan: %2$s, ad: %3$s</string>
     <string name="error_conflicting_version_code">Çakışan sürüm kodu. Beklenen: %1$s, bulunan: %2$s, ad: %3$s</string>
-
     <string name="uninstall_notif_channel_name">Kaldırma ilerlemesi</string>
     <string name="uninstall_notif_channel_description">Uygulamalar kaldırılırken ilerlemeyi gösterir</string>
     <string name="uninstall_notif_single_title">Kaldırılıyor…</string>
@@ -30,31 +28,23 @@
     <string name="uninstall_notif_batch_done">Kaldırma tamamlandı</string>
     <string name="uninstall_notif_batch_done_with_errors">Kaldırma işlemi hatalarla tamamlandı</string>
     <string name="uninstall_notif_batch_done_text">%1$d başarılı · %2$d başarısız</string>
-
     <string name="status_success">Başarılı</string>
     <string name="status_failed">Başarısız</string>
-
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">Geçmiş</string>
     <string name="install_history_clear">Temizle</string>
     <string name="install_unsupported_file">Desteklenmeyen dosya. Lütfen bir APK, APKS, XAPK veya APKM dosyası seçin.</string>
-
     <string name="file_picker_parsing">Paket ayrıştırılıyor…</string>
     <string name="file_picker_select">Bir paket seçin</string>
-    <string name="file_picker_formats">APK, APKS, XAPK, APKM</string>
-
     <string name="session_installed_success">Başarıyla yüklendi</string>
     <string name="session_installing_progress">%d%% yükleniyor…</string>
     <string name="session_retry">Yeniden Dene</string>
-
     <string name="apk_info_label_package">Paket</string>
     <string name="apk_info_label_version">Sürüm</string>
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip">Android %s+</string>
     <string name="apk_info_splits_count">%d Splits</string>
-    <string name="apk_info_version_detail">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Desteklenen Mimariler</string>
     <string name="apk_info_section_languages">Desteklenen Diller (%d)</string>
@@ -70,7 +60,6 @@
     <string name="apk_info_vt_suspicious_detail">%1$d şüpheli · %2$d zararsız · %3$d algılanmadı</string>
     <string name="apk_info_vt_not_found">Dosya VirusTotal veritabanında bulunamadı</string>
     <string name="apk_info_vt_error">Tarama hatası: %s</string>
-
     <string name="uninstall_show_system_apps">Sistem uygulamalarını göster</string>
     <string name="uninstall_search_hint">Uygulamalarda ara…</string>
     <string name="uninstall_no_apps_found">Uygulama bulunamadı</string>
@@ -88,7 +77,6 @@
     <string name="uninstall_confirm_single_title">%s kaldırılsın mı?</string>
     <string name="uninstall_confirm_single_text">Bu işlem, %1$s (%2$s) uygulamasını cihazınızdan kaldıracaktır.</string>
     <string name="uninstall_app_cd">%s uygulamasını kaldır</string>
-
     <string name="logs_screen_title">Kaldırma Günlükleri</string>
     <string name="logs_clear_all_dialog_title">Tüm günlükler temizlensin mi?</string>
     <string name="logs_clear_all_dialog_text">Bu işlem, cihazdaki kaldırma günlüğü geçmişini kalıcı olarak silecektir.</string>
@@ -101,7 +89,6 @@
     <string name="logs_expand_cd">Genişlet</string>
     <string name="logs_collapse_cd">Daralt</string>
     <string name="logs_delete_entry_cd">Kaydı sil</string>
-
     <string name="setting_title">Ayarlar</string>
     <string name="setting_section_installation">Yükleme</string>
     <string name="setting_shizuku_backend">Shizuku Backend</string>
@@ -133,17 +120,11 @@
     <string name="setting_theme_title">Tema</string>
     <string name="setting_theme_subtitle">Tercih ettiğiniz temayı seçin</string>
     <string name="setting_section_about">Hakkında</string>
-    <string name="setting_about_app_name">Universal Installer</string>
     <string name="setting_version">Sürüm %s</string>
-    <string name="setting_github_title">GitHub</string>
     <string name="setting_github_subtitle">Kaynak kodu ve katkılar</string>
-    <string name="setting_telegram_title">Telegram</string>
     <string name="setting_telegram_subtitle">Topluluğumuza katılın</string>
-
-    <string name="installer_mode_shizuku">Shizuku</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">%s kullanılıyor</string>
-
     <string name="install_error_cancelled_title">Yükleme iptal edildi</string>
     <string name="install_error_cancelled_guidance">Yükleme, kullanıcı veya sistem tarafından iptal edildi. Tekrar denemek için Yeniden Dene\'ye dokunun.</string>
     <string name="install_error_blocked_title">Yükleme engellendi</string>
@@ -163,9 +144,7 @@
     <string name="install_error_failed_title">Yükleme başarısız</string>
     <string name="install_error_unknown_guidance">Bilinmeyen bir hata oluştu. Tekrar denemek için Yeniden Dene\'ye dokunun.</string>
     <string name="install_error_unknown_guidance_short">Bilinmeyen bir hata oluştu.</string>
-
     <string name="splash_tagline">Her şeyi, her yere yükle</string>
-
     <string name="onboarding_skip">Atla</string>
     <string name="onboarding_next">İleri</string>
     <string name="onboarding_get_started">Başla</string>
@@ -189,7 +168,6 @@
     <string name="apk_info_vt_large_hint">Dosya 32 MB\'ın üzerinde — VirusTotal\'in büyük dosya uç noktası üzerinden yükleniyor. Bu birkaç dakika sürebilir.</string>
     <string name="apk_info_vt_check_button">VirusTotal ile Kontrol Et</string>
     <string name="apk_info_vt_rescan_button">Yeniden tara</string>
-
     <string name="vt_notif_channel_name">VirusTotal taramaları</string>
     <string name="vt_notif_channel_description">VirusTotal yükleme ve analizlerinin ilerlemesi</string>
     <string name="vt_notif_hashing">Dosya özetleniyor (hashing)…</string>
@@ -206,7 +184,6 @@
     <string name="install_storage_title">Depolama</string>
     <string name="install_storage_value">%1$s boş / %2$s</string>
     <string name="install_no_splits_error">Paket ayrıştırılamadı. Dosya bozuk, eksik veya bu cihazla uyumsuz olabilir.</string>
-
     <string name="batch_install_title">Toplu yükleme</string>
     <string name="batch_install_summary">%1$d paket · %2$s seçildi</string>
     <string name="batch_install_parsing">%1$d / %2$d analiz ediliyor…</string>
@@ -215,16 +192,13 @@
     <string name="batch_install_failed_chip">%d başarısız</string>
     <string name="batch_install_action">%1$d yükle · %2$s</string>
     <string name="batch_install_dup_package">Kopya paket</string>
-
     <string name="download_notif_channel_name">Paket indirmeleri</string>
     <string name="download_notif_channel_description">URL\'den APK/XAPK/APKS dosyalarını indirme ilerlemesi</string>
     <string name="download_notif_running_title">%s indiriliyor</string>
-    <string name="download_notif_running_text">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">%s indirildi</string>
     <string name="download_notif_done_title">İndirme tamamlandı</string>
     <string name="download_notif_done_text">%s · yüklemek için uygulamayı açın</string>
     <string name="download_notif_failed_title">İndirme başarısız</string>
-
     <string name="download_history_title">İndirme geçmişi</string>
     <string name="download_history_empty">Henüz indirilen paket yok.</string>
     <string name="download_history_clear_cd">Tümünü temizle</string>
@@ -242,23 +216,18 @@
     <string name="download_history_delete_message">%s dosyasını diskten ve geçmişten kaldırır.</string>
     <string name="download_history_delete_confirm">Sil</string>
     <string name="download_history_open_button">İndirme geçmişi</string>
-
     <string name="source_tab_local">Yerel</string>
     <string name="source_tab_download">İndir</string>
-
     <string name="source_local_header">Dosya Seç</string>
     <string name="source_action_find_automatic">Otomatik bul</string>
     <string name="source_action_find_automatic_sub">Yüklenebilir paketler için bu cihazı tara</string>
     <string name="source_action_browse_packages">Paketlere göz at</string>
-    <string name="source_action_browse_packages_sub">.APK · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Tüm dosyalara göz at</string>
     <string name="source_action_browse_all_sub">Herhangi bir dosya türü — riski size aittir</string>
-
     <string name="source_download_header">URL\'den indir</string>
     <string name="source_download_hint">URL\'yi buraya girin veya yapıştırın…</string>
     <string name="source_download_start">İndir</string>
     <string name="source_download_paste">Yapıştır</string>
-
     <string name="find_auto_sheet_title">Bu cihazdaki paketler</string>
     <string name="find_auto_permission_title">Tüm dosyalara erişim gerekli</string>
     <string name="find_auto_permission_body">Cihazınızı paketler için taramak üzere, sistem ayarlarından tüm dosyalara erişime izin verin.</string>
@@ -273,7 +242,6 @@
     <string name="find_auto_delete_title">%d dosya silinsin mi?</string>
     <string name="find_auto_delete_message">Seçilen paket dosyaları cihaz depolama alanından kalıcı olarak kaldırılacaktır.</string>
     <string name="find_auto_delete_confirm">Sil</string>
-
     <string name="permissions_title">Uygulama izinleri</string>
     <string name="permissions_subtitle">Hangi izinlerin aktif olduğunu gözden geçirin ve ihtiyacınız olanları verin.</string>
     <string name="permissions_menu_cd">İzinleri gözden geçir</string>
@@ -289,9 +257,7 @@
     <string name="permission_notifications_desc">Uzun işlemler sırasında uygulamadan ayrılabilmeniz için indirme, OBB kopyalama ve VirusTotal tarama ilerlemesini gösterir.</string>
     <string name="permission_usage_title">Kullanım erişimi</string>
     <string name="permission_usage_desc">İsteğe bağlı — Kaldırma ekranının uygulamaları son kullanılana göre sıralamasını ve her bir uygulamanın kullanım sürelerini göstermesini sağlar.</string>
-
     <string name="remote_download_title">Paket indir</string>
-    <string name="remote_download_hint">https://example.com/app.apks</string>
     <string name="remote_download_paste">Yapıştır</string>
     <string name="remote_download_clipboard_empty">Pano boş</string>
     <string name="remote_download_clipboard_invalid">Pano bir URL içermiyor</string>
@@ -302,12 +268,10 @@
     <string name="remote_download_progress">İndiriliyor… %1$d%% · %2$s / %3$s</string>
     <string name="remote_download_failed">İndirme başarısız: %s</string>
     <string name="remote_download_unsupported">İndirilen dosya desteklenen bir paket değil</string>
-    <string name="apk_info_obb_chip">%d OBB</string>
     <string name="apk_info_obb_attach_title">OBB dosyalarını ekle (isteğe bağlı)</string>
     <string name="apk_info_obb_attach_desc">Bu uygulamaya ait .obb dosyalarını seçin — yüklemeden sonra Android/obb klasörüne kopyalanacaktır.</string>
     <string name="apk_info_obb_attach_button">OBB dosyası ekle</string>
     <string name="apk_info_obb_attach_remove">Kaldır</string>
-
     <string name="obb_copy_title">OBB dosyaları kopyalanıyor…</string>
     <string name="obb_copy_done">%1$s · %2$d OBB dosyası kopyalandı</string>
     <string name="obb_copy_error">OBB kopyalama başarısız: %s</string>
@@ -315,7 +279,6 @@
     <string name="obb_copy_need_grant_title">OBB klasörü erişimi gerekli</string>
     <string name="obb_copy_need_grant_body">Shizuku kullanılamıyor — uygulamanın OBB dosyalarını kopyalayabilmesi için Android/obb/%s/ konumuna erişim verin.</string>
     <string name="obb_copy_grant_button">Erişim izni ver</string>
-
     <string name="obb_notif_channel_name">OBB dosya kopyalama</string>
     <string name="obb_notif_channel_description">OBB veri dosyalarının Android/obb klasörüne kopyalanma ilerlemesi</string>
     <string name="obb_notif_running_title">OBB kopyalanıyor · %s</string>
@@ -340,7 +303,6 @@
     <string name="setting_shizuku_set_source_sub">Kapalı olduğunda varsayılan olarak bu uygulama olur</string>
     <string name="setting_shizuku_installer_label">(paket adı) tarafından yüklendi</string>
     <string name="setting_website_title">Web sitesi</string>
-    <string name="setting_website_subtitle">universal-installer.pwhs.app</string>
     <string name="setting_privacy_title">Gizlilik politikası</string>
     <string name="setting_privacy_subtitle">Verilerinizi nasıl işliyoruz</string>
     <string name="setting_terms_title">Hizmet şartları</string>
