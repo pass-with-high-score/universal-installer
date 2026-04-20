@@ -29,12 +29,19 @@ import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
 import app.pwhs.universalinstaller.util.LocaleHelper
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.map
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
+import androidx.core.net.toUri
+
 
 private enum class AppRoute { Splash, Onboarding, Main }
 
 class MainActivity : ComponentActivity() {
 
-
+    private val notificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { /* granted or not — uninstall flow works either way, notifications just won't show */ }
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
@@ -47,16 +54,17 @@ class MainActivity : ComponentActivity() {
             Intent.ACTION_INSTALL_PACKAGE,
             Intent.ACTION_SEND,
             Intent.ACTION_SEND_MULTIPLE,
-        )
+        ) && intent?.data?.scheme != "universalinstaller"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        setupShortcuts()
 
         // Determine if we should skip splash: when launched from a file-open intent,
         // the user expects to see the install preview immediately.
-        val skipSplash = isFileOpenIntent(intent)
+        val skipSplash = isFileOpenIntent(intent) || intent?.data?.scheme == "universalinstaller"
         setContent {
             // `remember` caches the Flow across recompositions so `map {}` isn't re-invoked
             // every frame (Detekt/Android Lint: "Flow operator functions should not be invoked
@@ -103,6 +111,17 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf(if (skipSplash) AppRoute.Main else AppRoute.Splash)
             }
 
+            val intentScheme = intent?.data?.scheme
+            val shortcutRoute = remember(intent) {
+                if (intentScheme == "universalinstaller") {
+                    when (intent?.data?.host) {
+                        "sync" -> com.ramcosta.composedestinations.generated.destinations.SyncScreenDestination
+                        "uninstall" -> com.ramcosta.composedestinations.generated.destinations.UninstallScreenDestination
+                        else -> null
+                    }
+                } else null
+            }
+
             // Post the intent URI AFTER the composable tree is set up, so InstallScreen
             // is already composed (when skipSplash == true) and can process it immediately.
             LaunchedEffect(Unit) {
@@ -128,6 +147,38 @@ class MainActivity : ComponentActivity() {
                     }                }
             }
         }
+    }
+
+    private fun setupShortcuts() {
+        val syncIntent = Intent(this, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = "universalinstaller://sync".toUri()
+        }
+        val syncShortcut = ShortcutInfoCompat.Builder(this, "shortcut_sync")
+            .setShortLabel(getString(R.string.setting_section_sync))
+            .setIcon(IconCompat.createWithResource(this, R.drawable.ic_shortcut_sync))
+            .setIntent(syncIntent)
+            .build()
+
+        val uninstallIntent = Intent(this, MainActivity::class.java).apply {
+            action = Intent.ACTION_VIEW
+            data = "universalinstaller://uninstall".toUri()
+        }
+        val uninstallShortcut = ShortcutInfoCompat.Builder(this, "shortcut_uninstall")
+            .setShortLabel(getString(R.string.screen_title_uninstall))
+            .setIcon(IconCompat.createWithResource(this, R.drawable.ic_delete))
+            .setIntent(uninstallIntent)
+            .build()
+
+        ShortcutManagerCompat.addDynamicShortcuts(this, listOf(syncShortcut, uninstallShortcut))
+    }
+
+    private fun maybeRequestNotificationPermission() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
+        val granted = ContextCompat.checkSelfPermission(
+            this, Manifest.permission.POST_NOTIFICATIONS
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!granted) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     override fun onNewIntent(intent: Intent) {
