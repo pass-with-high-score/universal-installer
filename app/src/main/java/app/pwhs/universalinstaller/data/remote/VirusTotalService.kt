@@ -118,6 +118,9 @@ class VirusTotalService(
      * We always attach `x-apikey`; the direct endpoint requires it and the presigned URL ignores
      * it harmlessly. The per-request timeout is bumped past the 5-minute global to cover slow
      * uploads of the full 650 MB ceiling.
+     *
+     * Retries up to [MAX_UPLOAD_RETRIES] times on transient I/O failures (e.g. EOFException from
+     * VT's bigfiles endpoint prematurely closing the connection).
      */
     private suspend fun postFileMultipart(
         url: String,
@@ -125,39 +128,55 @@ class VirusTotalService(
         file: File,
         onProgress: suspend (Int) -> Unit,
     ): String {
-        val response: HttpResponse = client.submitFormWithBinaryData(
-            url = url,
-            formData = formData {
-                append(
-                    key = "file",
-                    value = ChannelProvider(size = file.length()) { file.readChannel() },
-                    headers = Headers.build {
-                        append(HttpHeaders.ContentType, "application/octet-stream")
-                        append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
+        var lastException: Throwable? = null
+        repeat(MAX_UPLOAD_RETRIES + 1) { attempt ->
+            if (attempt > 0) {
+                Timber.w("Upload attempt ${attempt + 1}/${MAX_UPLOAD_RETRIES + 1} after transient failure")
+                delay(UPLOAD_RETRY_DELAY_MS)
+                onProgress(0) // reset progress indicator
+            }
+            try {
+                val response: HttpResponse = client.submitFormWithBinaryData(
+                    url = url,
+                    formData = formData {
+                        append(
+                            key = "file",
+                            value = ChannelProvider(size = file.length()) { file.readChannel() },
+                            headers = Headers.build {
+                                append(HttpHeaders.ContentType, "application/octet-stream")
+                                append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
+                            },
+                        )
                     },
-                )
-            },
-        ) {
-            headers {
-                append(HEADER_KEY, apiKey)
-                append(HttpHeaders.Accept, "application/json")
-            }
-            timeout {
-                // 20 minutes covers the 650 MB ceiling on a sub-1 MB/s link.
-                requestTimeoutMillis = UPLOAD_REQUEST_TIMEOUT_MS
-            }
-            onUpload { sent, total ->
-                val t = total ?: file.length()
-                if (t > 0) {
-                    val pct = ((sent * 100L) / t).toInt().coerceIn(0, 100)
-                    onProgress(pct)
+                ) {
+                    headers {
+                        append(HEADER_KEY, apiKey)
+                        append(HttpHeaders.Accept, "application/json")
+                    }
+                    timeout {
+                        // 20 minutes covers the 650 MB ceiling on a sub-1 MB/s link.
+                        requestTimeoutMillis = UPLOAD_REQUEST_TIMEOUT_MS
+                        socketTimeoutMillis = UPLOAD_REQUEST_TIMEOUT_MS
+                    }
+                    onUpload { sent, total ->
+                        val t = total ?: file.length()
+                        if (t > 0) {
+                            val pct = ((sent * 100L) / t).toInt().coerceIn(0, 100)
+                            onProgress(pct)
+                        }
+                    }
                 }
+                if (response.status.value !in 200..299) {
+                    error("Upload HTTP ${response.status.value}: ${response.status.description}")
+                }
+                return JSONObject(response.bodyAsText()).getJSONObject("data").getString("id")
+            } catch (e: java.io.IOException) {
+                // Transient I/O error (EOFException, SocketException, etc.) — retry
+                Timber.w(e, "Upload I/O error on attempt ${attempt + 1}")
+                lastException = e
             }
         }
-        if (response.status.value !in 200..299) {
-            error("Upload HTTP ${response.status.value}: ${response.status.description}")
-        }
-        return JSONObject(response.bodyAsText()).getJSONObject("data").getString("id")
+        throw lastException ?: java.io.IOException("Upload failed after ${MAX_UPLOAD_RETRIES + 1} attempts")
     }
 
     /**
@@ -314,6 +333,8 @@ class VirusTotalService(
         const val SIZE_LIMIT_LARGE: Long = 650L * 1024 * 1024
 
         private const val UPLOAD_REQUEST_TIMEOUT_MS: Long = 20 * 60 * 1000L
+        private const val MAX_UPLOAD_RETRIES = 2
+        private const val UPLOAD_RETRY_DELAY_MS = 5000L
 
         private val POLL_CONTINUE_STATES = setOf(VtStatus.QUEUED, VtStatus.ANALYZING)
     }

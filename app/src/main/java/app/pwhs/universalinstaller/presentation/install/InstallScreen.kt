@@ -56,8 +56,6 @@ import app.pwhs.universalinstaller.util.extension.getDisplayName
 
 
 
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.yield
 import org.koin.androidx.compose.koinViewModel
 import ru.solrudev.ackpine.splits.ApkSplits.validate
 import ru.solrudev.ackpine.splits.SplitPackage
@@ -245,10 +243,6 @@ private fun InstallUi(
     LaunchedEffect(pendingViewUri) {
         val uri = pendingViewUri ?: return@LaunchedEffect
         IntentHandoff.consume()
-        // Yield to let the composable tree finish its first layout pass so the bottom
-        // sheet (driven by uiState.pendingApkInfo) can actually render.
-        yield()
-        delay(500)
         try {
             val mimeType = context.contentResolver.getType(uri)?.lowercase()
             val displayName = context.contentResolver.getDisplayName(uri)
@@ -287,7 +281,6 @@ private fun InstallUi(
     LaunchedEffect(pendingViewUris) {
         val uris = pendingViewUris ?: return@LaunchedEffect
         IntentHandoff.consumeBatch()
-        yield()
         if (uris.size >= 2) onBatchPicked(uris)
     }
 

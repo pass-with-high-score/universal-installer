@@ -52,7 +52,7 @@ val appModule = module {
             install(HttpTimeout) {
                 requestTimeoutMillis = 5 * 60 * 1000L   // 5 minutes — covers 32 MB upload over 3G
                 connectTimeoutMillis = 30_000L
-                socketTimeoutMillis = 60_000L
+                socketTimeoutMillis = 5 * 60 * 1000L     // match request timeout for large uploads
             }
             if (BuildConfig.DEBUG) {
                 install(Logging) {
