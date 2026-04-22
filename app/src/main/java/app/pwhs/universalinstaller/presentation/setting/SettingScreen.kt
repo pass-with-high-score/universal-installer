@@ -129,6 +129,7 @@ private fun SettingUi(
     onSyncPinCodeChanged: (String) -> Unit = {},
     onSyncServerPortChanged: (String) -> Unit = {},
 ) {
+    val context = androidx.compose.ui.platform.LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     Scaffold(
@@ -497,46 +498,19 @@ private fun SettingUi(
                 SettingsSection(title = stringResource(R.string.setting_section_appearance), icon = Icons.Rounded.Palette) {
                     ListItem(
                         headlineContent = {
-                            Text(stringResource(R.string.setting_theme_title), style = MaterialTheme.typography.bodyLarge)
+                            Text(stringResource(R.string.theme_screen_title), style = MaterialTheme.typography.bodyLarge)
                         },
                         supportingContent = {
-                            Column {
-                                Text(
-                                    text = stringResource(R.string.setting_theme_subtitle),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                Spacer(Modifier.height(8.dp))
-                                SingleChoiceSegmentedButtonRow(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    ThemeMode.entries.forEachIndexed { index, mode ->
-                                        SegmentedButton(
-                                            selected = uiState.themeMode == mode,
-                                            onClick = { onThemeChanged(mode) },
-                                            shape = SegmentedButtonDefaults.itemShape(
-                                                index = index,
-                                                count = ThemeMode.entries.size,
-                                            ),
-                                            icon = {
-                                                Icon(
-                                                    imageVector = when (mode) {
-                                                        ThemeMode.System -> Icons.Rounded.SettingsApplications
-                                                        ThemeMode.Light -> Icons.Rounded.LightMode
-                                                        ThemeMode.Dark -> Icons.Rounded.DarkMode
-                                                    },
-                                                    contentDescription = null,
-                                                    modifier = Modifier.size(18.dp),
-                                                )
-                                            }
-                                        ) {
-                                            Text(mode.label, style = MaterialTheme.typography.labelMedium)
-                                        }
-                                    }
-                                }
-                            }
+                            Text(
+                                text = "Customize Dynamic Colors and Dark Mode",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                        modifier = Modifier.clickable {
+                            context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.setting.theme.ThemeActivity::class.java))
+                        }
                     )
                     ListItem(
                         headlineContent = {

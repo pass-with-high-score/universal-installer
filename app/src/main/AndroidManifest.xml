@@ -218,6 +218,11 @@
                 android:resource="@xml/file_paths" />
         </provider>
 
+        <activity
+            android:name=".presentation.setting.theme.ThemeActivity"
+            android:exported="false"
+            android:launchMode="singleTop" />
+
     </application>
 
 </manifest>

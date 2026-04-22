@@ -401,4 +401,14 @@
     <string name="setting_sync_port_title">Server Port</string>
     <!-- Quick Settings Tile -->
     <string name="qs_tile_sync_label">Sync &amp; Share</string>
+    <string name="theme_screen_title">App Theme</string>
+    <string name="theme_mode_title">Theme Mode</string>
+    <string name="theme_mode_system">Follow System</string>
+    <string name="theme_mode_light">Light</string>
+    <string name="theme_mode_dark">Dark</string>
+    <string name="theme_dynamic_color_title">Material You</string>
+    <string name="theme_dynamic_color_subtitle">Use system wallpaper colors for app accents (requires Android 12+)</string>
+    <string name="theme_amoled_mode_title">AMOLED Black</string>
+    <string name="theme_amoled_mode_subtitle">Use pitch black background in dark mode</string>
+
 </resources>

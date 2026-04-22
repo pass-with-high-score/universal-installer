@@ -118,7 +118,8 @@ private val DarkExtendedColors = ExtendedColors(
 @Composable
 fun UniversalInstallerTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = true,
+    amoledMode: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -128,6 +129,20 @@ fun UniversalInstallerTheme(
         }
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
+    }.let { baseScheme ->
+        if (darkTheme && amoledMode) {
+            baseScheme.copy(
+                background = Color.Black,
+                surface = Color.Black,
+                surfaceContainerLowest = Color.Black,
+                surfaceContainerLow = Color(0xFF0F0F0F),
+                surfaceContainer = Color(0xFF141414),
+                surfaceContainerHigh = Color(0xFF1C1C1C),
+                surfaceContainerHighest = Color(0xFF262626)
+            )
+        } else {
+            baseScheme
+        }
     }
 
     val extendedColors = if (darkTheme) DarkExtendedColors else LightExtendedColors

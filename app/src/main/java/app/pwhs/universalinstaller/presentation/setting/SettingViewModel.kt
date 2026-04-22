@@ -27,6 +27,8 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "se
 
 object PreferencesKeys {
     val THEME_MODE = stringPreferencesKey("theme_mode")
+    val DYNAMIC_COLOR = booleanPreferencesKey("dynamic_color")
+    val AMOLED_MODE = booleanPreferencesKey("amoled_mode")
     val USE_SHIZUKU = booleanPreferencesKey("use_shizuku")
     val USE_ROOT = booleanPreferencesKey("use_root")
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")
@@ -111,6 +113,8 @@ data class RootOptions(
 
 data class SettingUiState(
     val themeMode: ThemeMode = ThemeMode.System,
+    val dynamicColor: Boolean = true,
+    val amoledMode: Boolean = false,
     val useShizuku: Boolean = false,
     val useRoot: Boolean = false,
     val virusTotalApiKey: String = "",
@@ -172,6 +176,12 @@ class SettingViewModel(
             ThemeMode.entries.find { it.name == themeName } ?: ThemeMode.System
         },
         dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.DYNAMIC_COLOR] ?: true
+        },
+        dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.AMOLED_MODE] ?: false
+        },
+        dataStore.data.map { prefs ->
             prefs[PreferencesKeys.USE_SHIZUKU] ?: false
         },
         dataStore.data.map { prefs ->
@@ -222,15 +232,17 @@ class SettingViewModel(
         },
     ) { flows ->
         val theme = flows[0] as ThemeMode
-        val useShizuku = flows[1] as Boolean
-        val vtKey = flows[2] as String
-        val shizukuState = flows[3] as ShizukuState
-        val shizukuOpts = flows[4] as ShizukuOptions
-        val deleteApk = flows[5] as Boolean
-        val useRoot = flows[6] as Boolean
-        val rootState = flows[7] as RootState
-        val rootOpts = flows[8] as RootOptions
-        val syncOpts = flows[9] as SyncOptions
+        val dynamicColor = flows[1] as Boolean
+        val amoledMode = flows[2] as Boolean
+        val useShizuku = flows[3] as Boolean
+        val vtKey = flows[4] as String
+        val shizukuState = flows[5] as ShizukuState
+        val shizukuOpts = flows[6] as ShizukuOptions
+        val deleteApk = flows[7] as Boolean
+        val useRoot = flows[8] as Boolean
+        val rootState = flows[9] as RootState
+        val rootOpts = flows[10] as RootOptions
+        val syncOpts = flows[11] as SyncOptions
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
@@ -238,6 +250,8 @@ class SettingViewModel(
         } catch (_: Exception) { "" }
         SettingUiState(
             themeMode = theme,
+            dynamicColor = dynamicColor,
+            amoledMode = amoledMode,
             useShizuku = useShizuku && shizukuState == ShizukuState.READY,
             useRoot = useRoot && rootState == RootState.READY,
             virusTotalApiKey = vtKey,
@@ -259,6 +273,22 @@ class SettingViewModel(
         viewModelScope.launch {
             dataStore.edit { prefs ->
                 prefs[PreferencesKeys.THEME_MODE] = mode.name
+            }
+        }
+    }
+
+    fun setDynamicColor(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.DYNAMIC_COLOR] = enabled
+            }
+        }
+    }
+
+    fun setAmoledMode(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.AMOLED_MODE] = enabled
             }
         }
     }

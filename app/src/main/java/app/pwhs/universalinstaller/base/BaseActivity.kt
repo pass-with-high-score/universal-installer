@@ -12,6 +12,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import app.pwhs.universalinstaller.presentation.setting.ThemeMode
 import app.pwhs.universalinstaller.presentation.setting.dataStore
@@ -21,6 +22,12 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 abstract class BaseActivity : ComponentActivity() {
+
+    protected data class AppThemeState(
+        val mode: ThemeMode,
+        val dynamicColor: Boolean,
+        val amoledMode: Boolean
+    )
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
@@ -43,23 +50,29 @@ abstract class BaseActivity : ComponentActivity() {
     protected fun setContentWithTheme(content: @Composable () -> Unit) {
         enableEdgeToEdge()
         setContent {
-            val initialThemeMode = remember {
+            val initialState = remember {
                 kotlinx.coroutines.runBlocking {
                     val prefs = dataStore.data.first()
                     val name = prefs[stringPreferencesKey("theme_mode")] ?: ThemeMode.System.name
-                    ThemeMode.entries.find { it.name == name } ?: ThemeMode.System
+                    val mode = ThemeMode.entries.find { it.name == name } ?: ThemeMode.System
+                    val dynamicColor = prefs[booleanPreferencesKey("dynamic_color")] ?: true
+                    val amoledMode = prefs[booleanPreferencesKey("amoled_mode")] ?: false
+                    AppThemeState(mode, dynamicColor, amoledMode)
                 }
             }
             
-            val themeModeFlow = remember {
+            val themeStateFlow = remember {
                 dataStore.data.map { prefs ->
                     val name = prefs[stringPreferencesKey("theme_mode")] ?: ThemeMode.System.name
-                    ThemeMode.entries.find { it.name == name } ?: ThemeMode.System
+                    val mode = ThemeMode.entries.find { it.name == name } ?: ThemeMode.System
+                    val dynamicColor = prefs[booleanPreferencesKey("dynamic_color")] ?: true
+                    val amoledMode = prefs[booleanPreferencesKey("amoled_mode")] ?: false
+                    AppThemeState(mode, dynamicColor, amoledMode)
                 }
             }
-            val themeMode by themeModeFlow.collectAsState(initial = initialThemeMode)
+            val themeState by themeStateFlow.collectAsState(initial = initialState)
 
-            val darkTheme = when (themeMode) {
+            val darkTheme = when (themeState.mode) {
                 ThemeMode.System -> isSystemInDarkTheme()
                 ThemeMode.Light -> false
                 ThemeMode.Dark -> true
@@ -87,7 +100,11 @@ abstract class BaseActivity : ComponentActivity() {
                 onDispose {}
             }
 
-            UniversalInstallerTheme(darkTheme = darkTheme) {
+            UniversalInstallerTheme(
+                darkTheme = darkTheme,
+                dynamicColor = themeState.dynamicColor,
+                amoledMode = themeState.amoledMode
+            ) {
                 content()
             }
         }
