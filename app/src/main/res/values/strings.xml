@@ -186,6 +186,14 @@
     <string name="apk_info_vt_too_large">File too large (%1$s). VirusTotal accepts up to %2$d MB.</string>
     <string name="apk_info_vt_check_button">Check with VirusTotal</string>
     <string name="apk_info_vt_rescan_button">Scan again</string>
+    <string name="apk_info_vt_view_report">View full report on VirusTotal</string>
+    <string name="apk_info_vt_label_malicious">Malicious</string>
+    <string name="apk_info_vt_label_suspicious">Suspicious</string>
+    <string name="apk_info_vt_label_harmless">Harmless</string>
+    <string name="apk_info_vt_label_undetected">Undetected</string>
+    <string name="apk_info_vt_total_engines">%d engines scanned</string>
+    <string name="apk_info_vt_show_all_engines">Show all %d engines</string>
+    <string name="apk_info_vt_hide_engines">Hide details</string>
     <!-- VirusTotal notifications -->
     <string name="vt_notif_channel_name">VirusTotal scans</string>
     <string name="vt_notif_channel_description">Progress of VirusTotal uploads and analyses</string>

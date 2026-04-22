@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.data.remote
 
+import app.pwhs.universalinstaller.domain.model.VtEngineResult
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import io.ktor.client.HttpClient
@@ -222,7 +223,8 @@ class VirusTotalService(
     private fun parseFileStats(body: String): VtResult = try {
         val attributes = JSONObject(body).getJSONObject("data").getJSONObject("attributes")
         val stats = attributes.getJSONObject("last_analysis_stats")
-        toResult(stats)
+        val engines = parseEngineResults(attributes.optJSONObject("last_analysis_results"))
+        toResult(stats, engines)
     } catch (e: Exception) {
         Timber.e(e, "Error parsing VT file response")
         VtResult(status = VtStatus.ERROR, errorMessage = "Parse error: ${e.message}")
@@ -235,7 +237,8 @@ class VirusTotalService(
             "in-progress" -> VtResult(status = VtStatus.ANALYZING, analysisId = analysisId)
             "completed" -> {
                 val stats = attributes.getJSONObject("stats")
-                toResult(stats).copy(analysisId = analysisId)
+                val engines = parseEngineResults(attributes.optJSONObject("results"))
+                toResult(stats, engines).copy(analysisId = analysisId)
             }
             else -> VtResult(
                 status = VtStatus.ERROR,
@@ -252,7 +255,35 @@ class VirusTotalService(
         )
     }
 
-    private fun toResult(stats: JSONObject): VtResult {
+    /**
+     * Extract per-engine results from `last_analysis_results` (file endpoint) or
+     * `results` (analysis endpoint). Returns engines sorted: malicious first, then
+     * suspicious, then the rest alphabetically.
+     */
+    private fun parseEngineResults(resultsObj: JSONObject?): List<VtEngineResult> {
+        if (resultsObj == null) return emptyList()
+        val list = mutableListOf<VtEngineResult>()
+        for (key in resultsObj.keys()) {
+            val engine = resultsObj.optJSONObject(key) ?: continue
+            list.add(
+                VtEngineResult(
+                    engineName = key,
+                    category = engine.optString("category", "undetected"),
+                    result = engine.optString("result", "").let {
+                        if (it.isBlank() || it == "null") null else it
+                    },
+                )
+            )
+        }
+        // Sort: threats first (malicious > suspicious), then alphabetical
+        val categoryOrder = mapOf("malicious" to 0, "suspicious" to 1)
+        return list.sortedWith(
+            compareBy<VtEngineResult> { categoryOrder[it.category] ?: 2 }
+                .thenBy { it.engineName.lowercase() }
+        )
+    }
+
+    private fun toResult(stats: JSONObject, engines: List<VtEngineResult> = emptyList()): VtResult {
         val malicious = stats.optInt("malicious", 0)
         val suspicious = stats.optInt("suspicious", 0)
         val harmless = stats.optInt("harmless", 0)
@@ -268,6 +299,7 @@ class VirusTotalService(
             harmless = harmless,
             undetected = undetected,
             status = status,
+            engineResults = engines,
         )
     }
 

@@ -14,6 +14,18 @@ enum class VtStatus {
     ANALYZING,   // VT engines are running
 }
 
+/**
+ * Per-engine scan result from VirusTotal's `last_analysis_results`.
+ * @param engineName  e.g. "Kaspersky", "Avira", "ClamAV"
+ * @param category    one of "malicious", "suspicious", "harmless", "undetected", "type-unsupported", "timeout", "failure"
+ * @param result      detection label when positive, e.g. "Trojan.GenericKD.12345"; null/blank when clean
+ */
+data class VtEngineResult(
+    val engineName: String,
+    val category: String,
+    val result: String?,
+)
+
 data class VtResult(
     val malicious: Int = 0,
     val suspicious: Int = 0,
@@ -23,4 +35,5 @@ data class VtResult(
     val errorMessage: String = "",
     val uploadProgress: Int = 0,   // 0..100, meaningful only when status = UPLOADING
     val analysisId: String = "",
+    val engineResults: List<VtEngineResult> = emptyList(),
 )

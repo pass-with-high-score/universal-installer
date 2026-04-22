@@ -23,6 +23,7 @@ import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Memory
+import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Storage
@@ -209,6 +210,7 @@ internal fun ApkInfoContent(
         VirusTotalCard(
             vt = apkInfo.vtResult,
             fileSizeBytes = apkInfo.fileSizeBytes,
+            sha256 = apkInfo.sha256,
             onCheck = onCheckVirusTotal,
         )
 
@@ -323,14 +325,17 @@ private fun LanguagesCard(languages: List<String>) {
 private fun VirusTotalCard(
     vt: app.pwhs.universalinstaller.domain.model.VtResult?,
     fileSizeBytes: Long,
+    sha256: String = "",
     onCheck: () -> Unit,
 ) {
     val context = LocalContext.current
+    val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
     val extendedColors = LocalExtendedColors.current
     val warningColor = extendedColors.warning
     val status = vt?.status
     val inProgress = status == VtStatus.SCANNING || status == VtStatus.UPLOADING ||
             status == VtStatus.QUEUED || status == VtStatus.ANALYZING
+    val hasResult = status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)
 
     val vtColor = when (status) {
         VtStatus.CLEAN -> MaterialTheme.colorScheme.primary
@@ -410,11 +415,6 @@ private fun VirusTotalCard(
                         Spacer(Modifier.width(4.dp))
                         Text(stringResource(R.string.apk_info_vt_clean), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.primary)
                     }
-                    Text(
-                        text = stringResource(R.string.apk_info_vt_clean_detail, vt.harmless, vt.undetected),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
                 VtStatus.MALICIOUS -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -422,11 +422,6 @@ private fun VirusTotalCard(
                         Spacer(Modifier.width(4.dp))
                         Text(stringResource(R.string.apk_info_vt_malicious, vt.malicious), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error)
                     }
-                    Text(
-                        text = stringResource(R.string.apk_info_vt_malicious_detail, vt.malicious, vt.suspicious, vt.harmless),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
                 VtStatus.SUSPICIOUS -> {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -434,11 +429,6 @@ private fun VirusTotalCard(
                         Spacer(Modifier.width(4.dp))
                         Text(stringResource(R.string.apk_info_vt_suspicious, vt.suspicious), style = MaterialTheme.typography.bodySmall, color = warningColor)
                     }
-                    Text(
-                        text = stringResource(R.string.apk_info_vt_suspicious_detail, vt.suspicious, vt.harmless, vt.undetected),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
                 }
                 VtStatus.NOT_FOUND -> Text(
                     stringResource(R.string.apk_info_vt_not_found),
@@ -467,7 +457,13 @@ private fun VirusTotalCard(
                 else -> {}
             }
 
-            // Action button — only when we're idle and not too-large.
+            // Detailed breakdown — shown when results are available
+            if (hasResult && vt != null) {
+                Spacer(Modifier.height(12.dp))
+                VtBreakdownSection(vt = vt, warningColor = warningColor)
+            }
+
+            // Action buttons
             if (!inProgress && status != VtStatus.TOO_LARGE && status != VtStatus.NO_API_KEY) {
                 Spacer(Modifier.height(12.dp))
                 val label = when (status) {
@@ -487,7 +483,265 @@ private fun VirusTotalCard(
                     Text(label, style = MaterialTheme.typography.labelLarge)
                 }
             }
+
+            // "View on VirusTotal" link button
+            if (hasResult && sha256.isNotBlank()) {
+                TextButton(
+                    onClick = {
+                        uriHandler.openUri("https://www.virustotal.com/gui/file/$sha256")
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.OpenInNew,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        stringResource(R.string.apk_info_vt_view_report),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            }
         }
+    }
+}
+
+/**
+ * Detailed breakdown of VirusTotal engine results with visual indicator bars.
+ */
+@Composable
+private fun VtBreakdownSection(
+    vt: app.pwhs.universalinstaller.domain.model.VtResult,
+    warningColor: androidx.compose.ui.graphics.Color,
+) {
+    val total = (vt.malicious + vt.suspicious + vt.harmless + vt.undetected).coerceAtLeast(1)
+
+    Text(
+        text = stringResource(R.string.apk_info_vt_total_engines, total),
+        style = MaterialTheme.typography.labelSmall,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
+    Spacer(Modifier.height(8.dp))
+
+    // Stacked progress bar showing all categories
+    val malFraction = vt.malicious.toFloat() / total
+    val susFraction = vt.suspicious.toFloat() / total
+    val harmFraction = vt.harmless.toFloat() / total
+    // undetected fills the rest
+
+    val errorColor = MaterialTheme.colorScheme.error
+    val primaryColor = MaterialTheme.colorScheme.primary
+    val surfaceVariantColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f)
+
+    androidx.compose.foundation.Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(8.dp)
+            .clip(MaterialTheme.shapes.small)
+    ) {
+        val w = size.width
+        val h = size.height
+        var x = 0f
+
+        // Malicious (red)
+        val malW = w * malFraction
+        if (malW > 0f) {
+            drawRect(color = errorColor, topLeft = androidx.compose.ui.geometry.Offset(x, 0f), size = androidx.compose.ui.geometry.Size(malW, h))
+            x += malW
+        }
+        // Suspicious (warning/orange)
+        val susW = w * susFraction
+        if (susW > 0f) {
+            drawRect(color = warningColor, topLeft = androidx.compose.ui.geometry.Offset(x, 0f), size = androidx.compose.ui.geometry.Size(susW, h))
+            x += susW
+        }
+        // Harmless (green/primary)
+        val harmW = w * harmFraction
+        if (harmW > 0f) {
+            drawRect(color = primaryColor, topLeft = androidx.compose.ui.geometry.Offset(x, 0f), size = androidx.compose.ui.geometry.Size(harmW, h))
+            x += harmW
+        }
+        // Undetected (subtle gray)
+        val undetW = w - x
+        if (undetW > 0f) {
+            drawRect(color = surfaceVariantColor, topLeft = androidx.compose.ui.geometry.Offset(x, 0f), size = androidx.compose.ui.geometry.Size(undetW, h))
+        }
+    }
+
+    Spacer(Modifier.height(8.dp))
+
+    // Legend rows
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        if (vt.malicious > 0) {
+            VtLegendRow(
+                color = MaterialTheme.colorScheme.error,
+                label = stringResource(R.string.apk_info_vt_label_malicious),
+                count = vt.malicious,
+            )
+        }
+        if (vt.suspicious > 0) {
+            VtLegendRow(
+                color = warningColor,
+                label = stringResource(R.string.apk_info_vt_label_suspicious),
+                count = vt.suspicious,
+            )
+        }
+        VtLegendRow(
+            color = MaterialTheme.colorScheme.primary,
+            label = stringResource(R.string.apk_info_vt_label_harmless),
+            count = vt.harmless,
+        )
+        VtLegendRow(
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+            label = stringResource(R.string.apk_info_vt_label_undetected),
+            count = vt.undetected,
+        )
+    }
+
+    // Per-engine detail list
+    if (vt.engineResults.isNotEmpty()) {
+        Spacer(Modifier.height(12.dp))
+
+        val threats = remember(vt.engineResults) {
+            vt.engineResults.filter { it.category == "malicious" || it.category == "suspicious" }
+        }
+        val cleanEngines = remember(vt.engineResults) {
+            vt.engineResults.filter { it.category != "malicious" && it.category != "suspicious" }
+        }
+
+        var showAll by remember { mutableStateOf(false) }
+
+        // Always show threatening engines
+        if (threats.isNotEmpty()) {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                threats.forEach { engine ->
+                    VtEngineRow(
+                        engine = engine,
+                        warningColor = warningColor,
+                    )
+                }
+            }
+        }
+
+        // Collapsible clean engines
+        if (cleanEngines.isNotEmpty()) {
+            if (showAll) {
+                Spacer(Modifier.height(4.dp))
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    cleanEngines.forEach { engine ->
+                        VtEngineRow(
+                            engine = engine,
+                            warningColor = warningColor,
+                        )
+                    }
+                }
+            }
+            Spacer(Modifier.height(4.dp))
+            TextButton(
+                onClick = { showAll = !showAll },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = if (showAll) stringResource(R.string.apk_info_vt_hide_engines)
+                    else stringResource(R.string.apk_info_vt_show_all_engines, cleanEngines.size),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun VtEngineRow(
+    engine: app.pwhs.universalinstaller.domain.model.VtEngineResult,
+    warningColor: androidx.compose.ui.graphics.Color,
+) {
+    val dotColor = when (engine.category) {
+        "malicious" -> MaterialTheme.colorScheme.error
+        "suspicious" -> warningColor
+        "harmless" -> MaterialTheme.colorScheme.primary
+        else -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f)
+    }
+    val detectionText = engine.result
+    val isThreat = engine.category == "malicious" || engine.category == "suspicious"
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.small)
+            .then(
+                if (isThreat) Modifier.background(
+                    MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
+                ) else Modifier
+            )
+            .padding(horizontal = 8.dp, vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Spacer(
+            modifier = Modifier
+                .size(8.dp)
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(dotColor),
+        )
+        Spacer(Modifier.width(8.dp))
+        Text(
+            text = engine.engineName,
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = if (isThreat) FontWeight.SemiBold else FontWeight.Normal,
+            color = if (isThreat) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        if (detectionText != null) {
+            Text(
+                text = detectionText,
+                style = MaterialTheme.typography.labelSmall,
+                color = if (isThreat) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f),
+                textAlign = androidx.compose.ui.text.style.TextAlign.End,
+            )
+        } else {
+            Text(
+                text = engine.category.replaceFirstChar { it.uppercase() },
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                textAlign = androidx.compose.ui.text.style.TextAlign.End,
+            )
+        }
+    }
+}
+
+@Composable
+private fun VtLegendRow(
+    color: androidx.compose.ui.graphics.Color,
+    label: String,
+    count: Int,
+) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Spacer(
+            modifier = Modifier
+                .size(10.dp)
+                .clip(MaterialTheme.shapes.extraSmall)
+                .background(color),
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.labelSmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
     }
 }
 
