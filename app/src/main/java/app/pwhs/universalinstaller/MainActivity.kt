@@ -39,10 +39,6 @@ private enum class AppRoute { Splash, Onboarding, Main }
 
 class MainActivity : ComponentActivity() {
 
-    private val notificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { /* granted or not — uninstall flow works either way, notifications just won't show */ }
-
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
     }
@@ -112,15 +108,6 @@ class MainActivity : ComponentActivity() {
             }
 
             val intentScheme = intent?.data?.scheme
-            val shortcutRoute = remember(intent) {
-                if (intentScheme == "universalinstaller") {
-                    when (intent?.data?.host) {
-                        "sync" -> com.ramcosta.composedestinations.generated.destinations.SyncScreenDestination
-                        "uninstall" -> com.ramcosta.composedestinations.generated.destinations.UninstallScreenDestination
-                        else -> null
-                    }
-                } else null
-            }
 
             // Post the intent URI AFTER the composable tree is set up, so InstallScreen
             // is already composed (when skipSplash == true) and can process it immediately.
@@ -139,12 +126,23 @@ class MainActivity : ComponentActivity() {
                     )
                     AppRoute.Main -> {
                         LaunchedEffect(Unit) {
-                            startActivity(Intent(this@MainActivity, app.pwhs.universalinstaller.presentation.install.InstallActivity::class.java).apply {
+                            val uri = intent?.data
+                            val targetActivity = if (uri?.scheme == "universalinstaller") {
+                                when (uri.host) {
+                                    "sync" -> app.pwhs.universalinstaller.presentation.sync.SyncActivity::class.java
+                                    "uninstall" -> app.pwhs.universalinstaller.presentation.uninstall.UninstallActivity::class.java
+                                    else -> app.pwhs.universalinstaller.presentation.install.InstallActivity::class.java
+                                }
+                            } else {
+                                app.pwhs.universalinstaller.presentation.install.InstallActivity::class.java
+                            }
+                            startActivity(Intent(this@MainActivity, targetActivity).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                             })
                             finish()
                         }
-                    }                }
+                    }
+                }
             }
         }
     }
@@ -173,14 +171,6 @@ class MainActivity : ComponentActivity() {
         ShortcutManagerCompat.addDynamicShortcuts(this, listOf(syncShortcut, uninstallShortcut))
     }
 
-    private fun maybeRequestNotificationPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        val granted = ContextCompat.checkSelfPermission(
-            this, Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED
-        if (!granted) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-    }
-
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
@@ -198,6 +188,7 @@ class MainActivity : ComponentActivity() {
         when (intent.action) {
             Intent.ACTION_VIEW, Intent.ACTION_INSTALL_PACKAGE -> {
                 val uri: Uri = intent.data ?: return
+                if (uri.scheme == "universalinstaller") return
                 IntentHandoff.post(uri)
             }
             Intent.ACTION_SEND -> {
