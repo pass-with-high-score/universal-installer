@@ -1,6 +1,17 @@
 package app.pwhs.universalinstaller.domain.model
 
 import android.graphics.drawable.Drawable
+import android.net.Uri
+
+enum class SplitType { Base, Libs, Locale, ScreenDensity, Feature, Other }
+
+data class SplitEntry(
+    val name: String,
+    val type: SplitType,
+    val uri: Uri,
+    val sizeBytes: Long,
+    val selected: Boolean = true,
+)
 
 data class ApkInfo(
     val appName: String,
@@ -20,4 +31,5 @@ data class ApkInfo(
     val vtResult: VtResult? = null,
     val obbFileNames: List<String> = emptyList(),
     val obbTotalBytes: Long = 0L,
+    val splitEntries: List<SplitEntry> = emptyList(),
 )

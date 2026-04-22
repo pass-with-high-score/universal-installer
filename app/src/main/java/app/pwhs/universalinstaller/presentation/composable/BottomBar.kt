@@ -1,5 +1,7 @@
 package app.pwhs.universalinstaller.presentation.composable
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.InstallMobile
@@ -11,24 +13,29 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavHostController
 import app.pwhs.universalinstaller.R
-import com.ramcosta.composedestinations.generated.NavGraphs
-import com.ramcosta.composedestinations.generated.destinations.InstallScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.SettingScreenDestination
-import com.ramcosta.composedestinations.generated.destinations.UninstallScreenDestination
-import com.ramcosta.composedestinations.spec.DirectionDestinationSpec
-import com.ramcosta.composedestinations.utils.isRouteOnBackStackAsState
-import com.ramcosta.composedestinations.utils.rememberDestinationsNavigator
+import app.pwhs.universalinstaller.presentation.install.InstallActivity
+import app.pwhs.universalinstaller.presentation.setting.SettingActivity
+import app.pwhs.universalinstaller.presentation.uninstall.UninstallActivity
+
+enum class BottomBarItem(
+    val activityClass: Class<*>,
+    val label: Int,
+    val icon: ImageVector,
+) {
+    Install(InstallActivity::class.java, R.string.txt_install, Icons.Rounded.InstallMobile),
+    Uninstall(UninstallActivity::class.java, R.string.txt_uninstall, Icons.Rounded.DeleteOutline),
+    Settings(SettingActivity::class.java, R.string.txt_setting, Icons.Rounded.Settings)
+}
 
 @Composable
 fun BottomBar(
-    navController: NavHostController
+    currentTab: BottomBarItem
 ) {
-    val navigator = navController.rememberDestinationsNavigator()
+    val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
     val itemColors = NavigationBarItemDefaults.colors(
         selectedIconColor = colors.onPrimaryContainer,
@@ -39,22 +46,18 @@ fun BottomBar(
     )
     NavigationBar {
         BottomBarItem.entries.forEach { destination ->
-            val isCurrentDestOnBackStack by navController.isRouteOnBackStackAsState(destination.direction)
+            val isSelected = currentTab == destination
             NavigationBarItem(
-                selected = isCurrentDestOnBackStack,
+                selected = isSelected,
                 colors = itemColors,
                 onClick = {
-                    if (isCurrentDestOnBackStack) {
-                        navigator.popBackStack(destination.direction, false)
-                    }
-
-                    navigator.navigate(destination.direction) {
-                        popUpTo(NavGraphs.root) {
-                            saveState = true
+                    if (!isSelected) {
+                        val intent = Intent(context, destination.activityClass).apply {
+                            flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
                         }
-
-                        launchSingleTop = true
-                        restoreState = true
+                        context.startActivity(intent)
+                        @Suppress("DEPRECATION")
+                        (context as? android.app.Activity)?.overridePendingTransition(0, 0)
                     }
                 },
                 icon = {
@@ -67,14 +70,4 @@ fun BottomBar(
             )
         }
     }
-}
-
-enum class BottomBarItem(
-    val direction: DirectionDestinationSpec,
-    val label: Int,
-    val icon: ImageVector,
-) {
-    Install(InstallScreenDestination, R.string.txt_install, Icons.Rounded.InstallMobile),
-    Uninstall(UninstallScreenDestination, R.string.txt_uninstall, Icons.Rounded.DeleteOutline),
-    Settings(SettingScreenDestination, R.string.txt_setting, Icons.Rounded.Settings)
 }

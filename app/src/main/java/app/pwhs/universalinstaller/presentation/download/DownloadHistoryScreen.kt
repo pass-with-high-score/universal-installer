@@ -60,19 +60,18 @@ import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.IntentHandoff
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.DownloadHistoryEntity
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
 import java.text.DateFormat
 import java.util.Date
 
-@Destination<RootGraph>
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadHistoryScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: DownloadHistoryViewModel = koinViewModel(),
 ) {
@@ -115,7 +114,7 @@ fun DownloadHistoryScreen(
             LargeTopAppBar(
                 title = { Text(stringResource(R.string.download_history_title)) },
                 navigationIcon = {
-                    IconButton(onClick = { navigator.navigateUp() }) {
+                    IconButton(onClick = { val a = context as? android.app.Activity; a?.finish() }) {
                         Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
                     }
                 },
@@ -178,7 +177,7 @@ fun DownloadHistoryScreen(
                                 file,
                             )
                             IntentHandoff.post(uri)
-                            navigator.navigateUp()
+                            val a = context as? android.app.Activity; a?.finish()
                         },
                         onDelete = { pendingDelete = entry },
                         onCopyUrl = {

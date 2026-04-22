@@ -42,9 +42,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.util.LocaleHelper
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+
 
 data class AppLanguage(val tag: String, val nativeName: String)
 
@@ -65,10 +65,9 @@ private val SUPPORTED_LANGUAGES = listOf(
     AppLanguage("zh", "中文"),
 )
 
-@Destination<RootGraph>
+
 @Composable
 fun LanguageScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -79,7 +78,7 @@ fun LanguageScreen(
         modifier = modifier,
         selected = selected,
         onSelected = { selected = it },
-        onBack = { navigator.popBackStack() },
+        onBack = { val a = context as? android.app.Activity; a?.finish() },
         onDone = {
             if (selected != initial) {
                 LocaleHelper.setAppLanguage(context, selected)
@@ -88,7 +87,7 @@ fun LanguageScreen(
                     (context as? Activity)?.recreate()
                 }
             }
-            navigator.popBackStack()
+            val a = context as? android.app.Activity; a?.finish()
         },
     )
 }

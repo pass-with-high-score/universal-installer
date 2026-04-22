@@ -52,10 +52,10 @@ import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.composable.SessionCard
 import app.pwhs.universalinstaller.util.extension.getDisplayName
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.DownloadHistoryScreenDestination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.yield
 import org.koin.androidx.compose.koinViewModel
@@ -65,10 +65,8 @@ import ru.solrudev.ackpine.splits.SplitPackage.Companion.toSplitPackage
 import ru.solrudev.ackpine.splits.ZippedApkSplits
 import timber.log.Timber
 
-@Destination<RootGraph>(start = true)
 @Composable
 fun InstallScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: InstallViewModel = koinViewModel(),
 ) {
@@ -102,13 +100,18 @@ fun InstallScreen(
         onRemoveObb = { obb -> viewModel.removeAttachedObb(obb.uri) },
         onGrantObbFolder = viewModel::onObbTreeGranted,
         obbTreeHintUri = viewModel::obbTreeHintUri,
-        onOpenDownloadHistory = { navigator.navigate(DownloadHistoryScreenDestination) },
+        onOpenDownloadHistory = {
+            context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.download.DownloadHistoryActivity::class.java))
+        },
         onBatchPicked = { uris -> viewModel.parseBatch(context, uris) },
         onBatchToggleEntry = viewModel::toggleBatchSelection,
         onBatchToggleAll = viewModel::setBatchAllSelected,
         onBatchConfirm = viewModel::confirmBatchInstall,
         onBatchDismiss = viewModel::dismissBatchInstall,
-        onOpenSyncServer = { navigator.navigate(com.ramcosta.composedestinations.generated.destinations.SyncScreenDestination) }
+        onToggleSplit = viewModel::toggleSplit,
+        onOpenSyncServer = {
+            context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.sync.SyncActivity::class.java))
+        }
     )
 }
 
@@ -144,6 +147,7 @@ private fun InstallUi(
     onBatchToggleAll: (Boolean) -> Unit = {},
     onBatchConfirm: () -> Unit = {},
     onBatchDismiss: () -> Unit = {},
+    onToggleSplit: (Int) -> Unit = {},
     onOpenSyncServer: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -321,6 +325,7 @@ private fun InstallUi(
                 attachedObbFiles = uiState.attachedObbFiles,
                 onAttachObb = { obbPickerLauncher.launch(arrayOf("*/*")) },
                 onRemoveObb = onRemoveObb,
+                onToggleSplit = onToggleSplit,
             )
         }
     }

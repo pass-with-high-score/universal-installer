@@ -169,6 +169,14 @@
 
         </activity>
 
+        <activity android:name=".presentation.install.InstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.uninstall.UninstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.sync.SyncActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.setting.SettingActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.download.DownloadHistoryActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.uninstall.logs.UninstallLogsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.setting.language.LanguageActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"

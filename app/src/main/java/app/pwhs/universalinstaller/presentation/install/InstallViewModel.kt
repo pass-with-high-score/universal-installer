@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.install
 
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.provider.OpenableColumns
@@ -15,6 +16,8 @@ import app.pwhs.universalinstaller.data.remote.PackageDownloadService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.domain.model.ApkInfo
+import app.pwhs.universalinstaller.domain.model.SplitEntry
+import app.pwhs.universalinstaller.domain.model.SplitType
 import app.pwhs.universalinstaller.domain.model.SessionData
 import app.pwhs.universalinstaller.domain.model.SessionProgress
 import app.pwhs.universalinstaller.domain.model.VtResult
@@ -52,6 +55,7 @@ import timber.log.Timber
 import java.io.File
 import java.io.IOException
 import java.util.UUID
+import androidx.core.graphics.createBitmap
 
 class InstallViewModel(
     private val application: android.app.Application,
@@ -191,8 +195,27 @@ class InstallViewModel(
         }
     }
 
+    fun toggleSplit(index: Int) {
+        val info = _pendingApkInfo.value ?: return
+        val entries = info.splitEntries.toMutableList()
+        if (index !in entries.indices) return
+        val entry = entries[index]
+        // Base APK cannot be deselected
+        if (entry.type == SplitType.Base) return
+        entries[index] = entry.copy(selected = !entry.selected)
+        _pendingApkInfo.value = info.copy(splitEntries = entries)
+        // Update pendingApkUris to match selected splits
+        pendingApkUris = entries.filter { it.selected }.map { it.uri }
+    }
+
     fun confirmInstall() {
-        val uris = pendingApkUris
+        // Use selected splits from ApkInfo if available, otherwise fall back to cached URIs
+        val apkInfo = _pendingApkInfo.value
+        val uris = if (apkInfo != null && apkInfo.splitEntries.isNotEmpty()) {
+            apkInfo.splitEntries.filter { it.selected }.map { it.uri }
+        } else {
+            pendingApkUris
+        }
         if (uris.isNullOrEmpty()) {
             Timber.e("confirmInstall: pendingApkUris=${uris} — parse failed or splits incompatible")
             android.widget.Toast.makeText(
@@ -204,7 +227,6 @@ class InstallViewModel(
         }
         val fn = pendingFileName ?: return
         val originalUri = pendingOriginalUri
-        val apkInfo = _pendingApkInfo.value
         val obbEntries = pendingObbEntries
         val attachedObbs = _attachedObbFiles.value
         _pendingApkInfo.value = null
@@ -300,7 +322,7 @@ class InstallViewModel(
         val data = ObbCopyWorker.buildInputData(
             strategy, packageName, appName, sourceUri, entries, attached, treeUri,
         )
-        val workName = ObbCopyWorker.workNameFor(java.util.UUID.nameUUIDFromBytes(packageName.toByteArray()))
+        val workName = ObbCopyWorker.workNameFor(UUID.nameUUIDFromBytes(packageName.toByteArray()))
         val request = ObbCopyWorker.buildRequest(workName, data)
         wm.enqueueUniqueWork(workName, ExistingWorkPolicy.REPLACE, request)
         observeObbWorker(request.id, appName, packageName)
@@ -308,7 +330,7 @@ class InstallViewModel(
 
     private var obbWorkerObserverJob: Job? = null
 
-    private fun observeObbWorker(workId: java.util.UUID, appName: String, packageName: String) {
+    private fun observeObbWorker(workId: UUID, appName: String, packageName: String) {
         obbWorkerObserverJob?.cancel()
         obbWorkerObserverJob = viewModelScope.launch {
             WorkManager.getInstance(application)
@@ -422,7 +444,7 @@ class InstallViewModel(
     private suspend fun readObbTreeGrant(packageName: String): Uri? = try {
         val prefs = application.dataStore.data.first()
         val key = androidx.datastore.preferences.core.stringPreferencesKey("obb_tree_$packageName")
-        prefs[key]?.let(android.net.Uri::parse)
+        prefs[key]?.let(Uri::parse)
     } catch (_: Exception) { null }
 
     private suspend fun saveObbTreeGrant(packageName: String, uri: Uri) {
@@ -453,10 +475,10 @@ class InstallViewModel(
             )
         } catch (_: Exception) { /* best-effort; some providers don't support it */ }
         val size = try {
-            context.contentResolver.query(uri, arrayOf(android.provider.OpenableColumns.SIZE), null, null, null)
+            context.contentResolver.query(uri, arrayOf(OpenableColumns.SIZE), null, null, null)
                 ?.use { c ->
                     if (c.moveToFirst()) {
-                        val idx = c.getColumnIndex(android.provider.OpenableColumns.SIZE)
+                        val idx = c.getColumnIndex(OpenableColumns.SIZE)
                         if (idx >= 0) c.getLong(idx) else 0L
                     } else 0L
                 } ?: 0L
@@ -507,7 +529,7 @@ class InstallViewModel(
                         entries += BatchApkEntry(
                             uri = uri,
                             fileName = displayName,
-                            apkInfo = app.pwhs.universalinstaller.domain.model.ApkInfo(
+                            apkInfo = ApkInfo(
                                 appName = displayName.substringBeforeLast('.'),
                                 packageName = "Unknown",
                                 versionName = "",
@@ -563,7 +585,7 @@ class InstallViewModel(
         uri: Uri,
         splitPackage: SplitPackage.Provider,
         fileName: String,
-    ): Pair<app.pwhs.universalinstaller.domain.model.ApkInfo, List<Uri>> {
+    ): Pair<ApkInfo, List<Uri>> {
         val backup = pendingApkUris
         return try {
             val info = extractApkInfoAndCacheUris(context, uri, splitPackage, fileName)
@@ -839,7 +861,7 @@ class InstallViewModel(
     fun pickFromScan(context: Context, found: FoundPackageFile) {
         val file = File(found.path)
         if (!file.exists()) return
-        val uri = androidx.core.content.FileProvider.getUriForFile(
+        val uri = FileProvider.getUriForFile(
             context,
             "${BuildConfig.APPLICATION_ID}.fileprovider",
             file,
@@ -867,7 +889,7 @@ class InstallViewModel(
             val f = File(entry.path)
             if (!f.exists()) return@mapNotNull null
             runCatching {
-                androidx.core.content.FileProvider.getUriForFile(
+                FileProvider.getUriForFile(
                     context,
                     "${BuildConfig.APPLICATION_ID}.fileprovider",
                     f,
@@ -1094,8 +1116,8 @@ class InstallViewModel(
         val drawable = apkInfo?.icon ?: return null
         return withContext(Dispatchers.IO) {
             try {
-                val bitmap = (drawable as? android.graphics.drawable.BitmapDrawable)?.bitmap
-                    ?: android.graphics.Bitmap.createBitmap(192, 192, android.graphics.Bitmap.Config.ARGB_8888).also { bmp ->
+                val bitmap = (drawable as? BitmapDrawable)?.bitmap
+                    ?: createBitmap(192, 192).also { bmp ->
                         val canvas = android.graphics.Canvas(bmp)
                         drawable.setBounds(0, 0, 192, 192)
                         drawable.draw(canvas)
@@ -1187,6 +1209,7 @@ class InstallViewModel(
         val supportedAbis = mutableListOf<String>()
         val supportedLanguages = mutableListOf<String>()
 
+        val splitEntries = mutableListOf<SplitEntry>()
         try {
             val entries = splitPackage.get().toList()
             splitCount = entries.size
@@ -1206,15 +1229,58 @@ class InstallViewModel(
                         ackpineVersionCode = apk.versionCode
                         ackpineSize = apk.size
                         baseApkUri = apk.uri
+                        splitEntries.add(SplitEntry(
+                            name = "Base APK",
+                            type = SplitType.Base,
+                            uri = apk.uri,
+                            sizeBytes = apk.size,
+                        ))
                     }
-                    is Apk.Libs -> supportedAbis.add(apk.abi.name)
+                    is Apk.Libs -> {
+                        supportedAbis.add(apk.abi.name)
+                        splitEntries.add(SplitEntry(
+                            name = apk.abi.name,
+                            type = SplitType.Libs,
+                            uri = apk.uri,
+                            sizeBytes = apk.size,
+                        ))
+                    }
                     is Apk.Localization -> {
                         val displayName = apk.locale.displayLanguage
                         if (displayName.isNotBlank() && displayName !in supportedLanguages) {
                             supportedLanguages.add(displayName)
                         }
+                        splitEntries.add(SplitEntry(
+                            name = displayName.ifBlank { apk.locale.toLanguageTag() },
+                            type = SplitType.Locale,
+                            uri = apk.uri,
+                            sizeBytes = apk.size,
+                        ))
                     }
-                    else -> {}
+                    is Apk.ScreenDensity -> {
+                        splitEntries.add(SplitEntry(
+                            name = "${apk.dpi}dpi",
+                            type = SplitType.ScreenDensity,
+                            uri = apk.uri,
+                            sizeBytes = apk.size,
+                        ))
+                    }
+                    is Apk.Feature -> {
+                        splitEntries.add(SplitEntry(
+                            name = apk.name,
+                            type = SplitType.Feature,
+                            uri = apk.uri,
+                            sizeBytes = apk.size,
+                        ))
+                    }
+                    else -> {
+                        splitEntries.add(SplitEntry(
+                            name = apk.uri.lastPathSegment ?: "unknown",
+                            type = SplitType.Other,
+                            uri = apk.uri,
+                            sizeBytes = apk.size,
+                        ))
+                    }
                 }
             }
         } catch (e: Exception) {
@@ -1326,6 +1392,7 @@ class InstallViewModel(
             fileFormat = fileFormat,
             supportedAbis = supportedAbis.distinct(),
             supportedLanguages = supportedLanguages.sorted(),
+            splitEntries = splitEntries,
         )
     }
 }

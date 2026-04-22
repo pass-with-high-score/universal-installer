@@ -72,20 +72,20 @@ import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.LanguageScreenDestination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+
+
 import org.koin.androidx.compose.koinViewModel
 
-@Destination<RootGraph>
+
 @Composable
 fun SettingScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: SettingViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     SettingUi(
         modifier = modifier,
@@ -96,7 +96,9 @@ fun SettingScreen(
         onShizukuOptionChanged = viewModel::setShizukuOption,
         onShizukuInstallerChanged = viewModel::setShizukuInstallerPackageName,
         onDeleteApkChanged = viewModel::setDeleteApkAfterInstall,
-        onLanguageClick = { navigator.navigate(LanguageScreenDestination) },
+        onLanguageClick = { 
+            context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.setting.language.LanguageActivity::class.java))
+        },
         onRootChanged = viewModel::setUseRoot,
         onRootRetry = viewModel::retryRootProbe,
         onRootOptionChanged = viewModel::setRootOption,

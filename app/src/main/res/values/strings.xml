@@ -161,6 +161,14 @@
     <string name="apk_info_section_languages">Supported Languages (%d)</string>
     <string name="apk_info_section_permissions">Permissions (%d)</string>
     <string name="apk_info_permissions_more">… and %d more</string>
+    <string name="apk_info_section_splits">Splits (%d)</string>
+    <string name="apk_info_split_base">Base</string>
+    <string name="apk_info_split_libs">Native Library</string>
+    <string name="apk_info_split_locale">Language</string>
+    <string name="apk_info_split_density">Screen Density</string>
+    <string name="apk_info_split_feature">Feature</string>
+    <string name="apk_info_split_other">Other</string>
+    <string name="apk_info_split_show_less">Show less</string>
     <string name="apk_info_vt_scan_title">VirusTotal Scan</string>
     <string name="apk_info_vt_scanning">Scanning file…</string>
     <string name="apk_info_vt_clean">No threats detected</string>

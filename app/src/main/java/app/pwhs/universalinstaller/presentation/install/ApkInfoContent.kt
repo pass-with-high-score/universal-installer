@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.install
 
 import android.text.format.Formatter
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -38,6 +39,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -50,6 +55,8 @@ import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import androidx.core.graphics.drawable.toBitmap
 import app.pwhs.universalinstaller.domain.model.ApkInfo
+import app.pwhs.universalinstaller.domain.model.SplitEntry
+import app.pwhs.universalinstaller.domain.model.SplitType
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
 
@@ -63,6 +70,7 @@ internal fun ApkInfoContent(
     attachedObbFiles: List<AttachedObb> = emptyList(),
     onAttachObb: () -> Unit = {},
     onRemoveObb: (AttachedObb) -> Unit = {},
+    onToggleSplit: (Int) -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -174,6 +182,15 @@ internal fun ApkInfoContent(
 
         // Details card
         DetailsCard(apkInfo)
+
+        // Splits selector (only for bundles with multiple splits)
+        if (apkInfo.splitEntries.size > 1) {
+            Spacer(Modifier.height(16.dp))
+            SplitsCard(
+                splits = apkInfo.splitEntries,
+                onToggle = onToggleSplit,
+            )
+        }
 
         // Supported ABIs section
         if (apkInfo.supportedAbis.isNotEmpty()) {
@@ -476,26 +493,199 @@ private fun VirusTotalCard(
 
 @Composable
 private fun PermissionsCard(permissions: List<String>) {
+    // Well-known dangerous permissions that warrant visual emphasis
+    val dangerousSet = remember {
+        setOf(
+            "android.permission.CAMERA",
+            "android.permission.RECORD_AUDIO",
+            "android.permission.ACCESS_FINE_LOCATION",
+            "android.permission.ACCESS_COARSE_LOCATION",
+            "android.permission.ACCESS_BACKGROUND_LOCATION",
+            "android.permission.READ_CONTACTS",
+            "android.permission.WRITE_CONTACTS",
+            "android.permission.READ_CALL_LOG",
+            "android.permission.WRITE_CALL_LOG",
+            "android.permission.CALL_PHONE",
+            "android.permission.READ_PHONE_STATE",
+            "android.permission.READ_PHONE_NUMBERS",
+            "android.permission.SEND_SMS",
+            "android.permission.RECEIVE_SMS",
+            "android.permission.READ_SMS",
+            "android.permission.READ_EXTERNAL_STORAGE",
+            "android.permission.WRITE_EXTERNAL_STORAGE",
+            "android.permission.MANAGE_EXTERNAL_STORAGE",
+            "android.permission.READ_MEDIA_IMAGES",
+            "android.permission.READ_MEDIA_VIDEO",
+            "android.permission.READ_MEDIA_AUDIO",
+            "android.permission.BODY_SENSORS",
+            "android.permission.ACTIVITY_RECOGNITION",
+            "android.permission.READ_CALENDAR",
+            "android.permission.WRITE_CALENDAR",
+            "android.permission.SYSTEM_ALERT_WINDOW",
+            "android.permission.REQUEST_INSTALL_PACKAGES",
+        )
+    }
+
+    // Sort: dangerous first, then alphabetical within each group
+    val sorted = remember(permissions) {
+        permissions.sortedWith(
+            compareByDescending<String> { it in dangerousSet }
+                .thenBy { it.substringAfterLast('.') }
+        )
+    }
+
+    var expanded by remember { mutableStateOf(false) }
+    val collapsedCount = 5
+    val showToggle = sorted.size > collapsedCount
+    val visiblePerms = if (expanded || !showToggle) sorted else sorted.take(collapsedCount)
+
     SectionCard(
         icon = Icons.Rounded.Security,
         title = stringResource(R.string.apk_info_section_permissions, permissions.size),
     ) {
-        permissions.take(10).forEach { perm ->
-            val shortPerm = perm.substringAfterLast('.')
-            Text(
-                text = "• $shortPerm",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(vertical = 2.dp),
-            )
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            visiblePerms.forEach { perm ->
+                val isDangerous = perm in dangerousSet
+                val shortName = perm.substringAfterLast('.')
+                    .replace('_', ' ')
+                    .lowercase()
+                    .replaceFirstChar { it.uppercase() }
+                val prefix = perm.substringBeforeLast('.', "")
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(MaterialTheme.shapes.small)
+                        .then(
+                            if (isDangerous) Modifier.background(
+                                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)
+                            ) else Modifier
+                        )
+                        .padding(horizontal = 8.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = if (isDangerous) Icons.Rounded.Warning else Icons.Rounded.CheckCircle,
+                        contentDescription = null,
+                        tint = if (isDangerous) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = shortName,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = if (isDangerous) FontWeight.SemiBold else FontWeight.Normal,
+                            color = if (isDangerous) MaterialTheme.colorScheme.error
+                            else MaterialTheme.colorScheme.onSurface,
+                        )
+                        if (prefix.isNotEmpty()) {
+                            Text(
+                                text = prefix,
+                                style = MaterialTheme.typography.labelSmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                            )
+                        }
+                    }
+                }
+            }
         }
-        if (permissions.size > 10) {
-            Text(
-                text = stringResource(R.string.apk_info_permissions_more, permissions.size - 10),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                modifier = Modifier.padding(top = 4.dp),
-            )
+        if (showToggle) {
+            Spacer(Modifier.height(4.dp))
+            TextButton(
+                onClick = { expanded = !expanded },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = if (expanded) "Show less"
+                    else stringResource(R.string.apk_info_permissions_more, sorted.size - collapsedCount),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+    }
+}
+
+// ── Splits card ─────────────────────────────────────────
+
+@Composable
+private fun SplitsCard(
+    splits: List<SplitEntry>,
+    onToggle: (Int) -> Unit,
+) {
+    val context = LocalContext.current
+    var expanded by remember { mutableStateOf(false) }
+    val collapsedCount = 5
+    val showToggle = splits.size > collapsedCount
+    val visibleSplits = if (expanded || !showToggle) splits else splits.take(collapsedCount)
+
+    SectionCard(
+        icon = Icons.Rounded.Memory,
+        title = stringResource(R.string.apk_info_section_splits, splits.size),
+    ) {
+        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+            visibleSplits.forEachIndexed { index, split ->
+                val actualIndex = if (expanded || !showToggle) index
+                else splits.indexOf(split)
+                val typeLabel = when (split.type) {
+                    SplitType.Base -> stringResource(R.string.apk_info_split_base)
+                    SplitType.Libs -> stringResource(R.string.apk_info_split_libs)
+                    SplitType.Locale -> stringResource(R.string.apk_info_split_locale)
+                    SplitType.ScreenDensity -> stringResource(R.string.apk_info_split_density)
+                    SplitType.Feature -> stringResource(R.string.apk_info_split_feature)
+                    SplitType.Other -> stringResource(R.string.apk_info_split_other)
+                }
+                val isBase = split.type == SplitType.Base
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(MaterialTheme.shapes.small)
+                        .then(
+                            if (isBase) Modifier.background(
+                                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                            ) else Modifier
+                        )
+                        .padding(start = 4.dp, end = 8.dp, top = 2.dp, bottom = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    androidx.compose.material3.Checkbox(
+                        checked = split.selected,
+                        onCheckedChange = { onToggle(actualIndex) },
+                        enabled = !isBase,
+                        modifier = Modifier.size(36.dp),
+                    )
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = split.name,
+                            style = MaterialTheme.typography.bodySmall,
+                            fontWeight = if (isBase) FontWeight.SemiBold else FontWeight.Normal,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Text(
+                            text = typeLabel + if (split.sizeBytes > 0)
+                                " · ${Formatter.formatShortFileSize(context, split.sizeBytes)}"
+                            else "",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        )
+                    }
+                }
+            }
+        }
+        if (showToggle) {
+            Spacer(Modifier.height(4.dp))
+            TextButton(
+                onClick = { expanded = !expanded },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = if (expanded) stringResource(R.string.apk_info_split_show_less)
+                    else stringResource(R.string.apk_info_permissions_more, splits.size - collapsedCount),
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
         }
     }
 }

@@ -61,26 +61,26 @@ import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.UninstallLogEntity
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@Destination<RootGraph>
+
 @Composable
 fun UninstallLogsScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: UninstallLogsViewModel = koinViewModel(),
 ) {
     val logs by viewModel.logs.collectAsState()
+    val context = androidx.compose.ui.platform.LocalContext.current
     UninstallLogsUi(
         modifier = modifier,
         logs = logs,
-        onBack = { navigator.popBackStack() },
+        onBack = { val a = context as? android.app.Activity; a?.finish() },
         onClearAll = viewModel::clearAll,
         onDelete = viewModel::deleteById,
     )

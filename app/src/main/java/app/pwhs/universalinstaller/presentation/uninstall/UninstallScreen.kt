@@ -82,17 +82,16 @@ import app.pwhs.universalinstaller.util.AppIconData
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.ImageRequest
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.generated.destinations.UninstallLogsScreenDestination
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+
+
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-@Destination<RootGraph>
+
 @Composable
 fun UninstallScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: UninstallViewModel = koinViewModel(),
 ) {
@@ -109,7 +108,9 @@ fun UninstallScreen(
         onClearSelection = viewModel::clearSelection,
         onToggleSelectAll = viewModel::toggleSelectAll,
         onUninstallSelected = viewModel::uninstallSelected,
-        onOpenLogs = { navigator.navigate(UninstallLogsScreenDestination) },
+        onOpenLogs = { 
+            context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.uninstall.logs.UninstallLogsActivity::class.java))
+        },
         onRefresh = viewModel::refreshApps,
         onSortChange = viewModel::setSort,
         onRequestUsageAccess = {

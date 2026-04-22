@@ -21,7 +21,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import app.pwhs.universalinstaller.app.UniversalInstallerApp
 import app.pwhs.universalinstaller.presentation.onboarding.OnboardingScreen
 import app.pwhs.universalinstaller.presentation.setting.ThemeMode
 import app.pwhs.universalinstaller.presentation.setting.dataStore
@@ -35,9 +34,7 @@ private enum class AppRoute { Splash, Onboarding, Main }
 
 class MainActivity : ComponentActivity() {
 
-    private val notificationPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { /* granted or not — uninstall flow works either way, notifications just won't show */ }
+
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
@@ -56,7 +53,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        maybeRequestNotificationPermission()
 
         // Determine if we should skip splash: when launched from a file-open intent,
         // the user expects to see the install preview immediately.
@@ -122,18 +118,16 @@ class MainActivity : ComponentActivity() {
                     AppRoute.Onboarding -> OnboardingScreen(
                         onFinish = { currentRoute = AppRoute.Main },
                     )
-                    AppRoute.Main -> UniversalInstallerApp()
-                }
+                    AppRoute.Main -> {
+                        LaunchedEffect(Unit) {
+                            startActivity(Intent(this@MainActivity, app.pwhs.universalinstaller.presentation.install.InstallActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            })
+                            finish()
+                        }
+                    }                }
             }
         }
-    }
-
-    private fun maybeRequestNotificationPermission() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) return
-        val granted = ContextCompat.checkSelfPermission(
-            this, Manifest.permission.POST_NOTIFICATIONS
-        ) == PackageManager.PERMISSION_GRANTED
-        if (!granted) notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
     override fun onNewIntent(intent: Intent) {

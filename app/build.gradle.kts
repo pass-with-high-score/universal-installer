@@ -127,8 +127,7 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
 
-    implementation(libs.core)
-    ksp(libs.compose.destinations.ksp)
+
     implementation(libs.bottom.sheet)
 
     implementation(libs.timber)

@@ -45,16 +45,15 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.composable.QrCode
-import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+
+
+
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
 
-@Destination<RootGraph>
+
 @Composable
 fun SyncScreen(
-    navigator: DestinationsNavigator,
     modifier: Modifier = Modifier,
     viewModel: SyncViewModel = koinViewModel()
 ) {
@@ -140,7 +139,7 @@ fun SyncScreen(
         activeConnections = activeConnections,
         sharedFiles = sharedFiles,
         activeTransfers = activeTransfers,
-        onBack = { navigator.navigateUp() },
+        onBack = { val a = context as? android.app.Activity; a?.finish() },
         onToggle = { enabled ->
             if (enabled && !hasStoragePermission) {
                 showStorageDialog = true
