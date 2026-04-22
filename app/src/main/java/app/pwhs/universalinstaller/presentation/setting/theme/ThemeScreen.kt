@@ -6,6 +6,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.DarkMode
+import androidx.compose.material.icons.rounded.LightMode
+import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -114,6 +117,16 @@ private fun ThemeUi(
                             .padding(horizontal = 24.dp, vertical = 14.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Icon(
+                            imageVector = when (mode) {
+                                ThemeMode.System -> Icons.Rounded.SettingsApplications
+                                ThemeMode.Light -> Icons.Rounded.LightMode
+                                ThemeMode.Dark -> Icons.Rounded.DarkMode
+                            },
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(end = 16.dp).size(24.dp)
+                        )
                         Text(
                             text = stringResource(labelRes),
                             style = MaterialTheme.typography.bodyLarge,
