@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">Quét VirusTotal</string>
     <string name="apk_info_vt_scanning">Đang quét tệp…</string>
     <string name="apk_info_vt_clean">Không phát hiện mối đe dọa nào</string>
-    <string name="apk_info_vt_clean_detail">%1$d công cụ xác nhận an toàn · %2$d không phát hiện</string>
     <string name="apk_info_vt_malicious">%d công cụ đã phát hiện mối đe dọa!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d độc hại · %2$d đáng ngờ · %3$d vô hại</string>
     <string name="apk_info_vt_suspicious">%d công cụ đã gắn cờ là đáng ngờ</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d đáng ngờ · %2$d vô hại · %3$d không phát hiện</string>
     <string name="apk_info_vt_not_found">Không tìm thấy tệp trong cơ sở dữ liệu VirusTotal</string>
     <string name="apk_info_vt_error">Lỗi quét: %s</string>
     <string name="uninstall_show_system_apps">Hiển thị ứng dụng hệ thống</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Bật tính năng quét phần mềm độc hại trước khi cài đặt</string>
     <string name="setting_vt_key_placeholder">Nhập khóa API…</string>
     <string name="setting_section_appearance">Giao diện</string>
-    <string name="setting_theme_title">Chủ đề</string>
-    <string name="setting_theme_subtitle">Chọn chủ đề bạn ưa thích</string>
     <string name="setting_section_about">Giới thiệu</string>
     <string name="setting_version">Phiên bản %s</string>
     <string name="setting_github_subtitle">Mã nguồn &amp; đóng góp</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Sử dụng màu hình nền hệ thống cho các điểm nhấn của ứng dụng (yêu cầu Android 12+)</string>
     <string name="theme_amoled_mode_title">Đen AMOLED</string>
     <string name="theme_amoled_mode_subtitle">Sử dụng nền đen tuyền trong chế độ tối</string>
+    <string name="setting_theme_description">Tùy chỉnh Màu động và Chế độ tối</string>
 </resources>

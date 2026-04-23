@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">VirusTotal Taraması</string>
     <string name="apk_info_vt_scanning">Dosya taranıyor…</string>
     <string name="apk_info_vt_clean">Tehdit bulunamadı</string>
-    <string name="apk_info_vt_clean_detail">%1$d motor güvenli buldu · %2$d algılanmadı</string>
     <string name="apk_info_vt_malicious">%d motor tehdit algıladı!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d zararlı · %2$d şüpheli · %3$d zararsız</string>
     <string name="apk_info_vt_suspicious">%d motor şüpheli olarak işaretledi</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d şüpheli · %2$d zararsız · %3$d algılanmadı</string>
     <string name="apk_info_vt_not_found">Dosya VirusTotal veritabanında bulunamadı</string>
     <string name="apk_info_vt_error">Tarama hatası: %s</string>
     <string name="uninstall_show_system_apps">Sistem uygulamalarını göster</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Yüklemeden önce kötü amaçlı yazılım taramasını etkinleştir</string>
     <string name="setting_vt_key_placeholder">API anahtarını girin…</string>
     <string name="setting_section_appearance">Görünüm</string>
-    <string name="setting_theme_title">Tema</string>
-    <string name="setting_theme_subtitle">Tercih ettiğiniz temayı seçin</string>
     <string name="setting_section_about">Hakkında</string>
     <string name="setting_version">Sürüm %s</string>
     <string name="setting_github_subtitle">Kaynak kodu ve katkılar</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Uygulama vurguları için sistem duvar kağıdı renklerini kullan (Android 12+ gerektirir)</string>
     <string name="theme_amoled_mode_title">AMOLED Siyahı</string>
     <string name="theme_amoled_mode_subtitle">Koyu modda zifiri siyah arka plan kullan</string>
+    <string name="setting_theme_description">Dinamik Renkleri ve Karanlık Modu Özelleştir</string>
 </resources>

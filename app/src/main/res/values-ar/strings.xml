@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">فحص VirusTotal</string>
     <string name="apk_info_vt_scanning">جاري فحص الملف…</string>
     <string name="apk_info_vt_clean">لم يتم اكتشاف أي تهديدات</string>
-    <string name="apk_info_vt_clean_detail">%1$d محرك أكد أنه آمن · %2$d لم يتم اكتشافه</string>
     <string name="apk_info_vt_malicious">%d محرك(محركات) اكتشفت تهديدات!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d ضار · %2$d مشبوه · %3$d غير ضار</string>
     <string name="apk_info_vt_suspicious">%d محرك(محركات) تم وضع علامة مشبوهة عليها</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d مشبوه · %2$d غير ضار · %3$d لم يتم اكتشافه</string>
     <string name="apk_info_vt_not_found">لم يتم العثور على الملف في قاعدة بيانات VirusTotal</string>
     <string name="apk_info_vt_error">خطأ في الفحص: %s</string>
     <string name="uninstall_show_system_apps">إظهار تطبيقات النظام</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">تمكين فحص البرامج الضارة قبل التثبيت</string>
     <string name="setting_vt_key_placeholder">أدخل مفتاح API…</string>
     <string name="setting_section_appearance">المظهر</string>
-    <string name="setting_theme_title">السمة</string>
-    <string name="setting_theme_subtitle">اختر السمة المفضلة لديك</string>
     <string name="setting_section_about">حول</string>
     <string name="setting_version">الإصدار %s</string>
     <string name="setting_github_subtitle">كود المصدر والمساهمات</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">استخدم ألوان خلفية النظام للمسات التطبيق (يتطلب أندرويد 12+)</string>
     <string name="theme_amoled_mode_title">أسود AMOLED</string>
     <string name="theme_amoled_mode_subtitle">استخدم خلفية سوداء داكنة في الوضع الداكن</string>
+    <string name="setting_theme_description">تخصيص الألوان الديناميكية والوضع الداكن</string>
 </resources>

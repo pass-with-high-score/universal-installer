@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">Pemindaian VirusTotal</string>
     <string name="apk_info_vt_scanning">Memindai berkas…</string>
     <string name="apk_info_vt_clean">Tidak ada ancaman yang terdeteksi</string>
-    <string name="apk_info_vt_clean_detail">%1$d mesin mengonfirmasi aman · %2$d tidak terdeteksi</string>
     <string name="apk_info_vt_malicious">%d mesin mendeteksi ancaman!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d berbahaya · %2$d mencurigakan · %3$d tidak berbahaya</string>
     <string name="apk_info_vt_suspicious">%d mesin menandai sebagai mencurigakan</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d mencurigakan · %2$d tidak berbahaya · %3$d tidak terdeteksi</string>
     <string name="apk_info_vt_not_found">Berkas tidak ditemukan dalam basis data VirusTotal</string>
     <string name="apk_info_vt_error">Kesalahan pemindaian: %s</string>
     <string name="uninstall_show_system_apps">Tampilkan aplikasi sistem</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Aktifkan pemindaian malware sebelum instal</string>
     <string name="setting_vt_key_placeholder">Masukkan kunci API…</string>
     <string name="setting_section_appearance">Tampilan</string>
-    <string name="setting_theme_title">Tema</string>
-    <string name="setting_theme_subtitle">Pilih tema pilihan Anda</string>
     <string name="setting_section_about">Tentang</string>
     <string name="setting_version">Versi %s</string>
     <string name="setting_github_subtitle">Kode sumber &amp; kontribusi</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Gunakan warna wallpaper sistem untuk aksen aplikasi (membutuhkan Android 12+)</string>
     <string name="theme_amoled_mode_title">Hitam AMOLED</string>
     <string name="theme_amoled_mode_subtitle">Gunakan latar belakang hitam pekat dalam mode gelap</string>
+    <string name="setting_theme_description">Sesuaikan Warna Dinamis dan Mode Gelap</string>
 </resources>

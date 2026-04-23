@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">Analyse VirusTotal</string>
     <string name="apk_info_vt_scanning">Analyse du fichier en cours…</string>
     <string name="apk_info_vt_clean">Aucune menace détectée</string>
-    <string name="apk_info_vt_clean_detail">%1$d moteurs confirment la sécurité · %2$d non détectés</string>
     <string name="apk_info_vt_malicious">%d moteur(s) a/ont détecté des menaces !</string>
-    <string name="apk_info_vt_malicious_detail">%1$d malveillant(s) · %2$d suspect(s) · %3$d inoffensif(s)</string>
     <string name="apk_info_vt_suspicious">%d moteur(s) signalé(s) comme suspect(s)</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d suspect(s) · %2$d inoffensif(s) · %3$d non détecté(s)</string>
     <string name="apk_info_vt_not_found">Fichier introuvable dans la base de données VirusTotal</string>
     <string name="apk_info_vt_error">Erreur d\'analyse : %s</string>
     <string name="uninstall_show_system_apps">Afficher les applications système</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Activer l\'analyse des logiciels malveillants avant l\'installation</string>
     <string name="setting_vt_key_placeholder">Saisir la clé API…</string>
     <string name="setting_section_appearance">Apparence</string>
-    <string name="setting_theme_title">Thème</string>
-    <string name="setting_theme_subtitle">Choisissez votre thème préféré</string>
     <string name="setting_section_about">À propos</string>
     <string name="setting_version">Version %s</string>
     <string name="setting_github_subtitle">Code source &amp; contributions</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Utiliser les couleurs du fond d\'écran du système pour les accents de l\'appli (nécessite Android 12+)</string>
     <string name="theme_amoled_mode_title">Noir AMOLED</string>
     <string name="theme_amoled_mode_subtitle">Utiliser un fond noir profond en mode sombre</string>
+    <string name="setting_theme_description">Personnaliser les couleurs dynamiques et le mode sombre</string>
 </resources>

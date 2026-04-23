@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">Verificação do VirusTotal</string>
     <string name="apk_info_vt_scanning">Verificando arquivo…</string>
     <string name="apk_info_vt_clean">Nenhuma ameaça detectada</string>
-    <string name="apk_info_vt_clean_detail">%1$d motores confirmaram ser seguro · %2$d não detectados</string>
     <string name="apk_info_vt_malicious">%d motor(es) detectou ameaças!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d maliciosos · %2$d suspeitos · %3$d inofensivos</string>
     <string name="apk_info_vt_suspicious">%d motor(es) sinalizou como suspeito</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d suspeitos · %2$d inofensivos · %3$d não detectados</string>
     <string name="apk_info_vt_not_found">Arquivo não encontrado no banco de dados do VirusTotal</string>
     <string name="apk_info_vt_error">Erro de verificação: %s</string>
     <string name="uninstall_show_system_apps">Mostrar aplicativos do sistema</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Ativar a verificação de malware antes da instalação</string>
     <string name="setting_vt_key_placeholder">Insira a chave da API…</string>
     <string name="setting_section_appearance">Aparência</string>
-    <string name="setting_theme_title">Tema</string>
-    <string name="setting_theme_subtitle">Escolha o seu tema preferido</string>
     <string name="setting_section_about">Sobre</string>
     <string name="setting_version">Versão %s</string>
     <string name="setting_github_subtitle">Código fonte e contribuições</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Usar cores do papel de parede do sistema para destaques do app (requer Android 12+)</string>
     <string name="theme_amoled_mode_title">Preto AMOLED</string>
     <string name="theme_amoled_mode_subtitle">Usar fundo totalmente preto no modo escuro</string>
+    <string name="setting_theme_description">Personalizar Cores Dinâmicas e Modo Escuro</string>
 </resources>

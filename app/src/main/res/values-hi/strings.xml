@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">VirusTotal स्कैन</string>
     <string name="apk_info_vt_scanning">फ़ाइल स्कैन हो रही है…</string>
     <string name="apk_info_vt_clean">कोई खतरा नहीं मिला</string>
-    <string name="apk_info_vt_clean_detail">%1$d इंजनों ने सुरक्षित होने की पुष्टि की · %2$d में कुछ नहीं मिला</string>
     <string name="apk_info_vt_malicious">%d इंजन(इंजनों) को खतरे मिले!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d दुर्भावनापूर्ण · %2$d संदिग्ध · %3$d हानिरहित</string>
     <string name="apk_info_vt_suspicious">%d इंजन(इंजनों) ने संदिग्ध के रूप में चिह्नित किया</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d संदिग्ध · %2$d हानिरहित · %3$d में कुछ नहीं मिला</string>
     <string name="apk_info_vt_not_found">VirusTotal डेटाबेस में फ़ाइल नहीं मिली</string>
     <string name="apk_info_vt_error">स्कैन त्रुटि: %s</string>
     <string name="uninstall_show_system_apps">सिस्टम ऐप्स दिखाएं</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">इंस्टॉल करने से पहले मैलवेयर स्कैनिंग सक्षम करें</string>
     <string name="setting_vt_key_placeholder">API Key दर्ज करें…</string>
     <string name="setting_section_appearance">स्वरूप</string>
-    <string name="setting_theme_title">थीम</string>
-    <string name="setting_theme_subtitle">अपनी पसंदीदा थीम चुनें</string>
     <string name="setting_section_about">के बारे में</string>
     <string name="setting_version">वर्ज़न %s</string>
     <string name="setting_github_subtitle">सोर्स कोड और योगदान</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">ऐप एक्सेंट के लिए सिस्टम वॉलपेपर रंगों का उपयोग करें (Android 12+ आवश्यक)</string>
     <string name="theme_amoled_mode_title">AMOLED ब्लैक</string>
     <string name="theme_amoled_mode_subtitle">डार्क मोड में पिच ब्लैक बैकग्राउंड का उपयोग करें</string>
+    <string name="setting_theme_description">डायनामिक रंग और डार्क मोड कस्टमाइज़ करें</string>
 </resources>

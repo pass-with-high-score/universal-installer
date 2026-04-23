@@ -1,12 +1,13 @@
 package app.pwhs.universalinstaller.presentation.setting
 
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,28 +16,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
-import androidx.compose.material.icons.rounded.DarkMode
-import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
-import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Gavel
-import androidx.compose.material.icons.rounded.LightMode
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.Shield
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -47,11 +45,9 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -66,16 +62,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.datastore.preferences.core.Preferences
-import app.pwhs.universalinstaller.R
-import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-
-
-
-
+import androidx.datastore.preferences.core.Preferences
+import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -90,7 +82,6 @@ fun SettingScreen(
     SettingUi(
         modifier = modifier,
         uiState = uiState,
-        onThemeChanged = viewModel::setThemeMode,
         onShizukuChanged = viewModel::setUseShizuku,
         onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
         onShizukuOptionChanged = viewModel::setShizukuOption,
@@ -114,7 +105,6 @@ fun SettingScreen(
 private fun SettingUi(
     modifier: Modifier = Modifier,
     uiState: SettingUiState = SettingUiState(),
-    onThemeChanged: (ThemeMode) -> Unit = {},
     onShizukuChanged: (Boolean) -> Unit = {},
     onVirusTotalKeyChanged: (String) -> Unit = {},
     onShizukuOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
@@ -502,7 +492,7 @@ private fun SettingUi(
                         },
                         supportingContent = {
                             Text(
-                                text = "Customize Dynamic Colors and Dark Mode",
+                                text = stringResource(R.string.setting_theme_description),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -837,7 +827,10 @@ private fun ShizukuInstallSourceItem(
                         onInstallerChange(it)
                     },
                     modifier = Modifier
-                        .menuAnchor(androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
+                        .menuAnchor(
+                            androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryEditable,
+                            enabled = true
+                        )
                         .fillMaxWidth(),
                     singleLine = true,
                     label = { Text(stringResource(R.string.setting_shizuku_installer_label)) },
@@ -994,7 +987,10 @@ private fun RootInstallSourceItem(
                         onInstallerChange(it)
                     },
                     modifier = Modifier
-                        .menuAnchor(androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
+                        .menuAnchor(
+                            androidx.compose.material3.ExposedDropdownMenuAnchorType.PrimaryEditable,
+                            enabled = true
+                        )
                         .fillMaxWidth(),
                     singleLine = true,
                     label = { Text(stringResource(R.string.setting_root_installer_label)) },

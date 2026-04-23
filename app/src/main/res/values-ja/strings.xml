@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">VirusTotal スキャン</string>
     <string name="apk_info_vt_scanning">ファイルをスキャン中…</string>
     <string name="apk_info_vt_clean">脅威は検出されませんでした</string>
-    <string name="apk_info_vt_clean_detail">%1$d エンジンが安全と確認 · %2$d 未検出</string>
     <string name="apk_info_vt_malicious">%d エンジンが脅威を検出しました！</string>
-    <string name="apk_info_vt_malicious_detail">%1$d 悪意のある · %2$d 疑わしい · %3$d 無害</string>
     <string name="apk_info_vt_suspicious">%d エンジンが疑わしいとフラグを立てました</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d 疑わしい · %2$d 無害 · %3$d 未検出</string>
     <string name="apk_info_vt_not_found">VirusTotal データベースにファイルが見つかりません</string>
     <string name="apk_info_vt_error">スキャンエラー: %s</string>
     <string name="uninstall_show_system_apps">システムアプリを表示</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">インストール前のマルウェアスキャンを有効にします</string>
     <string name="setting_vt_key_placeholder">API キーを入力…</string>
     <string name="setting_section_appearance">外観</string>
-    <string name="setting_theme_title">テーマ</string>
-    <string name="setting_theme_subtitle">お好みのテーマを選択してください</string>
     <string name="setting_section_about">概要</string>
     <string name="setting_version">バージョン %s</string>
     <string name="setting_github_subtitle">ソースコードとコントリビューション</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">アプリのアクセントにシステムの壁紙の色を使用する (Android 12以降が必要)</string>
     <string name="theme_amoled_mode_title">AMOLEDブラック</string>
     <string name="theme_amoled_mode_subtitle">ダークモードで漆黒の背景を使用する</string>
+    <string name="setting_theme_description">ダイナミックカラーとダークモードをカスタマイズ</string>
 </resources>

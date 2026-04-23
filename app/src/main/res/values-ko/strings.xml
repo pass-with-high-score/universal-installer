@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">VirusTotal 스캔</string>
     <string name="apk_info_vt_scanning">파일 스캔 중…</string>
     <string name="apk_info_vt_clean">위협이 감지되지 않음</string>
-    <string name="apk_info_vt_clean_detail">%1$d개 엔진이 안전 확인 · %2$d개 미탐지</string>
     <string name="apk_info_vt_malicious">%d개 엔진에서 위협 감지!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d개 악성 · %2$d개 의심 · %3$d개 무해</string>
     <string name="apk_info_vt_suspicious">%d개 엔진에서 의심스러움으로 표시</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d개 의심 · %2$d개 무해 · %3$d개 미탐지</string>
     <string name="apk_info_vt_not_found">VirusTotal 데이터베이스에서 파일을 찾을 수 없음</string>
     <string name="apk_info_vt_error">스캔 오류: %s</string>
     <string name="uninstall_show_system_apps">시스템 앱 표시</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">설치 전 멀웨어 스캔 활성화</string>
     <string name="setting_vt_key_placeholder">API 키 입력…</string>
     <string name="setting_section_appearance">모양</string>
-    <string name="setting_theme_title">테마</string>
-    <string name="setting_theme_subtitle">선호하는 테마 선택</string>
     <string name="setting_section_about">정보</string>
     <string name="setting_version">버전 %s</string>
     <string name="setting_github_subtitle">소스 코드 및 기여</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">앱 강조 색상에 시스템 배경화면 색상 사용 (Android 12 이상 필요)</string>
     <string name="theme_amoled_mode_title">AMOLED 블랙</string>
     <string name="theme_amoled_mode_subtitle">다크 모드에서 완전한 검은색 배경 사용</string>
+    <string name="setting_theme_description">다이내믹 컬러 및 다크 모드 맞춤설정</string>
 </resources>

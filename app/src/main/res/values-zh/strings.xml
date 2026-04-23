@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">VirusTotal 扫描</string>
     <string name="apk_info_vt_scanning">正在扫描文件…</string>
     <string name="apk_info_vt_clean">未检测到威胁</string>
-    <string name="apk_info_vt_clean_detail">%1$d 个引擎确认安全 · %2$d 个未检测到</string>
     <string name="apk_info_vt_malicious">%d 个引擎检测到威胁！</string>
-    <string name="apk_info_vt_malicious_detail">%1$d 个恶意 · %2$d 个可疑 · %3$d 个无害</string>
     <string name="apk_info_vt_suspicious">%d 个引擎标记为可疑</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d 个可疑 · %2$d 个无害 · %3$d 个未检测到</string>
     <string name="apk_info_vt_not_found">在 VirusTotal 数据库中未找到该文件</string>
     <string name="apk_info_vt_error">扫描错误：%s</string>
     <string name="uninstall_show_system_apps">显示系统应用</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">启用安装前的恶意软件扫描</string>
     <string name="setting_vt_key_placeholder">输入 API 密钥…</string>
     <string name="setting_section_appearance">外观</string>
-    <string name="setting_theme_title">主题</string>
-    <string name="setting_theme_subtitle">选择您喜欢的主题</string>
     <string name="setting_section_about">关于</string>
     <string name="setting_version">版本 %s</string>
     <string name="setting_github_subtitle">源代码与贡献</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">使用系统壁纸颜色作为应用强调色（需要 Android 12+）</string>
     <string name="theme_amoled_mode_title">AMOLED 纯黑</string>
     <string name="theme_amoled_mode_subtitle">在深色模式下使用纯黑背景</string>
+    <string name="setting_theme_description">自定义动态颜色和深色模式</string>
 </resources>

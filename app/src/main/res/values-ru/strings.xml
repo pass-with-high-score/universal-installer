@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">Сканирование VirusTotal</string>
     <string name="apk_info_vt_scanning">Сканирование файла…</string>
     <string name="apk_info_vt_clean">Угроз не обнаружено</string>
-    <string name="apk_info_vt_clean_detail">%1$d антивирусов подтвердили безопасность · %2$d не обнаружили</string>
     <string name="apk_info_vt_malicious">%d антивирус(ов) обнаружили угрозы!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d вредоносных · %2$d подозрительных · %3$d безопасных</string>
     <string name="apk_info_vt_suspicious">%d антивирус(ов) отметили как подозрительный</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d подозрительных · %2$d безопасных · %3$d не обнаружили</string>
     <string name="apk_info_vt_not_found">Файл не найден в базе данных VirusTotal</string>
     <string name="apk_info_vt_error">Ошибка сканирования: %s</string>
     <string name="uninstall_show_system_apps">Показать системные приложения</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Включить проверку на вредоносное ПО перед установкой</string>
     <string name="setting_vt_key_placeholder">Введите API ключ…</string>
     <string name="setting_section_appearance">Внешний вид</string>
-    <string name="setting_theme_title">Тема</string>
-    <string name="setting_theme_subtitle">Выберите предпочитаемую тему</string>
     <string name="setting_section_about">О приложении</string>
     <string name="setting_version">Версия %s</string>
     <string name="setting_github_subtitle">Исходный код и участие</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Использовать цвета обоев системы для акцентов приложения (требуется Android 12+)</string>
     <string name="theme_amoled_mode_title">AMOLED Черный</string>
     <string name="theme_amoled_mode_subtitle">Использовать абсолютно черный фон в темном режиме</string>
+    <string name="setting_theme_description">Настройка динамических цветов и темного режима</string>
 </resources>

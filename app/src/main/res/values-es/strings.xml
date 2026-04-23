@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">Análisis de VirusTotal</string>
     <string name="apk_info_vt_scanning">Analizando archivo…</string>
     <string name="apk_info_vt_clean">No se detectaron amenazas</string>
-    <string name="apk_info_vt_clean_detail">%1$d motores confirmaron que es seguro · %2$d no detectados</string>
     <string name="apk_info_vt_malicious">¡%d motor(es) detectaron amenazas!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d maliciosos · %2$d sospechosos · %3$d inofensivos</string>
     <string name="apk_info_vt_suspicious">%d motor(es) marcados como sospechosos</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d sospechosos · %2$d inofensivos · %3$d no detectados</string>
     <string name="apk_info_vt_not_found">Archivo no encontrado en la base de datos de VirusTotal</string>
     <string name="apk_info_vt_error">Error de análisis: %s</string>
     <string name="uninstall_show_system_apps">Mostrar aplicaciones del sistema</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Habilitar el análisis de malware antes de la instalación</string>
     <string name="setting_vt_key_placeholder">Ingresa la clave de API…</string>
     <string name="setting_section_appearance">Apariencia</string>
-    <string name="setting_theme_title">Tema</string>
-    <string name="setting_theme_subtitle">Elige tu tema preferido</string>
     <string name="setting_section_about">Acerca de</string>
     <string name="setting_version">Versión %s</string>
     <string name="setting_github_subtitle">Código fuente y contribuciones</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Usar colores del fondo de pantalla del sistema para acentos de la app (requiere Android 12+)</string>
     <string name="theme_amoled_mode_title">Negro AMOLED</string>
     <string name="theme_amoled_mode_subtitle">Usar fondo negro puro en modo oscuro</string>
+    <string name="setting_theme_description">Personalizar colores dinámicos y modo oscuro</string>
 </resources>

@@ -42,11 +42,8 @@
     <string name="apk_info_vt_scan_title">VirusTotal-Scan</string>
     <string name="apk_info_vt_scanning">Datei wird gescannt…</string>
     <string name="apk_info_vt_clean">Keine Bedrohungen gefunden</string>
-    <string name="apk_info_vt_clean_detail">%1$d Engines bestätigen Sicherheit · %2$d nicht erkannt</string>
     <string name="apk_info_vt_malicious">%d Engine(s) haben Bedrohungen erkannt!</string>
-    <string name="apk_info_vt_malicious_detail">%1$d schädlich · %2$d verdächtig · %3$d harmlos</string>
     <string name="apk_info_vt_suspicious">%d Engine(s) haben die Datei als verdächtig eingestuft</string>
-    <string name="apk_info_vt_suspicious_detail">%1$d verdächtig · %2$d harmlos · %3$d nicht erkannt</string>
     <string name="apk_info_vt_not_found">Datei in der VirusTotal-Datenbank nicht gefunden</string>
     <string name="apk_info_vt_error">Scan-Fehler: %s</string>
     <string name="uninstall_show_system_apps">System-Apps anzeigen</string>
@@ -106,8 +103,6 @@
     <string name="setting_vt_key_subtitle">Malware-Scan vor der Installation aktivieren</string>
     <string name="setting_vt_key_placeholder">API-Schlüssel eingeben…</string>
     <string name="setting_section_appearance">Erscheinungsbild</string>
-    <string name="setting_theme_title">Design</string>
-    <string name="setting_theme_subtitle">Wähle dein bevorzugtes Design</string>
     <string name="setting_section_about">Über</string>
     <string name="setting_version">Version %s</string>
     <string name="setting_github_subtitle">Quellcode &amp; Mitwirkung</string>
@@ -366,4 +361,5 @@
     <string name="theme_dynamic_color_subtitle">Systemhintergrundfarben für App-Akzente verwenden (erfordert Android 12+)</string>
     <string name="theme_amoled_mode_title">AMOLED Schwarz</string>
     <string name="theme_amoled_mode_subtitle">Tiefschwarzen Hintergrund im dunklen Modus verwenden</string>
+    <string name="setting_theme_description">Dynamische Farben und Dark Mode anpassen</string>
 </resources>
