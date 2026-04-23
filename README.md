@@ -231,7 +231,7 @@ maintenance, new features, and keeping the app free.
 
 [![GPL-3.0-only](https://img.shields.io/badge/License-GPL--3.0--only-blue.svg)](https://spdx.org/licenses/GPL-3.0-only.html)
 
-This project is licensed under the **GNU License**.
+This project is licensed under the **GNU General Public License v3.0 only (GPL-3.0-only)**.
 You are free to use, modify, and distribute it.
 See the full [LICENSE](LICENSE) file for details.
 
