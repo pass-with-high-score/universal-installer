@@ -253,7 +253,7 @@ class SettingViewModel(
             dynamicColor = dynamicColor,
             amoledMode = amoledMode,
             useShizuku = useShizuku && shizukuState == ShizukuState.READY,
-            useRoot = useRoot && rootState == RootState.READY,
+            useRoot = useRoot && (rootState == RootState.READY || rootState == RootState.UNKNOWN),
             virusTotalApiKey = vtKey,
             deleteApkAfterInstall = deleteApk,
             shizukuState = shizukuState,
