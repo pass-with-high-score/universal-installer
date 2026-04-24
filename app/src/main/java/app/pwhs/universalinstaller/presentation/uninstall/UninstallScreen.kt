@@ -1,5 +1,7 @@
 package app.pwhs.universalinstaller.presentation.uninstall
 
+import android.content.Intent
+import android.provider.Settings
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -83,6 +85,7 @@ import app.pwhs.universalinstaller.domain.model.InstalledApp
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMethod
+import app.pwhs.universalinstaller.presentation.uninstall.logs.UninstallLogsActivity
 import app.pwhs.universalinstaller.util.AppIconData
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
@@ -114,7 +117,7 @@ fun UninstallScreen(
         onToggleSelectAll = viewModel::toggleSelectAll,
         onUninstallSelected = viewModel::uninstallSelected,
         onOpenLogs = { 
-            context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.uninstall.logs.UninstallLogsActivity::class.java))
+            context.startActivity(Intent(context, UninstallLogsActivity::class.java))
         },
         onRefresh = viewModel::refreshApps,
         onSortChange = viewModel::setSort,
@@ -123,8 +126,8 @@ fun UninstallScreen(
             // refreshUsageAccess() and reload the list if it flipped.
             runCatching {
                 context.startActivity(
-                    android.content.Intent(android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS)
-                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                    Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 )
             }
         },
