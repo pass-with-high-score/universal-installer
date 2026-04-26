@@ -43,6 +43,14 @@ enum class SortDirection { Asc, Desc }
  */
 enum class AppFilter { User, System, Disabled }
 
+data class StorageBreakdown(
+    val appBytes: Long,
+    val dataBytes: Long,
+    val cacheBytes: Long,
+) {
+    val totalBytes: Long get() = appBytes + dataBytes + cacheBytes
+}
+
 internal fun InstalledApp.category(): AppFilter = when {
     !enabled -> AppFilter.Disabled
     isSystemApp -> AppFilter.System
@@ -326,6 +334,99 @@ class ManageViewModel(
 
     fun dismissPrivilegedActionResult() {
         _privilegedActionResult.value = null
+    }
+
+    /**
+     * Lazy storage-stats lookup. Cheap when the user holds Usage Access (single binder
+     * call), so we run it only when the action sheet opens — not when the list loads,
+     * where 300+ apps × IPC would visibly stall the screen.
+     */
+    suspend fun queryStorageStats(packageName: String): StorageBreakdown? = withContext(Dispatchers.IO) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return@withContext null
+        try {
+            val ssm = application.getSystemService(android.app.usage.StorageStatsManager::class.java)
+                ?: return@withContext null
+            val uuid = android.os.storage.StorageManager.UUID_DEFAULT
+            val stats = ssm.queryStatsForPackage(
+                uuid,
+                packageName,
+                android.os.Process.myUserHandle(),
+            )
+            StorageBreakdown(
+                appBytes = stats.appBytes,
+                dataBytes = stats.dataBytes,
+                cacheBytes = stats.cacheBytes,
+            )
+        } catch (_: SecurityException) {
+            // PACKAGE_USAGE_STATS not granted — silently fall back to no breakdown.
+            null
+        } catch (_: Exception) {
+            null
+        }
+    }
+
+    fun clearCache(packageName: String, appName: String) {
+        viewModelScope.launch {
+            val executor = resolvePrivilegedExecutor()
+            if (executor == null) {
+                _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                    application.getString(R.string.manage_privileged_unavailable)
+                )
+                return@launch
+            }
+            val result = when (executor) {
+                PrivilegedExecutor.Root -> backendFactory.clearAppCacheViaRoot(packageName)
+                PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.clearAppCacheOnly(packageName)
+            }
+            _privilegedActionResult.value = if (result.isSuccess) {
+                PrivilegedActionResult.Success(
+                    application.getString(R.string.manage_action_clear_cache_done, appName)
+                )
+            } else {
+                PrivilegedActionResult.Failure(
+                    application.getString(
+                        R.string.manage_action_clear_cache_failed,
+                        result.exceptionOrNull()?.message ?: "unknown error",
+                    )
+                )
+            }
+        }
+    }
+
+    fun clearAllData(packageName: String, appName: String) {
+        // Don't let the user nuke our own data — we'd lose the install history they're
+        // probably looking at this very moment, plus they've got "Uninstall" two rows down.
+        if (packageName == application.packageName) {
+            _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                application.getString(R.string.manage_action_clear_data_self_blocked)
+            )
+            return
+        }
+        viewModelScope.launch {
+            val executor = resolvePrivilegedExecutor()
+            if (executor == null) {
+                _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                    application.getString(R.string.manage_privileged_unavailable)
+                )
+                return@launch
+            }
+            val result = when (executor) {
+                PrivilegedExecutor.Root -> backendFactory.clearAppDataViaRoot(packageName)
+                PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.clearAppData(packageName)
+            }
+            _privilegedActionResult.value = if (result.isSuccess) {
+                PrivilegedActionResult.Success(
+                    application.getString(R.string.manage_action_clear_data_done, appName)
+                )
+            } else {
+                PrivilegedActionResult.Failure(
+                    application.getString(
+                        R.string.manage_action_clear_data_failed,
+                        result.exceptionOrNull()?.message ?: "unknown error",
+                    )
+                )
+            }
+        }
     }
 
     private fun applySort(

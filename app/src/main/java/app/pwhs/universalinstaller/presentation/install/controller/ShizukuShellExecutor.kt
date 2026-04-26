@@ -103,6 +103,35 @@ object ShizukuShellExecutor {
     }
 
     /**
+     * `pm clear` wipes cache + data + obb. The shell UID can run this against any package
+     * on supported builds; the activity-manager service performs the actual deletion under
+     * `system` uid so file permissions don't matter.
+     */
+    suspend fun clearAppData(packageName: String): Result<String> =
+        runShell(packageName, "pm clear $packageName", successToken = "Success")
+
+    /**
+     * Cache-only clear is API 34+ (Android U) — earlier `pm` builds reject the flag.
+     * Shizuku path can't `rm -rf /data/data/...` (shell UID is not root and can't enter
+     * package-private dirs), so on older OS this surfaces a typed failure and the UI
+     * should fall back to "Clear all data" or hide the action.
+     */
+    suspend fun clearAppCacheOnly(packageName: String): Result<String> {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            return Result.failure(
+                UnsupportedOperationException(
+                    "Cache-only clear via Shizuku requires Android 14+ (use Root for older OS)",
+                ),
+            )
+        }
+        return runShell(
+            packageName,
+            "pm clear --cache-only $packageName",
+            successToken = "Success",
+        )
+    }
+
+    /**
      * Single-shot shell. [successToken] gates "did the command actually do the thing" beyond
      * the exit code — `pm` is notorious for printing soft failures ("Failure [...]") with
      * exit 0. Pass `null` for commands like `am force-stop` that have no output on success.

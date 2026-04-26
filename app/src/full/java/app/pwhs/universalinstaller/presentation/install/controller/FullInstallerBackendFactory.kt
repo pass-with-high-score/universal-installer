@@ -121,6 +121,17 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
         return runRootShell(packageName, cmd, successToken = token)
     }
 
+    override suspend fun clearAppDataViaRoot(packageName: String): Result<String> =
+        runRootShell(packageName, "pm clear $packageName", successToken = "Success")
+
+    override suspend fun clearAppCacheViaRoot(packageName: String): Result<String> =
+        // `rm -rf` returns 0 with no stdout on success, so no token to verify.
+        runRootShell(
+            packageName,
+            "rm -rf /data/data/$packageName/cache /data/data/$packageName/code_cache",
+            successToken = null,
+        )
+
     private suspend fun runRootShell(
         packageName: String,
         cmd: String,

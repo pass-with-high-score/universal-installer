@@ -34,6 +34,8 @@ import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.FolderZip
 import androidx.compose.material.icons.rounded.Block
+import androidx.compose.material.icons.rounded.CleaningServices
+import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Launch
@@ -129,6 +131,9 @@ fun ManageScreen(
         onShare = viewModel::shareApp,
         onForceStop = viewModel::forceStop,
         onSetEnabled = viewModel::setEnabled,
+        onClearCache = viewModel::clearCache,
+        onClearData = viewModel::clearAllData,
+        queryStorage = viewModel::queryStorageStats,
         onDismissExtractResult = viewModel::dismissExtractResult,
         onDismissPrivilegedResult = viewModel::dismissPrivilegedActionResult,
         onRefreshPrivileged = viewModel::refreshPrivilegedReady,
@@ -172,6 +177,9 @@ private fun UninstallUi(
     onShare: (String, String) -> Unit = { _, _ -> },
     onForceStop: (String, String) -> Unit = { _, _ -> },
     onSetEnabled: (String, String, Boolean) -> Unit = { _, _, _ -> },
+    onClearCache: (String, String) -> Unit = { _, _ -> },
+    onClearData: (String, String) -> Unit = { _, _ -> },
+    queryStorage: suspend (String) -> StorageBreakdown? = { null },
     onDismissExtractResult: () -> Unit = {},
     onDismissPrivilegedResult: () -> Unit = {},
     onRefreshPrivileged: () -> Unit = {},
@@ -192,6 +200,7 @@ private fun UninstallUi(
     val context = LocalContext.current
     var actionTarget by remember { mutableStateOf<InstalledApp?>(null) }
     var confirmUninstallTarget by remember { mutableStateOf<InstalledApp?>(null) }
+    var confirmClearDataTarget by remember { mutableStateOf<InstalledApp?>(null) }
     val extractInProgress = uiState.extractState is ExtractState.Running
 
     // Action sheet — opens on card tap (when not in selection mode). Adding new actions
@@ -229,6 +238,15 @@ private fun UninstallUi(
                 actionTarget = null
                 onSetEnabled(target.packageName, target.appName, enabled)
             },
+            onClearCache = {
+                actionTarget = null
+                onClearCache(target.packageName, target.appName)
+            },
+            onClearData = {
+                actionTarget = null
+                confirmClearDataTarget = target
+            },
+            queryStorage = queryStorage,
             onUninstall = {
                 actionTarget = null
                 // System apps bypass the generic confirm — the ViewModel surfaces the
@@ -249,6 +267,40 @@ private fun UninstallUi(
                 onUninstall(target.packageName)
             },
             onDismiss = { confirmUninstallTarget = null },
+        )
+    }
+
+    confirmClearDataTarget?.let { target ->
+        AlertDialog(
+            onDismissRequest = { confirmClearDataTarget = null },
+            icon = {
+                Icon(
+                    Icons.Rounded.DeleteForever,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            },
+            title = {
+                Text(stringResource(R.string.manage_clear_data_confirm_title, target.appName))
+            },
+            text = { Text(stringResource(R.string.manage_clear_data_confirm_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    val t = target
+                    confirmClearDataTarget = null
+                    onClearData(t.packageName, t.appName)
+                }) {
+                    Text(
+                        stringResource(R.string.manage_action_clear_data),
+                        color = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmClearDataTarget = null }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
         )
     }
 
@@ -492,6 +544,12 @@ private fun UninstallUi(
                 .padding(innerPadding)
                 .fillMaxSize()
         ) {
+            // Stats banner — recomputed from filteredApps so it follows the active chips.
+            // Hidden in selection mode where the top bar already shows "N selected".
+            if (!uiState.isSelectionMode) {
+                StatsBanner(apps = uiState.filteredApps)
+            }
+
             // Search bar
             if (!uiState.isSelectionMode) {
                 SearchBar(
@@ -1159,6 +1217,9 @@ private fun AppActionSheet(
     onExtract: () -> Unit,
     onForceStop: () -> Unit,
     onSetEnabled: (Boolean) -> Unit,
+    onClearCache: () -> Unit,
+    onClearData: () -> Unit,
+    queryStorage: suspend (String) -> StorageBreakdown?,
     onUninstall: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -1168,6 +1229,8 @@ private fun AppActionSheet(
     val launchable = remember(app.packageName) {
         context.packageManager.getLaunchIntentForPackage(app.packageName) != null
     }
+    var storage by remember(app.packageName) { mutableStateOf<StorageBreakdown?>(null) }
+    LaunchedEffect(app.packageName) { storage = queryStorage(app.packageName) }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1250,6 +1313,34 @@ private fun AppActionSheet(
             }
         }
 
+        // Storage breakdown — only renders when StorageStatsManager returns data (Usage
+        // Access granted + API 26+). Three lightweight chips so the user grasps APK vs
+        // Data vs Cache at a glance without a deep dialog.
+        storage?.let { s ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp, vertical = 4.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                StorageChip(
+                    label = stringResource(R.string.manage_storage_app),
+                    value = android.text.format.Formatter.formatShortFileSize(context, s.appBytes),
+                    weight = 1f,
+                )
+                StorageChip(
+                    label = stringResource(R.string.manage_storage_data),
+                    value = android.text.format.Formatter.formatShortFileSize(context, s.dataBytes),
+                    weight = 1f,
+                )
+                StorageChip(
+                    label = stringResource(R.string.manage_storage_cache),
+                    value = android.text.format.Formatter.formatShortFileSize(context, s.cacheBytes),
+                    weight = 1f,
+                )
+            }
+        }
+
         Spacer(Modifier.height(8.dp))
 
         if (launchable) {
@@ -1325,6 +1416,20 @@ private fun AppActionSheet(
                     onClick = { onSetEnabled(true) },
                 )
             }
+            ActionRow(
+                icon = Icons.Rounded.CleaningServices,
+                iconTint = MaterialTheme.colorScheme.tertiary,
+                label = stringResource(R.string.manage_action_clear_cache),
+                subtitle = stringResource(R.string.manage_action_clear_cache_sub),
+                onClick = onClearCache,
+            )
+            ActionRow(
+                icon = Icons.Rounded.DeleteForever,
+                iconTint = MaterialTheme.colorScheme.error,
+                label = stringResource(R.string.manage_action_clear_data),
+                subtitle = stringResource(R.string.manage_action_clear_data_sub),
+                onClick = onClearData,
+            )
         }
 
         ActionRow(
@@ -1482,4 +1587,71 @@ private fun appFilterLabel(filter: AppFilter): Int = when (filter) {
     AppFilter.User -> R.string.manage_filter_user
     AppFilter.System -> R.string.manage_filter_system
     AppFilter.Disabled -> R.string.manage_filter_disabled
+}
+
+/**
+ * Compact label/value chip for the storage row. Filled tonal so it reads as informational
+ * rather than actionable — these are display-only.
+ */
+@Composable
+private fun androidx.compose.foundation.layout.RowScope.StorageChip(
+    label: String,
+    value: String,
+    weight: Float,
+) {
+    Column(
+        modifier = Modifier
+            .weight(weight)
+            .clip(MaterialTheme.shapes.medium)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+        )
+    }
+}
+
+/**
+ * Compact 3-stat summary for the active filter set: count · total size · disabled count.
+ * Reads `apps` directly so the banner updates instantly when chips toggle.
+ */
+@Composable
+private fun StatsBanner(apps: List<InstalledApp>) {
+    val context = LocalContext.current
+    val totalBytes = remember(apps) { apps.sumOf { it.sizeBytes } }
+    val disabled = remember(apps) { apps.count { !it.enabled } }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.manage_stats_apps, apps.size),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        Text(text = "·", color = MaterialTheme.colorScheme.outline)
+        Text(
+            text = android.text.format.Formatter.formatShortFileSize(context, totalBytes),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+        if (disabled > 0) {
+            Text(text = "·", color = MaterialTheme.colorScheme.outline)
+            Text(
+                text = stringResource(R.string.manage_stats_disabled, disabled),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.error,
+            )
+        }
+    }
 }

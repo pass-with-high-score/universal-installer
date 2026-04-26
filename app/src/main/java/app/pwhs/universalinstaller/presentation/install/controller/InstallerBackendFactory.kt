@@ -64,6 +64,15 @@ interface InstallerBackendFactory {
      * failure.
      */
     suspend fun setEnabledViaRoot(packageName: String, enabled: Boolean): Result<String>
+
+    /** `pm clear <pkg>` via root shell — wipes cache + data + obb. Store flavor → failure. */
+    suspend fun clearAppDataViaRoot(packageName: String): Result<String>
+
+    /**
+     * Direct `rm -rf /data/data/<pkg>/cache /data/data/<pkg>/code_cache` via root shell.
+     * Works regardless of Android version because root sees package-private directories.
+     */
+    suspend fun clearAppCacheViaRoot(packageName: String): Result<String>
 }
 
 enum class SystemAppMethod {
