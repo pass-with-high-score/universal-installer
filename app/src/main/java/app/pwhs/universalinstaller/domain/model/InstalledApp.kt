@@ -11,4 +11,6 @@ data class InstalledApp(
     val installedAt: Long = 0L,
     /** Last time the app was used (UsageStatsManager). 0 if unknown or no permission. */
     val lastUsedAt: Long = 0L,
+    /** True when the install has split APKs (`splitSourceDirs` non-empty). */
+    val hasSplits: Boolean = false,
 )

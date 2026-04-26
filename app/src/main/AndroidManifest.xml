@@ -170,6 +170,7 @@
         </activity>
 
         <activity android:name=".presentation.install.InstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.extract.ExtractActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.uninstall.UninstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.sync.SyncActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.setting.SettingActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />

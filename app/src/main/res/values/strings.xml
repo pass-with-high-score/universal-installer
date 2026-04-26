@@ -2,9 +2,21 @@
 <resources>
     <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
+    <string name="txt_extract">Extract</string>
     <string name="txt_uninstall">Uninstall</string>
     <string name="txt_setting">Settings</string>
     <string name="screen_title_uninstall">Uninstall</string>
+    <string name="screen_title_extract">Extract APK</string>
+    <string name="extract_search_hint">Search apps</string>
+    <string name="extract_show_system">Show system apps</string>
+    <string name="extract_label_split">Split (APKS)</string>
+    <string name="extract_label_single">Single APK</string>
+    <string name="extract_action">Extract</string>
+    <string name="extract_running">Extracting %1$s…</string>
+    <string name="extract_done">Saved to %1$s</string>
+    <string name="extract_done_action_open">Open folder</string>
+    <string name="extract_failed">Extract failed: %1$s</string>
+    <string name="extract_empty">No installed apps to extract</string>
     <string name="cancel">Cancel</string>
     <string name="fab_install">Install Package</string>
     <string name="uninstall">Uninstall</string>

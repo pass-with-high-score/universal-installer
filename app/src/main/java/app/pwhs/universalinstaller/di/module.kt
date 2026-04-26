@@ -10,6 +10,7 @@ import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.data.repository.SessionDataRepositoryImpl
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.download.DownloadHistoryViewModel
+import app.pwhs.universalinstaller.presentation.extract.ExtractViewModel
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.universalinstaller.presentation.sync.SyncViewModel
@@ -76,6 +77,7 @@ val appModule = module {
 
     viewModelOf(::InstallViewModel)
     viewModelOf(::UninstallViewModel)
+    viewModelOf(::ExtractViewModel)
     viewModelOf(::SettingViewModel)
     viewModelOf(::UninstallLogsViewModel)
     viewModelOf(::DownloadHistoryViewModel)
