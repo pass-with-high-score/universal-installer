@@ -3,8 +3,7 @@ package app.pwhs.universalinstaller.presentation.composable
 import android.content.Context
 import android.content.Intent
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.DeleteOutline
-import androidx.compose.material.icons.rounded.FolderZip
+import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
@@ -18,10 +17,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.pwhs.universalinstaller.R
-import app.pwhs.universalinstaller.presentation.extract.ExtractActivity
 import app.pwhs.universalinstaller.presentation.install.InstallActivity
+import app.pwhs.universalinstaller.presentation.manage.ManageActivity
 import app.pwhs.universalinstaller.presentation.setting.SettingActivity
-import app.pwhs.universalinstaller.presentation.uninstall.UninstallActivity
 
 enum class BottomBarItem(
     val activityClass: Class<*>,
@@ -29,8 +27,7 @@ enum class BottomBarItem(
     val icon: ImageVector,
 ) {
     Install(InstallActivity::class.java, R.string.txt_install, Icons.Rounded.InstallMobile),
-    Extract(ExtractActivity::class.java, R.string.txt_extract, Icons.Rounded.FolderZip),
-    Uninstall(UninstallActivity::class.java, R.string.txt_uninstall, Icons.Rounded.DeleteOutline),
+    Manage(ManageActivity::class.java, R.string.txt_manage, Icons.Rounded.Apps),
     Settings(SettingActivity::class.java, R.string.txt_setting, Icons.Rounded.Settings)
 }
 

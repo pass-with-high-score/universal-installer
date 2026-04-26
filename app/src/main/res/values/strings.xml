@@ -2,10 +2,10 @@
 <resources>
     <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
-    <string name="txt_extract">Extract</string>
+    <string name="txt_manage">Manage</string>
     <string name="txt_uninstall">Uninstall</string>
     <string name="txt_setting">Settings</string>
-    <string name="screen_title_uninstall">Uninstall</string>
+    <string name="screen_title_uninstall">Manage apps</string>
     <string name="screen_title_extract">Extract APK</string>
     <string name="extract_search_hint">Search apps</string>
     <string name="extract_show_system">Show system apps</string>
@@ -17,6 +17,18 @@
     <string name="extract_done_action_open">Open folder</string>
     <string name="extract_failed">Extract failed: %1$s</string>
     <string name="extract_empty">No installed apps to extract</string>
+    <string name="extract_action_backups">Backups</string>
+    <string name="screen_title_backups">Extracted backups</string>
+    <string name="backups_count_size">%1$d files · %2$s</string>
+    <string name="backups_empty">No extracted APKs yet</string>
+    <string name="backup_action_install">Install</string>
+    <string name="backup_action_share">Share</string>
+    <string name="backup_action_delete">Delete</string>
+    <string name="backup_action_delete_all">Delete all</string>
+    <string name="backup_action_open_folder">Open folder</string>
+    <string name="backup_delete_one_title">Delete this backup?</string>
+    <string name="backup_delete_all_title">Delete all backups?</string>
+    <string name="backup_delete_all_msg">Permanently remove %1$d files from disk.</string>
     <string name="cancel">Cancel</string>
     <string name="fab_install">Install Package</string>
     <string name="uninstall">Uninstall</string>

@@ -10,12 +10,12 @@ import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.data.repository.SessionDataRepositoryImpl
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.download.DownloadHistoryViewModel
-import app.pwhs.universalinstaller.presentation.extract.ExtractViewModel
+import app.pwhs.universalinstaller.presentation.manage.BackupsViewModel
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.universalinstaller.presentation.sync.SyncViewModel
-import app.pwhs.universalinstaller.presentation.uninstall.UninstallViewModel
-import app.pwhs.universalinstaller.presentation.uninstall.logs.UninstallLogsViewModel
+import app.pwhs.universalinstaller.presentation.manage.ManageViewModel
+import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -76,8 +76,8 @@ val appModule = module {
     single { PackageDownloadService(get()) }
 
     viewModelOf(::InstallViewModel)
-    viewModelOf(::UninstallViewModel)
-    viewModelOf(::ExtractViewModel)
+    viewModelOf(::ManageViewModel)
+    viewModelOf(::BackupsViewModel)
     viewModelOf(::SettingViewModel)
     viewModelOf(::UninstallLogsViewModel)
     viewModelOf(::DownloadHistoryViewModel)

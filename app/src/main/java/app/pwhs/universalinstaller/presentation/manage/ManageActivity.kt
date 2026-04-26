@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.presentation.uninstall
+package app.pwhs.universalinstaller.presentation.manage
 
 import android.os.Bundle
 import androidx.compose.foundation.layout.Box
@@ -11,20 +11,20 @@ import app.pwhs.universalinstaller.presentation.composable.BottomBar
 import app.pwhs.universalinstaller.presentation.composable.BottomBarItem
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class UninstallActivity : BaseActivity() {
+class ManageActivity : BaseActivity() {
 
-    private val viewModel: UninstallViewModel by viewModel()
+    private val viewModel: ManageViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentWithTheme {
             Scaffold(
-                bottomBar = { BottomBar(BottomBarItem.Uninstall) }
+                bottomBar = { BottomBar(BottomBarItem.Manage) }
             ) { innerPadding ->
                 Box(modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = innerPadding.calculateBottomPadding())) {
-                    UninstallScreen(viewModel = viewModel)
+                    ManageScreen(viewModel = viewModel)
                 }
             }
         }

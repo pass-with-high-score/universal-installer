@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.presentation.uninstall
+package app.pwhs.universalinstaller.presentation.manage
 
 import android.content.Intent
 import android.provider.Settings
@@ -32,6 +32,8 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
+import androidx.compose.material.icons.rounded.FolderZip
+import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Search
@@ -54,6 +56,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -85,7 +90,7 @@ import app.pwhs.universalinstaller.domain.model.InstalledApp
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMethod
-import app.pwhs.universalinstaller.presentation.uninstall.logs.UninstallLogsActivity
+import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsActivity
 import app.pwhs.universalinstaller.util.AppIconData
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
@@ -99,9 +104,9 @@ import org.koin.androidx.compose.koinViewModel
 
 
 @Composable
-fun UninstallScreen(
+fun ManageScreen(
     modifier: Modifier = Modifier,
-    viewModel: UninstallViewModel = koinViewModel(),
+    viewModel: ManageViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -112,12 +117,17 @@ fun UninstallScreen(
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
         onToggleSystemApps = viewModel::toggleSystemApps,
         onUninstall = viewModel::uninstallApp,
+        onExtract = viewModel::extractApp,
+        onDismissExtractResult = viewModel::dismissExtractResult,
         onToggleSelection = viewModel::toggleSelection,
         onClearSelection = viewModel::clearSelection,
         onToggleSelectAll = viewModel::toggleSelectAll,
         onUninstallSelected = viewModel::uninstallSelected,
-        onOpenLogs = { 
+        onOpenLogs = {
             context.startActivity(Intent(context, UninstallLogsActivity::class.java))
+        },
+        onOpenBackups = {
+            context.startActivity(Intent(context, BackupsActivity::class.java))
         },
         onRefresh = viewModel::refreshApps,
         onSortChange = viewModel::setSort,
@@ -141,15 +151,18 @@ fun UninstallScreen(
 @Composable
 private fun UninstallUi(
     modifier: Modifier = Modifier,
-    uiState: UninstallUiState = UninstallUiState(),
+    uiState: ManageUiState = ManageUiState(),
     onSearchQueryChanged: (String) -> Unit = {},
     onToggleSystemApps: () -> Unit = {},
     onUninstall: (String) -> Unit = {},
+    onExtract: (String, String) -> Unit = { _, _ -> },
+    onDismissExtractResult: () -> Unit = {},
     onToggleSelection: (String) -> Unit = {},
     onClearSelection: () -> Unit = {},
     onToggleSelectAll: () -> Unit = {},
     onUninstallSelected: () -> Unit = {},
     onOpenLogs: () -> Unit = {},
+    onOpenBackups: () -> Unit = {},
     onRefresh: () -> Unit = {},
     onSortChange: (UninstallSortBy) -> Unit = {},
     onRequestUsageAccess: () -> Unit = {},
@@ -157,6 +170,69 @@ private fun UninstallUi(
     onConfirmSystemApp: (SystemAppMethod?) -> Unit = {},
     onDismissSystemApp: () -> Unit = {},
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    var actionTarget by remember { mutableStateOf<InstalledApp?>(null) }
+    var confirmUninstallTarget by remember { mutableStateOf<InstalledApp?>(null) }
+    val extractInProgress = uiState.extractState is ExtractState.Running
+
+    // Action sheet — opens on card tap (when not in selection mode). Adding new actions
+    // later is just appending another ActionRow; lifting the dialogs to this level avoided
+    // duplicating them inside every card composition.
+    actionTarget?.let { target ->
+        AppActionSheet(
+            app = target,
+            extractInProgress = extractInProgress,
+            onExtract = {
+                actionTarget = null
+                onExtract(target.packageName, target.appName)
+            },
+            onUninstall = {
+                actionTarget = null
+                // System apps bypass the generic confirm — the ViewModel surfaces the
+                // root-aware method dialog directly. User apps still get the explicit
+                // "Are you sure" guard before destructive action.
+                if (target.isSystemApp) onUninstall(target.packageName)
+                else confirmUninstallTarget = target
+            },
+            onDismiss = { actionTarget = null },
+        )
+    }
+
+    confirmUninstallTarget?.let { target ->
+        UninstallConfirmDialog(
+            app = target,
+            onConfirm = {
+                confirmUninstallTarget = null
+                onUninstall(target.packageName)
+            },
+            onDismiss = { confirmUninstallTarget = null },
+        )
+    }
+
+    // Surface extract success/failure as a snackbar; "Open folder" jumps to Backups so the
+    // user can see what landed on disk.
+    LaunchedEffect(uiState.extractState) {
+        when (val s = uiState.extractState) {
+            is ExtractState.Done -> {
+                val res = snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.extract_done, s.file.name),
+                    actionLabel = context.getString(R.string.extract_done_action_open),
+                    withDismissAction = true,
+                )
+                if (res == SnackbarResult.ActionPerformed) onOpenBackups()
+                onDismissExtractResult()
+            }
+            is ExtractState.Error -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.extract_failed, s.message),
+                    withDismissAction = true,
+                )
+                onDismissExtractResult()
+            }
+            else -> Unit
+        }
+    }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     var showFilterSheet by remember { mutableStateOf(false) }
     var showBatchConfirm by remember { mutableStateOf(false) }
@@ -218,6 +294,7 @@ private fun UninstallUi(
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         contentWindowInsets = WindowInsets(0, 0, 0, 0),
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             if (uiState.isSelectionMode) {
                 // Selection mode top bar
@@ -283,6 +360,12 @@ private fun UninstallUi(
                             Icon(
                                 imageVector = Icons.Rounded.Refresh,
                                 contentDescription = "Refresh",
+                            )
+                        }
+                        IconButton(onClick = onOpenBackups) {
+                            Icon(
+                                imageVector = Icons.Rounded.Inventory2,
+                                contentDescription = stringResource(R.string.extract_action_backups),
                             )
                         }
                         IconButton(onClick = onOpenLogs) {
@@ -462,7 +545,7 @@ private fun UninstallUi(
                                 app = app,
                                 isSelectionMode = uiState.isSelectionMode,
                                 isSelected = app.packageName in uiState.selectedPackages,
-                                onUninstall = { onUninstall(app.packageName) },
+                                onShowActions = { actionTarget = app },
                                 onLongClick = { onToggleSelection(app.packageName) },
                                 onToggleSelect = { onToggleSelection(app.packageName) },
                                 modifier = Modifier.animateItem(),
@@ -635,55 +718,12 @@ private fun AppCard(
     app: InstalledApp,
     isSelectionMode: Boolean,
     isSelected: Boolean,
-    onUninstall: () -> Unit,
+    onShowActions: () -> Unit,
     onLongClick: () -> Unit,
     onToggleSelect: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    var showConfirmDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
-
-    if (showConfirmDialog) {
-        AlertDialog(
-            onDismissRequest = { showConfirmDialog = false },
-            confirmButton = {
-                TextButton(onClick = {
-                    showConfirmDialog = false
-                    onUninstall()
-                }) {
-                    Text(stringResource(R.string.uninstall), color = MaterialTheme.colorScheme.error)
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showConfirmDialog = false }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            },
-            title = { Text(stringResource(R.string.uninstall_confirm_single_title, app.appName)) },
-            text = {
-                Text(stringResource(R.string.uninstall_confirm_single_text, app.appName, app.packageName))
-            },
-            icon = {
-                SubcomposeAsyncImage(
-                    model = ImageRequest.Builder(context)
-                        .data(AppIconData(app.packageName))
-                        .build(),
-                    contentDescription = app.appName,
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(MaterialTheme.shapes.medium),
-                    error = {
-                        Icon(
-                            imageVector = Icons.Rounded.DeleteOutline,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                        )
-                    },
-                    success = { SubcomposeAsyncImageContent() },
-                )
-            }
-        )
-    }
 
     ElevatedCard(
         modifier = modifier
@@ -691,14 +731,7 @@ private fun AppCard(
             .clip(MaterialTheme.shapes.large)
             .combinedClickable(
                 onClick = {
-                    when {
-                        isSelectionMode -> onToggleSelect()
-                        // Route system apps straight to the ViewModel so the root-aware
-                        // method dialog appears — avoids the generic confirm firing first
-                        // and the user seeing two dialogs back-to-back.
-                        app.isSystemApp -> onUninstall()
-                        else -> showConfirmDialog = true
-                    }
+                    if (isSelectionMode) onToggleSelect() else onShowActions()
                 },
                 onLongClick = onLongClick,
             ),
@@ -829,23 +862,6 @@ private fun AppCard(
                 }
             }
 
-            // Delete button (only in normal mode)
-            if (!isSelectionMode) {
-                FilledTonalIconButton(
-                    onClick = {
-                        // System apps bypass the normal confirm — let the ViewModel surface
-                        // the root-aware dialog directly so the user sees the right options.
-                        if (app.isSystemApp) onUninstall() else showConfirmDialog = true
-                    },
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.DeleteOutline,
-                        contentDescription = stringResource(R.string.uninstall_app_cd, app.appName),
-                        tint = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-            }
         }
     }
 }
@@ -1058,5 +1074,198 @@ private fun SystemAppPrivilegedRequiredDialog(
         dismissButton = if (hasRegular) {
             { TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) } }
         } else null,
+    )
+}
+
+// ── App actions bottom sheet ────────────────────────────────────────────────
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun AppActionSheet(
+    app: InstalledApp,
+    extractInProgress: Boolean,
+    onExtract: () -> Unit,
+    onUninstall: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    ModalBottomSheet(
+        onDismissRequest = onDismiss,
+        sheetState = sheetState,
+    ) {
+        // Header: app icon + name + package name. Same shell as the AppCard so users see
+        // the in-context selection echoed back to them.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(AppIconData(app.packageName))
+                    .build(),
+                contentDescription = app.appName,
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                error = {
+                    Icon(
+                        imageVector = Icons.Rounded.Android,
+                        contentDescription = null,
+                        modifier = Modifier.size(48.dp),
+                        tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                    )
+                },
+                success = { SubcomposeAsyncImageContent() },
+            )
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = app.appName,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = app.packageName,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                if (app.versionName.isNotBlank()) {
+                    Text(
+                        text = "v${app.versionName}",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                    )
+                }
+            }
+            if (app.isSystemApp) {
+                Text(
+                    text = stringResource(R.string.uninstall_system_badge),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.tertiaryContainer)
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                )
+            }
+        }
+
+        Spacer(Modifier.height(8.dp))
+
+        ActionRow(
+            icon = if (app.hasSplits) Icons.Rounded.FolderZip else Icons.Rounded.Inventory2,
+            iconTint = MaterialTheme.colorScheme.primary,
+            label = stringResource(R.string.extract_action),
+            subtitle = if (app.hasSplits) stringResource(R.string.extract_label_split)
+                else stringResource(R.string.extract_label_single),
+            enabled = !extractInProgress,
+            onClick = onExtract,
+        )
+        ActionRow(
+            icon = Icons.Rounded.DeleteOutline,
+            iconTint = MaterialTheme.colorScheme.error,
+            label = stringResource(R.string.uninstall),
+            subtitle = stringResource(R.string.uninstall_app_cd, app.appName),
+            onClick = onUninstall,
+        )
+
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
+@Composable
+private fun ActionRow(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconTint: androidx.compose.ui.graphics.Color,
+    label: String,
+    subtitle: String,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(20.dp),
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (enabled) iconTint else iconTint.copy(alpha = 0.4f),
+            modifier = Modifier.size(24.dp),
+        )
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.titleSmall,
+                color = if (enabled) MaterialTheme.colorScheme.onSurface
+                    else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f),
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+    }
+}
+
+@Composable
+private fun UninstallConfirmDialog(
+    app: InstalledApp,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val context = LocalContext.current
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = onConfirm) {
+                Text(
+                    stringResource(R.string.uninstall),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        },
+        title = { Text(stringResource(R.string.uninstall_confirm_single_title, app.appName)) },
+        text = {
+            Text(stringResource(R.string.uninstall_confirm_single_text, app.appName, app.packageName))
+        },
+        icon = {
+            SubcomposeAsyncImage(
+                model = ImageRequest.Builder(context)
+                    .data(AppIconData(app.packageName))
+                    .build(),
+                contentDescription = app.appName,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(MaterialTheme.shapes.medium),
+                error = {
+                    Icon(
+                        imageVector = Icons.Rounded.DeleteOutline,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                },
+                success = { SubcomposeAsyncImageContent() },
+            )
+        },
     )
 }

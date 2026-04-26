@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.presentation.uninstall.logs
+package app.pwhs.universalinstaller.presentation.manage.logs
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background

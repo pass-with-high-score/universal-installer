@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.presentation.uninstall.logs
+package app.pwhs.universalinstaller.presentation.manage.logs
 
 import android.os.Bundle
 import app.pwhs.universalinstaller.base.BaseActivity

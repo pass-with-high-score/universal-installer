@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.presentation.uninstall
+package app.pwhs.universalinstaller.presentation.manage
 
 import android.app.Application
 import android.content.pm.ApplicationInfo
@@ -54,7 +54,19 @@ sealed interface SystemAppPrompt {
     ) : SystemAppPrompt
 }
 
-data class UninstallUiState(
+sealed interface ExtractState {
+    data object Idle : ExtractState
+    data class Running(
+        val packageName: String,
+        val appName: String,
+        val bytesCopied: Long,
+        val totalBytes: Long,
+    ) : ExtractState
+    data class Done(val appName: String, val file: java.io.File) : ExtractState
+    data class Error(val appName: String, val message: String) : ExtractState
+}
+
+data class ManageUiState(
     val apps: List<InstalledApp> = emptyList(),
     val filteredApps: List<InstalledApp> = emptyList(),
     val searchQuery: String = "",
@@ -67,9 +79,10 @@ data class UninstallUiState(
     val sortDirection: SortDirection = SortDirection.Asc,
     val usageAccessGranted: Boolean = false,
     val systemAppPrompt: SystemAppPrompt? = null,
+    val extractState: ExtractState = ExtractState.Idle,
 )
 
-class UninstallViewModel(
+class ManageViewModel(
     private val application: Application,
     private val packageUninstaller: PackageUninstaller,
     private val uninstallLogDao: UninstallLogDao,
@@ -87,10 +100,13 @@ class UninstallViewModel(
     private val _sortDirection = MutableStateFlow(SortDirection.Asc)
     private val _usageAccess = MutableStateFlow(false)
     private val _systemAppPrompt = MutableStateFlow<SystemAppPrompt?>(null)
+    private val _extractState = MutableStateFlow<ExtractState>(ExtractState.Idle)
 
-    val uiState: StateFlow<UninstallUiState> = combine(
+    private var extractJob: kotlinx.coroutines.Job? = null
+
+    val uiState: StateFlow<ManageUiState> = combine(
         listOf(_apps, _searchQuery, _isLoading, _showSystemApps, _selectedPackages,
-            _sortBy, _sortDirection, _usageAccess, _systemAppPrompt)
+            _sortBy, _sortDirection, _usageAccess, _systemAppPrompt, _extractState)
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         val apps = flows[0] as List<InstalledApp>
@@ -103,6 +119,7 @@ class UninstallViewModel(
         val direction = flows[6] as SortDirection
         val usage = flows[7] as Boolean
         val prompt = flows[8] as SystemAppPrompt?
+        val extract = flows[9] as ExtractState
         val filtered = apps
             .filter { app ->
                 if (!showSystem && app.isSystemApp) return@filter false
@@ -111,7 +128,7 @@ class UninstallViewModel(
                         app.packageName.contains(query, ignoreCase = true)
             }
             .let { applySort(it, sortBy, direction) }
-        UninstallUiState(
+        ManageUiState(
             apps = apps,
             filteredApps = filtered,
             searchQuery = query,
@@ -124,8 +141,28 @@ class UninstallViewModel(
             sortDirection = direction,
             usageAccessGranted = usage,
             systemAppPrompt = prompt,
+            extractState = extract,
         )
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), UninstallUiState())
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ManageUiState())
+
+    fun extractApp(packageName: String, appName: String) {
+        if (_extractState.value is ExtractState.Running) return
+        extractJob?.cancel()
+        _extractState.value = ExtractState.Running(packageName, appName, 0L, 1L)
+        extractJob = viewModelScope.launch {
+            val result = ApkExtractor.extract(application, packageName) { bytes, total ->
+                _extractState.value = ExtractState.Running(packageName, appName, bytes, total)
+            }
+            _extractState.value = when (result) {
+                is ApkExtractor.Result.Success -> ExtractState.Done(appName, result.file)
+                is ApkExtractor.Result.Failure -> ExtractState.Error(appName, result.message)
+            }
+        }
+    }
+
+    fun dismissExtractResult() {
+        _extractState.value = ExtractState.Idle
+    }
 
     private fun applySort(
         list: List<InstalledApp>,
@@ -532,6 +569,7 @@ class UninstallViewModel(
                         sizeBytes = sizeBytes,
                         installedAt = pkgInfo?.firstInstallTime ?: 0L,
                         lastUsedAt = lastUsedMap[appInfo.packageName] ?: 0L,
+                        hasSplits = !appInfo.splitSourceDirs.isNullOrEmpty(),
                     )
                 }
             }

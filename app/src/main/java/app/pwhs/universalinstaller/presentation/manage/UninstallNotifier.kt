@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.presentation.uninstall
+package app.pwhs.universalinstaller.presentation.manage
 
 import android.Manifest
 import android.app.Notification

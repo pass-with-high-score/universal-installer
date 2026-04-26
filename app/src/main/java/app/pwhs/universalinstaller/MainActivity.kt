@@ -36,7 +36,7 @@ import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
 import app.pwhs.universalinstaller.presentation.install.InstallActivity
 import app.pwhs.universalinstaller.presentation.sync.SyncActivity
-import app.pwhs.universalinstaller.presentation.uninstall.UninstallActivity
+import app.pwhs.universalinstaller.presentation.manage.ManageActivity
 
 
 private enum class AppRoute { Splash, Onboarding, Main }
@@ -136,7 +136,7 @@ class MainActivity : ComponentActivity() {
                             val targetActivity = if (isDeepLink) {
                                 when (uri.host) {
                                     "sync" -> SyncActivity::class.java
-                                    "uninstall" -> UninstallActivity::class.java
+                                    "uninstall" -> ManageActivity::class.java
                                     else -> InstallActivity::class.java
                                 }
                             } else {
