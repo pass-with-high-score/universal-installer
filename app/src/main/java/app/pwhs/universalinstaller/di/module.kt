@@ -11,6 +11,7 @@ import app.pwhs.universalinstaller.data.repository.SessionDataRepositoryImpl
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.download.DownloadHistoryViewModel
 import app.pwhs.universalinstaller.presentation.manage.BackupsViewModel
+import app.pwhs.universalinstaller.presentation.manage.permissions.AppPermissionsViewModel
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.universalinstaller.presentation.sync.SyncViewModel
@@ -78,6 +79,7 @@ val appModule = module {
     viewModelOf(::InstallViewModel)
     viewModelOf(::ManageViewModel)
     viewModelOf(::BackupsViewModel)
+    viewModelOf(::AppPermissionsViewModel)
     viewModelOf(::SettingViewModel)
     viewModelOf(::UninstallLogsViewModel)
     viewModelOf(::DownloadHistoryViewModel)

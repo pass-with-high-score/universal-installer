@@ -52,6 +52,12 @@ data class StorageBreakdown(
     val totalBytes: Long get() = appBytes + dataBytes + cacheBytes
 }
 
+/** Usage time per day for the last N days, oldest → newest. Empty list if no data. */
+data class UsageBucket(
+    val dayStartMillis: Long,
+    val foregroundMillis: Long,
+)
+
 internal fun InstalledApp.category(): AppFilter = when {
     !enabled -> AppFilter.Disabled
     isSystemApp -> AppFilter.System
@@ -346,6 +352,54 @@ class ManageViewModel(
      * call), so we run it only when the action sheet opens — not when the list loads,
      * where 300+ apps × IPC would visibly stall the screen.
      */
+    /**
+     * Last 7 daily foreground-time buckets for [packageName]. Returns an empty list when
+     * the user hasn't granted Usage access — UI hides the chart in that case rather than
+     * showing a spinner-then-nothing transition.
+     */
+    suspend fun queryUsageBuckets(packageName: String): List<UsageBucket> = withContext(Dispatchers.IO) {
+        if (!hasUsageAccess()) return@withContext emptyList()
+        try {
+            val usm = application.getSystemService(android.content.Context.USAGE_STATS_SERVICE)
+                as android.app.usage.UsageStatsManager
+            val now = System.currentTimeMillis()
+            // Roll back to the start of today so all buckets are full days. We index 7
+            // buckets backward from there, keyed by their day-start timestamp.
+            val cal = java.util.Calendar.getInstance().apply {
+                timeInMillis = now
+                set(java.util.Calendar.HOUR_OF_DAY, 0)
+                set(java.util.Calendar.MINUTE, 0)
+                set(java.util.Calendar.SECOND, 0)
+                set(java.util.Calendar.MILLISECOND, 0)
+            }
+            val todayStart = cal.timeInMillis
+            val dayMs = 24L * 60 * 60 * 1000
+            val sevenAgo = todayStart - 6L * dayMs
+            val raw = usm.queryUsageStats(
+                android.app.usage.UsageStatsManager.INTERVAL_DAILY,
+                sevenAgo,
+                now,
+            ) ?: return@withContext emptyList()
+            // Sum any rows for our package falling into each daily window. INTERVAL_DAILY
+            // typically returns one row per day per package, but we sum defensively.
+            val buckets = LongArray(7)
+            for (row in raw) {
+                if (row.packageName != packageName) continue
+                val rowStart = row.firstTimeStamp
+                val idx = ((rowStart - sevenAgo) / dayMs).toInt().coerceIn(0, 6)
+                buckets[idx] += row.totalTimeInForeground
+            }
+            (0 until 7).map { i ->
+                UsageBucket(
+                    dayStartMillis = sevenAgo + i * dayMs,
+                    foregroundMillis = buckets[i],
+                )
+            }
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
     suspend fun queryStorageStats(packageName: String): StorageBreakdown? = withContext(Dispatchers.IO) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return@withContext null
         try {

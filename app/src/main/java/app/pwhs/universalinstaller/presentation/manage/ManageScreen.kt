@@ -41,6 +41,7 @@ import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Launch
 import androidx.compose.material.icons.rounded.PlayCircle
 import androidx.compose.material.icons.rounded.PowerSettingsNew
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Store
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Refresh
@@ -102,6 +103,7 @@ import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMethod
 import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsActivity
+import app.pwhs.universalinstaller.presentation.manage.permissions.AppPermissionsActivity
 import app.pwhs.universalinstaller.util.AppIconData
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
@@ -135,6 +137,7 @@ fun ManageScreen(
         onClearCache = viewModel::clearCache,
         onClearData = viewModel::clearAllData,
         queryStorage = viewModel::queryStorageStats,
+        queryUsage = viewModel::queryUsageBuckets,
         onDismissExtractResult = viewModel::dismissExtractResult,
         onDismissPrivilegedResult = viewModel::dismissPrivilegedActionResult,
         onRefreshPrivileged = viewModel::refreshPrivilegedReady,
@@ -182,6 +185,7 @@ private fun UninstallUi(
     onClearCache: (String, String) -> Unit = { _, _ -> },
     onClearData: (String, String) -> Unit = { _, _ -> },
     queryStorage: suspend (String) -> StorageBreakdown? = { null },
+    queryUsage: suspend (String) -> List<UsageBucket> = { emptyList() },
     onDismissExtractResult: () -> Unit = {},
     onDismissPrivilegedResult: () -> Unit = {},
     onRefreshPrivileged: () -> Unit = {},
@@ -250,6 +254,7 @@ private fun UninstallUi(
                 confirmClearDataTarget = target
             },
             queryStorage = queryStorage,
+            queryUsage = queryUsage,
             onUninstall = {
                 actionTarget = null
                 // System apps bypass the generic confirm — the ViewModel surfaces the
@@ -1285,6 +1290,7 @@ private fun AppActionSheet(
     onClearCache: () -> Unit,
     onClearData: () -> Unit,
     queryStorage: suspend (String) -> StorageBreakdown?,
+    queryUsage: suspend (String) -> List<UsageBucket>,
     onUninstall: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -1295,7 +1301,11 @@ private fun AppActionSheet(
         context.packageManager.getLaunchIntentForPackage(app.packageName) != null
     }
     var storage by remember(app.packageName) { mutableStateOf<StorageBreakdown?>(null) }
-    LaunchedEffect(app.packageName) { storage = queryStorage(app.packageName) }
+    var usage by remember(app.packageName) { mutableStateOf<List<UsageBucket>>(emptyList()) }
+    LaunchedEffect(app.packageName) {
+        storage = queryStorage(app.packageName)
+        usage = queryUsage(app.packageName)
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1378,6 +1388,17 @@ private fun AppActionSheet(
             }
         }
 
+        // Usage chart — renders only when there's at least one bucket with foreground time.
+        // Hidden silently when Usage Access isn't granted (queryUsage returns []).
+        val totalUsageMs = remember(usage) { usage.sumOf { it.foregroundMillis } }
+        if (totalUsageMs > 0L) {
+            UsageChart(
+                buckets = usage,
+                totalMillis = totalUsageMs,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+            )
+        }
+
         // Storage breakdown — only renders when StorageStatsManager returns data (Usage
         // Access granted + API 26+). Three lightweight chips so the user grasps APK vs
         // Data vs Cache at a glance without a deep dialog.
@@ -1445,6 +1466,18 @@ private fun AppActionSheet(
             label = stringResource(R.string.manage_action_app_info),
             subtitle = stringResource(R.string.manage_action_app_info_sub),
             onClick = onOpenAppInfo,
+        )
+        ActionRow(
+            icon = Icons.Rounded.Security,
+            iconTint = MaterialTheme.colorScheme.primary,
+            label = stringResource(R.string.manage_action_permissions),
+            subtitle = stringResource(R.string.manage_action_permissions_sub),
+            onClick = {
+                val intent = Intent(context, AppPermissionsActivity::class.java)
+                    .putExtra(AppPermissionsActivity.EXTRA_PACKAGE_NAME, app.packageName)
+                runCatching { context.startActivity(intent) }
+                onDismiss()
+            },
         )
         ActionRow(
             icon = Icons.Rounded.Share,
@@ -1768,5 +1801,82 @@ private fun GroupHeader(title: String, count: Int) {
                 .background(MaterialTheme.colorScheme.surfaceContainerHigh)
                 .padding(horizontal = 8.dp, vertical = 2.dp),
         )
+    }
+}
+
+/**
+ * 7-bar daily usage chart. Bars are drawn relative to the largest bucket so a single
+ * heavy day doesn't squash the rest into invisibility. Today is rightmost; bar opacity
+ * dims for zero-time days so they read as "no usage" rather than "missing data".
+ */
+@Composable
+private fun UsageChart(
+    buckets: List<UsageBucket>,
+    totalMillis: Long,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    val maxBucket = remember(buckets) { (buckets.maxOfOrNull { it.foregroundMillis } ?: 0L).coerceAtLeast(1L) }
+    val barColor = MaterialTheme.colorScheme.primary
+    val emptyColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+    Column(modifier = modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.manage_usage_title),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = stringResource(
+                    R.string.manage_usage_total,
+                    formatDuration(context, totalMillis),
+                ),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        Spacer(Modifier.height(8.dp))
+        androidx.compose.foundation.Canvas(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+        ) {
+            val barCount = buckets.size.coerceAtLeast(1)
+            // Total horizontal padding between bars: barCount-1 gaps × 4dp. Remaining
+            // space is split evenly so the chart adapts to any sheet width.
+            val gapPx = 4.dp.toPx()
+            val totalGap = gapPx * (barCount - 1)
+            val barWidth = (size.width - totalGap) / barCount
+            buckets.forEachIndexed { i, bucket ->
+                val ratio = bucket.foregroundMillis.toFloat() / maxBucket
+                val barHeight = size.height * ratio
+                val x = i * (barWidth + gapPx)
+                val y = size.height - barHeight
+                drawRoundRect(
+                    color = if (bucket.foregroundMillis == 0L) emptyColor else barColor,
+                    topLeft = androidx.compose.ui.geometry.Offset(x, y),
+                    size = androidx.compose.ui.geometry.Size(
+                        width = barWidth,
+                        height = barHeight.coerceAtLeast(2f),
+                    ),
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(barWidth / 4f),
+                )
+            }
+        }
+    }
+}
+
+private fun formatDuration(context: android.content.Context, millis: Long): String {
+    val totalSec = millis / 1000
+    val h = totalSec / 3600
+    val m = (totalSec % 3600) / 60
+    return when {
+        h > 0 -> "${h}h ${m}m"
+        m > 0 -> "${m}m"
+        else -> "<1m"
     }
 }

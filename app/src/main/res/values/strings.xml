@@ -58,6 +58,15 @@
     <string name="manage_stats_disabled">%1$d disabled</string>
     <string name="manage_action_open_in_store">Open in %1$s</string>
     <string name="manage_action_open_in_store_sub">View this app\'s listing</string>
+    <string name="manage_action_permissions">Permissions</string>
+    <string name="manage_action_permissions_sub">Review what this app can access</string>
+    <string name="permissions_section_granted">Granted (%1$d)</string>
+    <string name="permissions_section_not_granted">Not granted (%1$d)</string>
+    <string name="permissions_dangerous_badge">Dangerous</string>
+    <string name="permissions_empty">This app declares no permissions</string>
+    <string name="manage_usage_title">Usage · last 7 days</string>
+    <string name="manage_usage_total">%1$s total</string>
+    <string name="manage_usage_none">No foreground time recorded</string>
     <string name="manage_group_label">Group by installer</string>
     <string name="manage_group_other">Sideload &amp; other</string>
     <string name="screen_title_backups">Extracted backups</string>

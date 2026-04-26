@@ -172,6 +172,7 @@
         <activity android:name=".presentation.install.InstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.manage.ManageActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.manage.BackupsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity android:name=".presentation.manage.permissions.AppPermissionsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.sync.SyncActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.setting.SettingActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.download.DownloadHistoryActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
