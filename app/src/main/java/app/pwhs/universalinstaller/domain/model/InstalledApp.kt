@@ -15,4 +15,10 @@ data class InstalledApp(
     val hasSplits: Boolean = false,
     /** Mirror of [android.content.pm.ApplicationInfo.enabled]. False after `pm disable`. */
     val enabled: Boolean = true,
+    /**
+     * The package that registered as the installer for this app, if known. Examples:
+     * `com.android.vending` (Play), `org.fdroid.fdroid`, `com.aurora.store`. Null on
+     * sideload, unknown, or platform pre-installed apps.
+     */
+    val installerPackage: String? = null,
 )

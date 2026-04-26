@@ -41,6 +41,7 @@ import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Launch
 import androidx.compose.material.icons.rounded.PlayCircle
 import androidx.compose.material.icons.rounded.PowerSettingsNew
+import androidx.compose.material.icons.rounded.Store
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Share
@@ -149,6 +150,7 @@ fun ManageScreen(
         },
         onRefresh = viewModel::refreshApps,
         onSortChange = viewModel::setSort,
+        onGroupByChange = viewModel::setGroupBy,
         onRequestUsageAccess = {
             // Send user to the system Usage Access settings — we re-check on resume via
             // refreshUsageAccess() and reload the list if it flipped.
@@ -165,7 +167,7 @@ fun ManageScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 private fun UninstallUi(
     modifier: Modifier = Modifier,
@@ -191,6 +193,7 @@ private fun UninstallUi(
     onOpenBackups: () -> Unit = {},
     onRefresh: () -> Unit = {},
     onSortChange: (UninstallSortBy) -> Unit = {},
+    onGroupByChange: (GroupBy) -> Unit = {},
     onRequestUsageAccess: () -> Unit = {},
     onRefreshUsageAccess: () -> Unit = {},
     onConfirmSystemApp: (SystemAppMethod?) -> Unit = {},
@@ -366,8 +369,10 @@ private fun UninstallUi(
         FilterSheet(
             sortBy = uiState.sortBy,
             direction = uiState.sortDirection,
+            groupBy = uiState.groupBy,
             usageGranted = uiState.usageAccessGranted,
             onSortChange = onSortChange,
+            onGroupByChange = onGroupByChange,
             onRequestUsageAccess = onRequestUsageAccess,
             onDismiss = { showFilterSheet = false },
         )
@@ -674,6 +679,7 @@ private fun UninstallUi(
                             listState.scrollToItem(0)
                         }
                     }
+                    val sideloadLabel = stringResource(R.string.manage_group_other)
                     LazyColumn(
                         state = listState,
                         // Extra bottom space so the FAB doesn't overlap the last card's
@@ -683,19 +689,51 @@ private fun UninstallUi(
                         ),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        items(
-                            items = uiState.filteredApps,
-                            key = { it.packageName }
-                        ) { app ->
-                            AppCard(
-                                app = app,
-                                isSelectionMode = uiState.isSelectionMode,
-                                isSelected = app.packageName in uiState.selectedPackages,
-                                onShowActions = { actionTarget = app },
-                                onLongClick = { onToggleSelection(app.packageName) },
-                                onToggleSelect = { onToggleSelection(app.packageName) },
-                                modifier = Modifier.animateItem(),
-                            )
+                        if (uiState.groupBy == GroupBy.Installer) {
+                            // Group-by-installer view. We compute the bucket label per app
+                            // (known store → display name; everything else → sideload), then
+                            // sort groups by name so the order is stable across loads.
+                            val grouped = uiState.filteredApps.groupBy { app ->
+                                resolveInstallerInfo(app.installerPackage, app.packageName)
+                                    ?.displayName ?: sideloadLabel
+                            }.toSortedMap()
+                            grouped.forEach { (groupName, apps) ->
+                                stickyHeader(key = "h:$groupName") {
+                                    GroupHeader(
+                                        title = groupName,
+                                        count = apps.size,
+                                    )
+                                }
+                                items(
+                                    items = apps,
+                                    key = { it.packageName },
+                                ) { app ->
+                                    AppCard(
+                                        app = app,
+                                        isSelectionMode = uiState.isSelectionMode,
+                                        isSelected = app.packageName in uiState.selectedPackages,
+                                        onShowActions = { actionTarget = app },
+                                        onLongClick = { onToggleSelection(app.packageName) },
+                                        onToggleSelect = { onToggleSelection(app.packageName) },
+                                        modifier = Modifier.animateItem(),
+                                    )
+                                }
+                            }
+                        } else {
+                            items(
+                                items = uiState.filteredApps,
+                                key = { it.packageName }
+                            ) { app ->
+                                AppCard(
+                                    app = app,
+                                    isSelectionMode = uiState.isSelectionMode,
+                                    isSelected = app.packageName in uiState.selectedPackages,
+                                    onShowActions = { actionTarget = app },
+                                    onLongClick = { onToggleSelection(app.packageName) },
+                                    onToggleSelect = { onToggleSelection(app.packageName) },
+                                    modifier = Modifier.animateItem(),
+                                )
+                            }
                         }
                         item {
                             Spacer(Modifier.height(8.dp))
@@ -712,8 +750,10 @@ private fun UninstallUi(
 private fun FilterSheet(
     sortBy: UninstallSortBy,
     direction: SortDirection,
+    groupBy: GroupBy,
     usageGranted: Boolean,
     onSortChange: (UninstallSortBy) -> Unit,
+    onGroupByChange: (GroupBy) -> Unit,
     onRequestUsageAccess: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -776,6 +816,31 @@ private fun FilterSheet(
                 }
             }
 
+            Spacer(Modifier.height(20.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable {
+                        onGroupByChange(
+                            if (groupBy == GroupBy.Installer) GroupBy.None else GroupBy.Installer,
+                        )
+                    }
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.manage_group_label),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(1f),
+                )
+                Switch(
+                    checked = groupBy == GroupBy.Installer,
+                    onCheckedChange = {
+                        onGroupByChange(if (it) GroupBy.Installer else GroupBy.None)
+                    },
+                )
+            }
         }
     }
 }
@@ -1352,6 +1417,28 @@ private fun AppActionSheet(
                 onClick = onOpenApp,
             )
         }
+        // "Open in store" only renders when we have a known installer source. Sideload
+        // installs and unknown sources don't get this row — there's nowhere meaningful
+        // to send the user.
+        val storeInfo = remember(app.installerPackage, app.packageName) {
+            resolveInstallerInfo(app.installerPackage, app.packageName)
+        }
+        storeInfo?.let { info ->
+            ActionRow(
+                icon = Icons.Rounded.Store,
+                iconTint = MaterialTheme.colorScheme.primary,
+                label = stringResource(R.string.manage_action_open_in_store, info.displayName),
+                subtitle = stringResource(R.string.manage_action_open_in_store_sub),
+                onClick = {
+                    runCatching {
+                        context.startActivity(
+                            info.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
+                        )
+                    }
+                    onDismiss()
+                },
+            )
+        }
         ActionRow(
             icon = Icons.Rounded.Info,
             iconTint = MaterialTheme.colorScheme.primary,
@@ -1653,5 +1740,33 @@ private fun StatsBanner(apps: List<InstalledApp>) {
                 color = MaterialTheme.colorScheme.error,
             )
         }
+    }
+}
+
+@Composable
+private fun GroupHeader(title: String, count: Int) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.weight(1f),
+        )
+        Text(
+            text = count.toString(),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier
+                .clip(MaterialTheme.shapes.small)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .padding(horizontal = 8.dp, vertical = 2.dp),
+        )
     }
 }

@@ -42,6 +42,7 @@ enum class SortDirection { Asc, Desc }
  * regardless of where its APK lives.
  */
 enum class AppFilter { User, System, Disabled }
+enum class GroupBy { None, Installer }
 
 data class StorageBreakdown(
     val appBytes: Long,
@@ -124,6 +125,7 @@ data class ManageUiState(
     val isAllSelected: Boolean = false,
     val sortBy: UninstallSortBy = UninstallSortBy.Name,
     val sortDirection: SortDirection = SortDirection.Asc,
+    val groupBy: GroupBy = GroupBy.None,
     val usageAccessGranted: Boolean = false,
     val systemAppPrompt: SystemAppPrompt? = null,
     val extractState: ExtractState = ExtractState.Idle,
@@ -148,6 +150,7 @@ class ManageViewModel(
     private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
     private val _sortBy = MutableStateFlow(UninstallSortBy.Name)
     private val _sortDirection = MutableStateFlow(SortDirection.Asc)
+    private val _groupBy = MutableStateFlow(GroupBy.None)
     private val _usageAccess = MutableStateFlow(false)
     private val _systemAppPrompt = MutableStateFlow<SystemAppPrompt?>(null)
     private val _extractState = MutableStateFlow<ExtractState>(ExtractState.Idle)
@@ -159,7 +162,7 @@ class ManageViewModel(
     val uiState: StateFlow<ManageUiState> = combine(
         listOf(_apps, _searchQuery, _isLoading, _appFilter, _selectedPackages,
             _sortBy, _sortDirection, _usageAccess, _systemAppPrompt, _extractState,
-            _privilegedReady, _privilegedActionResult)
+            _privilegedReady, _privilegedActionResult, _groupBy)
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         val apps = flows[0] as List<InstalledApp>
@@ -176,6 +179,7 @@ class ManageViewModel(
         val extract = flows[9] as ExtractState
         val privReady = flows[10] as Boolean
         val privResult = flows[11] as PrivilegedActionResult?
+        val groupBy = flows[12] as GroupBy
         val filtered = apps
             .filter { app ->
                 if (app.category() !in appFilter) return@filter false
@@ -195,6 +199,7 @@ class ManageViewModel(
             isAllSelected = filtered.isNotEmpty() && selected.containsAll(filtered.map { it.packageName }.toSet()),
             sortBy = sortBy,
             sortDirection = direction,
+            groupBy = groupBy,
             usageAccessGranted = usage,
             systemAppPrompt = prompt,
             extractState = extract,
@@ -502,6 +507,10 @@ class ManageViewModel(
         val next = if (filter in current) current - filter else current + filter
         if (next.isEmpty()) return
         _appFilter.value = next
+    }
+
+    fun setGroupBy(groupBy: GroupBy) {
+        _groupBy.value = groupBy
     }
 
     fun toggleSelection(packageName: String) {
@@ -835,6 +844,15 @@ class ManageViewModel(
                         runCatching { java.io.File(sourceDir).length() }.getOrDefault(0L)
                     } else 0L
 
+                    val installer = try {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            pm.getInstallSourceInfo(appInfo.packageName).installingPackageName
+                        } else {
+                            @Suppress("DEPRECATION")
+                            pm.getInstallerPackageName(appInfo.packageName)
+                        }
+                    } catch (_: Exception) { null }
+
                     InstalledApp(
                         packageName = appInfo.packageName,
                         appName = appInfo.loadLabel(pm).toString(),
@@ -845,6 +863,7 @@ class ManageViewModel(
                         lastUsedAt = lastUsedMap[appInfo.packageName] ?: 0L,
                         hasSplits = !appInfo.splitSourceDirs.isNullOrEmpty(),
                         enabled = appInfo.enabled,
+                        installerPackage = installer,
                     )
                 }
             }

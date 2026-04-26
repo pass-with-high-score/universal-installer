@@ -56,6 +56,10 @@
     <string name="manage_storage_cache">Cache</string>
     <string name="manage_stats_apps">%1$d apps</string>
     <string name="manage_stats_disabled">%1$d disabled</string>
+    <string name="manage_action_open_in_store">Open in %1$s</string>
+    <string name="manage_action_open_in_store_sub">View this app\'s listing</string>
+    <string name="manage_group_label">Group by installer</string>
+    <string name="manage_group_other">Sideload &amp; other</string>
     <string name="screen_title_backups">Extracted backups</string>
     <string name="backups_count_size">%1$d files · %2$s</string>
     <string name="backups_empty">No extracted APKs yet</string>
