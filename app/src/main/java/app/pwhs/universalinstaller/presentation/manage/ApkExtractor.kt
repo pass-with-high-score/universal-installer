@@ -34,9 +34,15 @@ object ApkExtractor {
         data class Failure(val message: String) : Result
     }
 
+    /**
+     * [outputDir] defaults to the user-visible Download/UniversalInstaller/Extracted folder.
+     * Pass a cache directory (e.g. `cacheDir/share/`) when extracting for one-shot use like
+     * the Share action so the file doesn't pollute the user's Backups list.
+     */
     suspend fun extract(
         context: Context,
         packageName: String,
+        outputDir: File? = null,
         onProgress: (bytesCopied: Long, totalBytes: Long) -> Unit = { _, _ -> },
     ): Result = withContext(Dispatchers.IO) {
         val pm = context.packageManager
@@ -70,15 +76,18 @@ object ApkExtractor {
         } catch (_: Exception) { null } ?: ""
 
         val appName = appInfo.loadLabel(pm).toString()
-        val outputDir = File(
+        val effectiveOutputDir = (outputDir ?: File(
             Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
             SUBFOLDER,
-        ).apply { mkdirs() }
+        )).apply { mkdirs() }
 
         val baseName = sanitize(appName) +
             (if (versionName.isNotBlank()) "-$versionName" else "")
         val targetExt = if (splitDirs.isEmpty()) "apk" else "apks"
-        val target = File(outputDir, uniqueName(outputDir, "$baseName.$targetExt"))
+        val target = File(
+            effectiveOutputDir,
+            uniqueName(effectiveOutputDir, "$baseName.$targetExt"),
+        )
 
         val totalBytes = baseApk.length() + splitDirs.sumOf { it.length() }
 

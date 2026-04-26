@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">इंस्टॉल करें</string>
-    <string name="txt_uninstall">अनइंस्टॉल करें</string>
     <string name="txt_setting">सेटिंग्स</string>
     <string name="screen_title_uninstall">अनइंस्टॉल करें</string>
     <string name="cancel">रद्द करें</string>

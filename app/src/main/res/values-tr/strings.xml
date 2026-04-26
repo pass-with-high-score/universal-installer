@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Yükle</string>
-    <string name="txt_uninstall">Kaldır</string>
     <string name="txt_setting">Ayarlar</string>
     <string name="screen_title_uninstall">Kaldır</string>
     <string name="cancel">İptal</string>

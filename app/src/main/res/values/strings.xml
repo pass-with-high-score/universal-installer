@@ -3,21 +3,43 @@
     <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
     <string name="txt_manage">Manage</string>
-    <string name="txt_uninstall">Uninstall</string>
     <string name="txt_setting">Settings</string>
     <string name="screen_title_uninstall">Manage apps</string>
-    <string name="screen_title_extract">Extract APK</string>
-    <string name="extract_search_hint">Search apps</string>
-    <string name="extract_show_system">Show system apps</string>
     <string name="extract_label_split">Split (APKS)</string>
     <string name="extract_label_single">Single APK</string>
     <string name="extract_action">Extract</string>
-    <string name="extract_running">Extracting %1$s…</string>
     <string name="extract_done">Saved to %1$s</string>
     <string name="extract_done_action_open">Open folder</string>
     <string name="extract_failed">Extract failed: %1$s</string>
-    <string name="extract_empty">No installed apps to extract</string>
     <string name="extract_action_backups">Backups</string>
+    <string name="manage_action_open_app">Open app</string>
+    <string name="manage_action_open_app_sub">Launch %1$s</string>
+    <string name="manage_action_app_info">App info</string>
+    <string name="manage_action_app_info_sub">System settings page</string>
+    <string name="manage_action_share">Share APK</string>
+    <string name="manage_action_share_sub">Send the package to another app</string>
+    <string name="manage_action_share_chooser">Share %1$s</string>
+    <string name="manage_action_share_failed">Couldn\'t share: %1$s</string>
+    <string name="manage_section_advanced">Advanced</string>
+    <string name="manage_action_force_stop">Force stop</string>
+    <string name="manage_action_force_stop_sub">Kill the app process</string>
+    <string name="manage_action_force_stop_done">Stopped %1$s</string>
+    <string name="manage_action_force_stop_failed">Force stop failed: %1$s</string>
+    <string name="manage_action_force_stop_self_blocked">Can\'t force-stop this app on itself</string>
+    <string name="manage_action_disable">Disable</string>
+    <string name="manage_action_disable_sub">Freeze without uninstalling — reversible</string>
+    <string name="manage_action_disable_done">Disabled %1$s</string>
+    <string name="manage_action_disable_failed">Disable failed: %1$s</string>
+    <string name="manage_action_disable_self_blocked">Can\'t disable this app from itself</string>
+    <string name="manage_action_enable">Enable</string>
+    <string name="manage_action_enable_sub">Re-enable a previously disabled app</string>
+    <string name="manage_action_enable_done">Enabled %1$s</string>
+    <string name="manage_action_enable_failed">Enable failed: %1$s</string>
+    <string name="manage_privileged_unavailable">Shizuku or Root not ready</string>
+    <string name="manage_disabled_badge">Disabled</string>
+    <string name="manage_filter_user">User</string>
+    <string name="manage_filter_system">System</string>
+    <string name="manage_filter_disabled">Disabled</string>
     <string name="screen_title_backups">Extracted backups</string>
     <string name="backups_count_size">%1$d files · %2$s</string>
     <string name="backups_empty">No extracted APKs yet</string>
@@ -409,5 +431,4 @@
     <string name="theme_amoled_mode_title">AMOLED Black</string>
     <string name="theme_amoled_mode_subtitle">Use pitch black background in dark mode</string>
     <string name="setting_theme_description">Customize Dynamic Colors and Dark Mode</string>
-
 </resources>

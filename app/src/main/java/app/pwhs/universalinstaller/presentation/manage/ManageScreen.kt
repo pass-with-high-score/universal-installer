@@ -33,9 +33,16 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.FolderZip
+import androidx.compose.material.icons.rounded.Block
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Inventory2
+import androidx.compose.material.icons.rounded.Launch
+import androidx.compose.material.icons.rounded.PlayCircle
+import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.RadioButtonUnchecked
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Share
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.SearchOff
 import androidx.compose.material.icons.rounded.SelectAll
@@ -85,6 +92,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.InstalledApp
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
@@ -115,10 +123,15 @@ fun ManageScreen(
         modifier = modifier,
         uiState = uiState,
         onSearchQueryChanged = viewModel::onSearchQueryChanged,
-        onToggleSystemApps = viewModel::toggleSystemApps,
+        onToggleAppFilter = viewModel::toggleAppFilter,
         onUninstall = viewModel::uninstallApp,
         onExtract = viewModel::extractApp,
+        onShare = viewModel::shareApp,
+        onForceStop = viewModel::forceStop,
+        onSetEnabled = viewModel::setEnabled,
         onDismissExtractResult = viewModel::dismissExtractResult,
+        onDismissPrivilegedResult = viewModel::dismissPrivilegedActionResult,
+        onRefreshPrivileged = viewModel::refreshPrivilegedReady,
         onToggleSelection = viewModel::toggleSelection,
         onClearSelection = viewModel::clearSelection,
         onToggleSelectAll = viewModel::toggleSelectAll,
@@ -153,10 +166,15 @@ private fun UninstallUi(
     modifier: Modifier = Modifier,
     uiState: ManageUiState = ManageUiState(),
     onSearchQueryChanged: (String) -> Unit = {},
-    onToggleSystemApps: () -> Unit = {},
+    onToggleAppFilter: (AppFilter) -> Unit = {},
     onUninstall: (String) -> Unit = {},
     onExtract: (String, String) -> Unit = { _, _ -> },
+    onShare: (String, String) -> Unit = { _, _ -> },
+    onForceStop: (String, String) -> Unit = { _, _ -> },
+    onSetEnabled: (String, String, Boolean) -> Unit = { _, _, _ -> },
     onDismissExtractResult: () -> Unit = {},
+    onDismissPrivilegedResult: () -> Unit = {},
+    onRefreshPrivileged: () -> Unit = {},
     onToggleSelection: (String) -> Unit = {},
     onClearSelection: () -> Unit = {},
     onToggleSelectAll: () -> Unit = {},
@@ -180,12 +198,36 @@ private fun UninstallUi(
     // later is just appending another ActionRow; lifting the dialogs to this level avoided
     // duplicating them inside every card composition.
     actionTarget?.let { target ->
+        // Re-probe before each open in case Shizuku permission was just revoked or root
+        // shell expired — the cached `privilegedReady` flag may be stale.
+        LaunchedEffect(target.packageName) { onRefreshPrivileged() }
         AppActionSheet(
             app = target,
             extractInProgress = extractInProgress,
+            privilegedReady = uiState.privilegedReady,
+            onOpenApp = {
+                actionTarget = null
+                launchInstalledApp(context, target.packageName)
+            },
+            onOpenAppInfo = {
+                actionTarget = null
+                openAppInfoSettings(context, target.packageName)
+            },
+            onShare = {
+                actionTarget = null
+                onShare(target.packageName, target.appName)
+            },
             onExtract = {
                 actionTarget = null
                 onExtract(target.packageName, target.appName)
+            },
+            onForceStop = {
+                actionTarget = null
+                onForceStop(target.packageName, target.appName)
+            },
+            onSetEnabled = { enabled ->
+                actionTarget = null
+                onSetEnabled(target.packageName, target.appName, enabled)
             },
             onUninstall = {
                 actionTarget = null
@@ -210,24 +252,52 @@ private fun UninstallUi(
         )
     }
 
-    // Surface extract success/failure as a snackbar; "Open folder" jumps to Backups so the
-    // user can see what landed on disk.
+    // Privileged-action snackbar (Force stop / Disable / Enable). Lives alongside the
+    // extract snackbar — both share the same SnackbarHostState; the system Material
+    // queue handles back-to-back messages.
+    LaunchedEffect(uiState.privilegedActionResult) {
+        val result = uiState.privilegedActionResult ?: return@LaunchedEffect
+        snackbarHostState.showSnackbar(message = result.message, withDismissAction = true)
+        onDismissPrivilegedResult()
+    }
+
+    // Drive the post-extract UX from the ExtractState.mode field — Backup shows snackbar
+    // with "Open folder", Share fires the system chooser as soon as the cache file lands.
     LaunchedEffect(uiState.extractState) {
         when (val s = uiState.extractState) {
             is ExtractState.Done -> {
-                val res = snackbarHostState.showSnackbar(
-                    message = context.getString(R.string.extract_done, s.file.name),
-                    actionLabel = context.getString(R.string.extract_done_action_open),
-                    withDismissAction = true,
-                )
-                if (res == SnackbarResult.ActionPerformed) onOpenBackups()
+                when (s.mode) {
+                    ExtractMode.Backup -> {
+                        val res = snackbarHostState.showSnackbar(
+                            message = context.getString(R.string.extract_done, s.file.name),
+                            actionLabel = context.getString(R.string.extract_done_action_open),
+                            withDismissAction = true,
+                        )
+                        if (res == SnackbarResult.ActionPerformed) onOpenBackups()
+                    }
+                    ExtractMode.Share -> {
+                        val launched = launchShareIntent(context, s.file, s.appName)
+                        if (!launched) {
+                            snackbarHostState.showSnackbar(
+                                message = context.getString(
+                                    R.string.manage_action_share_failed,
+                                    "no app accepts the share",
+                                ),
+                                withDismissAction = true,
+                            )
+                        }
+                    }
+                }
                 onDismissExtractResult()
             }
             is ExtractState.Error -> {
-                snackbarHostState.showSnackbar(
-                    message = context.getString(R.string.extract_failed, s.message),
-                    withDismissAction = true,
-                )
+                val msg = when (s.mode) {
+                    ExtractMode.Share ->
+                        context.getString(R.string.manage_action_share_failed, s.message)
+                    ExtractMode.Backup ->
+                        context.getString(R.string.extract_failed, s.message)
+                }
+                snackbarHostState.showSnackbar(message = msg, withDismissAction = true)
                 onDismissExtractResult()
             }
             else -> Unit
@@ -244,10 +314,8 @@ private fun UninstallUi(
         FilterSheet(
             sortBy = uiState.sortBy,
             direction = uiState.sortDirection,
-            showSystemApps = uiState.showSystemApps,
             usageGranted = uiState.usageAccessGranted,
             onSortChange = onSortChange,
-            onToggleSystemApps = onToggleSystemApps,
             onRequestUsageAccess = onRequestUsageAccess,
             onDismiss = { showFilterSheet = false },
         )
@@ -456,6 +524,26 @@ private fun UninstallUi(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState())
+                        .padding(horizontal = 16.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    AppFilter.entries.forEach { filter ->
+                        val selected = filter in uiState.appFilter
+                        FilterChip(
+                            selected = selected,
+                            onClick = { onToggleAppFilter(filter) },
+                            label = { Text(stringResource(appFilterLabel(filter))) },
+                            colors = FilterChipDefaults.filterChipColors(),
+                        )
+                    }
+                }
+            }
+
+            if (!uiState.isSelectionMode) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
@@ -520,7 +608,7 @@ private fun UninstallUi(
                         uiState.sortBy,
                         uiState.sortDirection,
                         uiState.searchQuery,
-                        uiState.showSystemApps,
+                        uiState.appFilter,
                     ) {
                         if (listState.firstVisibleItemIndex != 0 ||
                             listState.firstVisibleItemScrollOffset != 0
@@ -566,10 +654,8 @@ private fun UninstallUi(
 private fun FilterSheet(
     sortBy: UninstallSortBy,
     direction: SortDirection,
-    showSystemApps: Boolean,
     usageGranted: Boolean,
     onSortChange: (UninstallSortBy) -> Unit,
-    onToggleSystemApps: () -> Unit,
     onRequestUsageAccess: () -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -632,37 +718,6 @@ private fun FilterSheet(
                 }
             }
 
-            Spacer(Modifier.height(20.dp))
-            Text(
-                text = stringResource(R.string.uninstall_filter_filter_section),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-            )
-            Spacer(Modifier.height(8.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .combinedClickableRow { onToggleSystemApps() }
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(R.string.uninstall_show_system_apps),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                    Text(
-                        text = stringResource(R.string.uninstall_show_system_apps_sub),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                }
-                Switch(
-                    checked = showSystemApps,
-                    onCheckedChange = { onToggleSystemApps() },
-                )
-            }
         }
     }
 }
@@ -800,6 +855,19 @@ private fun AppCard(
                             modifier = Modifier
                                 .clip(MaterialTheme.shapes.small)
                                 .background(MaterialTheme.colorScheme.tertiaryContainer)
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                        )
+                    }
+                    if (!app.enabled) {
+                        // Reuse the error palette so disabled apps stand out the same way
+                        // as the destructive Uninstall icon does at the row's trailing edge.
+                        Text(
+                            text = stringResource(R.string.manage_disabled_badge),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.small)
+                                .background(MaterialTheme.colorScheme.errorContainer)
                                 .padding(horizontal = 6.dp, vertical = 2.dp),
                         )
                     }
@@ -1084,12 +1152,22 @@ private fun SystemAppPrivilegedRequiredDialog(
 private fun AppActionSheet(
     app: InstalledApp,
     extractInProgress: Boolean,
+    privilegedReady: Boolean,
+    onOpenApp: () -> Unit,
+    onOpenAppInfo: () -> Unit,
+    onShare: () -> Unit,
     onExtract: () -> Unit,
+    onForceStop: () -> Unit,
+    onSetEnabled: (Boolean) -> Unit,
     onUninstall: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    // Cheap PM IPC; stable across recompositions so memoize per package.
+    val launchable = remember(app.packageName) {
+        context.packageManager.getLaunchIntentForPackage(app.packageName) != null
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -1145,21 +1223,59 @@ private fun AppActionSheet(
                     )
                 }
             }
-            if (app.isSystemApp) {
-                Text(
-                    text = stringResource(R.string.uninstall_system_badge),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onTertiaryContainer,
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.tertiaryContainer)
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                )
+            Column(horizontalAlignment = Alignment.End) {
+                if (app.isSystemApp) {
+                    Text(
+                        text = stringResource(R.string.uninstall_system_badge),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.tertiaryContainer)
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
+                if (!app.enabled) {
+                    if (app.isSystemApp) Spacer(Modifier.height(4.dp))
+                    Text(
+                        text = stringResource(R.string.manage_disabled_badge),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onErrorContainer,
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.errorContainer)
+                            .padding(horizontal = 8.dp, vertical = 4.dp),
+                    )
+                }
             }
         }
 
         Spacer(Modifier.height(8.dp))
 
+        if (launchable) {
+            ActionRow(
+                icon = Icons.Rounded.Launch,
+                iconTint = MaterialTheme.colorScheme.primary,
+                label = stringResource(R.string.manage_action_open_app),
+                subtitle = stringResource(R.string.manage_action_open_app_sub, app.appName),
+                onClick = onOpenApp,
+            )
+        }
+        ActionRow(
+            icon = Icons.Rounded.Info,
+            iconTint = MaterialTheme.colorScheme.primary,
+            label = stringResource(R.string.manage_action_app_info),
+            subtitle = stringResource(R.string.manage_action_app_info_sub),
+            onClick = onOpenAppInfo,
+        )
+        ActionRow(
+            icon = Icons.Rounded.Share,
+            iconTint = MaterialTheme.colorScheme.primary,
+            label = stringResource(R.string.manage_action_share),
+            subtitle = stringResource(R.string.manage_action_share_sub),
+            enabled = !extractInProgress,
+            onClick = onShare,
+        )
         ActionRow(
             icon = if (app.hasSplits) Icons.Rounded.FolderZip else Icons.Rounded.Inventory2,
             iconTint = MaterialTheme.colorScheme.primary,
@@ -1169,6 +1285,48 @@ private fun AppActionSheet(
             enabled = !extractInProgress,
             onClick = onExtract,
         )
+
+        // Privileged group — only renders when Shizuku or Root is currently usable.
+        // The interactive shell-out actions are riskier than intent fires above, so we
+        // visually separate them with a divider + section label so the user notices the
+        // jump from "safe" to "powerful".
+        if (privilegedReady) {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 8.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+            )
+            Text(
+                text = stringResource(R.string.manage_section_advanced),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 4.dp),
+            )
+            ActionRow(
+                icon = Icons.Rounded.Block,
+                iconTint = MaterialTheme.colorScheme.tertiary,
+                label = stringResource(R.string.manage_action_force_stop),
+                subtitle = stringResource(R.string.manage_action_force_stop_sub),
+                onClick = onForceStop,
+            )
+            if (app.enabled) {
+                ActionRow(
+                    icon = Icons.Rounded.PowerSettingsNew,
+                    iconTint = MaterialTheme.colorScheme.tertiary,
+                    label = stringResource(R.string.manage_action_disable),
+                    subtitle = stringResource(R.string.manage_action_disable_sub),
+                    onClick = { onSetEnabled(false) },
+                )
+            } else {
+                ActionRow(
+                    icon = Icons.Rounded.PlayCircle,
+                    iconTint = MaterialTheme.colorScheme.primary,
+                    label = stringResource(R.string.manage_action_enable),
+                    subtitle = stringResource(R.string.manage_action_enable_sub),
+                    onClick = { onSetEnabled(true) },
+                )
+            }
+        }
+
         ActionRow(
             icon = Icons.Rounded.DeleteOutline,
             iconTint = MaterialTheme.colorScheme.error,
@@ -1268,4 +1426,60 @@ private fun UninstallConfirmDialog(
             )
         },
     )
+}
+
+// ── Intent helpers ──────────────────────────────────────────────────────────
+
+private fun launchInstalledApp(context: android.content.Context, packageName: String) {
+    val intent = context.packageManager.getLaunchIntentForPackage(packageName) ?: return
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    runCatching { context.startActivity(intent) }
+}
+
+private fun openAppInfoSettings(context: android.content.Context, packageName: String) {
+    val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = "package:$packageName".toUri()
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    runCatching { context.startActivity(intent) }
+}
+
+/**
+ * Wraps the cache-extracted APK in a FileProvider URI and fires a SEND chooser. Returns
+ * false when no chooser-capable Activity is available so the caller can show feedback.
+ */
+private fun launchShareIntent(
+    context: android.content.Context,
+    file: java.io.File,
+    appName: String,
+): Boolean {
+    val uri = androidx.core.content.FileProvider.getUriForFile(
+        context,
+        "${app.pwhs.universalinstaller.BuildConfig.APPLICATION_ID}.fileprovider",
+        file,
+    )
+    val send = Intent(Intent.ACTION_SEND).apply {
+        // Most file managers and chat apps accept the canonical APK MIME — picky targets
+        // (e.g. Telegram on some Android versions) sometimes need octet-stream too, but
+        // that's a hostile UX trade-off (more apps in the chooser that can't actually
+        // handle APKs). Keep it strict.
+        type = "application/vnd.android.package-archive"
+        putExtra(Intent.EXTRA_STREAM, uri)
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    val chooser = Intent.createChooser(
+        send,
+        context.getString(
+            app.pwhs.universalinstaller.R.string.manage_action_share_chooser,
+            appName,
+        ),
+    ).apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
+    return runCatching { context.startActivity(chooser); true }.getOrDefault(false)
+}
+
+@Suppress("unused")
+private fun appFilterLabel(filter: AppFilter): Int = when (filter) {
+    AppFilter.User -> R.string.manage_filter_user
+    AppFilter.System -> R.string.manage_filter_system
+    AppFilter.Disabled -> R.string.manage_filter_disabled
 }

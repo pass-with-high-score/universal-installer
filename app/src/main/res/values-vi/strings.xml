@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Cài đặt</string>
-    <string name="txt_uninstall">Gỡ cài đặt</string>
     <string name="txt_setting">Cài đặt</string>
     <string name="screen_title_uninstall">Gỡ cài đặt</string>
     <string name="cancel">Hủy</string>

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Instal</string>
-    <string name="txt_uninstall">Copot Pemasangan</string>
     <string name="txt_setting">Pengaturan</string>
     <string name="screen_title_uninstall">Copot Pemasangan</string>
     <string name="cancel">Batal</string>

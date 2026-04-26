@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Installieren</string>
-    <string name="txt_uninstall">Deinstallieren</string>
     <string name="txt_setting">Einstellungen</string>
     <string name="screen_title_uninstall">Deinstallieren</string>
     <string name="cancel">Abbrechen</string>

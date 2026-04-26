@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Установить</string>
-    <string name="txt_uninstall">Удалить</string>
     <string name="txt_setting">Настройки</string>
     <string name="screen_title_uninstall">Удаление</string>
     <string name="cancel">Отмена</string>

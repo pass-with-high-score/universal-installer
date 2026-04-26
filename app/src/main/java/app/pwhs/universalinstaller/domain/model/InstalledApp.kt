@@ -13,4 +13,6 @@ data class InstalledApp(
     val lastUsedAt: Long = 0L,
     /** True when the install has split APKs (`splitSourceDirs` non-empty). */
     val hasSplits: Boolean = false,
+    /** Mirror of [android.content.pm.ApplicationInfo.enabled]. False after `pm disable`. */
+    val enabled: Boolean = true,
 )

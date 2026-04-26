@@ -107,4 +107,40 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
             stdout
         }
     }
+
+    override suspend fun forceStopViaRoot(packageName: String): Result<String> =
+        runRootShell(packageName, "am force-stop $packageName", successToken = null)
+
+    override suspend fun setEnabledViaRoot(
+        packageName: String,
+        enabled: Boolean,
+    ): Result<String> {
+        val cmd = if (enabled) "pm enable $packageName"
+            else "pm disable-user --user 0 $packageName"
+        val token = if (enabled) "new state: enabled" else "new state: disabled"
+        return runRootShell(packageName, cmd, successToken = token)
+    }
+
+    private suspend fun runRootShell(
+        packageName: String,
+        cmd: String,
+        successToken: String?,
+    ): Result<String> = withContext(Dispatchers.IO) {
+        require(packageName.matches(Regex("^[A-Za-z0-9._]+$"))) {
+            "Refusing to shell out with suspicious package name: $packageName"
+        }
+        runCatching {
+            val result = Shell.cmd(cmd).exec()
+            val stdout = result.out.joinToString("\n")
+            val stderr = result.err.joinToString("\n")
+            val tokenOk = successToken == null || stdout.contains(successToken, ignoreCase = true)
+            if (!result.isSuccess || !tokenOk) {
+                throw RuntimeException(
+                    "root shell failed: " +
+                        stdout.ifBlank { stderr }.ifBlank { "no output" },
+                )
+            }
+            stdout
+        }
+    }
 }

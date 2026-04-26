@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">تثبيت</string>
-    <string name="txt_uninstall">إلغاء التثبيت</string>
     <string name="txt_setting">الإعدادات</string>
     <string name="screen_title_uninstall">إلغاء التثبيت</string>
     <string name="cancel">إلغاء</string>

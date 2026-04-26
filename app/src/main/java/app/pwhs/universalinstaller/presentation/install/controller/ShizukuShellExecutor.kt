@@ -85,4 +85,58 @@ object ShizukuShellExecutor {
             stdout
         }
     }
+
+    /**
+     * Generic-shell helpers for the Manage tab's per-app actions. Force-stop/enable/disable
+     * don't fit `SystemAppMethod`'s narrow uninstall-vs-disable contract, but the shell-out
+     * mechanics (reflection, package validation, exit-code+token verification) are the same.
+     */
+
+    suspend fun forceStop(packageName: String): Result<String> =
+        runShell(packageName, "am force-stop $packageName", successToken = null)
+
+    suspend fun setEnabled(packageName: String, enabled: Boolean): Result<String> {
+        val cmd = if (enabled) "pm enable $packageName"
+            else "pm disable-user --user 0 $packageName"
+        val token = if (enabled) "new state: enabled" else "new state: disabled"
+        return runShell(packageName, cmd, successToken = token)
+    }
+
+    /**
+     * Single-shot shell. [successToken] gates "did the command actually do the thing" beyond
+     * the exit code — `pm` is notorious for printing soft failures ("Failure [...]") with
+     * exit 0. Pass `null` for commands like `am force-stop` that have no output on success.
+     */
+    private suspend fun runShell(
+        packageName: String,
+        cmd: String,
+        successToken: String?,
+    ): Result<String> = withContext(Dispatchers.IO) {
+        require(packageName.matches(Regex("^[A-Za-z0-9._]+$"))) {
+            "Refusing to shell out with suspicious package name: $packageName"
+        }
+        val reflected = newProcessMethod
+            ?: return@withContext Result.failure(
+                IllegalStateException("Shizuku.newProcess unavailable on this Shizuku build"),
+            )
+        runCatching {
+            val process = reflected.invoke(
+                null,
+                arrayOf("sh", "-c", cmd),
+                null,
+                null,
+            ) as Process
+            val stdout = process.inputStream.bufferedReader().use { it.readText() }
+            val stderr = process.errorStream.bufferedReader().use { it.readText() }
+            val exitCode = process.waitFor()
+            val tokenOk = successToken == null || stdout.contains(successToken, ignoreCase = true)
+            if (exitCode != 0 || !tokenOk) {
+                throw RuntimeException(
+                    "shizuku shell failed (exit=$exitCode): " +
+                        stdout.ifBlank { stderr }.ifBlank { "no output" },
+                )
+            }
+            stdout
+        }
+    }
 }

@@ -32,4 +32,14 @@ class StoreInstallerBackendFactory : InstallerBackendFactory {
     ): Result<String> = Result.failure(
         UnsupportedOperationException("Root not available in this build"),
     )
+
+    override suspend fun forceStopViaRoot(packageName: String): Result<String> =
+        Result.failure(UnsupportedOperationException("Root not available in this build"))
+
+    override suspend fun setEnabledViaRoot(
+        packageName: String,
+        enabled: Boolean,
+    ): Result<String> = Result.failure(
+        UnsupportedOperationException("Root not available in this build"),
+    )
 }

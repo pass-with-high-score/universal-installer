@@ -55,6 +55,15 @@ interface InstallerBackendFactory {
         packageName: String,
         method: SystemAppMethod,
     ): Result<String>
+
+    /** `am force-stop <pkg>` via root shell. Store flavor returns failure. */
+    suspend fun forceStopViaRoot(packageName: String): Result<String>
+
+    /**
+     * `pm enable` or `pm disable-user --user 0 <pkg>` via root shell. Store flavor returns
+     * failure.
+     */
+    suspend fun setEnabledViaRoot(packageName: String, enabled: Boolean): Result<String>
 }
 
 enum class SystemAppMethod {

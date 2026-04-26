@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Build
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.UninstallLogDao
 import app.pwhs.universalinstaller.data.local.UninstallLogEntity
 import app.pwhs.universalinstaller.domain.model.InstalledApp
@@ -36,6 +37,19 @@ enum class UninstallSortBy { Name, Size, InstalledAt, LastUsed }
 enum class SortDirection { Asc, Desc }
 
 /**
+ * Per-app category used by the filter chips. An app is exactly one category at a time —
+ * Disabled wins over System / User because a disabled app has its main entry point gone
+ * regardless of where its APK lives.
+ */
+enum class AppFilter { User, System, Disabled }
+
+internal fun InstalledApp.category(): AppFilter = when {
+    !enabled -> AppFilter.Disabled
+    isSystemApp -> AppFilter.System
+    else -> AppFilter.User
+}
+
+/**
  * Surfaced to the UI when the pending uninstall touches one or more system apps. The UI
  * renders either a single-app warning (with 2 method options) or a batch breakdown
  * ("N user + K system apps — pick method for system").
@@ -54,6 +68,12 @@ sealed interface SystemAppPrompt {
     ) : SystemAppPrompt
 }
 
+/**
+ * Backup → save to public Download/.../Extracted, snackbar with "Open folder" action.
+ * Share  → save to cacheDir, fire ACTION_SEND chooser as soon as the copy completes.
+ */
+enum class ExtractMode { Backup, Share }
+
 sealed interface ExtractState {
     data object Idle : ExtractState
     data class Running(
@@ -61,9 +81,28 @@ sealed interface ExtractState {
         val appName: String,
         val bytesCopied: Long,
         val totalBytes: Long,
+        val mode: ExtractMode,
     ) : ExtractState
-    data class Done(val appName: String, val file: java.io.File) : ExtractState
-    data class Error(val appName: String, val message: String) : ExtractState
+    data class Done(
+        val appName: String,
+        val file: java.io.File,
+        val mode: ExtractMode,
+    ) : ExtractState
+    data class Error(
+        val appName: String,
+        val message: String,
+        val mode: ExtractMode,
+    ) : ExtractState
+}
+
+/**
+ * One-shot snackbar payload for privileged actions (force-stop, disable/enable). Cleared
+ * after the UI consumes it via `dismissPrivilegedActionResult`.
+ */
+sealed interface PrivilegedActionResult {
+    val message: String
+    data class Success(override val message: String) : PrivilegedActionResult
+    data class Failure(override val message: String) : PrivilegedActionResult
 }
 
 data class ManageUiState(
@@ -71,7 +110,7 @@ data class ManageUiState(
     val filteredApps: List<InstalledApp> = emptyList(),
     val searchQuery: String = "",
     val isLoading: Boolean = true,
-    val showSystemApps: Boolean = false,
+    val appFilter: Set<AppFilter> = setOf(AppFilter.User),
     val selectedPackages: Set<String> = emptySet(),
     val isSelectionMode: Boolean = false,
     val isAllSelected: Boolean = false,
@@ -80,6 +119,9 @@ data class ManageUiState(
     val usageAccessGranted: Boolean = false,
     val systemAppPrompt: SystemAppPrompt? = null,
     val extractState: ExtractState = ExtractState.Idle,
+    /** True when Root or Shizuku is currently ready to run shell commands. */
+    val privilegedReady: Boolean = false,
+    val privilegedActionResult: PrivilegedActionResult? = null,
 )
 
 class ManageViewModel(
@@ -94,25 +136,29 @@ class ManageViewModel(
     private val _apps = MutableStateFlow<List<InstalledApp>>(emptyList())
     private val _searchQuery = MutableStateFlow("")
     private val _isLoading = MutableStateFlow(true)
-    private val _showSystemApps = MutableStateFlow(false)
+    private val _appFilter = MutableStateFlow(setOf(AppFilter.User))
     private val _selectedPackages = MutableStateFlow<Set<String>>(emptySet())
     private val _sortBy = MutableStateFlow(UninstallSortBy.Name)
     private val _sortDirection = MutableStateFlow(SortDirection.Asc)
     private val _usageAccess = MutableStateFlow(false)
     private val _systemAppPrompt = MutableStateFlow<SystemAppPrompt?>(null)
     private val _extractState = MutableStateFlow<ExtractState>(ExtractState.Idle)
+    private val _privilegedReady = MutableStateFlow(false)
+    private val _privilegedActionResult = MutableStateFlow<PrivilegedActionResult?>(null)
 
     private var extractJob: kotlinx.coroutines.Job? = null
 
     val uiState: StateFlow<ManageUiState> = combine(
-        listOf(_apps, _searchQuery, _isLoading, _showSystemApps, _selectedPackages,
-            _sortBy, _sortDirection, _usageAccess, _systemAppPrompt, _extractState)
+        listOf(_apps, _searchQuery, _isLoading, _appFilter, _selectedPackages,
+            _sortBy, _sortDirection, _usageAccess, _systemAppPrompt, _extractState,
+            _privilegedReady, _privilegedActionResult)
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         val apps = flows[0] as List<InstalledApp>
         val query = flows[1] as String
         val loading = flows[2] as Boolean
-        val showSystem = flows[3] as Boolean
+        @Suppress("UNCHECKED_CAST")
+        val appFilter = flows[3] as Set<AppFilter>
         @Suppress("UNCHECKED_CAST")
         val selected = flows[4] as Set<String>
         val sortBy = flows[5] as UninstallSortBy
@@ -120,9 +166,11 @@ class ManageViewModel(
         val usage = flows[7] as Boolean
         val prompt = flows[8] as SystemAppPrompt?
         val extract = flows[9] as ExtractState
+        val privReady = flows[10] as Boolean
+        val privResult = flows[11] as PrivilegedActionResult?
         val filtered = apps
             .filter { app ->
-                if (!showSystem && app.isSystemApp) return@filter false
+                if (app.category() !in appFilter) return@filter false
                 if (query.isBlank()) return@filter true
                 app.appName.contains(query, ignoreCase = true) ||
                         app.packageName.contains(query, ignoreCase = true)
@@ -133,7 +181,7 @@ class ManageViewModel(
             filteredApps = filtered,
             searchQuery = query,
             isLoading = loading,
-            showSystemApps = showSystem,
+            appFilter = appFilter,
             selectedPackages = selected,
             isSelectionMode = selected.isNotEmpty(),
             isAllSelected = filtered.isNotEmpty() && selected.containsAll(filtered.map { it.packageName }.toSet()),
@@ -142,26 +190,142 @@ class ManageViewModel(
             usageAccessGranted = usage,
             systemAppPrompt = prompt,
             extractState = extract,
+            privilegedReady = privReady,
+            privilegedActionResult = privResult,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ManageUiState())
 
     fun extractApp(packageName: String, appName: String) {
+        runExtraction(packageName, appName, ExtractMode.Backup, outputDir = null)
+    }
+
+    /**
+     * Extract into `cacheDir/share` so the file is gone next time the OS clears caches —
+     * this isn't user-visible storage, just a one-shot intermediate for the share intent.
+     */
+    fun shareApp(packageName: String, appName: String) {
+        val shareDir = java.io.File(application.cacheDir, "share").apply { mkdirs() }
+        // Best-effort cleanup so old share blobs from previous runs don't accumulate.
+        shareDir.listFiles()?.forEach { runCatching { it.delete() } }
+        runExtraction(packageName, appName, ExtractMode.Share, outputDir = shareDir)
+    }
+
+    private fun runExtraction(
+        packageName: String,
+        appName: String,
+        mode: ExtractMode,
+        outputDir: java.io.File?,
+    ) {
         if (_extractState.value is ExtractState.Running) return
         extractJob?.cancel()
-        _extractState.value = ExtractState.Running(packageName, appName, 0L, 1L)
+        _extractState.value = ExtractState.Running(packageName, appName, 0L, 1L, mode)
         extractJob = viewModelScope.launch {
-            val result = ApkExtractor.extract(application, packageName) { bytes, total ->
-                _extractState.value = ExtractState.Running(packageName, appName, bytes, total)
+            val result = ApkExtractor.extract(application, packageName, outputDir) { bytes, total ->
+                _extractState.value = ExtractState.Running(packageName, appName, bytes, total, mode)
             }
             _extractState.value = when (result) {
-                is ApkExtractor.Result.Success -> ExtractState.Done(appName, result.file)
-                is ApkExtractor.Result.Failure -> ExtractState.Error(appName, result.message)
+                is ApkExtractor.Result.Success -> ExtractState.Done(appName, result.file, mode)
+                is ApkExtractor.Result.Failure -> ExtractState.Error(appName, result.message, mode)
             }
         }
     }
 
     fun dismissExtractResult() {
         _extractState.value = ExtractState.Idle
+    }
+
+    // ── Privileged actions ──────────────────────────────────────────────────
+
+    /**
+     * Re-evaluate whether Root or Shizuku is currently usable so the action sheet can
+     * show/hide the Force-stop and Disable rows accordingly. Cheap (just probes the cached
+     * binder + DataStore prefs) so it's safe to call from `init` and after settings changes.
+     */
+    fun refreshPrivilegedReady() {
+        viewModelScope.launch {
+            _privilegedReady.value = resolvePrivilegedExecutor() != null
+        }
+    }
+
+    fun forceStop(packageName: String, appName: String) {
+        // Block self-stop — we'd kill the very process running the bottom sheet, leaving the
+        // user staring at a frozen UI until system_server force-resumes us.
+        if (packageName == application.packageName) {
+            _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                application.getString(R.string.manage_action_force_stop_self_blocked)
+            )
+            return
+        }
+        viewModelScope.launch {
+            val executor = resolvePrivilegedExecutor()
+            if (executor == null) {
+                _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                    application.getString(R.string.manage_privileged_unavailable)
+                )
+                return@launch
+            }
+            val result = when (executor) {
+                PrivilegedExecutor.Root -> backendFactory.forceStopViaRoot(packageName)
+                PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.forceStop(packageName)
+            }
+            _privilegedActionResult.value = if (result.isSuccess) {
+                PrivilegedActionResult.Success(
+                    application.getString(R.string.manage_action_force_stop_done, appName)
+                )
+            } else {
+                PrivilegedActionResult.Failure(
+                    application.getString(
+                        R.string.manage_action_force_stop_failed,
+                        result.exceptionOrNull()?.message ?: "unknown error",
+                    )
+                )
+            }
+        }
+    }
+
+    fun setEnabled(packageName: String, appName: String, enabled: Boolean) {
+        if (packageName == application.packageName) {
+            _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                application.getString(R.string.manage_action_disable_self_blocked)
+            )
+            return
+        }
+        viewModelScope.launch {
+            val executor = resolvePrivilegedExecutor()
+            if (executor == null) {
+                _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                    application.getString(R.string.manage_privileged_unavailable)
+                )
+                return@launch
+            }
+            val result = when (executor) {
+                PrivilegedExecutor.Root -> backendFactory.setEnabledViaRoot(packageName, enabled)
+                PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.setEnabled(packageName, enabled)
+            }
+            if (result.isSuccess) {
+                _privilegedActionResult.value = PrivilegedActionResult.Success(
+                    application.getString(
+                        if (enabled) R.string.manage_action_enable_done
+                        else R.string.manage_action_disable_done,
+                        appName,
+                    )
+                )
+                // Refresh so the row's enabled flag reflects the new state.
+                loadInstalledApps()
+            } else {
+                _privilegedActionResult.value = PrivilegedActionResult.Failure(
+                    application.getString(
+                        if (enabled) R.string.manage_action_enable_failed
+                        else R.string.manage_action_disable_failed,
+                        result.exceptionOrNull()?.message ?: "unknown error",
+                    )
+                )
+            }
+        }
+    }
+
+    fun dismissPrivilegedActionResult() {
+        _privilegedActionResult.value = null
     }
 
     private fun applySort(
@@ -220,14 +384,23 @@ class ManageViewModel(
     init {
         _usageAccess.value = hasUsageAccess()
         loadInstalledApps()
+        refreshPrivilegedReady()
     }
 
     fun onSearchQueryChanged(query: String) {
         _searchQuery.value = query
     }
 
-    fun toggleSystemApps() {
-        _showSystemApps.value = !_showSystemApps.value
+    /**
+     * Toggle [filter] in the active set. Refuses to leave the user with an empty filter
+     * (the screen would just show "no apps" with no easy way back) — at least one chip
+     * stays selected.
+     */
+    fun toggleAppFilter(filter: AppFilter) {
+        val current = _appFilter.value
+        val next = if (filter in current) current - filter else current + filter
+        if (next.isEmpty()) return
+        _appFilter.value = next
     }
 
     fun toggleSelection(packageName: String) {
@@ -570,6 +743,7 @@ class ManageViewModel(
                         installedAt = pkgInfo?.firstInstallTime ?: 0L,
                         lastUsedAt = lastUsedMap[appInfo.packageName] ?: 0L,
                         hasSplits = !appInfo.splitSourceDirs.isNullOrEmpty(),
+                        enabled = appInfo.enabled,
                     )
                 }
             }
