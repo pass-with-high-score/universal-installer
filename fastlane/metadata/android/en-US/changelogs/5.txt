@@ -1,0 +1,7 @@
+- Added theme settings screen (light, dark, system)
+- Added app shortcuts for quick actions
+- Added VirusTotal scan integration
+- Migrated to multiple activities for better navigation
+- Fixed settings root toggle not being saved
+- Fixed missing translations
+- Minor UI polish and bug fixes
