@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller
 
 import android.Manifest
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -33,6 +34,9 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.net.toUri
+import app.pwhs.universalinstaller.presentation.install.InstallActivity
+import app.pwhs.universalinstaller.presentation.sync.SyncActivity
+import app.pwhs.universalinstaller.presentation.uninstall.UninstallActivity
 
 
 private enum class AppRoute { Splash, Onboarding, Main }
@@ -126,19 +130,29 @@ class MainActivity : ComponentActivity() {
                     )
                     AppRoute.Main -> {
                         LaunchedEffect(Unit) {
-                            val uri = intent?.data
-                            val targetActivity = if (uri?.scheme == "universalinstaller") {
+                            val incoming = intent
+                            val uri = incoming?.data
+                            val isDeepLink = uri?.scheme == "universalinstaller"
+                            val targetActivity = if (isDeepLink) {
                                 when (uri.host) {
-                                    "sync" -> app.pwhs.universalinstaller.presentation.sync.SyncActivity::class.java
-                                    "uninstall" -> app.pwhs.universalinstaller.presentation.uninstall.UninstallActivity::class.java
-                                    else -> app.pwhs.universalinstaller.presentation.install.InstallActivity::class.java
+                                    "sync" -> SyncActivity::class.java
+                                    "uninstall" -> UninstallActivity::class.java
+                                    else -> InstallActivity::class.java
                                 }
                             } else {
-                                app.pwhs.universalinstaller.presentation.install.InstallActivity::class.java
+                                InstallActivity::class.java
                             }
-                            startActivity(Intent(this@MainActivity, targetActivity).apply {
+                            val launch = Intent(this@MainActivity, targetActivity).apply {
                                 flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            })
+                            }
+                            // Forward content URIs received via VIEW/INSTALL/SEND so the install
+                            // task gets its own read-permission grant. Without this, the new
+                            // task can't openInputStream() the URI and the parser falls back to
+                            // packageName="Unknown" — the v1.4.0 install regression.
+                            if (!isDeepLink) {
+                                forwardIncomingUris(incoming, launch)
+                            }
+                            startActivity(launch)
                             finish()
                         }
                     }
@@ -175,6 +189,45 @@ class MainActivity : ComponentActivity() {
         super.onNewIntent(intent)
         setIntent(intent)
         handleViewIntent(intent)
+    }
+
+    /**
+     * Re-grant any content URIs we received on [source] to [target] so the install activity's
+     * task can read them. Required because we launch [target] with `NEW_TASK | CLEAR_TASK` and
+     * `finish()` ourselves — the original grant only covered MainActivity's task.
+     *
+     * Single URI → `Intent.setData()`. Multiple URIs (`SEND_MULTIPLE`) → `ClipData`. In both
+     * cases we OR in `FLAG_GRANT_READ_URI_PERMISSION` so the system re-issues the grant.
+     */
+    private fun forwardIncomingUris(source: Intent?, target: Intent) {
+        if (source == null) return
+        val uris = collectGrantableUris(source)
+        if (uris.isEmpty()) return
+        if (uris.size == 1) {
+            target.data = uris.first()
+        } else {
+            val clip = ClipData.newRawUri("", uris.first())
+            for (i in 1 until uris.size) {
+                clip.addItem(ClipData.Item(uris[i]))
+            }
+            target.clipData = clip
+        }
+        target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
+    @Suppress("DEPRECATION")
+    private fun collectGrantableUris(source: Intent): List<Uri> {
+        val out = mutableListOf<Uri>()
+        source.data?.takeIf { it.scheme == "content" || it.scheme == "file" }?.let(out::add)
+        when (source.action) {
+            Intent.ACTION_SEND ->
+                (source.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)?.let(out::add)
+            Intent.ACTION_SEND_MULTIPLE ->
+                source.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                    ?.filterNotNull()
+                    ?.let(out::addAll)
+        }
+        return out.distinct()
     }
 
     /**
