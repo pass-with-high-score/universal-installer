@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.WifiTethering
 import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.CleaningServices
+import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Fingerprint
@@ -89,6 +90,7 @@ fun SettingScreen(
         onShizukuOptionChanged = viewModel::setShizukuOption,
         onShizukuInstallerChanged = viewModel::setShizukuInstallerPackageName,
         onDeleteApkChanged = viewModel::setDeleteApkAfterInstall,
+        onAutoOpenAfterInstallChanged = viewModel::setAutoOpenAfterInstall,
         onLanguageClick = { 
             context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.setting.language.LanguageActivity::class.java))
         },
@@ -114,6 +116,7 @@ private fun SettingUi(
     onShizukuOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
     onShizukuInstallerChanged: (String) -> Unit = {},
     onDeleteApkChanged: (Boolean) -> Unit = {},
+    onAutoOpenAfterInstallChanged: (Boolean) -> Unit = {},
     onLanguageClick: () -> Unit = {},
     onRootChanged: (Boolean) -> Unit = {},
     onRootRetry: () -> Unit = {},
@@ -235,6 +238,39 @@ private fun SettingUi(
                             Switch(
                                 checked = uiState.deleteApkAfterInstall,
                                 onCheckedChange = onDeleteApkChanged,
+                            )
+                        },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    ListItem(
+                        headlineContent = {
+                            Text(
+                                stringResource(R.string.setting_auto_open_title),
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        },
+                        supportingContent = {
+                            Text(
+                                text = stringResource(R.string.setting_auto_open_subtitle),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.RocketLaunch,
+                                contentDescription = null,
+                                tint = if (uiState.autoOpenAfterInstall)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                modifier = Modifier.size(24.dp),
+                            )
+                        },
+                        trailingContent = {
+                            Switch(
+                                checked = uiState.autoOpenAfterInstall,
+                                onCheckedChange = onAutoOpenAfterInstallChanged,
                             )
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),

@@ -34,6 +34,9 @@ object PreferencesKeys {
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")
     val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
 
+    /** Open the app automatically after a successful install (with a 3-second cancellable countdown). */
+    val AUTO_OPEN_AFTER_INSTALL = booleanPreferencesKey("auto_open_after_install")
+
     // Shizuku install options
     val SHIZUKU_BYPASS_LOW_TARGET_SDK = booleanPreferencesKey("shizuku_bypass_low_target_sdk")
     val SHIZUKU_ALLOW_TEST = booleanPreferencesKey("shizuku_allow_test")
@@ -132,6 +135,7 @@ data class SettingUiState(
     val useRoot: Boolean = false,
     val virusTotalApiKey: String = "",
     val deleteApkAfterInstall: Boolean = false,
+    val autoOpenAfterInstall: Boolean = false,
     val shizukuState: ShizukuState = ShizukuState.NOT_INSTALLED,
     val shizukuAvailable: Boolean = false,
     val shizukuOptions: ShizukuOptions = ShizukuOptions(),
@@ -260,7 +264,10 @@ class SettingViewModel(
                 (prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] ?: false)
         },
         dataStore.data.map { prefs ->
-            prefs[PreferencesKeys.DIALOG_INSTALL_MODE] ?: true
+            // Pair the dialog-mode flag and auto-open-after-install flag — both are simple
+            // booleans and pairing them avoids pushing combine() to 15 vararg flows.
+            (prefs[PreferencesKeys.DIALOG_INSTALL_MODE] ?: true) to
+                (prefs[PreferencesKeys.AUTO_OPEN_AFTER_INSTALL] ?: false)
         },
     ) { flows ->
         val theme = flows[0] as ThemeMode
@@ -277,7 +284,10 @@ class SettingViewModel(
         val syncOpts = flows[11] as SyncOptions
         @Suppress("UNCHECKED_CAST")
         val biometricFlags = flows[12] as Pair<Boolean, Boolean>
-        val dialogMode = flows[13] as Boolean
+        @Suppress("UNCHECKED_CAST")
+        val dialogModeFlags = flows[13] as Pair<Boolean, Boolean>
+        val dialogMode = dialogModeFlags.first
+        val autoOpen = dialogModeFlags.second
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
@@ -291,6 +301,7 @@ class SettingViewModel(
             useRoot = useRoot && (rootState == RootState.READY || rootState == RootState.UNKNOWN),
             virusTotalApiKey = vtKey,
             deleteApkAfterInstall = deleteApk,
+            autoOpenAfterInstall = autoOpen,
             shizukuState = shizukuState,
             // "Available" means the binder is alive — we can talk to Shizuku/Sui now.
             shizukuAvailable = shizukuState == ShizukuState.READY ||
@@ -502,6 +513,14 @@ class SettingViewModel(
         viewModelScope.launch {
             dataStore.edit { prefs ->
                 prefs[PreferencesKeys.DIALOG_INSTALL_MODE] = enabled
+            }
+        }
+    }
+
+    fun setAutoOpenAfterInstall(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.AUTO_OPEN_AFTER_INSTALL] = enabled
             }
         }
     }

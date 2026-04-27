@@ -59,6 +59,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.presentation.setting.dataStore
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogFailedContent
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallingContent
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogMenuContent
@@ -159,6 +161,11 @@ class DialogInstallActivity : ComponentActivity() {
             // We watch this + the session list to drive Installing → Success/Failed transitions.
             val dialogTarget by viewModel.dialogTarget.collectAsState()
 
+            // Auto-open-after-install pref — read directly from DataStore (no SettingViewModel
+            // dependency in this activity). Drives the Success-stage countdown.
+            val prefs by context.dataStore.data.collectAsState(initial = null)
+            val autoOpenAfterInstall = prefs?.get(PreferencesKeys.AUTO_OPEN_AFTER_INSTALL) ?: false
+
             // Once a target appears (install enqueued), move into the Installing stage so the
             // user sees progress instead of the dialog vanishing.
             LaunchedEffect(dialogTarget, uiState.dialogStage) {
@@ -240,6 +247,7 @@ class DialogInstallActivity : ComponentActivity() {
                     DialogContent(
                         uiState = uiState,
                         dialogTarget = dialogTarget,
+                        autoOpenAfterInstall = autoOpenAfterInstall,
                         onInstall = handleInstallTap,
                         onCancel = {
                             viewModel.dismissPendingInstall()
@@ -355,6 +363,7 @@ class DialogInstallActivity : ComponentActivity() {
 private fun DialogContent(
     uiState: InstallUiState,
     dialogTarget: DialogTarget?,
+    autoOpenAfterInstall: Boolean,
     onInstall: () -> Unit,
     onCancel: () -> Unit,
     onMenu: () -> Unit,
@@ -477,7 +486,7 @@ private fun DialogContent(
                             DialogSuccessContent(
                                 target = target,
                                 canOpen = canOpen,
-                                autoOpenCountdownSeconds = null,
+                                autoOpenCountdownStartSeconds = if (autoOpenAfterInstall) 3 else null,
                                 onOpen = { onOpenInstalledApp(target.packageName) },
                                 onDone = onCloseAfterResult,
                             )

@@ -139,15 +139,16 @@ fun DialogInstallingContent(
  *
  * @param canOpen whether the package has a launchable activity. When false, the
  * Open button is hidden (services / library packages have no MAIN/LAUNCHER intent).
- * @param autoOpenCountdownSeconds optional countdown shown next to the Open label;
- * null disables the countdown. When the countdown reaches zero the parent must
- * invoke [onOpen] — this composable does not auto-dispatch.
+ * @param autoOpenCountdownStartSeconds when non-null AND [canOpen] is true, a
+ * countdown starts on first composition; reaching zero invokes [onOpen]. The user
+ * can cancel by tapping Done (which transitions out of this stage and disposes
+ * the LaunchedEffect) or short-circuit by tapping Open. Pass null to disable.
  */
 @Composable
 fun DialogSuccessContent(
     target: DialogTarget,
     canOpen: Boolean,
-    autoOpenCountdownSeconds: Int?,
+    autoOpenCountdownStartSeconds: Int?,
     onOpen: () -> Unit,
     onDone: () -> Unit,
 ) {
@@ -159,6 +160,23 @@ fun DialogSuccessContent(
         ),
         label = "successIconScale",
     )
+
+    // Countdown ticks down from the start value on a 1-second cadence. We only
+    // arm it when the package is actually launchable — otherwise the auto-open
+    // would silently fail and the user would just see the dialog dismiss.
+    val countdownActive = canOpen && autoOpenCountdownStartSeconds != null
+    var remaining by remember(autoOpenCountdownStartSeconds, canOpen) {
+        mutableStateOf(if (countdownActive) autoOpenCountdownStartSeconds!! else 0)
+    }
+    if (countdownActive) {
+        LaunchedEffect(autoOpenCountdownStartSeconds) {
+            while (remaining > 0) {
+                kotlinx.coroutines.delay(1000)
+                remaining -= 1
+            }
+            onOpen()
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -214,8 +232,8 @@ fun DialogSuccessContent(
                     modifier = Modifier.weight(1f),
                 ) {
                     val openLabel = stringResource(R.string.dialog_success_open)
-                    val label = if (autoOpenCountdownSeconds != null) {
-                        "$openLabel ($autoOpenCountdownSeconds)"
+                    val label = if (countdownActive && remaining > 0) {
+                        "$openLabel ($remaining)"
                     } else {
                         openLabel
                     }
