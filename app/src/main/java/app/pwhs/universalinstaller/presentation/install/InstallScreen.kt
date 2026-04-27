@@ -83,6 +83,37 @@ fun InstallScreen(
         }
     }.collectAsState(initial = false)
 
+    // Risk consent gate — populated when the user taps Install on a downgrade or
+    // a VirusTotal-flagged APK. We render an AlertDialog over the rest of the screen
+    // and only proceed to the biometric gate + confirmInstall after they acknowledge.
+    var pendingRisks by remember { mutableStateOf<List<app.pwhs.universalinstaller.presentation.install.dialog.InstallRisk>>(emptyList()) }
+
+    val proceedWithBiometric: () -> Unit = {
+        val activity = context as? androidx.fragment.app.FragmentActivity
+        if (activity != null) {
+            BiometricGate.authenticate(
+                activity = activity,
+                enabled = installGateEnabled,
+                title = context.getString(R.string.biometric_install_title),
+                subtitle = context.getString(R.string.biometric_install_sub),
+                onSuccess = viewModel::confirmInstall,
+            )
+        } else {
+            viewModel.confirmInstall()
+        }
+    }
+
+    if (pendingRisks.isNotEmpty()) {
+        app.pwhs.universalinstaller.presentation.install.dialog.RiskConfirmDialog(
+            risks = pendingRisks,
+            onConfirm = {
+                pendingRisks = emptyList()
+                proceedWithBiometric()
+            },
+            onCancel = { pendingRisks = emptyList() },
+        )
+    }
+
     InstallUi(
         modifier = modifier,
         uiState = uiState,
@@ -94,19 +125,17 @@ fun InstallScreen(
         onCancelDownload = viewModel::cancelDownload,
         onDismissDownloadError = viewModel::dismissDownloadError,
         onConfirmInstall = {
-            // Biometric gate lives in the UI layer because BiometricPrompt needs the host
-            // FragmentActivity. `installGateEnabled` reflects the Settings → Security toggle.
-            val activity = context as? androidx.fragment.app.FragmentActivity
-            if (activity != null) {
-                BiometricGate.authenticate(
-                    activity = activity,
-                    enabled = installGateEnabled,
-                    title = context.getString(R.string.biometric_install_title),
-                    subtitle = context.getString(R.string.biometric_install_sub),
-                    onSuccess = viewModel::confirmInstall,
-                )
+            // Risk gate FIRST so the user sees what they're acknowledging — biometric
+            // prompts that follow then feel like a confirmation of an explicit choice
+            // rather than a surprise after fingerprint auth completes.
+            val info = uiState.pendingApkInfo
+            val risks = if (info != null) {
+                app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks(info)
+            } else emptyList()
+            if (risks.isNotEmpty()) {
+                pendingRisks = risks
             } else {
-                viewModel.confirmInstall()
+                proceedWithBiometric()
             }
         },
         onDismissPreview = viewModel::dismissPendingInstall,

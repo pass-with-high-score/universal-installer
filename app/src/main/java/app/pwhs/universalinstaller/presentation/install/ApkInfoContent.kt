@@ -155,12 +155,35 @@ internal fun ApkInfoContent(
 
         Spacer(Modifier.height(16.dp))
 
+        // Downgrade detection — fires when ApkInfoExtractor populated installedVersionCode.
+        // Surfaced both as a red chip here AND as a risk in the consent gate at install time.
+        val isDowngrade = apkInfo.installedVersionCode != null &&
+                apkInfo.installedVersionCode > 0 &&
+                apkInfo.versionCode < apkInfo.installedVersionCode
+
         // Info chips row
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.fillMaxWidth(),
         ) {
+            if (isDowngrade) {
+                InfoChip(
+                    label = stringResource(
+                        R.string.dialog_chip_downgrade,
+                    ) + " ${apkInfo.installedVersionName.orEmpty().ifBlank { "?" }} → ${apkInfo.versionName.ifBlank { "?" }}",
+                    leadingIcon = {
+                        Icon(
+                            Icons.Rounded.Warning,
+                            null,
+                            modifier = Modifier.size(16.dp),
+                            tint = MaterialTheme.colorScheme.error,
+                        )
+                    },
+                    containerColor = MaterialTheme.colorScheme.errorContainer,
+                    contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                )
+            }
             if (apkInfo.versionName.isNotBlank()) {
                 InfoChip(
                     label = stringResource(R.string.apk_info_version_chip, apkInfo.versionName),
@@ -980,11 +1003,13 @@ private fun SectionCard(
 internal fun InfoChip(
     label: String,
     leadingIcon: @Composable (() -> Unit)? = null,
+    containerColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+    contentColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     Surface(
         shape = MaterialTheme.shapes.small,
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = containerColor,
+        contentColor = contentColor,
         tonalElevation = 0.dp,
     ) {
         Row(
