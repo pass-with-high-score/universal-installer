@@ -895,7 +895,7 @@ class InstallViewModel(
         _scanState.value = ScanState.Scanning
         deviceScanJob = viewModelScope.launch {
             val results = try {
-                ApkScanner.scan()
+                ApkScanner.scan(application)
             } catch (ce: kotlinx.coroutines.CancellationException) {
                 throw ce
             } catch (t: Throwable) {

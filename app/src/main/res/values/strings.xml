@@ -172,6 +172,11 @@
     <string name="find_auto_delete_confirm">Delete</string>
     <string name="find_auto_search_hint">Search packages…</string>
     <string name="find_auto_no_match">No packages match &quot;%s&quot;</string>
+    <string name="found_chip_split">Split</string>
+    <string name="found_chip_new">New</string>
+    <string name="found_chip_update">Update</string>
+    <string name="found_chip_installed">Installed</string>
+    <string name="found_chip_older">Older</string>
     <string name="permissions_title">App permissions</string>
     <string name="permissions_subtitle">Review which permissions are active and grant the ones you need.</string>
     <string name="permissions_menu_cd">Review permissions</string>

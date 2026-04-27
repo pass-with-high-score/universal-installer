@@ -520,6 +520,7 @@ private fun FoundRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
+                FoundFileChips(file)
             }
             Spacer(Modifier.size(10.dp))
             Icon(
@@ -530,5 +531,89 @@ private fun FoundRow(
                        else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
+    }
+}
+
+/**
+ * Status chip strip — shown under each file's metadata. Up to two chips:
+ *
+ * - "Split" for archive bundles (.xapk/.apks/.apkm). Always shown when applicable.
+ * - One install-state chip:
+ *     New        — package not yet installed (primary tint)
+ *     Update     — APK is newer than what's installed (success/primary tint)
+ *     Installed  — same versionCode already installed (muted)
+ *     Older      — APK older than installed (error tint, downgrade warning)
+ *
+ * Archives stay InstallState.Unknown (we don't unpack base.apk during a scan), so they
+ * only get the Split chip. .apk files get the install-state chip.
+ */
+@Composable
+private fun FoundFileChips(file: FoundPackageFile) {
+    val isArchive = file.extension in setOf("xapk", "apks", "apkm")
+    val showStateChip = file.installState != InstallState.Unknown
+
+    if (!isArchive && !showStateChip) return
+
+    Row(
+        modifier = Modifier.padding(top = 6.dp),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        if (isArchive) {
+            StatusChip(
+                label = stringResource(R.string.found_chip_split),
+                container = MaterialTheme.colorScheme.tertiaryContainer,
+                content = MaterialTheme.colorScheme.onTertiaryContainer,
+            )
+        }
+        if (showStateChip) {
+            val (labelRes, container, contentColor) = when (file.installState) {
+                InstallState.NotInstalled -> Triple(
+                    R.string.found_chip_new,
+                    MaterialTheme.colorScheme.secondaryContainer,
+                    MaterialTheme.colorScheme.onSecondaryContainer,
+                )
+                InstallState.Newer -> Triple(
+                    R.string.found_chip_update,
+                    MaterialTheme.colorScheme.primaryContainer,
+                    MaterialTheme.colorScheme.onPrimaryContainer,
+                )
+                InstallState.SameVersion -> Triple(
+                    R.string.found_chip_installed,
+                    MaterialTheme.colorScheme.surfaceContainerHighest,
+                    MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                InstallState.Older -> Triple(
+                    R.string.found_chip_older,
+                    MaterialTheme.colorScheme.errorContainer,
+                    MaterialTheme.colorScheme.onErrorContainer,
+                )
+                InstallState.Unknown -> return@Row
+            }
+            StatusChip(
+                label = stringResource(labelRes),
+                container = container,
+                content = contentColor,
+            )
+        }
+    }
+}
+
+@Composable
+private fun StatusChip(
+    label: String,
+    container: androidx.compose.ui.graphics.Color,
+    content: androidx.compose.ui.graphics.Color,
+) {
+    Surface(
+        shape = RoundedCornerShape(6.dp),
+        color = container,
+        contentColor = content,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+        )
     }
 }
