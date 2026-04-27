@@ -25,6 +25,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.Launch
 import androidx.compose.material.icons.automirrored.rounded.ReceiptLong
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.ArrowDownward
@@ -1459,7 +1460,7 @@ private fun AppActionSheet(
 
         if (launchable) {
             ActionRow(
-                icon = Icons.Rounded.Launch,
+                icon = Icons.AutoMirrored.Rounded.Launch,
                 iconTint = MaterialTheme.colorScheme.primary,
                 label = stringResource(R.string.manage_action_open_app),
                 subtitle = stringResource(R.string.manage_action_open_app_sub, app.appName),

@@ -44,14 +44,11 @@
     <string name="biometric_install_sub">Authenticate to install this package</string>
     <string name="biometric_uninstall_title">Confirm uninstall</string>
     <string name="biometric_uninstall_sub">Authenticate to uninstall %1$s</string>
-    <string name="setting_biometric_section">Security</string>
     <string name="setting_biometric_install">Require auth to install</string>
     <string name="setting_biometric_install_sub">Confirm with fingerprint or device unlock before each install</string>
     <string name="setting_biometric_uninstall">Require auth to uninstall</string>
     <string name="setting_biometric_uninstall_sub">Confirm with fingerprint or device unlock before each uninstall</string>
     <string name="setting_biometric_unavailable">No fingerprint or device unlock enrolled — toggle has no effect until you set one up.</string>
-    <string name="setting_dialog_install_title">Open as dialog from other apps</string>
-    <string name="setting_dialog_install_subtitle">Show a focused install dialog when an APK is opened from a file manager or Chrome, instead of launching the full app.</string>
     <string name="manage_action_clear_data">Clear all data</string>
     <string name="manage_action_clear_data_sub">Reset the app — wipes settings, accounts, and cache</string>
     <string name="manage_action_clear_data_done">Cleared data for %1$s</string>
@@ -74,7 +71,6 @@
     <string name="permissions_empty">This app declares no permissions</string>
     <string name="manage_usage_title">Usage · last 7 days</string>
     <string name="manage_usage_total">%1$s total</string>
-    <string name="manage_usage_none">No foreground time recorded</string>
     <string name="manage_group_label">Group by installer</string>
     <string name="manage_group_other">Sideload &amp; other</string>
     <string name="screen_title_backups">Extracted backups</string>
@@ -272,7 +268,6 @@
     <string name="vt_notif_result_suspicious">VirusTotal: suspicious</string>
     <string name="vt_notif_result_done">VirusTotal scan complete</string>
     <string name="vt_notif_result_error">VirusTotal scan failed</string>
-    <string name="uninstall_show_system_apps">Show system apps</string>
     <string name="uninstall_app_count">%d apps</string>
     <string name="uninstall_sort_name">Name</string>
     <string name="uninstall_sort_size">Size</string>
@@ -284,8 +279,6 @@
     <string name="uninstall_current_sort_summary" translatable="false">%1$s %2$s</string>
     <string name="uninstall_filter_sheet_title">Sort &amp; filter</string>
     <string name="uninstall_filter_sort_section">Sort by</string>
-    <string name="uninstall_filter_filter_section">Filter</string>
-    <string name="uninstall_show_system_apps_sub">Include preinstalled and system packages</string>
     <string name="uninstall_search_hint">Search apps…</string>
     <string name="uninstall_no_apps_found">No apps found</string>
     <string name="uninstall_no_match">No apps match \&quot;%s\&quot;</string>
@@ -474,8 +467,6 @@
     <string name="theme_amoled_mode_title">AMOLED Black</string>
     <string name="theme_amoled_mode_subtitle">Use pitch black background in dark mode</string>
     <string name="setting_theme_description">Customize Dynamic Colors and Dark Mode</string>
-
-    <!-- Dialog multi-stage flow -->
     <string name="dialog_loading_text">Analyzing package…</string>
     <string name="dialog_install_btn">Install</string>
     <string name="dialog_update_btn">Update</string>
@@ -500,27 +491,20 @@
     <string name="dialog_failed_title">Installation failed</string>
     <string name="dialog_failed_retry">Retry</string>
     <string name="dialog_failed_close">Close</string>
-    <string name="dialog_version_new">New install</string>
-    <string name="dialog_version_update">%1$s → %2$s</string>
     <string name="dialog_version_downgrade">⚠ Downgrade: %1$s → %2$s</string>
     <string name="dialog_chip_downgrade">Downgrade</string>
     <string name="dialog_chip_split_apk">Split APK</string>
     <string name="dialog_chip_has_obb">Has OBB</string>
-    <string name="dialog_size_format">%s</string>
     <string name="dialog_menu_details">App Details</string>
     <string name="dialog_menu_details_desc">Version, SDK target, and package info</string>
     <string name="dialog_menu_architectures">Architectures</string>
-    <string name="dialog_menu_architectures_desc">Supported CPU architectures</string>
     <string name="dialog_menu_sha256">SHA-256 Hash</string>
-    <string name="dialog_menu_sha256_desc">File integrity fingerprint</string>
     <string name="dialog_menu_sha256_copied">SHA-256 copied to clipboard</string>
     <string name="dialog_menu_obb_attach">Attach OBB</string>
     <string name="dialog_menu_obb_attach_desc">Add OBB data files for this app</string>
     <string name="dialog_tab_info">Info</string>
     <string name="dialog_tab_security">Security</string>
     <string name="dialog_tab_advanced">Advanced</string>
-    <string name="dialog_menu_all_users">Install for All Users</string>
-    <string name="dialog_menu_all_users_desc">Install the app for all profiles on the device</string>
     <string name="dialog_menu_all_users_on">Will install for every user profile on this device</string>
     <string name="dialog_menu_all_users_off">Will install for the current user only</string>
     <string name="dialog_menu_install_source">Set Install Source</string>
@@ -536,8 +520,6 @@
     <string name="dialog_menu_target_all_sub">Owner plus any work profile on this device</string>
     <string name="dialog_menu_target_visible_profiles">Profiles on this device</string>
     <string name="dialog_menu_target_hidden_users_hint">Other users (e.g. Secure Folder) are not visible without elevated access.</string>
-
-    <!-- Risk confirmation -->
     <string name="dialog_risk_title_warn">Install with caution?</string>
     <string name="dialog_risk_title_severe">This APK looks dangerous</string>
     <string name="dialog_risk_proceed_warn">Install anyway</string>
