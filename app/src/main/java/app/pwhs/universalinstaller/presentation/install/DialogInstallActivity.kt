@@ -46,6 +46,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -146,6 +149,18 @@ class DialogInstallActivity : ComponentActivity() {
                 }
             }
 
+            // Auto-finish once the install session is actually enqueued.
+            // Calling finish() directly inside onInstall cancels viewModelScope before
+            // confirmInstall()'s launched coroutine creates the session, so the install
+            // silently never runs. Wait for pendingApkInfo to clear AND a session to appear.
+            var installRequested by rememberSaveable { mutableStateOf(false) }
+            LaunchedEffect(installRequested, uiState.pendingApkInfo, uiState.sessions.size) {
+                if (installRequested && uiState.pendingApkInfo == null && uiState.sessions.isNotEmpty()) {
+                    viewModel.dialogClose()
+                    finish()
+                }
+            }
+
             UniversalInstallerTheme {
                 // Apply background blur on Android 12+
                 WindowBlurEffect(blurRadius = 30)
@@ -168,12 +183,12 @@ class DialogInstallActivity : ComponentActivity() {
                     DialogContent(
                         uiState = uiState,
                         onInstall = {
-                            // Enqueue the install and finish — notification tracks progress.
-                            // confirmInstall() clears pendingApkInfo, so we must finish()
-                            // before the next recomposition sees null info.
+                            // Don't finish() here: confirmInstall() launches the install on
+                            // viewModelScope, which gets cancelled the moment the activity
+                            // finishes — the session never enqueues. The LaunchedEffect above
+                            // closes the dialog once the session is actually live.
+                            installRequested = true
                             viewModel.confirmInstall()
-                            viewModel.dialogClose()
-                            finish()
                         },
                         onCancel = {
                             viewModel.dismissPendingInstall()
