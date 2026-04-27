@@ -257,12 +257,6 @@ internal fun ApkInfoContent(
             AbisCard(apkInfo.supportedAbis)
         }
 
-        // Supported Languages section
-        if (apkInfo.supportedLanguages.isNotEmpty()) {
-            Spacer(Modifier.height(16.dp))
-            LanguagesCard(apkInfo.supportedLanguages)
-        }
-
         // VirusTotal Security Scan
         Spacer(Modifier.height(16.dp))
         VirusTotalCard(
@@ -367,36 +361,6 @@ private fun AbisCard(abis: List<String>) {
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             abis.forEach { abi -> InfoChip(label = abi) }
-        }
-    }
-}
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun LanguagesCard(languages: List<String>) {
-    // Show a localized 3-language preview in the header; full list lives behind the tap.
-    val previewSummary = remember(languages) {
-        val first = languages.take(3).joinToString(", ") { displayLanguage(it) }
-        if (languages.size > 3) "$first, +${languages.size - 3}" else first
-    }
-    SectionCard(
-        icon = Icons.Rounded.Language,
-        title = stringResource(R.string.apk_info_section_languages, languages.size),
-        summary = previewSummary,
-        badge = languages.size.toString(),
-        defaultExpanded = false,
-    ) {
-        FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp),
-        ) {
-            // Render localized display names ("English", "Français") rather than raw
-            // codes — much faster to scan visually. Cap at 20 to keep the card compact;
-            // a "+N" chip stands in for the rest.
-            languages.take(20).forEach { lang -> InfoChip(label = displayLanguage(lang)) }
-            if (languages.size > 20) {
-                InfoChip(label = "+${languages.size - 20}")
-            }
         }
     }
 }

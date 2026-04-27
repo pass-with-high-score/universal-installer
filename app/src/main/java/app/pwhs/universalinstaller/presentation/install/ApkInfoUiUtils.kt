@@ -9,8 +9,9 @@ import java.util.Locale
  *
  * Examples: `"en"` → "English", `"fr"` → "Français", `"zh-CN"` → "Chinese (China)".
  * Falls back to the original (uppercased) code when [Locale] can't resolve a name —
- * this happens for non-locale entries that occasionally appear in `supportedLanguages`,
- * e.g. ABI tags or asset directory leftovers.
+ * happens for non-locale strings that occasionally land here, e.g. raw ABI suffixes
+ * fed in by mistake. Used by the splits chip picker to label `Apk.Localization`
+ * entries readably ("English" instead of "config.en").
  */
 fun displayLanguage(code: String): String {
     if (code.isBlank()) return code

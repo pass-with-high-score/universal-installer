@@ -406,40 +406,6 @@ private fun androidx.compose.foundation.lazy.LazyListScope.infoTab(
         }
     }
 
-    // 3. Languages
-    if (apkInfo.supportedLanguages.isNotEmpty()) {
-        item(key = "languages") {
-            var expanded by remember { mutableStateOf(false) }
-            val previewText = remember(apkInfo.supportedLanguages) {
-                apkInfo.supportedLanguages
-                    .take(3)
-                    .joinToString(", ") { displayLanguage(it) }
-                    .let {
-                        if (apkInfo.supportedLanguages.size > 3) "$it, …" else it
-                    }
-            }
-            MenuCard(
-                title = stringResource(R.string.dialog_menu_languages),
-                description = previewText,
-                icon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Language,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                    )
-                },
-                expanded = expanded,
-                onClick = { expanded = !expanded },
-                badge = "${apkInfo.supportedLanguages.size}",
-            ) {
-                LanguageChipGrid(
-                    languages = apkInfo.supportedLanguages,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
-                )
-            }
-        }
-    }
-
     // 4. SHA-256 Hash
     if (apkInfo.sha256.isNotBlank()) {
         item(key = "sha256") {
@@ -849,39 +815,6 @@ private fun MenuCard(
                 )
                 expandedContent()
             }
-        }
-    }
-}
-
-// ─────────────────────────────────────────────────────────────────────────
-// Languages
-// ─────────────────────────────────────────────────────────────────────────
-
-@OptIn(ExperimentalLayoutApi::class)
-@Composable
-private fun LanguageChipGrid(
-    languages: List<String>,
-    modifier: Modifier = Modifier,
-) {
-    FlowRow(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        languages.forEach { code ->
-            AssistChip(
-                onClick = {},
-                label = {
-                    Text(
-                        text = displayLanguage(code),
-                        style = MaterialTheme.typography.labelSmall,
-                    )
-                },
-                colors = AssistChipDefaults.assistChipColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                    labelColor = MaterialTheme.colorScheme.onSurface,
-                ),
-            )
         }
     }
 }

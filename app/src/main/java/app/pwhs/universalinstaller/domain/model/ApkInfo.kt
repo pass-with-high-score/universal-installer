@@ -26,7 +26,6 @@ data class ApkInfo(
     val splitCount: Int = 1,
     val fileFormat: String = "APK",
     val supportedAbis: List<String> = emptyList(),
-    val supportedLanguages: List<String> = emptyList(),
     val sha256: String = "",
     val vtResult: VtResult? = null,
     val obbFileNames: List<String> = emptyList(),

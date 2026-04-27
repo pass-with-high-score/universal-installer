@@ -224,7 +224,6 @@
     <string name="apk_info_version_detail" translatable="false">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Supported Architectures</string>
-    <string name="apk_info_section_languages">Supported Languages (%d)</string>
     <string name="apk_info_section_permissions">Permissions (%d)</string>
     <string name="apk_info_permissions_more">… and %d more</string>
     <string name="apk_info_section_splits">Splits (%d)</string>
@@ -507,8 +506,6 @@
     <string name="dialog_menu_details_desc">Version, SDK target, and package info</string>
     <string name="dialog_menu_architectures">Architectures</string>
     <string name="dialog_menu_architectures_desc">Supported CPU architectures</string>
-    <string name="dialog_menu_languages">Languages</string>
-    <string name="dialog_menu_languages_desc">Supported language resources</string>
     <string name="dialog_menu_sha256">SHA-256 Hash</string>
     <string name="dialog_menu_sha256_desc">File integrity fingerprint</string>
     <string name="dialog_menu_sha256_copied">SHA-256 copied to clipboard</string>
