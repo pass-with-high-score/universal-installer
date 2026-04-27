@@ -166,34 +166,31 @@ class DialogInstallActivity : ComponentActivity() {
             val prefs by context.dataStore.data.collectAsState(initial = null)
             val autoOpenAfterInstall = prefs?.get(PreferencesKeys.AUTO_OPEN_AFTER_INSTALL) ?: false
 
-            // Once a target appears (install enqueued), move into the Installing stage so the
-            // user sees progress instead of the dialog vanishing.
-            LaunchedEffect(dialogTarget, uiState.dialogStage) {
-                if (dialogTarget != null &&
-                    uiState.dialogStage !is DialogStage.Installing &&
-                    uiState.dialogStage !is DialogStage.Success &&
-                    uiState.dialogStage !is DialogStage.Failed
-                ) {
-                    viewModel.dialogStartInstalling()
-                }
-            }
+            // Tracks whether we've actually observed the captured session in the repository.
+            // The session is added inside controller.install() AFTER createSession() suspends,
+            // so there's a window where dialogTarget is set but the session isn't in the list
+            // yet — without this guard we'd misread that as "session removed" and fire Success
+            // immediately, dismissing the dialog while ackpine hasn't finished installing.
+            var sessionEverSeen by remember(dialogTarget?.sessionId) { mutableStateOf(false) }
 
             // Resolve Installing → Success / Failed by watching the captured session.
-            //   - session in list, error blank        → still Installing
+            //   - session in list, error blank        → still Installing (mark as seen)
             //   - session in list, error non-blank   → Failed
             //   - session NOT in list (was there)    → Succeeded
+            //   - session NOT in list (never seen)   → not started yet, keep waiting
             // BaseInstallController removes on Succeeded and calls setError() on Failed.
             LaunchedEffect(dialogTarget, uiState.sessions, uiState.dialogStage) {
                 val target = dialogTarget ?: return@LaunchedEffect
                 if (uiState.dialogStage !is DialogStage.Installing) return@LaunchedEffect
                 val session = uiState.sessions.find { it.id == target.sessionId }
-                if (session == null) {
-                    viewModel.dialogInstallSuccess()
-                } else {
+                if (session != null) {
+                    sessionEverSeen = true
                     val msg = session.error.resolve(this@DialogInstallActivity).toString()
                     if (msg.isNotBlank()) {
                         viewModel.dialogInstallFailed(msg)
                     }
+                } else if (sessionEverSeen) {
+                    viewModel.dialogInstallSuccess()
                 }
             }
 
@@ -202,6 +199,10 @@ class DialogInstallActivity : ComponentActivity() {
             // the user to the Prepare/Menu stage (no install fires).
             var pendingRisks by remember { mutableStateOf<List<InstallRisk>>(emptyList()) }
             val proceedInstall = {
+                // Show the Installing stage straight away. dialogTarget arrives a moment
+                // later (after createSession suspends), at which point the Installing UI
+                // re-renders with the real session data and progress bar.
+                viewModel.dialogStartInstalling()
                 viewModel.confirmInstall(trackDialogTarget = true)
             }
             val handleInstallTap = {

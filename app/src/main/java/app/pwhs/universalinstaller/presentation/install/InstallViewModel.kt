@@ -296,24 +296,14 @@ class InstallViewModel(
         viewModelScope.launch {
             val iconPath = cacheIcon(apkInfo)
             val deleteAfterInstall = readDeleteApkPref()
-            val newSessionId = UUID.randomUUID()
             val sessionData = SessionData(
-                id = newSessionId,
+                // ackpine generates its own session ID inside controller.install() and the
+                // repository entry is stored under that one — this placeholder is overwritten.
+                id = UUID.randomUUID(),
                 name = fn,
                 appName = apkInfo?.appName ?: "",
                 iconPath = iconPath,
             )
-            // Snapshot before install — Success/Failed stages need this after pendingApkInfo
-            // has been cleared. Set BEFORE controller.install() so the dialog activity sees
-            // the target by the time the session appears in sessions list.
-            if (trackDialogTarget) {
-                _dialogTarget.value = DialogTarget(
-                    sessionId = newSessionId,
-                    packageName = apkInfo?.packageName.orEmpty(),
-                    appName = apkInfo?.appName.orEmpty().ifBlank { fn },
-                    iconPath = iconPath,
-                )
-            }
             val hasZipObbs = obbEntries.isNotEmpty() && originalUri != null
             val hasAttachedObbs = attachedObbs.isNotEmpty()
             val onSuccess: (suspend () -> Unit)? = if ((hasZipObbs || hasAttachedObbs) && apkInfo != null) {
@@ -324,6 +314,10 @@ class InstallViewModel(
                 }
                 hook
             } else null
+            // Capture target metadata in locals — the apkInfo reference is closed over but
+            // pendingApkInfo has already been cleared, so the callback below only sees these.
+            val pkgForTarget = apkInfo?.packageName.orEmpty()
+            val nameForTarget = apkInfo?.appName.orEmpty().ifBlank { fn }
             activeController().install(
                 uris = uris,
                 sessionData = sessionData,
@@ -332,6 +326,16 @@ class InstallViewModel(
                 originalUri = originalUri,
                 deleteAfterInstall = deleteAfterInstall,
                 onSuccess = onSuccess,
+                onSessionCreated = if (trackDialogTarget) {
+                    { realSessionId ->
+                        _dialogTarget.value = DialogTarget(
+                            sessionId = realSessionId,
+                            packageName = pkgForTarget,
+                            appName = nameForTarget,
+                            iconPath = iconPath,
+                        )
+                    }
+                } else null,
             )
         }
     }

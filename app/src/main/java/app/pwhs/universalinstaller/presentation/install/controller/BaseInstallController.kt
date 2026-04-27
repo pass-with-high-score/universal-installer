@@ -52,6 +52,7 @@ abstract class BaseInstallController(
         originalUri: Uri? = null,
         deleteAfterInstall: Boolean = false,
         onSuccess: (suspend () -> Unit)? = null,
+        onSessionCreated: ((UUID) -> Unit)? = null,
     ) {
         scope.launch {
             val session = createSession(uris, sessionData.name)
@@ -62,6 +63,10 @@ abstract class BaseInstallController(
             if (onSuccess != null) successHooks[session.id] = onSuccess
             val data = sessionData.copy(id = session.id)
             sessionDataRepository.addSessionData(data)
+            // Hand the real ackpine session ID back to the caller. The dialog flow keys its
+            // Installing/Success/Failed watchers off this — using the caller-passed id won't
+            // match because addSessionData stores the data under session.id, not sessionData.id.
+            onSessionCreated?.invoke(session.id)
             awaitSession(session, scope, context)
         }
     }
