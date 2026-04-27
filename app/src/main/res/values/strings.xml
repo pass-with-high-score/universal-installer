@@ -515,4 +515,21 @@
     <string name="dialog_tab_info">Info</string>
     <string name="dialog_tab_security">Security</string>
     <string name="dialog_tab_advanced">Advanced</string>
+    <string name="dialog_menu_all_users">Install for All Users</string>
+    <string name="dialog_menu_all_users_desc">Install the app for all profiles on the device</string>
+    <string name="dialog_menu_all_users_on">Will install for every user profile on this device</string>
+    <string name="dialog_menu_all_users_off">Will install for the current user only</string>
+    <string name="dialog_menu_install_source">Set Install Source</string>
+    <string name="dialog_menu_install_source_desc">Spoof the installer package name</string>
+    <string name="dialog_menu_install_source_on">Reported as installed by %1$s</string>
+    <string name="dialog_menu_permissions_breakdown">%1$d sensitive · %2$d normal</string>
+    <string name="dialog_menu_show_more">Show %1$d more</string>
+    <string name="dialog_menu_show_less">Show less</string>
+    <string name="dialog_menu_install_target">Install for</string>
+    <string name="dialog_menu_target_current">Current profile only</string>
+    <string name="dialog_menu_target_current_sub">Install for the user running this app</string>
+    <string name="dialog_menu_target_all">All visible profiles</string>
+    <string name="dialog_menu_target_all_sub">Owner plus any work profile on this device</string>
+    <string name="dialog_menu_target_visible_profiles">Profiles on this device</string>
+    <string name="dialog_menu_target_hidden_users_hint">Other users (e.g. Secure Folder) are not visible without elevated access.</string>
 </resources>

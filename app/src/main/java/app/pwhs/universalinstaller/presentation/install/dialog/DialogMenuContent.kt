@@ -3,11 +3,20 @@ package app.pwhs.universalinstaller.presentation.install.dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PermissionInfo
+import android.os.Process
+import android.os.UserHandle
+import android.os.UserManager
 import android.text.format.Formatter
 import android.widget.Toast
+import androidx.compose.foundation.background
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.ui.semantics.Role
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -23,29 +32,46 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Memory
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material.icons.rounded.Splitscreen
+import androidx.compose.material.icons.rounded.Store
+import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,19 +79,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.edit
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.SplitEntry
 import app.pwhs.universalinstaller.domain.model.SplitType
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.presentation.install.AttachedObb
+import app.pwhs.universalinstaller.presentation.setting.DEFAULT_INSTALLER_PACKAGE_NAME
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 /**
  * Stage 3: Extended Menu — full-featured option panel using a Tabbed Pager.
@@ -89,6 +123,38 @@ fun DialogMenuContent(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    
+    val prefs by context.dataStore.data.collectAsState(initial = null)
+    val allUsers = prefs?.get(PreferencesKeys.SHIZUKU_ALL_USERS) ?: false
+    val spoofSource = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
+    val installerPkg = prefs?.get(PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME) ?: DEFAULT_INSTALLER_PACKAGE_NAME
+
+    val onToggleAllUsers: (Boolean) -> Unit = { enabled ->
+        scope.launch {
+            context.dataStore.edit {
+                it[PreferencesKeys.SHIZUKU_ALL_USERS] = enabled
+                it[PreferencesKeys.ROOT_ALL_USERS] = enabled
+            }
+        }
+    }
+    
+    val onToggleSpoofSource: (Boolean) -> Unit = { enabled ->
+        scope.launch {
+            context.dataStore.edit {
+                it[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] = enabled
+                it[PreferencesKeys.ROOT_SET_INSTALL_SOURCE] = enabled
+            }
+        }
+    }
+    
+    val onChangeInstallerPkg: (String) -> Unit = { pkg ->
+        scope.launch {
+            context.dataStore.edit {
+                it[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME] = pkg
+                it[PreferencesKeys.ROOT_INSTALLER_PACKAGE_NAME] = pkg
+            }
+        }
+    }
     
     val tabs = listOf(
         stringResource(R.string.dialog_tab_info),
@@ -114,7 +180,7 @@ fun DialogMenuContent(
         // ── Tabs ──
         TabRow(
             selectedTabIndex = pagerState.currentPage,
-            containerColor = androidx.compose.ui.graphics.Color.Transparent,
+            containerColor = Color.Transparent,
             divider = { HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)) },
             indicator = { tabPositions ->
                 TabRowDefaults.SecondaryIndicator(
@@ -157,8 +223,20 @@ fun DialogMenuContent(
             ) {
                 when (page) {
                     0 -> infoTab(apkInfo, context)
-                    1 -> securityTab(apkInfo, onCheckVirusTotal)
-                    2 -> advancedTab(apkInfo, attachedObbFiles, onRemoveObb, onAttachObb, onToggleSplit)
+                    1 -> securityTab(apkInfo, context, onCheckVirusTotal)
+                    2 -> advancedTab(
+                        apkInfo = apkInfo,
+                        attachedObbFiles = attachedObbFiles,
+                        onRemoveObb = onRemoveObb,
+                        onAttachObb = onAttachObb,
+                        onToggleSplit = onToggleSplit,
+                        allUsers = allUsers,
+                        spoofSource = spoofSource,
+                        installerPkg = installerPkg,
+                        onToggleAllUsers = onToggleAllUsers,
+                        onToggleSpoofSource = onToggleSpoofSource,
+                        onChangeInstallerPkg = onChangeInstallerPkg,
+                    )
                 }
                 
                 // Add a bottom spacer so the last item isn't clipped
@@ -283,9 +361,17 @@ private fun androidx.compose.foundation.lazy.LazyListScope.infoTab(
     if (apkInfo.supportedLanguages.isNotEmpty()) {
         item(key = "languages") {
             var expanded by remember { mutableStateOf(false) }
+            val previewText = remember(apkInfo.supportedLanguages) {
+                apkInfo.supportedLanguages
+                    .take(3)
+                    .joinToString(", ") { displayLanguage(it) }
+                    .let {
+                        if (apkInfo.supportedLanguages.size > 3) "$it, …" else it
+                    }
+            }
             MenuCard(
                 title = stringResource(R.string.dialog_menu_languages),
-                description = stringResource(R.string.dialog_menu_languages_desc),
+                description = previewText,
                 icon = {
                     Icon(
                         imageVector = Icons.Rounded.Language,
@@ -297,18 +383,10 @@ private fun androidx.compose.foundation.lazy.LazyListScope.infoTab(
                 onClick = { expanded = !expanded },
                 badge = "${apkInfo.supportedLanguages.size}",
             ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(2.dp),
-                ) {
-                    apkInfo.supportedLanguages.chunked(4).forEach { row ->
-                        Text(
-                            text = row.joinToString("  ·  "),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+                LanguageChipGrid(
+                    languages = apkInfo.supportedLanguages,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
             }
         }
     }
@@ -364,6 +442,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.infoTab(
 
 private fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     apkInfo: ApkInfo,
+    context: Context,
     onCheckVirusTotal: () -> Unit,
 ) {
     // 1. VirusTotal
@@ -405,9 +484,22 @@ private fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     if (apkInfo.permissions.isNotEmpty()) {
         item(key = "permissions") {
             var expanded by remember { mutableStateOf(true) } // Expanded by default in this tab
+            val entries = remember(apkInfo.permissions) {
+                resolvePermissionEntries(context, apkInfo.permissions)
+            }
+            val dangerousCount = entries.count { it.isDangerous }
+            val description = if (dangerousCount > 0) {
+                stringResource(
+                    R.string.dialog_menu_permissions_breakdown,
+                    dangerousCount,
+                    entries.size - dangerousCount,
+                )
+            } else {
+                stringResource(R.string.dialog_menu_permissions_desc)
+            }
             MenuCard(
                 title = stringResource(R.string.dialog_menu_permissions),
-                description = stringResource(R.string.dialog_menu_permissions_desc),
+                description = description,
                 icon = {
                     Icon(
                         imageVector = Icons.Rounded.Security,
@@ -419,18 +511,10 @@ private fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
                 onClick = { expanded = !expanded },
                 badge = "${apkInfo.permissions.size}",
             ) {
-                Column(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    apkInfo.permissions.forEach { perm ->
-                        Text(
-                            text = perm.substringAfterLast('.'),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
+                PermissionRowList(
+                    entries = entries,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                )
             }
         }
     }
@@ -442,6 +526,12 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     onRemoveObb: (AttachedObb) -> Unit,
     onAttachObb: () -> Unit,
     onToggleSplit: (Int) -> Unit,
+    allUsers: Boolean,
+    spoofSource: Boolean,
+    installerPkg: String,
+    onToggleAllUsers: (Boolean) -> Unit,
+    onToggleSpoofSource: (Boolean) -> Unit,
+    onChangeInstallerPkg: (String) -> Unit,
 ) {
     // 1. OBB Files
     if (apkInfo.obbFileNames.isNotEmpty() || attachedObbFiles.isNotEmpty()) {
@@ -571,6 +661,69 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
             }
         }
     }
+
+    // 3. Install target — profile picker
+    item(key = "setting_all_users") {
+        val profiles = rememberDeviceUserProfiles()
+        val allUsersDesc = if (allUsers) {
+            stringResource(R.string.dialog_menu_all_users_on)
+        } else {
+            stringResource(R.string.dialog_menu_all_users_off)
+        }
+        MenuCard(
+            title = stringResource(R.string.dialog_menu_install_target),
+            description = allUsersDesc,
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Person,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                )
+            },
+            onClick = { /* expanded is always shown */ },
+            expanded = true,
+            expandedContent = {
+                InstallTargetPicker(
+                    profiles = profiles,
+                    allUsers = allUsers,
+                    onSelectAllUsers = onToggleAllUsers,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                )
+            }
+        )
+    }
+
+    item(key = "setting_spoof_source") {
+        val installerLabel = rememberInstallerLabel(installerPkg)
+        val description = if (spoofSource) {
+            stringResource(R.string.dialog_menu_install_source_on, installerLabel)
+        } else {
+            stringResource(R.string.dialog_menu_install_source_desc)
+        }
+        MenuCard(
+            title = stringResource(R.string.dialog_menu_install_source),
+            description = description,
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Store,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                )
+            },
+            onClick = { onToggleSpoofSource(!spoofSource) },
+            trailingContent = {
+                Switch(checked = spoofSource, onCheckedChange = onToggleSpoofSource)
+            },
+            expanded = spoofSource,
+            expandedContent = {
+                InstallerSourcePicker(
+                    installerPackageName = installerPkg,
+                    onInstallerChange = onChangeInstallerPkg,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+        )
+    }
 }
 
 // ─────────────────────────────────────────────────────────────────────────
@@ -608,7 +761,8 @@ private fun MenuCard(
     onClick: () -> Unit,
     expanded: Boolean = false,
     badge: String? = null,
-    descriptionColor: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    trailingContent: (@Composable () -> Unit)? = null,
+    descriptionColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     expandedContent: (@Composable () -> Unit)? = null,
 ) {
     Card(
@@ -653,6 +807,9 @@ private fun MenuCard(
                         overflow = TextOverflow.Ellipsis,
                     )
                 }
+                if (trailingContent != null) {
+                    trailingContent()
+                }
             }
 
             if (expanded && expandedContent != null) {
@@ -662,6 +819,387 @@ private fun MenuCard(
                 )
                 expandedContent()
             }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Languages
+// ─────────────────────────────────────────────────────────────────────────
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun LanguageChipGrid(
+    languages: List<String>,
+    modifier: Modifier = Modifier,
+) {
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        languages.forEach { code ->
+            AssistChip(
+                onClick = {},
+                label = {
+                    Text(
+                        text = displayLanguage(code),
+                        style = MaterialTheme.typography.labelSmall,
+                    )
+                },
+                colors = AssistChipDefaults.assistChipColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    labelColor = MaterialTheme.colorScheme.onSurface,
+                ),
+            )
+        }
+    }
+}
+
+private fun displayLanguage(code: String): String {
+    if (code.isBlank()) return code
+    return runCatching {
+        val locale = Locale.forLanguageTag(code.replace('_', '-'))
+        val name = locale.getDisplayName(Locale.getDefault())
+        if (name.isNullOrBlank() || name.equals(code, ignoreCase = true)) {
+            code.uppercase(Locale.getDefault())
+        } else {
+            name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        }
+    }.getOrDefault(code)
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Permissions
+// ─────────────────────────────────────────────────────────────────────────
+
+private data class PermissionEntry(
+    val name: String,
+    val label: String,
+    val prefix: String,
+    val isDangerous: Boolean,
+)
+
+private fun resolvePermissionEntries(context: Context, names: List<String>): List<PermissionEntry> {
+    val pm = context.packageManager
+    return names.map { name ->
+        val info = runCatching { pm.getPermissionInfo(name, 0) }.getOrNull()
+        val protection = info?.protection ?: PermissionInfo.PROTECTION_NORMAL
+        val isDangerous = protection == PermissionInfo.PROTECTION_DANGEROUS
+        val label = info?.loadLabel(pm)?.toString()?.takeIf { it.isNotBlank() && it != name }
+            ?: name.substringAfterLast('.').replace('_', ' ').lowercase(Locale.getDefault())
+                .replaceFirstChar { it.titlecase(Locale.getDefault()) }
+        PermissionEntry(
+            name = name,
+            label = label,
+            prefix = name.substringBeforeLast('.', ""),
+            isDangerous = isDangerous,
+        )
+    }.sortedWith(
+        compareByDescending<PermissionEntry> { it.isDangerous }
+            .thenBy { it.label.lowercase(Locale.getDefault()) },
+    )
+}
+
+@Composable
+private fun PermissionRowList(
+    entries: List<PermissionEntry>,
+    modifier: Modifier = Modifier,
+) {
+    var showAll by remember(entries) { mutableStateOf(false) }
+    val collapsedCount = 5
+    val needsToggle = entries.size > collapsedCount
+    val visible = if (showAll || !needsToggle) entries else entries.take(collapsedCount)
+
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        visible.forEach { entry ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .then(
+                        if (entry.isDangerous) {
+                            Modifier.background(
+                                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f),
+                            )
+                        } else Modifier
+                    )
+                    .padding(horizontal = 8.dp, vertical = 6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    imageVector = if (entry.isDangerous) Icons.Rounded.Warning else Icons.Rounded.CheckCircle,
+                    contentDescription = null,
+                    tint = if (entry.isDangerous) MaterialTheme.colorScheme.error
+                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.size(16.dp),
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = entry.label,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontWeight = if (entry.isDangerous) FontWeight.SemiBold else FontWeight.Normal,
+                        color = if (entry.isDangerous) MaterialTheme.colorScheme.error
+                        else MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    if (entry.prefix.isNotEmpty()) {
+                        Text(
+                            text = entry.prefix,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            }
+        }
+        if (needsToggle) {
+            androidx.compose.material3.TextButton(
+                onClick = { showAll = !showAll },
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(
+                    text = if (showAll) {
+                        stringResource(R.string.dialog_menu_show_less)
+                    } else {
+                        stringResource(R.string.dialog_menu_show_more, entries.size - collapsedCount)
+                    },
+                    style = MaterialTheme.typography.labelMedium,
+                )
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Installer source picker
+// ─────────────────────────────────────────────────────────────────────────
+
+private data class InstallerPreset(val packageName: String, val labelRes: Int)
+
+private val INSTALLER_PRESETS = listOf(
+    InstallerPreset("com.android.vending", R.string.setting_shizuku_installer_preset_play),
+    InstallerPreset("com.aurora.store", R.string.setting_shizuku_installer_preset_aurora),
+    InstallerPreset("org.fdroid.fdroid", R.string.setting_shizuku_installer_preset_fdroid),
+    InstallerPreset("com.amazon.venezia", R.string.setting_shizuku_installer_preset_amazon),
+    InstallerPreset("com.sec.android.app.samsungapps", R.string.setting_shizuku_installer_preset_samsung),
+    InstallerPreset("com.huawei.appmarket", R.string.setting_shizuku_installer_preset_huawei),
+    InstallerPreset("com.xiaomi.market", R.string.setting_shizuku_installer_preset_xiaomi),
+)
+
+@Composable
+private fun rememberInstallerLabel(packageName: String): String {
+    val preset = INSTALLER_PRESETS.firstOrNull { it.packageName == packageName }
+    return if (preset != null) stringResource(preset.labelRes) else packageName
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun InstallerSourcePicker(
+    installerPackageName: String,
+    onInstallerChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val presets = INSTALLER_PRESETS.map { it.packageName to stringResource(it.labelRes) }
+
+    var expanded by remember { mutableStateOf(false) }
+    var text by remember(installerPackageName) { mutableStateOf(installerPackageName) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+        modifier = modifier.fillMaxWidth(),
+    ) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = {
+                text = it
+                onInstallerChange(it)
+            },
+            modifier = Modifier
+                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
+                .fillMaxWidth(),
+            singleLine = true,
+            label = { Text(stringResource(R.string.setting_shizuku_installer_label)) },
+            leadingIcon = { Icon(Icons.Rounded.Badge, contentDescription = null) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            textStyle = MaterialTheme.typography.bodyMedium,
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            presets.forEach { (pkg, label) ->
+                DropdownMenuItem(
+                    text = {
+                        Column {
+                            Text(label, style = MaterialTheme.typography.bodyMedium)
+                            Text(
+                                text = pkg,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                    },
+                    onClick = {
+                        text = pkg
+                        onInstallerChange(pkg)
+                        expanded = false
+                    },
+                )
+            }
+        }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Install target — user profile picker
+// ─────────────────────────────────────────────────────────────────────────
+
+private data class DeviceUserProfile(
+    val displayName: String,
+    val isOwner: Boolean,
+    val isWorkProfile: Boolean,
+)
+
+@Composable
+private fun rememberDeviceUserProfiles(): List<DeviceUserProfile> {
+    val context = LocalContext.current
+    return remember(context) { loadDeviceUserProfiles(context) }
+}
+
+private fun loadDeviceUserProfiles(context: Context): List<DeviceUserProfile> {
+    val um = context.getSystemService(Context.USER_SERVICE) as? UserManager ?: return emptyList()
+    val ownHandle = Process.myUserHandle()
+    val handles: List<UserHandle> = runCatching { um.userProfiles }.getOrElse { listOf(ownHandle) }
+    return handles.map { handle ->
+        val isOwner = handle == ownHandle
+        DeviceUserProfile(
+            displayName = if (isOwner) "Owner" else "Work profile",
+            isOwner = isOwner,
+            isWorkProfile = !isOwner,
+        )
+    }
+}
+
+@Composable
+private fun InstallTargetPicker(
+    profiles: List<DeviceUserProfile>,
+    allUsers: Boolean,
+    onSelectAllUsers: (Boolean) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        TargetOptionRow(
+            icon = Icons.Rounded.Person,
+            title = stringResource(R.string.dialog_menu_target_current),
+            subtitle = stringResource(R.string.dialog_menu_target_current_sub),
+            selected = !allUsers,
+            onClick = { onSelectAllUsers(false) },
+        )
+        TargetOptionRow(
+            icon = Icons.Rounded.Lock,
+            title = stringResource(R.string.dialog_menu_target_all),
+            subtitle = stringResource(R.string.dialog_menu_target_all_sub),
+            selected = allUsers,
+            onClick = { onSelectAllUsers(true) },
+        )
+
+        if (profiles.size > 1) {
+            Spacer(modifier = Modifier.height(4.dp))
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
+            Text(
+                text = stringResource(R.string.dialog_menu_target_visible_profiles),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp),
+            )
+            profiles.forEach { profile ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = when {
+                            profile.isWorkProfile -> Icons.Rounded.Work
+                            profile.isOwner -> Icons.Rounded.Person
+                            else -> Icons.Rounded.Lock
+                        },
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = profile.displayName,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            }
+        }
+
+        Text(
+            text = stringResource(R.string.dialog_menu_target_hidden_users_hint),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+            modifier = Modifier.padding(start = 8.dp, top = 6.dp, bottom = 4.dp, end = 8.dp),
+        )
+    }
+}
+
+@Composable
+private fun TargetOptionRow(
+    icon: ImageVector,
+    title: String,
+    subtitle: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
+    val container = if (selected) {
+        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+    } else {
+        Color.Transparent
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.medium)
+            .selectable(
+                selected = selected,
+                onClick = onClick,
+                role = Role.RadioButton,
+            )
+            .background(container)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        RadioButton(selected = selected, onClick = null)
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(20.dp),
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
         }
     }
 }
