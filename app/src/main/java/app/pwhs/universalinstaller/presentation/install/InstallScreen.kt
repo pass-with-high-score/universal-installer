@@ -3,6 +3,10 @@ package app.pwhs.universalinstaller.presentation.install
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.presentation.setting.dataStore
+import app.pwhs.universalinstaller.util.BiometricGate
+import kotlinx.coroutines.flow.map
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -71,6 +75,13 @@ fun InstallScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val history by viewModel.history.collectAsState()
+    val installGateEnabled by remember(context) {
+        // Read the Settings toggle as a Flow so a change in Settings applies on the next
+        // confirm without restarting the screen.
+        context.dataStore.data.map {
+            it[PreferencesKeys.BIOMETRIC_LOCK_INSTALL] ?: false
+        }
+    }.collectAsState(initial = false)
 
     InstallUi(
         modifier = modifier,
@@ -82,7 +93,22 @@ fun InstallScreen(
         onDownloadFromUrl = { url -> viewModel.downloadFromUrl(context, url) },
         onCancelDownload = viewModel::cancelDownload,
         onDismissDownloadError = viewModel::dismissDownloadError,
-        onConfirmInstall = viewModel::confirmInstall,
+        onConfirmInstall = {
+            // Biometric gate lives in the UI layer because BiometricPrompt needs the host
+            // FragmentActivity. `installGateEnabled` reflects the Settings → Security toggle.
+            val activity = context as? androidx.fragment.app.FragmentActivity
+            if (activity != null) {
+                BiometricGate.authenticate(
+                    activity = activity,
+                    enabled = installGateEnabled,
+                    title = context.getString(R.string.biometric_install_title),
+                    subtitle = context.getString(R.string.biometric_install_sub),
+                    onSuccess = viewModel::confirmInstall,
+                )
+            } else {
+                viewModel.confirmInstall()
+            }
+        },
         onDismissPreview = viewModel::dismissPendingInstall,
         onCancel = viewModel::cancelSession,
         onRetry = viewModel::retrySession,

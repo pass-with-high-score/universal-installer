@@ -104,6 +104,8 @@ import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMethod
 import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsActivity
 import app.pwhs.universalinstaller.presentation.manage.permissions.AppPermissionsActivity
+import app.pwhs.universalinstaller.presentation.setting.dataStore
+import kotlinx.coroutines.flow.map
 import app.pwhs.universalinstaller.util.AppIconData
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
@@ -207,6 +209,29 @@ private fun UninstallUi(
     var confirmUninstallTarget by remember { mutableStateOf<InstalledApp?>(null) }
     var confirmClearDataTarget by remember { mutableStateOf<InstalledApp?>(null) }
     val extractInProgress = uiState.extractState is ExtractState.Running
+    // Biometric gate state — flag tracked per-attempt rather than per-target so toggling
+    // the Settings switch applies on the next uninstall without re-composing.
+    val uninstallGateEnabled by remember(context) {
+        context.dataStore.data.map {
+            it[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+                .BIOMETRIC_LOCK_UNINSTALL] ?: false
+        }
+    }.collectAsState(initial = false)
+    val gatedUninstall: (String) -> Unit = { pkg ->
+        val activity = context as? androidx.fragment.app.FragmentActivity
+        if (activity != null) {
+            val name = uiState.apps.firstOrNull { it.packageName == pkg }?.appName ?: pkg
+            app.pwhs.universalinstaller.util.BiometricGate.authenticate(
+                activity = activity,
+                enabled = uninstallGateEnabled,
+                title = context.getString(R.string.biometric_uninstall_title),
+                subtitle = context.getString(R.string.biometric_uninstall_sub, name),
+                onSuccess = { onUninstall(pkg) },
+            )
+        } else {
+            onUninstall(pkg)
+        }
+    }
 
     // Action sheet — opens on card tap (when not in selection mode). Adding new actions
     // later is just appending another ActionRow; lifting the dialogs to this level avoided
@@ -253,8 +278,10 @@ private fun UninstallUi(
                 actionTarget = null
                 // System apps bypass the generic confirm — the ViewModel surfaces the
                 // root-aware method dialog directly. User apps still get the explicit
-                // "Are you sure" guard before destructive action.
-                if (target.isSystemApp) onUninstall(target.packageName)
+                // "Are you sure" guard before destructive action. Biometric gate (when
+                // enabled) wraps the system-app path; the user-app path goes through the
+                // confirm dialog → its onConfirm calls gatedUninstall.
+                if (target.isSystemApp) gatedUninstall(target.packageName)
                 else confirmUninstallTarget = target
             },
             onDismiss = { actionTarget = null },
@@ -266,7 +293,7 @@ private fun UninstallUi(
             app = target,
             onConfirm = {
                 confirmUninstallTarget = null
-                onUninstall(target.packageName)
+                gatedUninstall(target.packageName)
             },
             onDismiss = { confirmUninstallTarget = null },
         )

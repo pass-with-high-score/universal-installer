@@ -29,6 +29,7 @@ import app.pwhs.universalinstaller.presentation.splash.SplashScreen
 import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
 import app.pwhs.universalinstaller.util.LocaleHelper
 import androidx.datastore.preferences.core.stringPreferencesKey
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
@@ -62,9 +63,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setupShortcuts()
 
-        // Determine if we should skip splash: when launched from a file-open intent,
-        // the user expects to see the install preview immediately.
-        val skipSplash = isFileOpenIntent(intent) || intent?.data?.scheme == "universalinstaller"
+        // File-open intents (VIEW/SEND/INSTALL with content/file URIs) no longer hit
+        // MainActivity — they're routed straight to DialogInstallActivity via manifest
+        // intent filters, eliminating the launcher-activity flash that the old fast-path
+        // here couldn't fully suppress. Only `universalinstaller://` deep links (sync,
+        // uninstall) still need the splash-skip path below.
+        val skipSplash = intent?.data?.scheme == "universalinstaller"
         setContent {
             // `remember` caches the Flow across recompositions so `map {}` isn't re-invoked
             // every frame (Detekt/Android Lint: "Flow operator functions should not be invoked
@@ -132,8 +136,10 @@ class MainActivity : ComponentActivity() {
                         LaunchedEffect(Unit) {
                             val incoming = intent
                             val uri = incoming?.data
-                            val isDeepLink = uri?.scheme == "universalinstaller"
-                            val targetActivity = if (isDeepLink) {
+                            // Only `universalinstaller://` deep-links land here now —
+                            // file-open intents are routed to DialogInstallActivity by
+                            // the manifest. Pick the destination by deep-link host.
+                            val targetActivity = if (uri?.scheme == "universalinstaller") {
                                 when (uri.host) {
                                     "sync" -> SyncActivity::class.java
                                     "uninstall" -> ManageActivity::class.java
@@ -142,17 +148,12 @@ class MainActivity : ComponentActivity() {
                             } else {
                                 InstallActivity::class.java
                             }
-                            val launch = Intent(this@MainActivity, targetActivity).apply {
-                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                            }
-                            // Forward content URIs received via VIEW/INSTALL/SEND so the install
-                            // task gets its own read-permission grant. Without this, the new
-                            // task can't openInputStream() the URI and the parser falls back to
-                            // packageName="Unknown" — the v1.4.0 install regression.
-                            if (!isDeepLink) {
-                                forwardIncomingUris(incoming, launch)
-                            }
-                            startActivity(launch)
+                            startActivity(
+                                Intent(this@MainActivity, targetActivity).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or
+                                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                },
+                            )
                             finish()
                         }
                     }

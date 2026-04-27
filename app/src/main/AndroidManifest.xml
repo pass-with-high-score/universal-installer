@@ -60,10 +60,30 @@
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.UniversalInstaller">
+            <!-- Launcher-only entry. File-open intents land directly in
+                 DialogInstallActivity below so external installs never flash through the
+                 launcher activity. Deep links (universalinstaller://sync, ://uninstall)
+                 still come through here because they're internal-only. -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".presentation.install.InstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+
+        <!-- Dialog-style install entry point. Owns every file-open / share intent filter so
+             external apps land here directly without a router-activity hop. singleInstance
+             + excludeFromRecents keep the dialog isolated from the launcher task; the
+             translucent theme lets the calling app remain visible behind the scrim. -->
+        <activity
+            android:name=".presentation.install.DialogInstallActivity"
+            android:exported="true"
+            android:theme="@style/Theme.UniversalInstaller.Dialog"
+            android:launchMode="singleInstance"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout">
 
             <!-- Splits + single APK by file extension -->
             <intent-filter>
@@ -120,15 +140,10 @@
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.xapk" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.xapk" />
                 <data android:pathPattern=".*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\..*\\.xapk" />
-
             </intent-filter>
 
             <!-- MIME-only filter. Catches Chrome / download manager URIs whose path is a
-                 database id (no filename, so the pathPattern filter above can't match).
-                 Non-standard MIMEs (vnd.apkm, xapk-package-archive) are sometimes set by
-                 APKMirror / APKPure apps. octet-stream is what most servers send for
-                 unknown extensions — MainActivity validates the extension on receipt to
-                 avoid installing unrelated binary files. -->
+                 database id (no filename, so the pathPattern filter above can't match). -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
@@ -158,18 +173,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <!-- Specific MIMEs only — avoid `*/*` here, otherwise we'd appear in every
-                     "Share N files" chooser (photos, docs, etc.). -->
                 <data android:mimeType="application/vnd.android.package-archive" />
                 <data android:mimeType="application/vnd.apkm" />
                 <data android:mimeType="application/xapk-package-archive" />
                 <data android:mimeType="application/octet-stream" />
                 <data android:mimeType="application/zip" />
             </intent-filter>
-
         </activity>
-
-        <activity android:name=".presentation.install.InstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.manage.ManageActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.manage.BackupsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
         <activity android:name=".presentation.manage.permissions.AppPermissionsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />

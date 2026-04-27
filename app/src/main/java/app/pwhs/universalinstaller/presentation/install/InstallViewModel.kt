@@ -1213,7 +1213,6 @@ class InstallViewModel(
         try {
             val entries = splitPackage.get().toList()
             splitCount = entries.size
-            pendingApkUris = entries.map { it.apk.uri }
             if (entries.isEmpty()) {
                 Timber.e(
                     "SplitPackage enumerated 0 entries for $originalUri (fileName=$fileName ext=$extension) — " +
@@ -1283,6 +1282,15 @@ class InstallViewModel(
                     }
                 }
             }
+            // Smart split picker — ackpine's filterCompatible() keeps every split this device
+            // CAN run, so a multi-ABI bundle (arm64 + armeabi-v7a + x86) lands here with all
+            // three Libs splits even on an arm64-only device. Trim to the best fit per type:
+            //   - Libs: top match in Build.SUPPORTED_ABIS (primary ABI)
+            //   - ScreenDensity: closest to device's actual densityDpi
+            //   - Locale: matches top user locale; always keep base for unspecified strings
+            //   - Feature/Other: keep all (developer's choice)
+            applySmartPick(splitEntries, context)
+            pendingApkUris = splitEntries.filter { it.selected }.map { it.uri }
         } catch (e: Exception) {
             Timber.e(e, "Error reading SplitPackage entries")
         }
@@ -1394,5 +1402,53 @@ class InstallViewModel(
             supportedLanguages = supportedLanguages.sorted(),
             splitEntries = splitEntries,
         )
+    }
+
+    /**
+     * In-place toggle each [SplitEntry.selected] flag to the smart-pick default. Base/Feature/
+     * Other are always selected. Libs/ScreenDensity/Locale are reduced to the single best
+     * match for this device. The user can still override via [toggleSplit].
+     */
+    private fun applySmartPick(entries: MutableList<SplitEntry>, context: Context) {
+        // Libs: prefer the highest-priority ABI in Build.SUPPORTED_ABIS. Splits are tagged
+        // with the canonical ackpine ABI name, which uses underscores (`arm64_v8a`) while
+        // Build.SUPPORTED_ABIS uses dashes (`arm64-v8a`). Normalise both sides before match.
+        val abiPriority = Build.SUPPORTED_ABIS.orEmpty().mapIndexed { i, abi ->
+            abi.replace('-', '_').lowercase() to i
+        }.toMap()
+        val libsBest = entries
+            .filter { it.type == SplitType.Libs }
+            .minByOrNull { abiPriority[it.name.lowercase()] ?: Int.MAX_VALUE }
+            ?.uri
+
+        // Density: closest dpi to the device's actual densityDpi. Names parse as "${dpi}dpi".
+        val deviceDpi = context.resources.displayMetrics.densityDpi
+        val densityBest = entries
+            .filter { it.type == SplitType.ScreenDensity }
+            .minByOrNull {
+                val dpi = it.name.removeSuffix("dpi").toIntOrNull() ?: Int.MAX_VALUE
+                kotlin.math.abs(dpi - deviceDpi)
+            }
+            ?.uri
+
+        // Locale: include splits whose displayed language matches any of the user's preferred
+        // locales. We match against the top-priority locale's display language (English form
+        // matches `Apk.Localization.locale.displayLanguage` from the parser); fallback English
+        // also stays selected so apps with English-only resources don't lose all strings.
+        val userLangs = run {
+            val list = androidx.core.os.LocaleListCompat.getDefault()
+            (0 until list.size()).mapNotNull { list[it]?.getDisplayLanguage(java.util.Locale.ENGLISH) }
+        }.toSet() + "English"
+
+        for (i in entries.indices) {
+            val e = entries[i]
+            val keep = when (e.type) {
+                SplitType.Base, SplitType.Feature, SplitType.Other -> true
+                SplitType.Libs -> e.uri == libsBest
+                SplitType.ScreenDensity -> e.uri == densityBest
+                SplitType.Locale -> e.name in userLangs
+            }
+            if (e.selected != keep) entries[i] = e.copy(selected = keep)
+        }
     }
 }

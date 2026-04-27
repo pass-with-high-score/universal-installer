@@ -48,6 +48,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -74,6 +75,27 @@ internal fun ApkInfoContent(
     onToggleSplit: (Int) -> Unit = {},
 ) {
     val context = LocalContext.current
+    // One-shot entry animation. We key on packageName so opening the sheet for a different
+    // APK replays the animation; same package re-renders (e.g. VT scan finishes) won't.
+    var animationVisible by remember(apkInfo.packageName) { mutableStateOf(false) }
+    androidx.compose.runtime.LaunchedEffect(apkInfo.packageName) { animationVisible = true }
+    val iconScale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (animationVisible) 1f else 0.6f,
+        animationSpec = androidx.compose.animation.core.spring(
+            dampingRatio = androidx.compose.animation.core.Spring.DampingRatioMediumBouncy,
+            stiffness = androidx.compose.animation.core.Spring.StiffnessMediumLow,
+        ),
+        label = "iconScale",
+    )
+    val contentAlpha by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (animationVisible) 1f else 0f,
+        animationSpec = androidx.compose.animation.core.tween(
+            durationMillis = 350,
+            delayMillis = 80,
+            easing = androidx.compose.animation.core.FastOutSlowInEasing,
+        ),
+        label = "contentAlpha",
+    )
 
     Column(
         modifier = Modifier
@@ -83,21 +105,27 @@ internal fun ApkInfoContent(
             .padding(bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        // App icon
+        // App icon — bouncy scale-up entrance. The clip shape is preserved on the
+        // graphicsLayer transform; using `.scale()` directly would clip the bouncy
+        // overshoot at the sheet boundary on small screens.
+        val iconModifier = Modifier
+            .size(80.dp)
+            .graphicsLayer {
+                scaleX = iconScale
+                scaleY = iconScale
+            }
         if (apkInfo.icon != null) {
             Image(
                 bitmap = apkInfo.icon.toBitmap(128, 128).asImageBitmap(),
                 contentDescription = apkInfo.appName,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(MaterialTheme.shapes.large)
+                modifier = iconModifier.clip(MaterialTheme.shapes.large),
             )
             Spacer(Modifier.height(12.dp))
         } else {
             Icon(
                 imageVector = Icons.Rounded.Android,
                 contentDescription = null,
-                modifier = Modifier.size(80.dp),
+                modifier = iconModifier,
                 tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
             )
             Spacer(Modifier.height(12.dp))
@@ -110,6 +138,7 @@ internal fun ApkInfoContent(
             fontWeight = FontWeight.Bold,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.graphicsLayer { alpha = contentAlpha },
         )
         Spacer(Modifier.height(4.dp))
 
@@ -120,6 +149,7 @@ internal fun ApkInfoContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.graphicsLayer { alpha = contentAlpha },
         )
 
         Spacer(Modifier.height(16.dp))

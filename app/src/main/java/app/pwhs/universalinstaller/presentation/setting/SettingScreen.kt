@@ -23,10 +23,12 @@ import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.Code
 import androidx.compose.material.icons.rounded.Favorite
+import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Gavel
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Language
+import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.Public
 import androidx.compose.material.icons.rounded.Security
@@ -97,6 +99,8 @@ fun SettingScreen(
         onSyncRequirePinChanged = viewModel::setSyncRequirePin,
         onSyncPinCodeChanged = viewModel::setSyncPinCode,
         onSyncServerPortChanged = viewModel::setSyncServerPort,
+        onBiometricLockInstallChanged = viewModel::setBiometricLockInstall,
+        onBiometricLockUninstallChanged = viewModel::setBiometricLockUninstall,
     )
 }
 
@@ -118,6 +122,8 @@ private fun SettingUi(
     onSyncRequirePinChanged: (Boolean) -> Unit = {},
     onSyncPinCodeChanged: (String) -> Unit = {},
     onSyncServerPortChanged: (String) -> Unit = {},
+    onBiometricLockInstallChanged: (Boolean) -> Unit = {},
+    onBiometricLockUninstallChanged: (Boolean) -> Unit = {},
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -393,6 +399,27 @@ private fun SettingUi(
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
+
+                    BiometricToggleRow(
+                        title = stringResource(R.string.setting_biometric_install),
+                        subtitle = stringResource(R.string.setting_biometric_install_sub),
+                        checked = uiState.biometricLockInstall,
+                        onCheckedChange = onBiometricLockInstallChanged,
+                    )
+                    BiometricToggleRow(
+                        title = stringResource(R.string.setting_biometric_uninstall),
+                        subtitle = stringResource(R.string.setting_biometric_uninstall_sub),
+                        checked = uiState.biometricLockUninstall,
+                        onCheckedChange = onBiometricLockUninstallChanged,
+                    )
+                    if (!uiState.biometricEnrolmentAvailable) {
+                        Text(
+                            text = stringResource(R.string.setting_biometric_unavailable),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                        )
+                    }
                 }
             }
 
@@ -1057,6 +1084,39 @@ private fun LinkItem(
             )
         },
         modifier = Modifier.clickable(onClick = onClick),
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+    )
+}
+@Composable
+private fun BiometricToggleRow(
+    title: String,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    ListItem(
+        headlineContent = {
+            Text(title, style = MaterialTheme.typography.bodyLarge)
+        },
+        supportingContent = {
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        },
+        leadingContent = {
+            Icon(
+                imageVector = Icons.Rounded.Fingerprint,
+                contentDescription = null,
+                tint = if (checked) MaterialTheme.colorScheme.primary
+                    else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                modifier = Modifier.size(24.dp),
+            )
+        },
+        trailingContent = {
+            Switch(checked = checked, onCheckedChange = onCheckedChange)
+        },
         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
     )
 }

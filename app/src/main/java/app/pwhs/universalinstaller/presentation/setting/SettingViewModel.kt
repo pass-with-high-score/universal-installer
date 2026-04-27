@@ -63,6 +63,19 @@ object PreferencesKeys {
     val SYNC_REQUIRE_PIN = booleanPreferencesKey("sync_require_pin")
     val SYNC_PIN_CODE = stringPreferencesKey("sync_pin_code")
     val SYNC_SERVER_PORT = stringPreferencesKey("sync_server_port")
+
+    // Biometric gate — independent toggles so users can guard install but not uninstall (or
+    // vice versa) without one switch implying the other.
+    val BIOMETRIC_LOCK_INSTALL = booleanPreferencesKey("biometric_lock_install")
+    val BIOMETRIC_LOCK_UNINSTALL = booleanPreferencesKey("biometric_lock_uninstall")
+
+    /**
+     * When true (default), external VIEW/SEND intents land in DialogInstallActivity instead
+     * of the full InstallActivity — i.e. opening an APK from a file manager pops up a focused
+     * dialog over the calling app rather than launching our full UI. Off → fall back to the
+     * historical InstallActivity flow (full screen with bottom bar).
+     */
+    val DIALOG_INSTALL_MODE = booleanPreferencesKey("dialog_install_mode")
 }
 
 data class SyncOptions(
@@ -127,6 +140,16 @@ data class SettingUiState(
     val rootOptions: RootOptions = RootOptions(),
     val syncOptions: SyncOptions = SyncOptions(),
     val appVersion: String = "",
+    val biometricLockInstall: Boolean = false,
+    val biometricLockUninstall: Boolean = false,
+    val dialogInstallMode: Boolean = true,
+    /**
+     * True when the device has at least one biometric or device-credential enrolled.
+     * Used to greyly inform the user that the toggles will be no-ops until they
+     * enrol a fingerprint or set a screen lock. Computed at VM init from
+     * BiometricManager so we don't keep a live device-state dependency.
+     */
+    val biometricEnrolmentAvailable: Boolean = false,
 )
 
 class SettingViewModel(
@@ -230,6 +253,15 @@ class SettingViewModel(
                 serverPort = prefs[PreferencesKeys.SYNC_SERVER_PORT] ?: "8080"
             )
         },
+        dataStore.data.map { prefs ->
+            // Both biometric toggles share one Flow so we don't blow past combine()'s
+            // vararg comfort zone — Pair carries them through to the SettingUiState build.
+            (prefs[PreferencesKeys.BIOMETRIC_LOCK_INSTALL] ?: false) to
+                (prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] ?: false)
+        },
+        dataStore.data.map { prefs ->
+            prefs[PreferencesKeys.DIALOG_INSTALL_MODE] ?: true
+        },
     ) { flows ->
         val theme = flows[0] as ThemeMode
         val dynamicColor = flows[1] as Boolean
@@ -243,6 +275,9 @@ class SettingViewModel(
         val rootState = flows[9] as RootState
         val rootOpts = flows[10] as RootOptions
         val syncOpts = flows[11] as SyncOptions
+        @Suppress("UNCHECKED_CAST")
+        val biometricFlags = flows[12] as Pair<Boolean, Boolean>
+        val dialogMode = flows[13] as Boolean
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
@@ -266,6 +301,11 @@ class SettingViewModel(
             rootOptions = rootOpts,
             syncOptions = syncOpts,
             appVersion = versionName,
+            biometricLockInstall = biometricFlags.first,
+            biometricLockUninstall = biometricFlags.second,
+            biometricEnrolmentAvailable = app.pwhs.universalinstaller.util
+                .BiometricGate.canAuthenticate(application),
+            dialogInstallMode = dialogMode,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingUiState())
 
@@ -438,6 +478,30 @@ class SettingViewModel(
         viewModelScope.launch {
             dataStore.edit { prefs ->
                 prefs[PreferencesKeys.SYNC_SERVER_PORT] = port
+            }
+        }
+    }
+
+    fun setBiometricLockInstall(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.BIOMETRIC_LOCK_INSTALL] = enabled
+            }
+        }
+    }
+
+    fun setBiometricLockUninstall(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] = enabled
+            }
+        }
+    }
+
+    fun setDialogInstallMode(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.DIALOG_INSTALL_MODE] = enabled
             }
         }
     }

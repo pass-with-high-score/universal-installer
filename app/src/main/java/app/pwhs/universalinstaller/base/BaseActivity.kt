@@ -2,10 +2,10 @@ package app.pwhs.universalinstaller.base
 
 import android.content.Context
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.fragment.app.FragmentActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -21,7 +21,7 @@ import app.pwhs.universalinstaller.util.LocaleHelper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
-abstract class BaseActivity : ComponentActivity() {
+abstract class BaseActivity : FragmentActivity() {
 
     protected data class AppThemeState(
         val mode: ThemeMode,

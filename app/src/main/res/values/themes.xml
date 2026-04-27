@@ -2,4 +2,16 @@
 <resources>
 
     <style name="Theme.UniversalInstaller" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- DialogInstallActivity sits over whatever launched the install (file manager,
+         Chrome, etc.). Translucent + transparent background lets our Compose scrim handle
+         the dimming so we get full control over the colour and tap-outside dismiss. No
+         window animation because the scaffolded Card composable runs its own entry. -->
+    <style name="Theme.UniversalInstaller.Dialog" parent="Theme.UniversalInstaller">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
 </resources>
