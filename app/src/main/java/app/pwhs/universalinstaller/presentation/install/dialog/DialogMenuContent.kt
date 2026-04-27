@@ -3,7 +3,6 @@ package app.pwhs.universalinstaller.presentation.install.dialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.pm.PermissionInfo
 import android.os.Process
 import android.os.UserHandle
 import android.os.UserManager
@@ -95,11 +94,13 @@ import app.pwhs.universalinstaller.domain.model.SplitEntry
 import app.pwhs.universalinstaller.domain.model.SplitType
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.presentation.install.AttachedObb
+import app.pwhs.universalinstaller.presentation.install.PermissionEntry
+import app.pwhs.universalinstaller.presentation.install.displayLanguage
+import app.pwhs.universalinstaller.presentation.install.resolvePermissionEntries
 import app.pwhs.universalinstaller.presentation.setting.DEFAULT_INSTALLER_PACKAGE_NAME
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
 import kotlinx.coroutines.launch
-import java.util.Locale
 
 /**
  * Stage 3: Extended Menu — full-featured option panel using a Tabbed Pager.
@@ -907,50 +908,9 @@ private fun LanguageChipGrid(
     }
 }
 
-private fun displayLanguage(code: String): String {
-    if (code.isBlank()) return code
-    return runCatching {
-        val locale = Locale.forLanguageTag(code.replace('_', '-'))
-        val name = locale.getDisplayName(Locale.getDefault())
-        if (name.isNullOrBlank() || name.equals(code, ignoreCase = true)) {
-            code.uppercase(Locale.getDefault())
-        } else {
-            name.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-        }
-    }.getOrDefault(code)
-}
-
 // ─────────────────────────────────────────────────────────────────────────
 // Permissions
 // ─────────────────────────────────────────────────────────────────────────
-
-private data class PermissionEntry(
-    val name: String,
-    val label: String,
-    val prefix: String,
-    val isDangerous: Boolean,
-)
-
-private fun resolvePermissionEntries(context: Context, names: List<String>): List<PermissionEntry> {
-    val pm = context.packageManager
-    return names.map { name ->
-        val info = runCatching { pm.getPermissionInfo(name, 0) }.getOrNull()
-        val protection = info?.protection ?: PermissionInfo.PROTECTION_NORMAL
-        val isDangerous = protection == PermissionInfo.PROTECTION_DANGEROUS
-        val label = info?.loadLabel(pm)?.toString()?.takeIf { it.isNotBlank() && it != name }
-            ?: name.substringAfterLast('.').replace('_', ' ').lowercase(Locale.getDefault())
-                .replaceFirstChar { it.titlecase(Locale.getDefault()) }
-        PermissionEntry(
-            name = name,
-            label = label,
-            prefix = name.substringBeforeLast('.', ""),
-            isDangerous = isDangerous,
-        )
-    }.sortedWith(
-        compareByDescending<PermissionEntry> { it.isDangerous }
-            .thenBy { it.label.lowercase(Locale.getDefault()) },
-    )
-}
 
 @Composable
 private fun PermissionRowList(

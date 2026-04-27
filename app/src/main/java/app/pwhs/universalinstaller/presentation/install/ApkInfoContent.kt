@@ -344,7 +344,10 @@ private fun LanguagesCard(languages: List<String>) {
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
         ) {
-            languages.take(20).forEach { lang -> InfoChip(label = lang) }
+            // Render localized display names ("English", "Français") rather than raw
+            // codes — much faster to scan visually. Cap at 20 to keep the card compact;
+            // a "+N" chip stands in for the rest.
+            languages.take(20).forEach { lang -> InfoChip(label = displayLanguage(lang)) }
             if (languages.size > 20) {
                 InfoChip(label = "+${languages.size - 20}")
             }
@@ -778,71 +781,29 @@ private fun VtLegendRow(
 
 @Composable
 private fun PermissionsCard(permissions: List<String>) {
-    // Well-known dangerous permissions that warrant visual emphasis
-    val dangerousSet = remember {
-        setOf(
-            "android.permission.CAMERA",
-            "android.permission.RECORD_AUDIO",
-            "android.permission.ACCESS_FINE_LOCATION",
-            "android.permission.ACCESS_COARSE_LOCATION",
-            "android.permission.ACCESS_BACKGROUND_LOCATION",
-            "android.permission.READ_CONTACTS",
-            "android.permission.WRITE_CONTACTS",
-            "android.permission.READ_CALL_LOG",
-            "android.permission.WRITE_CALL_LOG",
-            "android.permission.CALL_PHONE",
-            "android.permission.READ_PHONE_STATE",
-            "android.permission.READ_PHONE_NUMBERS",
-            "android.permission.SEND_SMS",
-            "android.permission.RECEIVE_SMS",
-            "android.permission.READ_SMS",
-            "android.permission.READ_EXTERNAL_STORAGE",
-            "android.permission.WRITE_EXTERNAL_STORAGE",
-            "android.permission.MANAGE_EXTERNAL_STORAGE",
-            "android.permission.READ_MEDIA_IMAGES",
-            "android.permission.READ_MEDIA_VIDEO",
-            "android.permission.READ_MEDIA_AUDIO",
-            "android.permission.BODY_SENSORS",
-            "android.permission.ACTIVITY_RECOGNITION",
-            "android.permission.READ_CALENDAR",
-            "android.permission.WRITE_CALENDAR",
-            "android.permission.SYSTEM_ALERT_WINDOW",
-            "android.permission.REQUEST_INSTALL_PACKAGES",
-        )
-    }
-
-    // Sort: dangerous first, then alphabetical within each group
-    val sorted = remember(permissions) {
-        permissions.sortedWith(
-            compareByDescending<String> { it in dangerousSet }
-                .thenBy { it.substringAfterLast('.') }
-        )
-    }
+    val context = LocalContext.current
+    // PackageManager-based danger detection + friendly labels via loadLabel(). Beats the
+    // old hardcoded dangerous-set: catches new runtime perms (POST_NOTIFICATIONS,
+    // RECORD_VIDEO, BLUETOOTH_*, NEARBY_WIFI_DEVICES, …) without having to maintain a list.
+    val entries = remember(permissions) { resolvePermissionEntries(context, permissions) }
 
     var expanded by remember { mutableStateOf(false) }
     val collapsedCount = 5
-    val showToggle = sorted.size > collapsedCount
-    val visiblePerms = if (expanded || !showToggle) sorted else sorted.take(collapsedCount)
+    val showToggle = entries.size > collapsedCount
+    val visible = if (expanded || !showToggle) entries else entries.take(collapsedCount)
 
     SectionCard(
         icon = Icons.Rounded.Security,
         title = stringResource(R.string.apk_info_section_permissions, permissions.size),
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            visiblePerms.forEach { perm ->
-                val isDangerous = perm in dangerousSet
-                val shortName = perm.substringAfterLast('.')
-                    .replace('_', ' ')
-                    .lowercase()
-                    .replaceFirstChar { it.uppercase() }
-                val prefix = perm.substringBeforeLast('.', "")
-
+            visible.forEach { entry ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(MaterialTheme.shapes.small)
                         .then(
-                            if (isDangerous) Modifier.background(
+                            if (entry.isDangerous) Modifier.background(
                                 MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)
                             ) else Modifier
                         )
@@ -850,26 +811,30 @@ private fun PermissionsCard(permissions: List<String>) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
-                        imageVector = if (isDangerous) Icons.Rounded.Warning else Icons.Rounded.CheckCircle,
+                        imageVector = if (entry.isDangerous) Icons.Rounded.Warning else Icons.Rounded.CheckCircle,
                         contentDescription = null,
-                        tint = if (isDangerous) MaterialTheme.colorScheme.error
+                        tint = if (entry.isDangerous) MaterialTheme.colorScheme.error
                         else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(8.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = shortName,
+                            text = entry.label,
                             style = MaterialTheme.typography.bodySmall,
-                            fontWeight = if (isDangerous) FontWeight.SemiBold else FontWeight.Normal,
-                            color = if (isDangerous) MaterialTheme.colorScheme.error
+                            fontWeight = if (entry.isDangerous) FontWeight.SemiBold else FontWeight.Normal,
+                            color = if (entry.isDangerous) MaterialTheme.colorScheme.error
                             else MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
-                        if (prefix.isNotEmpty()) {
+                        if (entry.prefix.isNotEmpty()) {
                             Text(
-                                text = prefix,
+                                text = entry.prefix,
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
                         }
                     }
@@ -883,8 +848,8 @@ private fun PermissionsCard(permissions: List<String>) {
                 modifier = Modifier.fillMaxWidth(),
             ) {
                 Text(
-                    text = if (expanded) "Show less"
-                    else stringResource(R.string.apk_info_permissions_more, sorted.size - collapsedCount),
+                    text = if (expanded) stringResource(R.string.apk_info_split_show_less)
+                    else stringResource(R.string.apk_info_permissions_more, entries.size - collapsedCount),
                     style = MaterialTheme.typography.labelMedium,
                 )
             }
