@@ -789,15 +789,6 @@ class InstallViewModel(
     companion object {
         /** User-facing folder under /sdcard/Download/ so downloads are easy to browse. */
         const val DOWNLOADS_SUBFOLDER = "UniversalInstaller"
-
-        /**
-         * Minimum size for a Locale split to count toward "supported languages". Below
-         * this, the split is almost certainly an AAR-only stub (AndroidX / Material /
-         * Play Services translations rolled into the bundle as their own per-locale
-         * APKs) rather than a language the app itself supports. Empirical: AAR-only
-         * splits land at 4–8 KB; real app translations are 30–150 KB.
-         */
-        const val LOCALE_SPLIT_MIN_BYTES = 10_240L
     }
 
     fun downloadFromUrl(context: Context, url: String) {
@@ -1354,27 +1345,12 @@ class InstallViewModel(
                         ))
                     }
                     is Apk.Localization -> {
-                        // Filter AAR-only locale splits before counting them as a "supported
-                        // language". App Bundle locale splits land here for every locale that
-                        // any AAR ships — AndroidX, Material, Play Services etc. all include
-                        // translations for ~80 locales. Those splits are tiny (a handful of
-                        // strings: ok / cancel / next / dismiss); real app translations span
-                        // hundreds of strings and weigh in at least an order of magnitude
-                        // more. The 10 KB cutoff is empirical but separates the two cleanly
-                        // in practice.
-                        //
-                        // NB: we still include the split in [splitEntries] so the user can
-                        // toggle it — filtering only suppresses the misleading "supported
-                        // languages" count surfaced in the UI summary cards.
-                        val displayName = apk.locale.displayLanguage
-                        if (apk.size >= LOCALE_SPLIT_MIN_BYTES &&
-                            displayName.isNotBlank() &&
-                            displayName !in supportedLanguages
-                        ) {
-                            supportedLanguages.add(displayName)
-                        }
+                        // We don't filter inline anymore — apply a relative-size filter
+                        // AFTER the loop, once we know the largest locale split. See the
+                        // post-loop block below for the rationale. Always keep the split
+                        // in splitEntries so the user can still toggle it in the picker.
                         splitEntries.add(SplitEntry(
-                            name = displayName.ifBlank { apk.locale.toLanguageTag() },
+                            name = apk.locale.displayLanguage.ifBlank { apk.locale.toLanguageTag() },
                             type = SplitType.Locale,
                             uri = apk.uri,
                             sizeBytes = apk.size,
@@ -1406,6 +1382,33 @@ class InstallViewModel(
                     }
                 }
             }
+
+            // Filter AAR-only locale splits before counting them as a "supported language".
+            // App Bundle locale splits emit one APK per locale that ANY dependency translates,
+            // so a Vietnamese-only app pulling AndroidX/Material gets ~80 locale splits — most
+            // are tiny stubs containing just "ok / cancel / next" from the libraries.
+            //
+            // Heuristic: real app translations are at least an order of magnitude larger than
+            // the AAR-only stubs, regardless of the app's overall size. So we size locales
+            // relative to the largest locale split. The 2 KB floor is a sanity guard for the
+            // pathological case where every locale split is tiny (no real translations at all).
+            //
+            // We don't touch splitEntries — the user can still toggle any locale in the picker.
+            // This filter only suppresses the misleading "supported languages" surface in the
+            // info cards.
+            val localeSizes = splitEntries.filter { it.type == SplitType.Locale }
+            if (localeSizes.isNotEmpty()) {
+                val maxLocaleSize = localeSizes.maxOf { it.sizeBytes }
+                val threshold = maxOf(2_048L, maxLocaleSize / 10)
+                for (entry in localeSizes) {
+                    if (entry.sizeBytes < threshold) continue
+                    val name = entry.name
+                    if (name.isNotBlank() && name !in supportedLanguages) {
+                        supportedLanguages.add(name)
+                    }
+                }
+            }
+
             // Smart split picker — ackpine's filterCompatible() keeps every split this device
             // CAN run, so a multi-ABI bundle (arm64 + armeabi-v7a + x86) lands here with all
             // three Libs splits even on an arm64-only device. Trim to the best fit per type:
@@ -1463,14 +1466,39 @@ class InstallViewModel(
                 }
             }
 
-            // Intentionally no AssetManager fallback for monolithic APKs. AssetManager.getLocales()
-            // returns every `values-xx/` directory merged into resources.arsc — which includes
-            // AndroidX/Material/Play Services translations for ~80 locales regardless of what
-            // the app itself ships. Without parsing arsc string-table entries per locale (and
-             // counting "real" translations) we can't tell which are app-supported. We choose
-            // showing nothing over reporting a misleading 80-language count for a Vietnamese-
-            // only app. Bundle installs hit the per-locale-split path above, which has a
-            // size-based filter that works.
+            // Monolithic APK fallback. AssetManager.getLocales() returns every values-xx/
+            // directory merged into resources.arsc — including AndroidX/Material/Play
+            // Services translations the app pulls in transitively. Without parsing arsc
+            // string-table entries per locale we can't tell which are app-supported, so this
+            // path is inherently noisy for monolithic APKs that depend on translated AARs.
+            //
+            // We still run it (rather than reporting zero) because for apps without those
+            // deps — or apps that set resConfigs in build.gradle — the result is accurate.
+            // Bundle installs hit the per-split path above, which has a working size filter.
+            if (supportedLanguages.isEmpty() && tempFile.exists()) {
+                try {
+                    val am = android.content.res.AssetManager::class.java
+                        .getDeclaredConstructor().newInstance()
+                    val addAssetPath = am.javaClass
+                        .getDeclaredMethod("addAssetPath", String::class.java)
+                    addAssetPath.isAccessible = true
+                    addAssetPath.invoke(am, tempFile.absolutePath)
+                    @Suppress("DEPRECATION")
+                    val locales = am.locales
+                    for (localeStr in locales) {
+                        if (localeStr.isBlank()) continue
+                        val locale = java.util.Locale.forLanguageTag(localeStr.replace('_', '-'))
+                        val displayName = locale.getDisplayLanguage(java.util.Locale.ENGLISH)
+                        if (displayName.isNotBlank() && displayName !in supportedLanguages) {
+                            supportedLanguages.add(displayName)
+                        }
+                    }
+                    supportedLanguages.sort()
+                    am.close()
+                } catch (e: Exception) {
+                    Timber.d(e, "Error extracting locales via AssetManager")
+                }
+            }
 
             if (supportedAbis.isEmpty() && tempFile.exists()) {
                 try {
