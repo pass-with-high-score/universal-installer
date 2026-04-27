@@ -1,8 +1,10 @@
 package app.pwhs.universalinstaller.presentation.install
 
 import android.text.format.Formatter
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -21,6 +23,8 @@ import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudUpload
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Memory
@@ -309,14 +313,20 @@ internal fun ApkInfoContent(
 
 @Composable
 private fun DetailsCard(apkInfo: ApkInfo) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
-        ),
+    // Collapsed by default — packageName + version are already in the hero, so this
+    // card is mostly for the curious (target SDK, full version code).
+    val summary = buildList {
+        if (apkInfo.targetSdkVersion > 0) add("Target API ${apkInfo.targetSdkVersion}")
+        if (apkInfo.minSdkVersion > 0) add("Min API ${apkInfo.minSdkVersion}")
+        if (apkInfo.versionCode > 0) add("code ${apkInfo.versionCode}")
+    }.joinToString(" · ")
+    SectionCard(
+        icon = Icons.Rounded.Android,
+        title = stringResource(R.string.apk_info_label_package),
+        summary = summary,
+        defaultExpanded = false,
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column {
             InfoRow(stringResource(R.string.apk_info_label_package), apkInfo.packageName)
             if (apkInfo.versionName.isNotBlank()) {
                 InfoRow(
@@ -343,9 +353,14 @@ private fun DetailsCard(apkInfo: ApkInfo) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun AbisCard(abis: List<String>) {
+    // Most users don't care about ABI specifics — showing the list inline as the
+    // collapsed summary keeps the info one tap away without burning vertical space.
     SectionCard(
         icon = Icons.Rounded.Memory,
         title = stringResource(R.string.apk_info_section_architectures),
+        summary = abis.joinToString(", "),
+        badge = abis.size.toString(),
+        defaultExpanded = false,
     ) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -359,9 +374,17 @@ private fun AbisCard(abis: List<String>) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun LanguagesCard(languages: List<String>) {
+    // Show a localized 3-language preview in the header; full list lives behind the tap.
+    val previewSummary = remember(languages) {
+        val first = languages.take(3).joinToString(", ") { displayLanguage(it) }
+        if (languages.size > 3) "$first, +${languages.size - 3}" else first
+    }
     SectionCard(
         icon = Icons.Rounded.Language,
         title = stringResource(R.string.apk_info_section_languages, languages.size),
+        summary = previewSummary,
+        badge = languages.size.toString(),
+        defaultExpanded = false,
     ) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -809,15 +832,26 @@ private fun PermissionsCard(permissions: List<String>) {
     // old hardcoded dangerous-set: catches new runtime perms (POST_NOTIFICATIONS,
     // RECORD_VIDEO, BLUETOOTH_*, NEARBY_WIFI_DEVICES, …) without having to maintain a list.
     val entries = remember(permissions) { resolvePermissionEntries(context, permissions) }
+    val dangerousCount = entries.count { it.isDangerous }
 
     var expanded by remember { mutableStateOf(false) }
     val collapsedCount = 5
     val showToggle = entries.size > collapsedCount
     val visible = if (expanded || !showToggle) entries else entries.take(collapsedCount)
 
+    // Summary leads with the security signal — "3 sensitive · 12 normal" tells the user
+    // whether to bother expanding without forcing them to scan a full list.
+    val summary = if (dangerousCount > 0) {
+        "$dangerousCount sensitive · ${entries.size - dangerousCount} normal"
+    } else {
+        "${entries.size} normal"
+    }
     SectionCard(
         icon = Icons.Rounded.Security,
         title = stringResource(R.string.apk_info_section_permissions, permissions.size),
+        summary = summary,
+        badge = entries.size.toString(),
+        defaultExpanded = false,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             visible.forEach { entry ->
@@ -893,9 +927,18 @@ private fun SplitsCard(
     val showToggle = splits.size > collapsedCount
     val visibleSplits = if (expanded || !showToggle) splits else splits.take(collapsedCount)
 
+    // Splits is interactive (the user toggles), so default-expand. Summary shows the
+    // selection so a glance after collapsing tells you what's about to install.
+    val selectedCount = splits.count { it.selected }
+    val selectedBytes = splits.filter { it.selected }.sumOf { it.sizeBytes.coerceAtLeast(0) }
+    val sizeText = if (selectedBytes > 0) " · ${Formatter.formatShortFileSize(context, selectedBytes)}" else ""
+
     SectionCard(
         icon = Icons.Rounded.Memory,
         title = stringResource(R.string.apk_info_section_splits, splits.size),
+        summary = "Selected $selectedCount/${splits.size}$sizeText",
+        badge = "$selectedCount/${splits.size}",
+        defaultExpanded = true,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             visibleSplits.forEachIndexed { index, split ->
@@ -965,12 +1008,30 @@ private fun SplitsCard(
 
 // ── Reusable helpers ────────────────────────────────────
 
+/**
+ * Elevated card with a collapsible body. Header is always visible (icon + title
+ * + optional collapsed-state summary + optional badge); tapping toggles the body.
+ *
+ * Distinct from the dialog's MenuCard by design: the in-app preview is a bottom
+ * sheet with room to breathe, so we use a tappable elevated header strip with a
+ * trailing chevron + count badge instead of the dialog's compact icon-tile look.
+ *
+ * @param summary one-line preview shown next to the title when collapsed (and
+ *                hidden once expanded — the body content takes over).
+ * @param badge   small chip on the right (e.g. "12" for a permission count).
+ * @param defaultExpanded false to start collapsed; tap to open. Default true
+ *                preserves existing behavior for callers that haven't opted in.
+ */
 @Composable
 private fun SectionCard(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
+    summary: String? = null,
+    badge: String? = null,
+    defaultExpanded: Boolean = true,
     content: @Composable () -> Unit,
 ) {
+    var expanded by remember { mutableStateOf(defaultExpanded) }
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
@@ -978,23 +1039,62 @@ private fun SectionCard(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+        Column(modifier = Modifier.animateContentSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { expanded = !expanded }
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp),
                 )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.labelLarge,
-                    color = MaterialTheme.colorScheme.primary,
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.primary,
+                    )
+                    if (!expanded && !summary.isNullOrBlank()) {
+                        Text(
+                            text = summary,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+                if (badge != null) {
+                    Text(
+                        text = badge,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(end = 4.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f))
+                            .padding(horizontal = 8.dp, vertical = 2.dp),
+                    )
+                }
+                Icon(
+                    imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp),
                 )
             }
-            Spacer(Modifier.height(8.dp))
-            content()
+            if (expanded) {
+                Column(modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)) {
+                    content()
+                }
+            }
         }
     }
 }
