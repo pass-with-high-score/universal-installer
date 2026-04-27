@@ -401,7 +401,7 @@
     <string name="setting_biometric_install_sub">Confirmer avec l\'empreinte digitale ou le déverrouillage de l\'appareil avant chaque installation</string>
     <string name="setting_biometric_uninstall">Exiger une authentification pour désinstaller</string>
     <string name="setting_biometric_uninstall_sub">Confirmer avec l\'empreinte digitale ou le déverrouillage de l\'appareil avant chaque désinstallation</string>
-    <string name="setting_biometric_unavailable">Aucune empreinte digitale ou déverrouillage de l\'appareil enregistré — le commutateur n\'a aucun effet tant que vous n'en configurez pas un.</string>
+    <string name="setting_biometric_unavailable">Aucune empreinte digitale ou déverrouillage de l\'appareil enregistré — le commutateur n\'a aucun effet tant que vous n\'en configurez pas un.</string>
     <string name="manage_action_clear_data">Effacer toutes les données</string>
     <string name="manage_action_clear_data_sub">Réinitialiser l\'application — efface les paramètres, les comptes et le cache</string>
     <string name="manage_action_clear_data_done">Données effacées pour %1$s</string>
