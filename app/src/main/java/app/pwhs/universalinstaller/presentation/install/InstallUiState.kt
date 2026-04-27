@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.install
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.SessionData
 import app.pwhs.universalinstaller.domain.model.SessionProgress
+import java.util.UUID
 
 /**
  * Stages for the dialog install flow, inspired by InstallerX-Revived's multi-stage pattern.
@@ -30,6 +31,17 @@ sealed interface DialogStage {
     /** No dialog should be shown. */
     data object None : DialogStage
 }
+
+/**
+ * Snapshot of the install target captured at confirmInstall time. Lets the
+ * Installing/Success/Failed dialog stages render after pendingApkInfo is cleared.
+ */
+data class DialogTarget(
+    val sessionId: UUID,
+    val packageName: String,
+    val appName: String,
+    val iconPath: String?,
+)
 
 sealed interface DownloadState {
     data object Idle : DownloadState

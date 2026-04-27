@@ -46,9 +46,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -59,8 +57,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.dialog.DialogFailedContent
+import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallingContent
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogMenuContent
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogPrepareContent
+import app.pwhs.universalinstaller.presentation.install.dialog.DialogSuccessContent
 import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
 import app.pwhs.universalinstaller.util.LocaleHelper
 import app.pwhs.universalinstaller.util.WindowBlurEffect
@@ -149,15 +150,38 @@ class DialogInstallActivity : ComponentActivity() {
                 }
             }
 
-            // Auto-finish once the install session is actually enqueued.
-            // Calling finish() directly inside onInstall cancels viewModelScope before
-            // confirmInstall()'s launched coroutine creates the session, so the install
-            // silently never runs. Wait for pendingApkInfo to clear AND a session to appear.
-            var installRequested by rememberSaveable { mutableStateOf(false) }
-            LaunchedEffect(installRequested, uiState.pendingApkInfo, uiState.sessions.size) {
-                if (installRequested && uiState.pendingApkInfo == null && uiState.sessions.isNotEmpty()) {
-                    viewModel.dialogClose()
-                    finish()
+            // Dialog target snapshot — set inside confirmInstall before the install fires.
+            // We watch this + the session list to drive Installing → Success/Failed transitions.
+            val dialogTarget by viewModel.dialogTarget.collectAsState()
+
+            // Once a target appears (install enqueued), move into the Installing stage so the
+            // user sees progress instead of the dialog vanishing.
+            LaunchedEffect(dialogTarget, uiState.dialogStage) {
+                if (dialogTarget != null &&
+                    uiState.dialogStage !is DialogStage.Installing &&
+                    uiState.dialogStage !is DialogStage.Success &&
+                    uiState.dialogStage !is DialogStage.Failed
+                ) {
+                    viewModel.dialogStartInstalling()
+                }
+            }
+
+            // Resolve Installing → Success / Failed by watching the captured session.
+            //   - session in list, error blank        → still Installing
+            //   - session in list, error non-blank   → Failed
+            //   - session NOT in list (was there)    → Succeeded
+            // BaseInstallController removes on Succeeded and calls setError() on Failed.
+            LaunchedEffect(dialogTarget, uiState.sessions, uiState.dialogStage) {
+                val target = dialogTarget ?: return@LaunchedEffect
+                if (uiState.dialogStage !is DialogStage.Installing) return@LaunchedEffect
+                val session = uiState.sessions.find { it.id == target.sessionId }
+                if (session == null) {
+                    viewModel.dialogInstallSuccess()
+                } else {
+                    val msg = session.error.resolve(this@DialogInstallActivity).toString()
+                    if (msg.isNotBlank()) {
+                        viewModel.dialogInstallFailed(msg)
+                    }
                 }
             }
 
@@ -182,17 +206,19 @@ class DialogInstallActivity : ComponentActivity() {
                 ) {
                     DialogContent(
                         uiState = uiState,
+                        dialogTarget = dialogTarget,
                         onInstall = {
                             // Don't finish() here: confirmInstall() launches the install on
                             // viewModelScope, which gets cancelled the moment the activity
-                            // finishes — the session never enqueues. The LaunchedEffect above
-                            // closes the dialog once the session is actually live.
-                            installRequested = true
-                            viewModel.confirmInstall()
+                            // finishes. The LaunchedEffect above moves into the Installing
+                            // stage when the session is live and into Success/Failed when it
+                            // resolves. The user closes the dialog from Success/Failed.
+                            viewModel.confirmInstall(trackDialogTarget = true)
                         },
                         onCancel = {
                             viewModel.dismissPendingInstall()
                             viewModel.dialogClose()
+                            viewModel.clearDialogTarget()
                             finish()
                         },
                         onMenu = viewModel::dialogShowMenu,
@@ -203,6 +229,25 @@ class DialogInstallActivity : ComponentActivity() {
                         onRemoveObb = { obb -> viewModel.removeAttachedObb(obb.uri) },
                         onToggleSplit = viewModel::toggleSplit,
                         onAttachObb = { obbPickerLauncher.launch(arrayOf("*/*")) },
+                        onBackground = {
+                            // Dialog dismisses; install continues in the background, tracked by
+                            // the system notification. Clear the target so a subsequent open
+                            // doesn't replay Success/Failed for an already-finished session.
+                            viewModel.dialogClose()
+                            viewModel.clearDialogTarget()
+                            finish()
+                        },
+                        onOpenInstalledApp = { pkg ->
+                            viewModel.getAppLaunchIntent(pkg)?.let { startActivity(it) }
+                            viewModel.dialogClose()
+                            viewModel.clearDialogTarget()
+                            finish()
+                        },
+                        onCloseAfterResult = {
+                            viewModel.dialogClose()
+                            viewModel.clearDialogTarget()
+                            finish()
+                        },
                     )
                 }
             }
@@ -283,6 +328,7 @@ class DialogInstallActivity : ComponentActivity() {
 @Composable
 private fun DialogContent(
     uiState: InstallUiState,
+    dialogTarget: DialogTarget?,
     onInstall: () -> Unit,
     onCancel: () -> Unit,
     onMenu: () -> Unit,
@@ -291,6 +337,9 @@ private fun DialogContent(
     onRemoveObb: (AttachedObb) -> Unit,
     onToggleSplit: (Int) -> Unit,
     onAttachObb: () -> Unit,
+    onBackground: () -> Unit,
+    onOpenInstalledApp: (String) -> Unit,
+    onCloseAfterResult: () -> Unit,
 ) {
     // The scrim Box swallows tap events that fall outside the card, mapping them to a
     // cancel. The inner Surface's own pointerInput consumes its events so they never
@@ -372,9 +421,52 @@ private fun DialogContent(
                         }
                     }
 
-                    // Installing/Success/Failed/None: dialog should have finished before
-                    // reaching these, but handle gracefully if somehow shown.
-                    else -> {
+                    DialogStage.Installing -> {
+                        val target = dialogTarget
+                        if (target != null) {
+                            val sp = uiState.sessionsProgress.find { it.id == target.sessionId }
+                            val fraction = sp?.let {
+                                if (it.progressMax > 0) it.currentProgress.toFloat() / it.progressMax else null
+                            }
+                            DialogInstallingContent(
+                                target = target,
+                                progressFraction = fraction,
+                                onBackground = onBackground,
+                            )
+                        } else {
+                            LoadingContent()
+                        }
+                    }
+
+                    DialogStage.Success -> {
+                        val target = dialogTarget
+                        if (target != null) {
+                            val context = LocalContext.current
+                            val canOpen = remember(target.packageName) {
+                                target.packageName.isNotBlank() &&
+                                    context.packageManager.getLaunchIntentForPackage(target.packageName) != null
+                            }
+                            DialogSuccessContent(
+                                target = target,
+                                canOpen = canOpen,
+                                autoOpenCountdownSeconds = null,
+                                onOpen = { onOpenInstalledApp(target.packageName) },
+                                onDone = onCloseAfterResult,
+                            )
+                        } else {
+                            LoadingContent()
+                        }
+                    }
+
+                    is DialogStage.Failed -> {
+                        DialogFailedContent(
+                            target = dialogTarget,
+                            errorMessage = stage.errorMessage,
+                            onClose = onCloseAfterResult,
+                        )
+                    }
+
+                    DialogStage.None -> {
                         Spacer(modifier = Modifier.size(0.dp))
                     }
                 }

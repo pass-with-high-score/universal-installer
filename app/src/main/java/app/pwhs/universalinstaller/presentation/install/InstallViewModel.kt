@@ -38,6 +38,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
@@ -85,6 +87,14 @@ class InstallViewModel(
     private val _attachedObbFiles = MutableStateFlow<List<AttachedObb>>(emptyList())
     private val _batchState = MutableStateFlow<BatchInstallState>(BatchInstallState.Idle)
     private val _dialogStage = MutableStateFlow<DialogStage>(DialogStage.None)
+
+    /**
+     * Snapshot of the install target captured at confirmInstall time. We can't read
+     * pendingApkInfo in Success/Failed stages because confirmInstall clears it; this
+     * keeps just enough to render the post-install UI (Open button, app name, icon).
+     */
+    private val _dialogTarget = MutableStateFlow<DialogTarget?>(null)
+    val dialogTarget: StateFlow<DialogTarget?> = _dialogTarget.asStateFlow()
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
@@ -199,6 +209,16 @@ class InstallViewModel(
     /** Close dialog entirely. */
     fun dialogClose() { _dialogStage.value = DialogStage.None }
 
+    /** Clear the captured install target — call when the dialog is fully closed. */
+    fun clearDialogTarget() { _dialogTarget.value = null }
+
+    /**
+     * Returns the launch intent for an installed package, or null if not launchable
+     * (services, libraries, packages without a MAIN/LAUNCHER activity).
+     */
+    fun getAppLaunchIntent(packageName: String): android.content.Intent? =
+        application.packageManager.getLaunchIntentForPackage(packageName)
+
     fun parseApkInfo(context: Context, uri: Uri, splitPackage: SplitPackage.Provider, fileName: String) {
         // A new file invalidates any in-flight scan.
         cancelActiveScan()
@@ -237,7 +257,7 @@ class InstallViewModel(
         pendingApkUris = entries.filter { it.selected }.map { it.uri }
     }
 
-    fun confirmInstall() {
+    fun confirmInstall(trackDialogTarget: Boolean = false) {
         // Use selected splits from ApkInfo if available, otherwise fall back to cached URIs
         val apkInfo = _pendingApkInfo.value
         val uris = if (apkInfo != null && apkInfo.splitEntries.isNotEmpty()) {
@@ -268,12 +288,24 @@ class InstallViewModel(
         viewModelScope.launch {
             val iconPath = cacheIcon(apkInfo)
             val deleteAfterInstall = readDeleteApkPref()
+            val newSessionId = UUID.randomUUID()
             val sessionData = SessionData(
-                id = UUID.randomUUID(),
+                id = newSessionId,
                 name = fn,
                 appName = apkInfo?.appName ?: "",
                 iconPath = iconPath,
             )
+            // Snapshot before install — Success/Failed stages need this after pendingApkInfo
+            // has been cleared. Set BEFORE controller.install() so the dialog activity sees
+            // the target by the time the session appears in sessions list.
+            if (trackDialogTarget) {
+                _dialogTarget.value = DialogTarget(
+                    sessionId = newSessionId,
+                    packageName = apkInfo?.packageName.orEmpty(),
+                    appName = apkInfo?.appName.orEmpty().ifBlank { fn },
+                    iconPath = iconPath,
+                )
+            }
             val hasZipObbs = obbEntries.isNotEmpty() && originalUri != null
             val hasAttachedObbs = attachedObbs.isNotEmpty()
             val onSuccess: (suspend () -> Unit)? = if ((hasZipObbs || hasAttachedObbs) && apkInfo != null) {
