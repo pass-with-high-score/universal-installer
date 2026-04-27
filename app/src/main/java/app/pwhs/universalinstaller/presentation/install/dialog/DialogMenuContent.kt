@@ -128,6 +128,10 @@ fun DialogMenuContent(
     val allUsers = prefs?.get(PreferencesKeys.SHIZUKU_ALL_USERS) ?: false
     val spoofSource = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
     val installerPkg = prefs?.get(PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME) ?: DEFAULT_INSTALLER_PACKAGE_NAME
+    val overridesSerialized = prefs?.get(PreferencesKeys.INSTALLER_OVERRIDES)
+    val packageOverride = remember(overridesSerialized, apkInfo.packageName) {
+        InstallerOverrides.get(overridesSerialized, apkInfo.packageName)
+    }
 
     val onToggleAllUsers: (Boolean) -> Unit = { enabled ->
         scope.launch {
@@ -152,6 +156,46 @@ fun DialogMenuContent(
             context.dataStore.edit {
                 it[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME] = pkg
                 it[PreferencesKeys.ROOT_INSTALLER_PACKAGE_NAME] = pkg
+            }
+        }
+    }
+
+    // "Remember for this app" toggle — true when an override row exists for the
+    // current package. Writing flips the row in/out of the INSTALLER_OVERRIDES map.
+    val onSetRemember: (Boolean) -> Unit = { remember ->
+        val pkg = apkInfo.packageName
+        if (pkg.isNotBlank()) {
+            scope.launch {
+                context.dataStore.edit { p ->
+                    val current = p[PreferencesKeys.INSTALLER_OVERRIDES]
+                    p[PreferencesKeys.INSTALLER_OVERRIDES] = if (remember) {
+                        InstallerOverrides.put(current, pkg, installerPkg)
+                    } else {
+                        InstallerOverrides.remove(current, pkg)
+                    }
+                }
+            }
+        }
+    }
+
+    // When the dialog opens for a package that has a saved override and spoof
+    // source is on, push the override into the active installer pref so the
+    // install actually uses it. Keyed on package + override so it fires once
+    // per (package, value) — re-tabbing through Menu doesn't replay it.
+    androidx.compose.runtime.LaunchedEffect(apkInfo.packageName, packageOverride, spoofSource) {
+        if (spoofSource && packageOverride != null && packageOverride != installerPkg) {
+            onChangeInstallerPkg(packageOverride)
+        }
+    }
+    // Keep the override in sync when the user tweaks the dropdown while
+    // "Remember" is on. If they turned remember off, this is a no-op.
+    androidx.compose.runtime.LaunchedEffect(installerPkg, spoofSource) {
+        if (spoofSource && packageOverride != null && packageOverride != installerPkg) {
+            scope.launch {
+                context.dataStore.edit { p ->
+                    p[PreferencesKeys.INSTALLER_OVERRIDES] =
+                        InstallerOverrides.put(p[PreferencesKeys.INSTALLER_OVERRIDES], apkInfo.packageName, installerPkg)
+                }
             }
         }
     }
@@ -233,9 +277,11 @@ fun DialogMenuContent(
                         allUsers = allUsers,
                         spoofSource = spoofSource,
                         installerPkg = installerPkg,
+                        rememberForThisApp = packageOverride != null,
                         onToggleAllUsers = onToggleAllUsers,
                         onToggleSpoofSource = onToggleSpoofSource,
                         onChangeInstallerPkg = onChangeInstallerPkg,
+                        onSetRemember = onSetRemember,
                     )
                 }
                 
@@ -529,9 +575,11 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     allUsers: Boolean,
     spoofSource: Boolean,
     installerPkg: String,
+    rememberForThisApp: Boolean,
     onToggleAllUsers: (Boolean) -> Unit,
     onToggleSpoofSource: (Boolean) -> Unit,
     onChangeInstallerPkg: (String) -> Unit,
+    onSetRemember: (Boolean) -> Unit,
 ) {
     // 1. OBB Files
     if (apkInfo.obbFileNames.isNotEmpty() || attachedObbFiles.isNotEmpty()) {
@@ -719,6 +767,9 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
                 InstallerSourcePicker(
                     installerPackageName = installerPkg,
                     onInstallerChange = onChangeInstallerPkg,
+                    rememberForThisApp = rememberForThisApp,
+                    onSetRemember = onSetRemember,
+                    canRemember = apkInfo.packageName.isNotBlank(),
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
                 )
             }
@@ -1002,6 +1053,9 @@ private fun rememberInstallerLabel(packageName: String): String {
 private fun InstallerSourcePicker(
     installerPackageName: String,
     onInstallerChange: (String) -> Unit,
+    rememberForThisApp: Boolean,
+    onSetRemember: (Boolean) -> Unit,
+    canRemember: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val presets = INSTALLER_PRESETS.map { it.packageName to stringResource(it.labelRes) }
@@ -1009,48 +1063,79 @@ private fun InstallerSourcePicker(
     var expanded by remember { mutableStateOf(false) }
     var text by remember(installerPackageName) { mutableStateOf(installerPackageName) }
 
-    ExposedDropdownMenuBox(
-        expanded = expanded,
-        onExpandedChange = { expanded = !expanded },
-        modifier = modifier.fillMaxWidth(),
-    ) {
-        OutlinedTextField(
-            value = text,
-            onValueChange = {
-                text = it
-                onInstallerChange(it)
-            },
-            modifier = Modifier
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
-                .fillMaxWidth(),
-            singleLine = true,
-            label = { Text(stringResource(R.string.setting_shizuku_installer_label)) },
-            leadingIcon = { Icon(Icons.Rounded.Badge, contentDescription = null) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            textStyle = MaterialTheme.typography.bodyMedium,
-        )
-        ExposedDropdownMenu(
+    Column(modifier = modifier.fillMaxWidth()) {
+        ExposedDropdownMenuBox(
             expanded = expanded,
-            onDismissRequest = { expanded = false },
+            onExpandedChange = { expanded = !expanded },
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            presets.forEach { (pkg, label) ->
-                DropdownMenuItem(
-                    text = {
-                        Column {
-                            Text(label, style = MaterialTheme.typography.bodyMedium)
-                            Text(
-                                text = pkg,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    },
-                    onClick = {
-                        text = pkg
-                        onInstallerChange(pkg)
-                        expanded = false
-                    },
-                )
+            OutlinedTextField(
+                value = text,
+                onValueChange = {
+                    text = it
+                    onInstallerChange(it)
+                },
+                modifier = Modifier
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, enabled = true)
+                    .fillMaxWidth(),
+                singleLine = true,
+                label = { Text(stringResource(R.string.setting_shizuku_installer_label)) },
+                leadingIcon = { Icon(Icons.Rounded.Badge, contentDescription = null) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                textStyle = MaterialTheme.typography.bodyMedium,
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+            ) {
+                presets.forEach { (pkg, label) ->
+                    DropdownMenuItem(
+                        text = {
+                            Column {
+                                Text(label, style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    text = pkg,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        },
+                        onClick = {
+                            text = pkg
+                            onInstallerChange(pkg)
+                            expanded = false
+                        },
+                    )
+                }
+            }
+        }
+
+        if (canRemember) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(MaterialTheme.shapes.small)
+                    .selectable(
+                        selected = rememberForThisApp,
+                        onClick = { onSetRemember(!rememberForThisApp) },
+                        role = Role.Checkbox,
+                    )
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Checkbox(checked = rememberForThisApp, onCheckedChange = null)
+                Spacer(modifier = Modifier.width(4.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = stringResource(R.string.dialog_menu_remember_for_app),
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    Text(
+                        text = stringResource(R.string.dialog_menu_remember_for_app_sub),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
             }
         }
     }

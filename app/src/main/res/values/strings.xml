@@ -544,4 +544,6 @@
     <string name="dialog_risk_vt_malicious">VirusTotal: %1$d engine(s) flagged this file as malicious.</string>
     <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d engine(s) flagged this file as suspicious.</string>
     <string name="dialog_risk_footer">Only proceed if you trust the source of this file.</string>
+    <string name="dialog_menu_remember_for_app">Remember for this app</string>
+    <string name="dialog_menu_remember_for_app_sub">Use this installer source whenever this app is installed.</string>
 </resources>

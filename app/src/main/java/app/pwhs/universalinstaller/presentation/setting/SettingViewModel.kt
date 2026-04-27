@@ -37,6 +37,15 @@ object PreferencesKeys {
     /** Open the app automatically after a successful install (with a 3-second cancellable countdown). */
     val AUTO_OPEN_AFTER_INSTALL = booleanPreferencesKey("auto_open_after_install")
 
+    /**
+     * Per-package installer-source overrides. Stored as one entry per line
+     * (`pkg=installer`) so we don't pull in a JSON dependency. See
+     * [app.pwhs.universalinstaller.presentation.install.dialog.InstallerOverrides]
+     * for the parser. Empty / missing → no override; the global Shizuku/Root
+     * installer pref is used.
+     */
+    val INSTALLER_OVERRIDES = stringPreferencesKey("installer_overrides")
+
     // Shizuku install options
     val SHIZUKU_BYPASS_LOW_TARGET_SDK = booleanPreferencesKey("shizuku_bypass_low_target_sdk")
     val SHIZUKU_ALLOW_TEST = booleanPreferencesKey("shizuku_allow_test")
