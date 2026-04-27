@@ -424,34 +424,6 @@ class ManageViewModel(
         }
     }
 
-    fun clearCache(packageName: String, appName: String) {
-        viewModelScope.launch {
-            val executor = resolvePrivilegedExecutor()
-            if (executor == null) {
-                _privilegedActionResult.value = PrivilegedActionResult.Failure(
-                    application.getString(R.string.manage_privileged_unavailable)
-                )
-                return@launch
-            }
-            val result = when (executor) {
-                PrivilegedExecutor.Root -> backendFactory.clearAppCacheViaRoot(packageName)
-                PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.clearAppCacheOnly(packageName)
-            }
-            _privilegedActionResult.value = if (result.isSuccess) {
-                PrivilegedActionResult.Success(
-                    application.getString(R.string.manage_action_clear_cache_done, appName)
-                )
-            } else {
-                PrivilegedActionResult.Failure(
-                    application.getString(
-                        R.string.manage_action_clear_cache_failed,
-                        result.exceptionOrNull()?.message ?: "unknown error",
-                    )
-                )
-            }
-        }
-    }
-
     fun clearAllData(packageName: String, appName: String) {
         // Don't let the user nuke our own data — we'd lose the install history they're
         // probably looking at this very moment, plus they've got "Uninstall" two rows down.

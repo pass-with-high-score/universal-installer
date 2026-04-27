@@ -40,10 +40,6 @@
     <string name="manage_filter_user">User</string>
     <string name="manage_filter_system">System</string>
     <string name="manage_filter_disabled">Disabled</string>
-    <string name="manage_action_clear_cache">Clear cache</string>
-    <string name="manage_action_clear_cache_sub">Free up space by removing cached files</string>
-    <string name="manage_action_clear_cache_done">Cleared cache for %1$s</string>
-    <string name="manage_action_clear_cache_failed">Clear cache failed: %1$s</string>
     <string name="manage_action_clear_data">Clear all data</string>
     <string name="manage_action_clear_data_sub">Reset the app — wipes settings, accounts, and cache</string>
     <string name="manage_action_clear_data_done">Cleared data for %1$s</string>

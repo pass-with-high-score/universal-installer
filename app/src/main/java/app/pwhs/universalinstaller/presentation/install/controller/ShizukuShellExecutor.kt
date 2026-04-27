@@ -111,35 +111,19 @@ object ShizukuShellExecutor {
         runShell(packageName, "pm clear $packageName", successToken = "Success")
 
     /**
-     * Cache-only clear is API 34+ (Android U) — earlier `pm` builds reject the flag.
-     * Shizuku path can't `rm -rf /data/data/...` (shell UID is not root and can't enter
-     * package-private dirs), so on older OS this surfaces a typed failure and the UI
-     * should fall back to "Clear all data" or hide the action.
-     */
-    suspend fun clearAppCacheOnly(packageName: String): Result<String> {
-        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            return Result.failure(
-                UnsupportedOperationException(
-                    "Cache-only clear via Shizuku requires Android 14+ (use Root for older OS)",
-                ),
-            )
-        }
-        return runShell(
-            packageName,
-            "pm clear --cache-only $packageName",
-            successToken = "Success",
-        )
-    }
-
-    /**
      * Single-shot shell. [successToken] gates "did the command actually do the thing" beyond
      * the exit code — `pm` is notorious for printing soft failures ("Failure [...]") with
      * exit 0. Pass `null` for commands like `am force-stop` that have no output on success.
+     *
+     * [timeoutSeconds] guards against vendor-specific hangs (e.g. `pm clear --cache-only`
+     * never returns on Xiaomi HyperOS Android 15). Without this the calling coroutine sits
+     * forever in process.waitFor() and the user gets no feedback.
      */
     private suspend fun runShell(
         packageName: String,
         cmd: String,
         successToken: String?,
+        timeoutSeconds: Long = 15,
     ): Result<String> = withContext(Dispatchers.IO) {
         require(packageName.matches(Regex("^[A-Za-z0-9._]+$"))) {
             "Refusing to shell out with suspicious package name: $packageName"
@@ -155,9 +139,16 @@ object ShizukuShellExecutor {
                 null,
                 null,
             ) as Process
+            val finished = process.waitFor(timeoutSeconds, java.util.concurrent.TimeUnit.SECONDS)
+            if (!finished) {
+                runCatching { process.destroyForcibly() }
+                throw RuntimeException(
+                    "shizuku shell timed out after ${timeoutSeconds}s — vendor build may have a broken `$cmd` (try Force stop first, or use Clear all data)",
+                )
+            }
             val stdout = process.inputStream.bufferedReader().use { it.readText() }
             val stderr = process.errorStream.bufferedReader().use { it.readText() }
-            val exitCode = process.waitFor()
+            val exitCode = process.exitValue()
             val tokenOk = successToken == null || stdout.contains(successToken, ignoreCase = true)
             if (exitCode != 0 || !tokenOk) {
                 throw RuntimeException(

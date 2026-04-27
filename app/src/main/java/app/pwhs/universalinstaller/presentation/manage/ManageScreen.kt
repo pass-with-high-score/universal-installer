@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ReceiptLong
 import androidx.compose.material.icons.rounded.Android
@@ -34,7 +35,6 @@ import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.FilterList
 import androidx.compose.material.icons.rounded.FolderZip
 import androidx.compose.material.icons.rounded.Block
-import androidx.compose.material.icons.rounded.CleaningServices
 import androidx.compose.material.icons.rounded.DeleteForever
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Inventory2
@@ -134,7 +134,6 @@ fun ManageScreen(
         onShare = viewModel::shareApp,
         onForceStop = viewModel::forceStop,
         onSetEnabled = viewModel::setEnabled,
-        onClearCache = viewModel::clearCache,
         onClearData = viewModel::clearAllData,
         queryStorage = viewModel::queryStorageStats,
         queryUsage = viewModel::queryUsageBuckets,
@@ -182,7 +181,6 @@ private fun UninstallUi(
     onShare: (String, String) -> Unit = { _, _ -> },
     onForceStop: (String, String) -> Unit = { _, _ -> },
     onSetEnabled: (String, String, Boolean) -> Unit = { _, _, _ -> },
-    onClearCache: (String, String) -> Unit = { _, _ -> },
     onClearData: (String, String) -> Unit = { _, _ -> },
     queryStorage: suspend (String) -> StorageBreakdown? = { null },
     queryUsage: suspend (String) -> List<UsageBucket> = { emptyList() },
@@ -244,10 +242,6 @@ private fun UninstallUi(
             onSetEnabled = { enabled ->
                 actionTarget = null
                 onSetEnabled(target.packageName, target.appName, enabled)
-            },
-            onClearCache = {
-                actionTarget = null
-                onClearCache(target.packageName, target.appName)
             },
             onClearData = {
                 actionTarget = null
@@ -1287,7 +1281,6 @@ private fun AppActionSheet(
     onExtract: () -> Unit,
     onForceStop: () -> Unit,
     onSetEnabled: (Boolean) -> Unit,
-    onClearCache: () -> Unit,
     onClearData: () -> Unit,
     queryStorage: suspend (String) -> StorageBreakdown?,
     queryUsage: suspend (String) -> List<UsageBucket>,
@@ -1311,6 +1304,14 @@ private fun AppActionSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
     ) {
+        // Sheet content can grow taller than the viewport once usage chart + storage
+        // chips + privileged group + intent rows all render. ModalBottomSheet's body
+        // slot doesn't scroll on its own, so wrap in our own scrolling column.
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+        ) {
         // Header: app icon + name + package name. Same shell as the AppCard so users see
         // the in-context selection echoed back to them.
         Row(
@@ -1537,13 +1538,6 @@ private fun AppActionSheet(
                 )
             }
             ActionRow(
-                icon = Icons.Rounded.CleaningServices,
-                iconTint = MaterialTheme.colorScheme.tertiary,
-                label = stringResource(R.string.manage_action_clear_cache),
-                subtitle = stringResource(R.string.manage_action_clear_cache_sub),
-                onClick = onClearCache,
-            )
-            ActionRow(
                 icon = Icons.Rounded.DeleteForever,
                 iconTint = MaterialTheme.colorScheme.error,
                 label = stringResource(R.string.manage_action_clear_data),
@@ -1560,7 +1554,8 @@ private fun AppActionSheet(
             onClick = onUninstall,
         )
 
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
+        }
     }
 }
 

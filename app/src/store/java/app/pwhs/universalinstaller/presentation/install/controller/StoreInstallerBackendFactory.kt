@@ -45,7 +45,4 @@ class StoreInstallerBackendFactory : InstallerBackendFactory {
 
     override suspend fun clearAppDataViaRoot(packageName: String): Result<String> =
         Result.failure(UnsupportedOperationException("Root not available in this build"))
-
-    override suspend fun clearAppCacheViaRoot(packageName: String): Result<String> =
-        Result.failure(UnsupportedOperationException("Root not available in this build"))
 }
