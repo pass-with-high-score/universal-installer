@@ -4,6 +4,33 @@ import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.SessionData
 import app.pwhs.universalinstaller.domain.model.SessionProgress
 
+/**
+ * Stages for the dialog install flow, inspired by InstallerX-Revived's multi-stage pattern.
+ * The dialog shows different content at each stage, keeping the main screen clean and gọn.
+ */
+sealed interface DialogStage {
+    /** APK is being parsed — show a spinner. */
+    data object Loading : DialogStage
+
+    /** Parse complete — show clean info: icon + name + version + warning chips + buttons. */
+    data object Prepare : DialogStage
+
+    /** User tapped Menu — show extended options: permissions, VT, OBB, splits, install flags. */
+    data object Menu : DialogStage
+
+    /** Install session is in progress — show progress bar. */
+    data object Installing : DialogStage
+
+    /** Install succeeded — show open/done buttons. */
+    data object Success : DialogStage
+
+    /** Install failed — show error + retry/close buttons. */
+    data class Failed(val errorMessage: String = "") : DialogStage
+
+    /** No dialog should be shown. */
+    data object None : DialogStage
+}
+
 sealed interface DownloadState {
     data object Idle : DownloadState
     data class Running(
@@ -81,4 +108,6 @@ data class InstallUiState(
     val obbCopyState: ObbCopyState = ObbCopyState.Idle,
     val attachedObbFiles: List<AttachedObb> = emptyList(),
     val batchState: BatchInstallState = BatchInstallState.Idle,
+    /** Current stage of the dialog install flow. */
+    val dialogStage: DialogStage = DialogStage.None,
 )

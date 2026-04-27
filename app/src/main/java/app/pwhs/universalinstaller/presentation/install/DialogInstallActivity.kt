@@ -6,23 +6,43 @@ import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.AlertDialogDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,12 +50,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.dialog.DialogMenuContent
+import app.pwhs.universalinstaller.presentation.install.dialog.DialogPrepareContent
 import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
 import app.pwhs.universalinstaller.util.LocaleHelper
+import app.pwhs.universalinstaller.util.WindowBlurEffect
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import ru.solrudev.ackpine.splits.ApkSplits.validate
@@ -56,25 +81,27 @@ import timber.log.Timber
  * - `singleInstance` + `excludeFromRecents` keep this off the recents stack.
  * - `Theme.UniversalInstaller.Dialog` is translucent so the calling app stays visible
  *   behind our scrim.
- * - The dialog itself is a Compose [Dialog] window so the system handles scrim fade and
- *   we get focus / IME behaviour for free.
+ * - The dialog content transitions through stages: Loading → Prepare → Menu → Installing → Result.
  *
  * Dismissal paths:
  * - Tap outside the card → dismiss. Detected via stacked `pointerInput` blocks (outer
  *   scrim Box dispatches dismiss; inner Surface consumes taps).
  * - Cancel button → same.
- * - Install button → confirmInstall(); we keep the dialog visible until ackpine's session
- *   is enqueued, then auto-finish.
+ * - Install button → starts install; dialog shows progress then result.
  */
 class DialogInstallActivity : ComponentActivity() {
 
     private val viewModel: InstallViewModel by viewModel()
+
+    /** Track whether system took us to a confirmation activity. */
+    private var wentToSystemConfirm = false
 
     override fun attachBaseContext(newBase: Context) {
         super.attachBaseContext(LocaleHelper.wrap(newBase))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         val incomingUri = collectIncomingUri(intent)
@@ -84,9 +111,19 @@ class DialogInstallActivity : ComponentActivity() {
             return
         }
 
+        // Start in Loading stage
+        viewModel.dialogStartLoading()
+
         setContent {
             val uiState by viewModel.uiState.collectAsState()
+            val resource = LocalResources.current
             val context = LocalContext.current
+
+            val obbPickerLauncher = rememberLauncherForActivityResult(
+                ActivityResultContracts.OpenMultipleDocuments()
+            ) { uris ->
+                uris.forEach { viewModel.attachObbFile(context, it) }
+            }
 
             // Dispatch parsing once. Keyed on the URI so a config-change recomposition
             // doesn't re-parse — the VM's pendingApkInfo state survives the recomposition.
@@ -95,26 +132,28 @@ class DialogInstallActivity : ComponentActivity() {
                     Timber.e(e, "Parse failed for $incomingUri")
                     Toast.makeText(
                         context,
-                        context.getString(R.string.install_unsupported_file),
+                        resource.getString(R.string.install_unsupported_file),
                         Toast.LENGTH_LONG,
                     ).show()
                     finish()
                 }
             }
 
-            // Auto-finish once the install session is enqueued. confirmInstall() clears
-            // pendingApkInfo and adds to sessions; from there ackpine's notification
-            // tracks progress, so we step out of the way.
-            LaunchedEffect(uiState.pendingApkInfo, uiState.sessions.size) {
-                if (uiState.pendingApkInfo == null && uiState.sessions.isNotEmpty()) {
-                    finish()
+            // Transition from Loading → Prepare when parse completes
+            LaunchedEffect(uiState.pendingApkInfo, uiState.dialogStage) {
+                if (uiState.pendingApkInfo != null && uiState.dialogStage == DialogStage.Loading) {
+                    viewModel.dialogShowPrepare()
                 }
             }
 
             UniversalInstallerTheme {
+                // Apply background blur on Android 12+
+                WindowBlurEffect(blurRadius = 30)
+
                 Dialog(
                     onDismissRequest = {
                         viewModel.dismissPendingInstall()
+                        viewModel.dialogClose()
                         finish()
                     },
                     properties = DialogProperties(
@@ -128,20 +167,57 @@ class DialogInstallActivity : ComponentActivity() {
                 ) {
                     DialogContent(
                         uiState = uiState,
-                        onInstall = viewModel::confirmInstall,
-                        onCancel = {
-                            viewModel.dismissPendingInstall()
+                        onInstall = {
+                            // Enqueue the install and finish — notification tracks progress.
+                            // confirmInstall() clears pendingApkInfo, so we must finish()
+                            // before the next recomposition sees null info.
+                            viewModel.confirmInstall()
+                            viewModel.dialogClose()
                             finish()
                         },
+                        onCancel = {
+                            viewModel.dismissPendingInstall()
+                            viewModel.dialogClose()
+                            finish()
+                        },
+                        onMenu = viewModel::dialogShowMenu,
+                        onMenuBack = viewModel::dialogBackToPrepare,
                         onCheckVirusTotal = {
                             viewModel.scanVirusTotal(this@DialogInstallActivity)
                         },
                         onRemoveObb = { obb -> viewModel.removeAttachedObb(obb.uri) },
                         onToggleSplit = viewModel::toggleSplit,
+                        onAttachObb = { obbPickerLauncher.launch(arrayOf("*/*")) },
                     )
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        val uri = collectIncomingUri(intent) ?: return
+        viewModel.dismissPendingInstall()
+        viewModel.dialogStartLoading()
+        val context = this
+        // Re-parse new intent
+        lifecycleScope.launch {
+            runCatching { parseAndPush(context, uri) }.onFailure { e ->
+                Timber.e(e, "Parse failed for new intent $uri")
+                Toast.makeText(
+                    context,
+                    getString(R.string.install_unsupported_file),
+                    Toast.LENGTH_LONG,
+                ).show()
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Don't auto-finish if we went to system's install confirm dialog.
+        // This prevents the dialog from disappearing when system shows confirmation.
     }
 
     /**
@@ -186,18 +262,20 @@ class DialogInstallActivity : ComponentActivity() {
 }
 
 /**
- * The visual layer of the install dialog. A scrim Box fills the screen behind the
- * Material3 Surface; both consume taps via `pointerInput` so an outside-tap dismisses
- * while taps on the card itself pass through to its child controls.
+ * The visual layer of the install dialog. Uses AnimatedContent to smoothly transition
+ * between stages (Loading → Prepare → Menu). Install triggers finish() immediately.
  */
-@androidx.compose.runtime.Composable
+@Composable
 private fun DialogContent(
     uiState: InstallUiState,
     onInstall: () -> Unit,
     onCancel: () -> Unit,
+    onMenu: () -> Unit,
+    onMenuBack: () -> Unit,
     onCheckVirusTotal: () -> Unit,
     onRemoveObb: (AttachedObb) -> Unit,
     onToggleSplit: (Int) -> Unit,
+    onAttachObb: () -> Unit,
 ) {
     // The scrim Box swallows tap events that fall outside the card, mapping them to a
     // cancel. The inner Surface's own pointerInput consumes its events so they never
@@ -233,18 +311,81 @@ private fun DialogContent(
             tonalElevation = AlertDialogDefaults.TonalElevation,
             shadowElevation = 12.dp,
         ) {
-            uiState.pendingApkInfo?.let { info ->
-                ApkInfoContent(
-                    apkInfo = info,
-                    onInstall = onInstall,
-                    onCancel = onCancel,
-                    onCheckVirusTotal = onCheckVirusTotal,
-                    attachedObbFiles = uiState.attachedObbFiles,
-                    onAttachObb = { /* OBB picker disabled in dialog mode for v1 */ },
-                    onRemoveObb = onRemoveObb,
-                    onToggleSplit = onToggleSplit,
-                )
+            AnimatedContent(
+                targetState = uiState.dialogStage,
+                transitionSpec = {
+                    (fadeIn(tween(250)) + slideInVertically { it / 8 })
+                        .togetherWith(fadeOut(tween(200)) + slideOutVertically { -it / 8 })
+                        .using(SizeTransform(clip = false))
+                },
+                label = "DialogStageTransition",
+            ) { stage ->
+                when (stage) {
+                    DialogStage.Loading -> {
+                        LoadingContent()
+                    }
+
+                    DialogStage.Prepare -> {
+                        val info = uiState.pendingApkInfo
+                        if (info != null) {
+                            DialogPrepareContent(
+                                apkInfo = info,
+                                onInstall = onInstall,
+                                onMenu = onMenu,
+                                onCancel = onCancel,
+                            )
+                        } else {
+                            LoadingContent()
+                        }
+                    }
+
+                    DialogStage.Menu -> {
+                        val info = uiState.pendingApkInfo
+                        if (info != null) {
+                            DialogMenuContent(
+                                apkInfo = info,
+                                attachedObbFiles = uiState.attachedObbFiles,
+                                onBack = onMenuBack,
+                                onInstall = onInstall,
+                                onCheckVirusTotal = onCheckVirusTotal,
+                                onRemoveObb = onRemoveObb,
+                                onToggleSplit = onToggleSplit,
+                                onAttachObb = onAttachObb,
+                            )
+                        } else {
+                            LoadingContent()
+                        }
+                    }
+
+                    // Installing/Success/Failed/None: dialog should have finished before
+                    // reaching these, but handle gracefully if somehow shown.
+                    else -> {
+                        Spacer(modifier = Modifier.size(0.dp))
+                    }
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun LoadingContent() {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(48.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(40.dp),
+            color = MaterialTheme.colorScheme.primary,
+            strokeWidth = 3.dp,
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.dialog_loading_text),
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
     }
 }

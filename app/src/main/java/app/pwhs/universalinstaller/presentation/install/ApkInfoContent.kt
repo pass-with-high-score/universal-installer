@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.CloudUpload
@@ -523,7 +524,7 @@ private fun VirusTotalCard(
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Icon(
-                        imageVector = Icons.Rounded.OpenInNew,
+                        imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                     )

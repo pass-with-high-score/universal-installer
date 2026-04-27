@@ -84,6 +84,7 @@ class InstallViewModel(
     private val _obbCopyState = MutableStateFlow<ObbCopyState>(ObbCopyState.Idle)
     private val _attachedObbFiles = MutableStateFlow<List<AttachedObb>>(emptyList())
     private val _batchState = MutableStateFlow<BatchInstallState>(BatchInstallState.Idle)
+    private val _dialogStage = MutableStateFlow<DialogStage>(DialogStage.None)
 
     private var pendingApkUris: List<Uri>? = null
     private var pendingFileName: String? = null
@@ -151,6 +152,7 @@ class InstallViewModel(
         _obbCopyState,
         _attachedObbFiles,
         _batchState,
+        _dialogStage,
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         InstallUiState(
@@ -163,12 +165,39 @@ class InstallViewModel(
             obbCopyState = flows[6] as ObbCopyState,
             attachedObbFiles = flows[7] as List<AttachedObb>,
             batchState = flows[8] as BatchInstallState,
+            dialogStage = flows[9] as DialogStage,
         )
     }
         .onStart { activeController().restoreSessionsFromSavedState(viewModelScope) }
         .stateIn(viewModelScope, SharingStarted.Lazily, InstallUiState())
 
     // ── Public actions ──────────────────────────────────
+
+    // ── Dialog stage navigation (InstallerX-style multi-stage) ──
+
+    /** Transition dialog to Loading stage (called when parse starts). */
+    fun dialogStartLoading() { _dialogStage.value = DialogStage.Loading }
+
+    /** Transition dialog to Prepare stage (called when parse completes). */
+    fun dialogShowPrepare() { _dialogStage.value = DialogStage.Prepare }
+
+    /** User tapped Menu → show extended options. */
+    fun dialogShowMenu() { _dialogStage.value = DialogStage.Menu }
+
+    /** User tapped Back in Menu → return to Prepare. */
+    fun dialogBackToPrepare() { _dialogStage.value = DialogStage.Prepare }
+
+    /** Transition to Installing stage. */
+    fun dialogStartInstalling() { _dialogStage.value = DialogStage.Installing }
+
+    /** Install completed successfully. */
+    fun dialogInstallSuccess() { _dialogStage.value = DialogStage.Success }
+
+    /** Install failed. */
+    fun dialogInstallFailed(error: String) { _dialogStage.value = DialogStage.Failed(error) }
+
+    /** Close dialog entirely. */
+    fun dialogClose() { _dialogStage.value = DialogStage.None }
 
     fun parseApkInfo(context: Context, uri: Uri, splitPackage: SplitPackage.Provider, fileName: String) {
         // A new file invalidates any in-flight scan.
