@@ -32,4 +32,7 @@ data class ApkInfo(
     val obbFileNames: List<String> = emptyList(),
     val obbTotalBytes: Long = 0L,
     val splitEntries: List<SplitEntry> = emptyList(),
+    /** Installed version on this device, null if not installed. Powers the downgrade chip. */
+    val installedVersionName: String? = null,
+    val installedVersionCode: Long? = null,
 )

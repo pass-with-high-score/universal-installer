@@ -235,9 +235,17 @@ class InstallViewModel(
             val archiveExts = setOf("apks", "xapk", "apkm", "zip")
             val obbEntries = if (ext in archiveExts) ObbExtractor.scan(context, uri) else emptyList()
             pendingObbEntries = obbEntries
+            // Look up the currently-installed version so the dialog can flag downgrades and
+            // gate them behind a confirmation. Returns nulls if not installed — the most
+            // common case — and that's a clean signal for "no downgrade risk".
+            val installed = withContext(Dispatchers.IO) {
+                lookupInstalledVersion(context, info.packageName)
+            }
             _pendingApkInfo.value = info.copy(
                 obbFileNames = obbEntries.map { it.fileName },
                 obbTotalBytes = obbEntries.sumOf { it.sizeBytes.coerceAtLeast(0L) },
+                installedVersionName = installed?.first,
+                installedVersionCode = installed?.second,
             )
             _isLoading.value = false
             launchHashLookupOnly(context, uri)
@@ -1171,6 +1179,33 @@ class InstallViewModel(
             val prefs = application.dataStore.data.first()
             prefs[androidx.datastore.preferences.core.booleanPreferencesKey("delete_apk_after_install")] ?: false
         } catch (_: Exception) { false }
+    }
+
+    /**
+     * Returns (versionName, versionCode) for the installed package, or null if not installed.
+     * Uses longVersionCode on API 28+ and falls back to the deprecated int versionCode below.
+     */
+    private fun lookupInstalledVersion(context: Context, packageName: String): Pair<String, Long>? {
+        if (packageName.isBlank()) return null
+        return try {
+            val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0L))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(packageName, 0)
+            }
+            val name = pi.versionName.orEmpty()
+            val code = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                pi.longVersionCode
+            } else {
+                @Suppress("DEPRECATION") pi.versionCode.toLong()
+            }
+            name to code
+        } catch (_: PackageManager.NameNotFoundException) {
+            null
+        } catch (_: Exception) {
+            null
+        }
     }
 
     private suspend fun cacheIcon(apkInfo: ApkInfo?): String? {

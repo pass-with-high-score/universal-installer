@@ -46,7 +46,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -62,6 +64,9 @@ import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallingC
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogMenuContent
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogPrepareContent
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogSuccessContent
+import app.pwhs.universalinstaller.presentation.install.dialog.InstallRisk
+import app.pwhs.universalinstaller.presentation.install.dialog.RiskConfirmDialog
+import app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks
 import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
 import app.pwhs.universalinstaller.util.LocaleHelper
 import app.pwhs.universalinstaller.util.WindowBlurEffect
@@ -185,9 +190,37 @@ class DialogInstallActivity : ComponentActivity() {
                 }
             }
 
+            // Risk-gate state — when non-empty we render the consent AlertDialog over the
+            // main install Dialog. Confirming proceeds with the install; cancelling returns
+            // the user to the Prepare/Menu stage (no install fires).
+            var pendingRisks by remember { mutableStateOf<List<InstallRisk>>(emptyList()) }
+            val proceedInstall = {
+                viewModel.confirmInstall(trackDialogTarget = true)
+            }
+            val handleInstallTap = {
+                val info = uiState.pendingApkInfo
+                val risks = if (info != null) detectInstallRisks(info) else emptyList()
+                if (risks.isNotEmpty()) {
+                    pendingRisks = risks
+                } else {
+                    proceedInstall()
+                }
+            }
+
             UniversalInstallerTheme {
                 // Apply background blur on Android 12+
                 WindowBlurEffect(blurRadius = 30)
+
+                if (pendingRisks.isNotEmpty()) {
+                    RiskConfirmDialog(
+                        risks = pendingRisks,
+                        onConfirm = {
+                            pendingRisks = emptyList()
+                            proceedInstall()
+                        },
+                        onCancel = { pendingRisks = emptyList() },
+                    )
+                }
 
                 Dialog(
                     onDismissRequest = {
@@ -207,14 +240,7 @@ class DialogInstallActivity : ComponentActivity() {
                     DialogContent(
                         uiState = uiState,
                         dialogTarget = dialogTarget,
-                        onInstall = {
-                            // Don't finish() here: confirmInstall() launches the install on
-                            // viewModelScope, which gets cancelled the moment the activity
-                            // finishes. The LaunchedEffect above moves into the Installing
-                            // stage when the session is live and into Success/Failed when it
-                            // resolves. The user closes the dialog from Success/Failed.
-                            viewModel.confirmInstall(trackDialogTarget = true)
-                        },
+                        onInstall = handleInstallTap,
                         onCancel = {
                             viewModel.dismissPendingInstall()
                             viewModel.dialogClose()
@@ -394,6 +420,8 @@ private fun DialogContent(
                         if (info != null) {
                             DialogPrepareContent(
                                 apkInfo = info,
+                                installedVersionName = info.installedVersionName,
+                                installedVersionCode = info.installedVersionCode,
                                 onInstall = onInstall,
                                 onMenu = onMenu,
                                 onCancel = onCancel,

@@ -532,4 +532,14 @@
     <string name="dialog_menu_target_all_sub">Owner plus any work profile on this device</string>
     <string name="dialog_menu_target_visible_profiles">Profiles on this device</string>
     <string name="dialog_menu_target_hidden_users_hint">Other users (e.g. Secure Folder) are not visible without elevated access.</string>
+
+    <!-- Risk confirmation -->
+    <string name="dialog_risk_title_warn">Install with caution?</string>
+    <string name="dialog_risk_title_severe">This APK looks dangerous</string>
+    <string name="dialog_risk_proceed_warn">Install anyway</string>
+    <string name="dialog_risk_proceed_severe">Install at my own risk</string>
+    <string name="dialog_risk_downgrade">Downgrade: %1$s → %2$s. Existing app data may be wiped.</string>
+    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d engine(s) flagged this file as malicious.</string>
+    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d engine(s) flagged this file as suspicious.</string>
+    <string name="dialog_risk_footer">Only proceed if you trust the source of this file.</string>
 </resources>
