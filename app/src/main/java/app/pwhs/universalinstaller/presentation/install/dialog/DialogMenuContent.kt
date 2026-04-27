@@ -37,8 +37,8 @@ import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Language
-import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Work
@@ -53,6 +53,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
@@ -661,6 +663,8 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
         item(key = "splits") {
             var expanded by remember { mutableStateOf(true) }
             val selectedCount = apkInfo.splitEntries.count { it.selected }
+            val selectedBytes = apkInfo.splitEntries.filter { it.selected }
+                .sumOf { it.sizeBytes.coerceAtLeast(0) }
             MenuCard(
                 title = stringResource(R.string.dialog_menu_splits),
                 description = stringResource(R.string.dialog_menu_splits_desc),
@@ -675,38 +679,12 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
                 onClick = { expanded = !expanded },
                 badge = "$selectedCount / ${apkInfo.splitEntries.size}",
             ) {
-                val context = LocalContext.current
-                Column(
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                ) {
-                    apkInfo.splitEntries.forEachIndexed { index, entry ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Checkbox(
-                                checked = entry.selected,
-                                onCheckedChange = {
-                                    if (entry.type != SplitType.Base) onToggleSplit(index)
-                                },
-                                enabled = entry.type != SplitType.Base,
-                            )
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = entry.name,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                                Text(
-                                    text = Formatter.formatFileSize(context, entry.sizeBytes),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
-                }
+                SplitChipPicker(
+                    entries = apkInfo.splitEntries,
+                    selectedBytes = selectedBytes,
+                    onToggle = onToggleSplit,
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 12.dp),
+                )
             }
         }
     }
@@ -983,6 +961,93 @@ private fun PermissionRowList(
                 )
             }
         }
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// Split APK picker (FilterChip grid)
+// ─────────────────────────────────────────────────────────────────────────
+
+/**
+ * Renders splits as a FilterChip grid. Tapping a chip toggles its selection;
+ * the Base APK chip is always selected and can't be disabled (required for
+ * the install). Locale chips render localized language names ("English") so
+ * users don't have to read raw "config.en" tags.
+ */
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@Composable
+private fun SplitChipPicker(
+    entries: List<SplitEntry>,
+    selectedBytes: Long,
+    onToggle: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    Column(modifier = modifier.fillMaxWidth()) {
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            entries.forEachIndexed { index, entry ->
+                val isBase = entry.type == SplitType.Base
+                FilterChip(
+                    selected = entry.selected,
+                    onClick = { if (!isBase) onToggle(index) },
+                    enabled = !isBase,
+                    label = {
+                        Text(
+                            text = splitChipLabel(entry),
+                            style = MaterialTheme.typography.labelSmall,
+                        )
+                    },
+                    leadingIcon = if (isBase) {
+                        {
+                            Icon(
+                                imageVector = Icons.Rounded.Lock,
+                                contentDescription = null,
+                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                            )
+                        }
+                    } else null,
+                    colors = FilterChipDefaults.filterChipColors(
+                        // Base sticks to selected styling even though it's disabled — visually
+                        // it's "locked on", not greyed out into ambiguity.
+                        disabledContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                        disabledLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        disabledSelectedContainerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
+                    ),
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = if (selectedBytes > 0) {
+                "Selected: ${Formatter.formatFileSize(context, selectedBytes)}"
+            } else {
+                "Selected: —"
+            },
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
+}
+
+/**
+ * Friendly chip label per split type. Strips the "config." prefix that Android
+ * Bundles add to ABI/locale/density splits, and runs locales through
+ * displayLanguage so "config.en" renders as "English".
+ */
+@Composable
+private fun splitChipLabel(entry: SplitEntry): String {
+    val raw = entry.name.removePrefix("config.")
+    return when (entry.type) {
+        SplitType.Base -> "Base"
+        SplitType.Locale -> displayLanguage(raw)
+        SplitType.Libs -> raw.replace('_', '-')
+        SplitType.ScreenDensity -> raw
+        SplitType.Feature -> raw
+        SplitType.Other -> entry.name
     }
 }
 
