@@ -176,28 +176,15 @@ private fun PermissionRow(entry: PermissionEntry, granted: Boolean) {
                 .size(20.dp)
                 .padding(top = 2.dp),
         )
-        Column(modifier = Modifier.weight(1f)) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Text(
-                    text = entry.label,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                if (entry.isDangerous) {
-                    Text(
-                        text = stringResource(R.string.permissions_dangerous_badge),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier
-                            .clip(MaterialTheme.shapes.small)
-                            .background(MaterialTheme.colorScheme.errorContainer)
-                            .padding(horizontal = 6.dp, vertical = 2.dp),
-                    )
-                }
-            }
+        Column(
+            modifier = Modifier.weight(1f),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Text(
+                text = entry.label,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
             Text(
                 text = entry.name,
                 style = MaterialTheme.typography.bodySmall,
@@ -210,6 +197,17 @@ private fun PermissionRow(entry: PermissionEntry, granted: Boolean) {
                     text = desc,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
+                )
+            }
+            if (entry.isDangerous) {
+                Text(
+                    text = stringResource(R.string.permissions_dangerous_badge),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = MaterialTheme.colorScheme.onErrorContainer,
+                    modifier = Modifier
+                        .clip(MaterialTheme.shapes.small)
+                        .background(MaterialTheme.colorScheme.errorContainer)
+                        .padding(horizontal = 6.dp, vertical = 2.dp),
                 )
             }
         }

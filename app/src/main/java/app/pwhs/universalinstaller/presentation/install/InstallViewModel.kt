@@ -789,6 +789,13 @@ class InstallViewModel(
     companion object {
         /** User-facing folder under /sdcard/Download/ so downloads are easy to browse. */
         const val DOWNLOADS_SUBFOLDER = "UniversalInstaller"
+
+        private val ABI_TOKENS = setOf(
+            "armeabi_v7a", "arm64_v8a", "x86_64", "armeabi", "x86", "mips64", "mips",
+        )
+        private val DPI_TOKENS = setOf(
+            "ldpi", "mdpi", "tvdpi", "hdpi", "xhdpi", "xxhdpi", "xxxhdpi",
+        )
     }
 
     fun downloadFromUrl(context: Context, url: String) {
@@ -1175,7 +1182,26 @@ class InstallViewModel(
             Timber.w("USE_ROOT set but root probe=$state — falling back to next backend")
         }
         val useShizuku = prefs?.get(PreferencesKeys.USE_SHIZUKU) ?: false
-        return if (useShizuku) shizukuController else defaultController
+        if (useShizuku && isShizukuReadyForInstall()) {
+            return shizukuController
+        }
+        if (useShizuku) {
+            Timber.w("USE_SHIZUKU set but Shizuku binder/permission not ready — falling back to default installer")
+        }
+        return defaultController
+    }
+
+    // Mirrors the root probe: verify Shizuku is actually usable before handing the install
+    // off to ackpine's shizuku backend. Without this, a stale toggle (Shizuku app stopped,
+    // permission revoked, pre-v11 build) crashes the session deep in BaseInstallController
+    // with "binder haven't been received".
+    private fun isShizukuReadyForInstall(): Boolean = try {
+        rikka.shizuku.Shizuku.pingBinder() &&
+            !rikka.shizuku.Shizuku.isPreV11() &&
+            rikka.shizuku.Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+    } catch (t: Throwable) {
+        Timber.w(t, "Shizuku readiness probe failed")
+        false
     }
 
     private suspend fun readDeleteApkPref(): Boolean {
@@ -1310,7 +1336,20 @@ class InstallViewModel(
 
         val splitEntries = mutableListOf<SplitEntry>()
         try {
-            val entries = splitPackage.get().toList()
+            var entries = splitPackage.get().toList()
+            // Bundle parsers (apks/xapk/apkm/zip) look for `.apk` files INSIDE the zip and
+            // come back empty when the file is actually a single APK that's just been
+            // served/saved with a non-apk extension — e.g. F-Droid's
+            // `net.typeblog.shelter_445.zip` is really one APK. The system installer doesn't
+            // care; reparse via the singleton path so we don't surface a misleading "may be
+            // corrupt" error.
+            if (entries.isEmpty() && extension in setOf("apks", "xapk", "apkm", "zip")) {
+                Timber.w(
+                    "SplitPackage enumerated 0 entries for $originalUri (fileName=$fileName ext=$extension) — " +
+                        "retrying as single APK"
+                )
+                entries = SingletonApkSequence(originalUri, context).toSplitPackage().get().toList()
+            }
             splitCount = entries.size
             if (entries.isEmpty()) {
                 Timber.e(
@@ -1372,12 +1411,32 @@ class InstallViewModel(
                         ))
                     }
                     else -> {
-                        splitEntries.add(SplitEntry(
-                            name = apk.uri.lastPathSegment ?: "unknown",
-                            type = SplitType.Other,
-                            uri = apk.uri,
-                            sizeBytes = apk.size,
-                        ))
+                        // Ackpine returns Apk.Other when its split-name parser fails to
+                        // extract a known ABI/DPI/locale token — typically because the
+                        // splitName contains an extra suffix like `.v2` (signature scheme
+                        // marker) that defeats `splitTypePart()`'s "after last `config.`"
+                        // strategy, e.g. `config.arm64_v8a.v2`. Reclassify by scanning each
+                        // dot-separated segment for ABI/DPI tokens before falling back to
+                        // the generic Other bucket.
+                        val reclassified = reclassifyOtherSplit(apk.name)
+                        if (reclassified != null) {
+                            if (reclassified.first == SplitType.Libs) {
+                                supportedAbis.add(reclassified.second)
+                            }
+                            splitEntries.add(SplitEntry(
+                                name = reclassified.second,
+                                type = reclassified.first,
+                                uri = apk.uri,
+                                sizeBytes = apk.size,
+                            ))
+                        } else {
+                            splitEntries.add(SplitEntry(
+                                name = apk.name.ifBlank { apk.uri.lastPathSegment ?: "unknown" },
+                                type = SplitType.Other,
+                                uri = apk.uri,
+                                sizeBytes = apk.size,
+                            ))
+                        }
                     }
                 }
             }
@@ -1477,6 +1536,18 @@ class InstallViewModel(
             supportedAbis = supportedAbis.distinct(),
             splitEntries = splitEntries,
         )
+    }
+
+    // Recover ABI/DPI splits that ackpine surfaces as Apk.Other because the splitName has an
+    // extra suffix like `.v2` that breaks its `config.<token>` parse. Returns null if the
+    // name yields no recognizable token, in which case the caller keeps the Other category.
+    private fun reclassifyOtherSplit(splitName: String): Pair<SplitType, String>? {
+        if (splitName.isBlank()) return null
+        for (token in splitName.lowercase().split('.')) {
+            if (token in ABI_TOKENS) return SplitType.Libs to token.uppercase()
+            if (token in DPI_TOKENS) return SplitType.ScreenDensity to "${token.uppercase()}dpi"
+        }
+        return null
     }
 
     /**
