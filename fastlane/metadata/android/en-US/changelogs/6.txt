@@ -1,0 +1,6 @@
+- Redesigned Manage tab: actions, filter chips, storage breakdown, permissions viewer, usage stats, group by installer
+- Extract installed apps to .apk / .apks
+- Smart split picker, biometric lock, per-package installer source override
+- Risk consent gate for downgrades and VirusTotal-flagged installs, with a downgrade chip
+- Find Automatic results tagged Split / New / Update / Installed / Older
+- Auto-open after install with cancellable countdown
