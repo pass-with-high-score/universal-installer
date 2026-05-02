@@ -68,6 +68,15 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <!-- Plain-text share (browser share sheet → APK download URL). The URL is
+                 extracted from EXTRA_TEXT and routed through the InstallScreen's
+                 download-from-URL flow. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
         </activity>
 
         <activity android:name=".presentation.install.InstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />

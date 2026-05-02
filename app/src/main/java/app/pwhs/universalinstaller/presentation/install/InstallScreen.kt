@@ -339,6 +339,17 @@ private fun InstallUi(
         if (uris.size >= 2) onBatchPicked(uris)
     }
 
+    // Plain-text share (browser share sheet → APK download URL). Switch to the Download
+    // tab so the user can see the running progress, then kick off the existing
+    // download-from-URL flow (which validates the URL and surfaces errors in the UI).
+    val pendingDownloadUrl by IntentHandoff.pendingDownloadUrl.collectAsState()
+    LaunchedEffect(pendingDownloadUrl) {
+        val url = pendingDownloadUrl ?: return@LaunchedEffect
+        IntentHandoff.consumeDownloadUrl()
+        selectedTab = SourceTab.Download
+        onDownloadFromUrl(url)
+    }
+
     val grantPermissionLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             // Re-check on return — user may or may not have granted.

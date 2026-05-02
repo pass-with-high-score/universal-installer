@@ -67,8 +67,11 @@ class MainActivity : ComponentActivity() {
         // MainActivity — they're routed straight to DialogInstallActivity via manifest
         // intent filters, eliminating the launcher-activity flash that the old fast-path
         // here couldn't fully suppress. Only `universalinstaller://` deep links (sync,
-        // uninstall) still need the splash-skip path below.
-        val skipSplash = intent?.data?.scheme == "universalinstaller"
+        // uninstall) and text/plain shares (URL → download) still need the splash-skip
+        // path below.
+        val isTextShare = intent?.action == Intent.ACTION_SEND &&
+            intent?.type?.startsWith("text/") == true
+        val skipSplash = intent?.data?.scheme == "universalinstaller" || isTextShare
         setContent {
             // `remember` caches the Flow across recompositions so `map {}` isn't re-invoked
             // every frame (Detekt/Android Lint: "Flow operator functions should not be invoked
@@ -246,6 +249,14 @@ class MainActivity : ComponentActivity() {
                 IntentHandoff.post(uri)
             }
             Intent.ACTION_SEND -> {
+                // text/plain share — typically an APK download link from a browser's
+                // share sheet. Extract the first http(s):// URL we find and hand it to
+                // InstallScreen's download flow.
+                if (intent.type?.startsWith("text/") == true) {
+                    val text = intent.getStringExtra(Intent.EXTRA_TEXT) ?: return
+                    extractHttpUrl(text)?.let { IntentHandoff.postDownloadUrl(it) }
+                    return
+                }
                 // Share single: either intent.data or EXTRA_STREAM.
                 val uri = intent.data ?: @Suppress("DEPRECATION")
                     (intent.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri) ?: return
@@ -263,5 +274,25 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    /**
+     * Pull the first http/https URL out of a shared text payload. Browsers usually send
+     * just the URL, but messaging apps (and "Copy link" → "Share text" flows) sometimes
+     * wrap it in surrounding text — so we scan rather than trust a clean string.
+     */
+    private fun extractHttpUrl(text: String): String? {
+        val trimmed = text.trim()
+        if (trimmed.startsWith("http://", ignoreCase = true) ||
+            trimmed.startsWith("https://", ignoreCase = true)
+        ) {
+            return trimmed.substringBefore(' ').substringBefore('\n')
+        }
+        val match = HTTP_URL_REGEX.find(trimmed) ?: return null
+        return match.value
+    }
+
+    private companion object {
+        private val HTTP_URL_REGEX = Regex("""https?://\S+""", RegexOption.IGNORE_CASE)
     }
 }

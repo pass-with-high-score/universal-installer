@@ -19,12 +19,22 @@ object IntentHandoff {
     private val _pendingUris = MutableStateFlow<List<Uri>?>(null)
     val pendingUris: StateFlow<List<Uri>?> = _pendingUris.asStateFlow()
 
+    /** Plain-text share (`ACTION_SEND` + `text/plain`) — typically a download URL pasted
+     *  from a browser's share sheet. Consumed by InstallScreen which routes it through
+     *  the existing download-from-URL flow. */
+    private val _pendingDownloadUrl = MutableStateFlow<String?>(null)
+    val pendingDownloadUrl: StateFlow<String?> = _pendingDownloadUrl.asStateFlow()
+
     fun post(uri: Uri) {
         _pendingUri.value = uri
     }
 
     fun postBatch(uris: List<Uri>) {
         _pendingUris.value = uris
+    }
+
+    fun postDownloadUrl(url: String) {
+        _pendingDownloadUrl.value = url
     }
 
     fun consume(): Uri? {
@@ -36,6 +46,12 @@ object IntentHandoff {
     fun consumeBatch(): List<Uri>? {
         val value = _pendingUris.value
         if (value != null) _pendingUris.value = null
+        return value
+    }
+
+    fun consumeDownloadUrl(): String? {
+        val value = _pendingDownloadUrl.value
+        if (value != null) _pendingDownloadUrl.value = null
         return value
     }
 }
