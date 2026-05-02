@@ -11,12 +11,12 @@ plugins {
 
 android {
     namespace = "app.pwhs.universalinstaller"
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "app.pwhs.universalinstaller"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 37
         versionCode = 6
         versionName = "1.5.0"
 
