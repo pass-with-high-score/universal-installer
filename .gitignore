@@ -22,4 +22,4 @@ fastlane/screenshots
 fastlane/test_output
 fastlane/README.md
 Gemfile.lock
-vendor/
+vendor/downloads/
