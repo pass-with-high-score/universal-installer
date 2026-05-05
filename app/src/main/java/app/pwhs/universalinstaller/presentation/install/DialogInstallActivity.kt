@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.presentation.install
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -58,6 +59,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import app.pwhs.universalinstaller.IntentHandoff
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.dataStore
@@ -115,12 +117,26 @@ class DialogInstallActivity : ComponentActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
-        val incomingUri = collectIncomingUri(intent)
-        if (incomingUri == null) {
-            Timber.w("DialogInstallActivity launched without a content URI — bailing")
+        val incomingUris = collectIncomingUris(intent)
+        if (incomingUris.isEmpty()) {
+            Timber.w("DialogInstallActivity launched without any content URIs — bailing")
             finish()
             return
         }
+
+        if (incomingUris.size > 1) {
+            // Multiple URIs → redirect to full app for batch install
+            IntentHandoff.postBatch(incomingUris)
+            val targetIntent = Intent(this, InstallActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            forwardIncomingUris(intent, targetIntent)
+            startActivity(targetIntent)
+            finish()
+            return
+        }
+
+        val incomingUri = incomingUris.first()
 
         // Start in Loading stage
         viewModel.dialogStartLoading()
@@ -185,7 +201,7 @@ class DialogInstallActivity : ComponentActivity() {
                 val session = uiState.sessions.find { it.id == target.sessionId }
                 if (session != null) {
                     sessionEverSeen = true
-                    val msg = session.error.resolve(this@DialogInstallActivity).toString()
+                    val msg = session.error.resolve(this@DialogInstallActivity)
                     if (msg.isNotBlank()) {
                         viewModel.dialogInstallFailed(msg)
                     }
@@ -292,7 +308,22 @@ class DialogInstallActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val uri = collectIncomingUri(intent) ?: return
+        val uris = collectIncomingUris(intent)
+        if (uris.isEmpty()) return
+
+        if (uris.size > 1) {
+            // Multiple URIs → redirect to full app for batch install
+            IntentHandoff.postBatch(uris)
+            val targetIntent = Intent(this, InstallActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            forwardIncomingUris(intent, targetIntent)
+            startActivity(targetIntent)
+            finish()
+            return
+        }
+
+        val uri = uris.first()
         viewModel.dismissPendingInstall()
         viewModel.dialogStartLoading()
         val context = this
@@ -309,6 +340,27 @@ class DialogInstallActivity : ComponentActivity() {
         }
     }
 
+    /**
+     * Re-grant any content URIs we received on [source] to [target] so the install activity's
+     * task can read them. Required because we launch [target] with `NEW_TASK | CLEAR_TASK` and
+     * `finish()` ourselves — the original grant only covered DialogInstallActivity's task.
+     */
+    private fun forwardIncomingUris(source: Intent?, target: Intent) {
+        if (source == null) return
+        val uris = collectIncomingUris(source)
+        if (uris.isEmpty()) return
+        if (uris.size == 1) {
+            target.data = uris.first()
+        } else {
+            val clip = ClipData.newRawUri("", uris.first())
+            for (i in 1 until uris.size) {
+                clip.addItem(ClipData.Item(uris[i]))
+            }
+            target.clipData = clip
+        }
+        target.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+
     override fun onStop() {
         super.onStop()
         // Don't auto-finish if we went to system's install confirm dialog.
@@ -320,7 +372,7 @@ class DialogInstallActivity : ComponentActivity() {
      * then hand to the shared VM so the install logic (split picker, VT scan, OBB) works
      * identically to the full-screen flow.
      */
-    private suspend fun parseAndPush(context: Context, uri: Uri) {
+    private fun parseAndPush(context: Context, uri: Uri) {
         val displayName = context.contentResolver.getDisplayName(uri)
         val mime = context.contentResolver.getType(uri)?.lowercase()
         val ext = displayName.substringAfterLast('.', "").lowercase()
@@ -338,21 +390,36 @@ class DialogInstallActivity : ComponentActivity() {
     }
 
     /**
-     * Pull the first installable URI off the launch intent. SEND_MULTIPLE picks the first
-     * URI for the dialog-mode v1; users with batch needs can launch the full app and use
-     * the Install tab's batch flow.
+     * Pull all installable URIs off the launch intent. If multiple URIs are found,
+     * onCreate/onNewIntent will redirect to the full app's batch flow.
      */
-    private fun collectIncomingUri(source: Intent?): Uri? {
-        if (source == null) return null
-        source.data?.takeIf { it.scheme == "content" || it.scheme == "file" }?.let { return it }
+    private fun collectIncomingUris(source: Intent?): List<Uri> {
+        if (source == null) return emptyList()
+        val out = mutableListOf<Uri>()
+
+        // 1. Data URI (VIEW / INSTALL_PACKAGE)
+        source.data?.takeIf { it.scheme == "content" || it.scheme == "file" }?.let(out::add)
+
+        // 2. EXTRA_STREAM (SEND / SEND_MULTIPLE)
         @Suppress("DEPRECATION")
-        (source.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)?.let { return it }
-        val clip = source.clipData ?: return null
-        for (i in 0 until clip.itemCount) {
-            val u = clip.getItemAt(i).uri ?: continue
-            if (u.scheme == "content" || u.scheme == "file") return u
+        when (source.action) {
+            Intent.ACTION_SEND ->
+                (source.getParcelableExtra(Intent.EXTRA_STREAM) as? Uri)?.let(out::add)
+            Intent.ACTION_SEND_MULTIPLE ->
+                source.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM)
+                    ?.filterNotNull()
+                    ?.let(out::addAll)
         }
-        return null
+
+        // 3. ClipData (Alternative for some file managers)
+        source.clipData?.let { clip ->
+            for (i in 0 until clip.itemCount) {
+                val u = clip.getItemAt(i).uri ?: continue
+                if (u.scheme == "content" || u.scheme == "file") out.add(u)
+            }
+        }
+
+        return out.distinct()
     }
 }
 
@@ -460,14 +527,13 @@ private fun DialogContent(
                     }
 
                     DialogStage.Installing -> {
-                        val target = dialogTarget
-                        if (target != null) {
-                            val sp = uiState.sessionsProgress.find { it.id == target.sessionId }
+                        if (dialogTarget != null) {
+                            val sp = uiState.sessionsProgress.find { it.id == dialogTarget.sessionId }
                             val fraction = sp?.let {
                                 if (it.progressMax > 0) it.currentProgress.toFloat() / it.progressMax else null
                             }
                             DialogInstallingContent(
-                                target = target,
+                                target = dialogTarget,
                                 progressFraction = fraction,
                                 onBackground = onBackground,
                             )
@@ -477,18 +543,17 @@ private fun DialogContent(
                     }
 
                     DialogStage.Success -> {
-                        val target = dialogTarget
-                        if (target != null) {
+                        if (dialogTarget != null) {
                             val context = LocalContext.current
-                            val canOpen = remember(target.packageName) {
-                                target.packageName.isNotBlank() &&
-                                    context.packageManager.getLaunchIntentForPackage(target.packageName) != null
+                            val canOpen = remember(dialogTarget.packageName) {
+                                dialogTarget.packageName.isNotBlank() &&
+                                    context.packageManager.getLaunchIntentForPackage(dialogTarget.packageName) != null
                             }
                             DialogSuccessContent(
-                                target = target,
+                                target = dialogTarget,
                                 canOpen = canOpen,
                                 autoOpenCountdownStartSeconds = if (autoOpenAfterInstall) 3 else null,
-                                onOpen = { onOpenInstalledApp(target.packageName) },
+                                onOpen = { onOpenInstalledApp(dialogTarget.packageName) },
                                 onDone = onCloseAfterResult,
                             )
                         } else {

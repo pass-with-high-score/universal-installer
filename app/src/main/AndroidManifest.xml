@@ -79,7 +79,10 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".presentation.install.InstallActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.install.InstallActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
 
         <!-- Dialog-style install entry point. Owns every file-open / share intent filter so
              external apps land here directly without a router-activity hop. singleInstance
@@ -87,17 +90,18 @@
              translucent theme lets the calling app remain visible behind the scrim. -->
         <activity
             android:name=".presentation.install.DialogInstallActivity"
-            android:exported="true"
-            android:theme="@style/Theme.UniversalInstaller.Dialog"
-            android:launchMode="singleInstance"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
             android:excludeFromRecents="true"
+            android:exported="true"
+            android:launchMode="singleInstance"
             android:taskAffinity=""
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout">
+            android:theme="@style/Theme.UniversalInstaller.Dialog">
 
             <!-- Splits + single APK by file extension -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
@@ -173,6 +177,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/vnd.android.package-archive" />
                 <data android:mimeType="application/vnd.apkm" />
                 <data android:mimeType="application/xapk-package-archive" />
@@ -182,6 +187,7 @@
             <intent-filter>
                 <action android:name="android.intent.action.SEND_MULTIPLE" />
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="application/vnd.android.package-archive" />
                 <data android:mimeType="application/vnd.apkm" />
                 <data android:mimeType="application/xapk-package-archive" />
@@ -189,21 +195,45 @@
                 <data android:mimeType="application/zip" />
             </intent-filter>
         </activity>
-        <activity android:name=".presentation.manage.ManageActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
-        <activity android:name=".presentation.manage.BackupsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
-        <activity android:name=".presentation.manage.permissions.AppPermissionsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
-        <activity android:name=".presentation.sync.SyncActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
-        <activity android:name=".presentation.setting.SettingActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
-        <activity android:name=".presentation.download.DownloadHistoryActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
-        <activity android:name=".presentation.manage.logs.UninstallLogsActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
-        <activity android:name=".presentation.setting.language.LanguageActivity" android:exported="false" android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.manage.ManageActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.manage.BackupsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.manage.permissions.AppPermissionsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.sync.SyncActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.setting.SettingActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.download.DownloadHistoryActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.manage.logs.UninstallLogsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
+            android:name=".presentation.setting.language.LanguageActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
 
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
             android:authorities="${applicationId}.shizuku"
-            android:multiprocess="false"
             android:enabled="true"
             android:exported="true"
+            android:multiprocess="false"
             android:permission="android.permission.INTERACT_ACROSS_USERS_FULL" />
 
         <!-- WorkManager foreground service type for Android 14+. Overrides the library's
@@ -215,15 +245,15 @@
 
         <service
             android:name=".presentation.sync.SyncService"
-            android:foregroundServiceType="dataSync"
-            android:exported="false" />
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
 
         <service
             android:name=".presentation.sync.SyncTileService"
+            android:exported="true"
             android:icon="@drawable/ic_qs_sync"
             android:label="@string/qs_tile_sync_label"
-            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE"
-            android:exported="true">
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
             </intent-filter>
