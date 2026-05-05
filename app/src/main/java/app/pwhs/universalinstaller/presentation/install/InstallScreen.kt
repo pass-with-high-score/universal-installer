@@ -56,10 +56,6 @@ import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.composable.SessionCard
 import app.pwhs.universalinstaller.util.extension.getDisplayName
-
-
-
-
 import org.koin.androidx.compose.koinViewModel
 import ru.solrudev.ackpine.splits.ApkSplits.validate
 import ru.solrudev.ackpine.splits.SplitPackage
@@ -73,6 +69,7 @@ fun InstallScreen(
     viewModel: InstallViewModel = koinViewModel(),
 ) {
     val context = LocalContext.current
+    val resource = LocalResources.current
     val uiState by viewModel.uiState.collectAsState()
     val history by viewModel.history.collectAsState()
     val installGateEnabled by remember(context) {
@@ -94,8 +91,8 @@ fun InstallScreen(
             BiometricGate.authenticate(
                 activity = activity,
                 enabled = installGateEnabled,
-                title = context.getString(R.string.biometric_install_title),
-                subtitle = context.getString(R.string.biometric_install_sub),
+                title = resource.getString(R.string.biometric_install_title),
+                subtitle = resource.getString(R.string.biometric_install_sub),
                 onSuccess = viewModel::confirmInstall,
             )
         } else {
@@ -164,7 +161,8 @@ fun InstallScreen(
         onToggleSplit = viewModel::toggleSplit,
         onOpenSyncServer = {
             context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.sync.SyncActivity::class.java))
-        }
+        },
+        onSetMergeSplits = viewModel::setMergeSplits,
     )
 }
 
@@ -202,6 +200,7 @@ private fun InstallUi(
     onBatchDismiss: () -> Unit = {},
     onToggleSplit: (Int) -> Unit = {},
     onOpenSyncServer: () -> Unit = {},
+    onSetMergeSplits: (Boolean) -> Unit = { },
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -391,9 +390,11 @@ private fun InstallUi(
 
     BatchInstallSheet(
         state = uiState.batchState,
+        mergeSplits = uiState.mergeSplits,
         onDismiss = onBatchDismiss,
         onToggleEntry = onBatchToggleEntry,
         onToggleAll = onBatchToggleAll,
+        onToggleMerge = onSetMergeSplits,
         onConfirm = onBatchConfirm,
     )
 

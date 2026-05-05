@@ -122,4 +122,6 @@ data class InstallUiState(
     val batchState: BatchInstallState = BatchInstallState.Idle,
     /** Current stage of the dialog install flow. */
     val dialogStage: DialogStage = DialogStage.None,
+    /** Whether to merge split APKs from multiple files into a single session. */
+    val mergeSplits: Boolean = false,
 )

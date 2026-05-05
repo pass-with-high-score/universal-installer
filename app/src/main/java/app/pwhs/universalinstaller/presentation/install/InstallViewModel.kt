@@ -87,6 +87,7 @@ class InstallViewModel(
     private val _attachedObbFiles = MutableStateFlow<List<AttachedObb>>(emptyList())
     private val _batchState = MutableStateFlow<BatchInstallState>(BatchInstallState.Idle)
     private val _dialogStage = MutableStateFlow<DialogStage>(DialogStage.None)
+    private val _mergeSplits = MutableStateFlow(false)
 
     /**
      * Snapshot of the install target captured at confirmInstall time. We can't read
@@ -163,6 +164,7 @@ class InstallViewModel(
         _attachedObbFiles,
         _batchState,
         _dialogStage,
+        _mergeSplits,
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         InstallUiState(
@@ -176,6 +178,7 @@ class InstallViewModel(
             attachedObbFiles = flows[7] as List<AttachedObb>,
             batchState = flows[8] as BatchInstallState,
             dialogStage = flows[9] as DialogStage,
+            mergeSplits = flows[10] as Boolean,
         )
     }
         .onStart { activeController().restoreSessionsFromSavedState(viewModelScope) }
@@ -208,6 +211,17 @@ class InstallViewModel(
 
     /** Close dialog entirely. */
     fun dialogClose() { _dialogStage.value = DialogStage.None }
+
+    /** Toggle whether to merge split APKs in batch install. */
+    fun setMergeSplits(merge: Boolean) {
+        _mergeSplits.value = merge
+        // If we're already in a batch Ready state, re-parse to apply the change.
+        val state = _batchState.value
+        if (state is BatchInstallState.Ready) {
+            val uris = state.entries.map { it.uri }
+            parseBatch(application, uris)
+        }
+    }
 
     /** Clear the captured install target — call when the dialog is fully closed. */
     fun clearDialogTarget() { _dialogTarget.value = null }
@@ -629,22 +643,47 @@ class InstallViewModel(
             // installing both serially usually fails or surprises the user (downgrade / signature
             // mismatch). They can still re-check manually if that's really what they want.
             val dupLabel = application.getString(R.string.batch_install_dup_package)
-            val seen = mutableSetOf<String>()
-            val deduped = entries.map { e ->
-                when {
-                    e.parseError != null -> e
-                    e.apkInfo.packageName.isBlank() || e.apkInfo.packageName == "Unknown" -> e
-                    e.apkInfo.packageName in seen -> e.copy(
-                        selected = false,
-                        conflictLabel = dupLabel,
-                    )
-                    else -> {
-                        seen += e.apkInfo.packageName
-                        e
+            val mergedLabel = application.getString(R.string.batch_install_merged_splits)
+            val useMerge = _mergeSplits.value
+
+            val processedEntries = if (useMerge) {
+                // Group by package name and version code. Versions must match to be merged.
+                entries.groupBy { "${it.apkInfo.packageName}_${it.apkInfo.versionCode}" }
+                    .map { (_, group) ->
+                        if (group.size > 1 && group.all { it.parseError == null }) {
+                            // Merge splits: take the first as base, add URIs from others
+                            val first = group.first()
+                            val allSplitUris = group.flatMap { it.splitUris }.distinct()
+                            first.copy(
+                                splitUris = allSplitUris,
+                                conflictLabel = mergedLabel,
+                                apkInfo = first.apkInfo.copy(
+                                    splitCount = allSplitUris.size,
+                                    fileSizeBytes = group.sumOf { it.apkInfo.fileSizeBytes }
+                                )
+                            )
+                        } else {
+                            group.first()
+                        }
+                    }
+            } else {
+                val seen = mutableSetOf<String>()
+                entries.map { e ->
+                    when {
+                        e.parseError != null -> e
+                        e.apkInfo.packageName.isBlank() || e.apkInfo.packageName == "Unknown" -> e
+                        e.apkInfo.packageName in seen -> e.copy(
+                            selected = false,
+                            conflictLabel = dupLabel,
+                        )
+                        else -> {
+                            seen += e.apkInfo.packageName
+                            e
+                        }
                     }
                 }
             }
-            _batchState.value = BatchInstallState.Ready(deduped)
+            _batchState.value = BatchInstallState.Ready(processedEntries)
         }
     }
 

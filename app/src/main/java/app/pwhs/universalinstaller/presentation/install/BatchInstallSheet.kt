@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.CheckBox
 import androidx.compose.material.icons.rounded.CheckBoxOutlineBlank
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.MergeType
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
@@ -60,9 +61,11 @@ import app.pwhs.universalinstaller.R
 @Composable
 internal fun BatchInstallSheet(
     state: BatchInstallState,
+    mergeSplits: Boolean,
     onDismiss: () -> Unit,
     onToggleEntry: (Uri) -> Unit,
     onToggleAll: (Boolean) -> Unit,
+    onToggleMerge: (Boolean) -> Unit,
     onConfirm: () -> Unit,
 ) {
     if (state is BatchInstallState.Idle) return
@@ -76,9 +79,11 @@ internal fun BatchInstallSheet(
             is BatchInstallState.Parsing -> ParsingBody(state)
             is BatchInstallState.Ready -> ReadyBody(
                 state = state,
+                mergeSplits = mergeSplits,
                 onDismiss = onDismiss,
                 onToggleEntry = onToggleEntry,
                 onToggleAll = onToggleAll,
+                onToggleMerge = onToggleMerge,
                 onConfirm = onConfirm,
             )
             BatchInstallState.Idle -> Unit
@@ -116,9 +121,11 @@ private fun ParsingBody(state: BatchInstallState.Parsing) {
 @Composable
 private fun ReadyBody(
     state: BatchInstallState.Ready,
+    mergeSplits: Boolean,
     onDismiss: () -> Unit,
     onToggleEntry: (Uri) -> Unit,
     onToggleAll: (Boolean) -> Unit,
+    onToggleMerge: (Boolean) -> Unit,
     onConfirm: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -185,6 +192,25 @@ private fun ReadyBody(
                         color = MaterialTheme.colorScheme.onSurface,
                     )
                 }
+
+                // Merge toggle
+                AssistChip(
+                    onClick = { onToggleMerge(!mergeSplits) },
+                    label = { Text(stringResource(R.string.batch_install_merge_splits)) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.MergeType,
+                            contentDescription = null,
+                            modifier = Modifier.size(AssistChipDefaults.IconSize),
+                        )
+                    },
+                    colors = if (mergeSplits) AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        leadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    ) else AssistChipDefaults.assistChipColors(),
+                )
+
                 if (failedCount > 0) {
                     AssistChip(
                         onClick = {},

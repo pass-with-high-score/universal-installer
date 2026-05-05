@@ -113,6 +113,8 @@
     <string name="batch_install_failed_chip">%d failed</string>
     <string name="batch_install_action">Install %1$d · %2$s</string>
     <string name="batch_install_dup_package">Duplicate package</string>
+    <string name="batch_install_merge_splits">Merge split APKs</string>
+    <string name="batch_install_merged_splits">Merged</string>
     <string name="download_notif_channel_name">Package downloads</string>
     <string name="download_notif_channel_description">Progress of downloading APK/XAPK/APKS files from a URL</string>
     <string name="download_notif_running_title">Downloading %s</string>
