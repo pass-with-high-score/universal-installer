@@ -124,7 +124,6 @@ When Root access or Shizuku is enabled, unlocks:
 * **Room** — Local DB for install / uninstall / download history
 * **Koin** — Dependency injection
 * **DataStore** — Preferences storage
-* **Compose Destinations** — Type-safe navigation
 * **Coil 3** — App icon loading
 
 ---
