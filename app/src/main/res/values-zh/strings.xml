@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">仅当您信任此文件的来源时才继续操作。</string>
     <string name="dialog_menu_remember_for_app">记住此应用的设置</string>
     <string name="dialog_menu_remember_for_app_sub">每次安装此应用时都使用此安装程序来源。</string>
+    <string name="batch_install_merge_splits">合并 split APK</string>
+    <string name="batch_install_merged_splits">已合并</string>
 </resources>

@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">Sadece bu dosyanın kaynağına güveniyorsanız devam edin.</string>
     <string name="dialog_menu_remember_for_app">Bu uygulama için hatırla</string>
     <string name="dialog_menu_remember_for_app_sub">Bu uygulama ne zaman yüklenirse bu yükleyici kaynağını kullan.</string>
+    <string name="batch_install_merge_splits">Split APK'ları birleştir</string>
+    <string name="batch_install_merged_splits">Birleştirildi</string>
 </resources>

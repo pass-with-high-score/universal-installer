@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">Lanjutkan hanya jika Anda memercayai sumber file ini.</string>
     <string name="dialog_menu_remember_for_app">Ingat untuk aplikasi ini</string>
     <string name="dialog_menu_remember_for_app_sub">Gunakan sumber penginstal ini setiap kali aplikasi ini diinstal.</string>
+    <string name="batch_install_merge_splits">Gabungkan split APK</string>
+    <string name="batch_install_merged_splits">Digabungkan</string>
 </resources>

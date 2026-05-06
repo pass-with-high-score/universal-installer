@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">このファイルの提供元を信頼する場合にのみ続行してください。</string>
     <string name="dialog_menu_remember_for_app">このアプリ用に記憶する</string>
     <string name="dialog_menu_remember_for_app_sub">このアプリをインストールする際は、常にこのインストール元を使用します。</string>
+    <string name="batch_install_merge_splits">分割APKを結合</string>
+    <string name="batch_install_merged_splits">結合済み</string>
 </resources>

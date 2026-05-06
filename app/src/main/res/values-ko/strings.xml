@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">이 파일의 출처를 신뢰하는 경우에만 계속하세요.</string>
     <string name="dialog_menu_remember_for_app">이 앱에 대해 기억하기</string>
     <string name="dialog_menu_remember_for_app_sub">이 앱이 설치될 때마다 이 설치 프로그램 출처를 사용합니다.</string>
+    <string name="batch_install_merge_splits">분할 APK 병합</string>
+    <string name="batch_install_merged_splits">병합됨</string>
 </resources>

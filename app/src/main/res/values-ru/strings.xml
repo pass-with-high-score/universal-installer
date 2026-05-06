@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">Продолжайте только если доверяете источнику этого файла.</string>
     <string name="dialog_menu_remember_for_app">Запомнить для этого приложения</string>
     <string name="dialog_menu_remember_for_app_sub">Использовать этот источник установки при каждой установке этого приложения.</string>
+    <string name="batch_install_merge_splits">Объединить split APK</string>
+    <string name="batch_install_merged_splits">Объединено</string>
 </resources>

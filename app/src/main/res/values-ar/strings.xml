@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">استمر فقط إذا كنت تثق في مصدر هذا الملف.</string>
     <string name="dialog_menu_remember_for_app">تذكر لهذا التطبيق</string>
     <string name="dialog_menu_remember_for_app_sub">استخدم مصدر المثبت هذا متى تم تثبيت هذا التطبيق.</string>
+    <string name="batch_install_merge_splits">دمج ملفات split APK</string>
+    <string name="batch_install_merged_splits">مدمج</string>
 </resources>

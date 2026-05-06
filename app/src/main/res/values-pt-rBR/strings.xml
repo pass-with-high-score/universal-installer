@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">Prossiga apenas se você confiar na fonte deste arquivo.</string>
     <string name="dialog_menu_remember_for_app">Lembrar para este app</string>
     <string name="dialog_menu_remember_for_app_sub">Usar esta fonte de instalador sempre que este app for instalado.</string>
+    <string name="batch_install_merge_splits">Mesclar split APKs</string>
+    <string name="batch_install_merged_splits">Mesclado</string>
 </resources>

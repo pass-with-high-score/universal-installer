@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">Chỉ tiếp tục nếu bạn tin tưởng nguồn của tệp này.</string>
     <string name="dialog_menu_remember_for_app">Ghi nhớ cho ứng dụng này</string>
     <string name="dialog_menu_remember_for_app_sub">Sử dụng nguồn cài đặt này mỗi khi cài đặt ứng dụng này.</string>
+    <string name="batch_install_merge_splits">Gộp split APK</string>
+    <string name="batch_install_merged_splits">Đã gộp</string>
 </resources>

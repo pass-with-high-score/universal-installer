@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">Fahren Sie nur fort</string>
     <string name="dialog_menu_remember_for_app">Für diese App merken</string>
     <string name="dialog_menu_remember_for_app_sub">Diese Installationsquelle verwenden</string>
+    <string name="batch_install_merge_splits">Split-APKs zusammenführen</string>
+    <string name="batch_install_merged_splits">Zusammengeführt</string>
 </resources>

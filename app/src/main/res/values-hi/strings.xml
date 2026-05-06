@@ -507,4 +507,6 @@
     <string name="dialog_risk_footer">तभी आगे बढ़ें जब आपको इस फ़ाइल के स्रोत पर भरोसा हो।</string>
     <string name="dialog_menu_remember_for_app">इस ऐप के लिए याद रखें</string>
     <string name="dialog_menu_remember_for_app_sub">जब भी यह ऐप इंस्टॉल हो तो इस इंस्टॉलर स्रोत का उपयोग करें।</string>
+    <string name="batch_install_merge_splits">स्प्लिट एपीके मर्ज करें</string>
+    <string name="batch_install_merged_splits">मर्ज किया गया</string>
 </resources>
