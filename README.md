@@ -43,6 +43,7 @@
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.jpg" width="200">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.jpg" width="200">
   <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.jpg" width="200">
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.jpg" width="200">
 </div>
 
 ---
