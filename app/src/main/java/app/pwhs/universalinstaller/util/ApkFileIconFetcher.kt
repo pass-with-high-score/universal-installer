@@ -12,6 +12,7 @@ import coil3.request.Options
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.solrudev.ackpine.splits.Apk
+import ru.solrudev.ackpine.splits.CloseableSequence
 import ru.solrudev.ackpine.splits.ZippedApkSplits
 
 @JvmInline
@@ -31,11 +32,16 @@ class ApkFileIconFetcher(
             try {
                 val uri = android.net.Uri.fromFile(file)
                 var baseApk: Apk.Base? = null
-                for (apk in ZippedApkSplits.getApksForUri(uri, context)) {
-                    if (apk is Apk.Base) {
-                        baseApk = apk
-                        break
+                val apks = ZippedApkSplits.getApksForUri(uri, context)
+                try {
+                    for (apk in apks) {
+                        if (apk is Apk.Base) {
+                            baseApk = apk
+                            break
+                        }
                     }
+                } finally {
+                    apks.close()
                 }
                 if (baseApk == null) return@withContext null
 

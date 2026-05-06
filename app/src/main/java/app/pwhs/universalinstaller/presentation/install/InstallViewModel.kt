@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.solrudev.ackpine.installer.PackageInstaller
 import ru.solrudev.ackpine.splits.Apk
+import ru.solrudev.ackpine.splits.CloseableSequence
 import ru.solrudev.ackpine.splits.ApkSplits.validate
 import ru.solrudev.ackpine.splits.SplitPackage
 import ru.solrudev.ackpine.splits.SplitPackage.Companion.toSplitPackage
@@ -58,6 +59,7 @@ import java.io.File
 import java.io.IOException
 import java.util.UUID
 import androidx.core.graphics.createBitmap
+import java.util.zip.ZipFile
 
 class InstallViewModel(
     private val application: android.app.Application,
@@ -1375,7 +1377,12 @@ class InstallViewModel(
 
         val splitEntries = mutableListOf<SplitEntry>()
         try {
-            var entries = splitPackage.get().toList()
+            val sequence = splitPackage.get()
+            var entries = try {
+                sequence.toList()
+            } finally {
+                (sequence as? CloseableSequence<*>)?.close()
+            }
             // Bundle parsers (apks/xapk/apkm/zip) look for `.apk` files INSIDE the zip and
             // come back empty when the file is actually a single APK that's just been
             // served/saved with a non-apk extension — e.g. F-Droid's
@@ -1387,7 +1394,12 @@ class InstallViewModel(
                     "SplitPackage enumerated 0 entries for $originalUri (fileName=$fileName ext=$extension) — " +
                         "retrying as single APK"
                 )
-                entries = SingletonApkSequence(originalUri, context).toSplitPackage().get().toList()
+                val fallbackSequence = SingletonApkSequence(originalUri, context).toSplitPackage().get()
+                entries = try {
+                    fallbackSequence.toList()
+                } finally {
+                    (fallbackSequence as? CloseableSequence<*>)?.close()
+                }
             }
             splitCount = entries.size
             if (entries.isEmpty()) {
@@ -1540,7 +1552,9 @@ class InstallViewModel(
 
             if (supportedAbis.isEmpty() && tempFile.exists()) {
                 try {
-                    java.util.zip.ZipFile(tempFile).use { zip ->
+                    withContext(Dispatchers.IO) {
+                        ZipFile(tempFile)
+                    }.use { zip ->
                         val abiRegex = Regex("^lib/([^/]+)/")
                         val foundAbis = mutableSetOf<String>()
                         for (entry in zip.entries()) {
