@@ -1,0 +1,1 @@
+- Fix bottom navigation flickering on older Android versions
