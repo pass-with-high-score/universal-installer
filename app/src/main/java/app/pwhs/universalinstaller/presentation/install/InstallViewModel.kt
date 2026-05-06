@@ -1410,12 +1410,17 @@ class InstallViewModel(
             }
 
             for (entry in entries) {
-                when (val apk = entry.apk) {
+                val apk = entry.apk
+                // Pull package metadata from ANY split type — Ackpine parses the manifest of
+                // each split, and we need this to group splits for merging even if the system
+                // parser (PackageManager) fails.
+                if (ackpinePackageName.isEmpty()) ackpinePackageName = apk.packageName
+                if (ackpineVersionName.isEmpty()) ackpineVersionName = apk.versionName
+                if (ackpineVersionCode == 0L) ackpineVersionCode = apk.versionCode
+                if (ackpineSize == 0L) ackpineSize = apk.size
+
+                when (apk) {
                     is Apk.Base -> {
-                        ackpinePackageName = apk.packageName
-                        ackpineVersionName = apk.versionName
-                        ackpineVersionCode = apk.versionCode
-                        ackpineSize = apk.size
                         baseApkUri = apk.uri
                         splitEntries.add(SplitEntry(
                             name = "Base APK",
@@ -1518,14 +1523,22 @@ class InstallViewModel(
                 tempFile.outputStream().use { output -> input.copyTo(output) }
             }
 
-            val packageInfo = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.getPackageArchiveInfo(
-                    tempFile.absolutePath,
-                    PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                pm.getPackageArchiveInfo(tempFile.absolutePath, PackageManager.GET_PERMISSIONS)
+            // PackageManager.getPackageArchiveInfo can throw ExceptionInInitializerError on
+            // some Android 14/15 devices due to a missing /vendor/etc/aconfig_flags.pb file.
+            // Catch Throwable to prevent crashing the app and fall back to Ackpine's metadata.
+            val packageInfo = try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    pm.getPackageArchiveInfo(
+                        tempFile.absolutePath,
+                        PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong())
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    pm.getPackageArchiveInfo(tempFile.absolutePath, PackageManager.GET_PERMISSIONS)
+                }
+            } catch (t: Throwable) {
+                Timber.w(t, "PackageManager failed to parse $fileName — falling back to metadata")
+                null
             }
 
             if (packageInfo != null) {
