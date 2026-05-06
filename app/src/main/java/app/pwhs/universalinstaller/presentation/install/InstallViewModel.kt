@@ -1418,10 +1418,46 @@ class InstallViewModel(
                 // Pull package metadata from ANY split type — Ackpine parses the manifest of
                 // each split, and we need this to group splits for merging even if the system
                 // parser (PackageManager) fails.
-                if (ackpinePackageName.isEmpty()) ackpinePackageName = apk.packageName
-                if (ackpineVersionName.isEmpty()) ackpineVersionName = apk.versionName
-                if (ackpineVersionCode == 0L) ackpineVersionCode = apk.versionCode
-                if (ackpineSize == 0L) ackpineSize = apk.size
+                if (ackpinePackageName.isEmpty()) {
+                    ackpinePackageName = when (apk) {
+                        is Apk.Base -> apk.packageName
+                        is Apk.Libs -> apk.packageName
+                        is Apk.Localization -> apk.packageName
+                        is Apk.ScreenDensity -> apk.packageName
+                        is Apk.Feature -> apk.packageName
+                        is Apk.Other -> apk.packageName
+                    }
+                }
+                if (ackpineVersionName.isEmpty()) {
+                    ackpineVersionName = when (apk) {
+                        is Apk.Base -> apk.versionName
+                        is Apk.Libs -> apk.versionName
+                        is Apk.Localization -> apk.versionName
+                        is Apk.ScreenDensity -> apk.versionName
+                        is Apk.Feature -> apk.versionName
+                        is Apk.Other -> apk.versionName
+                    }
+                }
+                if (ackpineVersionCode == 0L) {
+                    ackpineVersionCode = when (apk) {
+                        is Apk.Base -> apk.versionCode
+                        is Apk.Libs -> apk.versionCode
+                        is Apk.Localization -> apk.versionCode
+                        is Apk.ScreenDensity -> apk.versionCode
+                        is Apk.Feature -> apk.versionCode
+                        is Apk.Other -> apk.versionCode
+                    }
+                }
+                if (ackpineSize == 0L) {
+                    ackpineSize = when (apk) {
+                        is Apk.Base -> apk.size
+                        is Apk.Libs -> apk.size
+                        is Apk.Localization -> apk.size
+                        is Apk.ScreenDensity -> apk.size
+                        is Apk.Feature -> apk.size
+                        is Apk.Other -> apk.size
+                    }
+                }
 
                 when (apk) {
                     is Apk.Base -> {
