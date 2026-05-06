@@ -1431,11 +1431,7 @@ class InstallViewModel(
                 if (ackpineVersionName.isEmpty()) {
                     ackpineVersionName = when (apk) {
                         is Apk.Base -> apk.versionName
-                        is Apk.Libs -> apk.versionName
-                        is Apk.Localization -> apk.versionName
-                        is Apk.ScreenDensity -> apk.versionName
-                        is Apk.Feature -> apk.versionName
-                        is Apk.Other -> apk.versionName
+                        else -> ""
                     }
                 }
                 if (ackpineVersionCode == 0L) {
