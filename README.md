@@ -52,6 +52,8 @@
 ### Install
 
 * **Multi-format** — `.apk`, `.apks`, `.xapk`, `.apkm` with split APK handling (via [Ackpine](https://ackpine.solrudev.ru/))
+* **Merge split APKs** — Group multiple individual `.apk` files (e.g. from a manual split extraction) into a single installation session. Perfect for installing apps served as a collection of separate splits.
+* **Modern Android Support** — Fully compatible with **Android 14, 15, 16**, and ready for **Android 17**. Fixes common parsing errors (e.g. `aconfig_flags.pb`) found on newer system versions.
 * **Package preview** — App name, icon, version, package, size, min/target SDK, supported ABIs, languages, permissions, OBB count, split count — shown in a bottom sheet before you commit
 * **Three local pick modes** — Find automatic (scans device storage), Browse packages (APK/XAPK/APKS/APKM only), Browse all files
 * **Remote download** — Paste a URL, download package directly. Files land in `/sdcard/Download/UniversalInstaller/` with their Content-Disposition name so they're easy to re-find in any file manager

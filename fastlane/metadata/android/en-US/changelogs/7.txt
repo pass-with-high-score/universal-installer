@@ -1,0 +1,5 @@
+- Added "Merge split APKs" feature
+- Fixed crash when deleting many APKs
+- Fixed parsing errors on Android 14+
+- Improved split APK compatibility
+- Added support for Android 17
