@@ -648,18 +648,22 @@ class InstallViewModel(
             val mergedLabel = application.getString(R.string.batch_install_merged_splits)
             val useMerge = _mergeSplits.value
 
+            // Group by package name and version code. Versions must match to be merged.
             val processedEntries = if (useMerge) {
-                // Group by package name and version code. Versions must match to be merged.
                 entries.groupBy { "${it.apkInfo.packageName}_${it.apkInfo.versionCode}" }
                     .map { (_, group) ->
                         if (group.size > 1 && group.all { it.parseError == null }) {
-                            // Merge splits: take the first as base, add URIs from others
-                            val first = group.first()
+                            // Merge splits: prefer the entry that contains a Base APK as the
+                            // representative (for correct name/icon).
+                            val representative = group.find { g ->
+                                g.apkInfo.splitEntries.any { it.type == SplitType.Base }
+                            } ?: group.first()
+                            
                             val allSplitUris = group.flatMap { it.splitUris }.distinct()
-                            first.copy(
+                            representative.copy(
                                 splitUris = allSplitUris,
                                 conflictLabel = mergedLabel,
-                                apkInfo = first.apkInfo.copy(
+                                apkInfo = representative.apkInfo.copy(
                                     splitCount = allSplitUris.size,
                                     fileSizeBytes = group.sumOf { it.apkInfo.fileSizeBytes }
                                 )
@@ -1622,6 +1626,16 @@ class InstallViewModel(
      * match for this device. The user can still override via [toggleSplit].
      */
     private fun applySmartPick(entries: MutableList<SplitEntry>, context: Context) {
+        if (entries.size <= 1) {
+            // If the file only has one split (common for individual split APKs), keep it
+            // by default so it can be merged even if it doesn't match the current device
+            // locale/ABI. The user can always deselect it in the preview sheet.
+            for (i in entries.indices) {
+                if (!entries[i].selected) entries[i] = entries[i].copy(selected = true)
+            }
+            return
+        }
+
         // Libs: prefer the highest-priority ABI in Build.SUPPORTED_ABIS. Splits are tagged
         // with the canonical ackpine ABI name, which uses underscores (`arm64_v8a`) while
         // Build.SUPPORTED_ABIS uses dashes (`arm64-v8a`). Normalise both sides before match.
@@ -1649,8 +1663,10 @@ class InstallViewModel(
         // also stays selected so apps with English-only resources don't lose all strings.
         val userLangs = run {
             val list = androidx.core.os.LocaleListCompat.getDefault()
-            (0 until list.size()).mapNotNull { list[it]?.getDisplayLanguage(java.util.Locale.ENGLISH) }
-        }.toSet() + "English"
+            (0 until list.size()).mapNotNull { 
+                list[it]?.getDisplayLanguage(java.util.Locale.ENGLISH)?.lowercase()
+            }
+        }.toSet() + "english"
 
         for (i in entries.indices) {
             val e = entries[i]
@@ -1658,7 +1674,7 @@ class InstallViewModel(
                 SplitType.Base, SplitType.Feature, SplitType.Other -> true
                 SplitType.Libs -> e.uri == libsBest
                 SplitType.ScreenDensity -> e.uri == densityBest
-                SplitType.Locale -> e.name in userLangs
+                SplitType.Locale -> e.name.lowercase() in userLangs
             }
             if (e.selected != keep) entries[i] = e.copy(selected = keep)
         }
