@@ -11,14 +11,14 @@ plugins {
 
 android {
     namespace = "app.pwhs.universalinstaller"
-    compileSdk = 37
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "app.pwhs.universalinstaller"
         minSdk = 24
-        targetSdk = 37
-        versionCode = 9
-        versionName = "1.6.2"
+        targetSdk = 36
+        versionCode = 10
+        versionName = "1.6.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
