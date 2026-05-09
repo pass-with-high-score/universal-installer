@@ -1,0 +1,482 @@
+locale,name,default_value
+ar,permission_return_channel_name,العودة إلى التطبيق
+ar,permission_return_channel_desc,إشعار للعودة إلى التطبيق بعد منح الإذن في إعدادات النظام.
+ar,permission_return_title,تم منح الإذن
+ar,permission_return_body,اضغط للعودة إلى Universal Installer.
+ar,setting_about_subtitle,"معلومات التطبيق، الروابط وتفاصيل الجهاز"
+ar,about_section_app,التطبيق
+ar,about_section_community,المجتمع
+ar,about_section_legal,قانوني
+ar,about_section_device,الجهاز
+ar,about_creator_title,أنشئ بواسطة
+ar,about_license_title,الترخيص
+ar,about_device_info_title,معلومات الجهاز
+ar,about_device_manufacturer,الشركة المصنعة: %s
+ar,about_device_model,الموديل: %s
+ar,about_device_board,اللوحة: %s
+ar,about_device_arch,ABIs: %s
+ar,about_device_sdk,Android SDK: %s
+ar,about_device_os,إصدار نظام التشغيل: %s
+ar,about_device_density,كثافة الشاشة: %s
+ar,about_btn_copy,نسخ
+ar,about_copied,تم نسخ معلومات الجهاز
+ar,setting_diagnostics_title,التشخيص
+ar,setting_diagnostics_subtitle,عرض السجلات وتقارير الأخطاء
+ar,diagnostics_title,التشخيص
+ar,diagnostics_tab_session,سجلات الجلسة
+ar,diagnostics_tab_crashes,تقارير الأخطاء
+ar,diagnostics_share,مشاركة التقرير
+ar,diagnostics_copy,نسخ
+ar,diagnostics_copied,تم النسخ إلى الحافظة
+ar,diagnostics_loading,جارٍ التحميل…
+ar,diagnostics_no_session_logs,لا توجد تحذيرات أو أخطاء في هذه الجلسة
+ar,diagnostics_no_crashes,لم يتم تسجيل أي أعطال
+ar,diagnostics_clear_crashes,مسح تقارير الأخطاء
+ar,diagnostics_clear_confirm_title,مسح تقارير الأخطاء؟
+ar,diagnostics_clear_confirm_body,سيتم حذف جميع سجلات الأعطال المخزنة نهائيًا.
+ar,diagnostics_clear,مسح
+ar,diagnostics_cancel,إلغاء
+de,permission_return_channel_name,Zur App zurückkehren
+de,permission_return_channel_desc,Benachrichtigung zur Rückkehr zur App nach Erteilung einer Berechtigung in den Systemeinstellungen.
+de,permission_return_title,Berechtigung erteilt
+de,permission_return_body,Tippen, um zu Universal Installer zurückzukehren.
+de,setting_about_subtitle,"App-Info, Links und Gerätedetails"
+de,about_section_app,App
+de,about_section_community,Community
+de,about_section_legal,Rechtliches
+de,about_section_device,Gerät
+de,about_creator_title,Erstellt von
+de,about_license_title,Lizenz
+de,about_device_info_title,Geräteinformationen
+de,about_device_manufacturer,Hersteller: %s
+de,about_device_model,Modell: %s
+de,about_device_board,Board: %s
+de,about_device_arch,ABIs: %s
+de,about_device_sdk,Android SDK: %s
+de,about_device_os,Betriebssystemversion: %s
+de,about_device_density,Bildschirmdichte: %s
+de,about_btn_copy,Kopieren
+de,about_copied,Geräteinfo kopiert
+de,setting_diagnostics_title,Diagnose
+de,setting_diagnostics_subtitle,Protokolle und Absturzberichte anzeigen
+de,diagnostics_title,Diagnose
+de,diagnostics_tab_session,Sitzungsprotokolle
+de,diagnostics_tab_crashes,Absturzberichte
+de,diagnostics_share,Bericht teilen
+de,diagnostics_copy,Kopieren
+de,diagnostics_copied,In die Zwischenablage kopiert
+de,diagnostics_loading,Lädt…
+de,diagnostics_no_session_logs,Keine Warnungen oder Fehler in dieser Sitzung
+de,diagnostics_no_crashes,Keine Abstürze aufgezeichnet
+de,diagnostics_clear_crashes,Absturzberichte löschen
+de,diagnostics_clear_confirm_title,Absturzberichte löschen?
+de,diagnostics_clear_confirm_body,Alle gespeicherten Absturzprotokolle werden dauerhaft entfernt.
+de,diagnostics_clear,Löschen
+de,diagnostics_cancel,Abbrechen
+es,permission_return_channel_name,Volver a la aplicación
+es,permission_return_channel_desc,Notificación para volver a la aplicación después de otorgar un permiso en los ajustes del sistema.
+es,permission_return_title,Permiso otorgado
+es,permission_return_body,Toca para volver a Universal Installer.
+es,setting_about_subtitle,"Información de la aplicación, enlaces y detalles del dispositivo"
+es,about_section_app,Aplicación
+es,about_section_community,Comunidad
+es,about_section_legal,Legal
+es,about_section_device,Dispositivo
+es,about_creator_title,Creado por
+es,about_license_title,Licencia
+es,about_device_info_title,Información del dispositivo
+es,about_device_manufacturer,Fabricante: %s
+es,about_device_model,Modelo: %s
+es,about_device_board,Placa: %s
+es,about_device_arch,ABIs: %s
+es,about_device_sdk,Android SDK: %s
+es,about_device_os,Versión de SO: %s
+es,about_device_density,Densidad de pantalla: %s
+es,about_btn_copy,Copiar
+es,about_copied,Información del dispositivo copiada
+es,setting_diagnostics_title,Diagnóstico
+es,setting_diagnostics_subtitle,Ver registros e informes de errores
+es,diagnostics_title,Diagnóstico
+es,diagnostics_tab_session,Registros de sesión
+es,diagnostics_tab_crashes,Informes de errores
+es,diagnostics_share,Compartir informe
+es,diagnostics_copy,Copiar
+es,diagnostics_copied,Copiado al portapapeles
+es,diagnostics_loading,Cargando…
+es,diagnostics_no_session_logs,No hay advertencias ni errores en esta sesión
+es,diagnostics_no_crashes,No se registraron fallos
+es,diagnostics_clear_crashes,Borrar informes de errores
+es,diagnostics_clear_confirm_title,¿Borrar informes de errores?
+es,diagnostics_clear_confirm_body,Todos los registros de fallos guardados se eliminarán permanentemente.
+es,diagnostics_clear,Borrar
+es,diagnostics_cancel,Cancelar
+fr,permission_return_channel_name,Retourner à l'application
+fr,permission_return_channel_desc,Notification pour retourner à l'application après avoir accordé une permission dans les paramètres système.
+fr,permission_return_title,Autorisation accordée
+fr,permission_return_body,Appuyez pour retourner à Universal Installer.
+fr,setting_about_subtitle,"Infos application, liens et détails de l'appareil"
+fr,about_section_app,Application
+fr,about_section_community,Communauté
+fr,about_section_legal,Légal
+fr,about_section_device,Appareil
+fr,about_creator_title,Créé par
+fr,about_license_title,Licence
+fr,about_device_info_title,Infos appareil
+fr,about_device_manufacturer,Fabricant : %s
+fr,about_device_model,Modèle : %s
+fr,about_device_board,Carte : %s
+fr,about_device_arch,ABIs : %s
+fr,about_device_sdk,Android SDK : %s
+fr,about_device_os,Version de l'OS : %s
+fr,about_device_density,Densité d'écran : %s
+fr,about_btn_copy,Copier
+fr,about_copied,Infos appareil copiées
+fr,setting_diagnostics_title,Diagnostics
+fr,setting_diagnostics_subtitle,Voir les logs et rapports de plantage
+fr,diagnostics_title,Diagnostics
+fr,diagnostics_tab_session,Logs de session
+fr,diagnostics_tab_crashes,Rapports de plantage
+fr,diagnostics_share,Partager le rapport
+fr,diagnostics_copy,Copier
+fr,diagnostics_copied,Copié dans le presse-papiers
+fr,diagnostics_loading,Chargement…
+fr,diagnostics_no_session_logs,Aucun avertissement ou erreur trong cette session
+fr,diagnostics_no_crashes,Aucun plantage enregistré
+fr,diagnostics_clear_crashes,Effacer les rapports de plantage
+fr,diagnostics_clear_confirm_title,Effacer les rapports de plantage ?
+fr,diagnostics_clear_confirm_body,Tous les logs de plantage enregistrés seront définitivement supprimés.
+fr,diagnostics_clear,Effacer
+fr,diagnostics_cancel,Annuler
+hi,permission_return_channel_name,ऐप पर वापस लौटें
+hi,permission_return_channel_desc,सिस्टम सेटिंग में अनुमति देने के बाद ऐप पर लौटने के लिए अधिसूचना।
+hi,permission_return_title,अनुमति दी गई
+hi,permission_return_body,Universal Installer पर लौटने के लिए टैप करें।
+hi,setting_about_subtitle,"ऐप की जानकारी, लिंक और डिवाइस विवरण"
+hi,about_section_app,ऐप
+hi,about_section_community,समुदाय
+hi,about_section_legal,कानूनी
+hi,about_section_device,डिवाइस
+hi,about_creator_title,इनके द्वारा बनाया गया
+hi,about_license_title,लाइसेंस
+hi,about_device_info_title,डिवाइस की जानकारी
+hi,about_device_manufacturer,निर्माता: %s
+hi,about_device_model,मॉडल: %s
+hi,about_device_board,बोर्ड: %s
+hi,about_device_arch,ABIs: %s
+hi,about_device_sdk,Android SDK: %s
+hi,about_device_os,OS संस्करण: %s
+hi,about_device_density,स्क्रीन डेंसिटी: %s
+hi,about_btn_copy,कॉपी करें
+hi,about_copied,डिवाइस की जानकारी कॉपी की गई
+hi,setting_diagnostics_title,डायग्नोस्टिक्स
+hi,setting_diagnostics_subtitle,लॉग और क्रैश रिपोर्ट देखें
+hi,diagnostics_title,डायग्नोस्टिक्स
+hi,diagnostics_tab_session,सत्र लॉग
+hi,diagnostics_tab_crashes,क्रैश रिपोर्ट
+hi,diagnostics_share,रिपोर्ट साझा करें
+hi,diagnostics_copy,कॉपी करें
+hi,diagnostics_copied,क्लिपबोर्ड पर कॉपी किया गया
+hi,diagnostics_loading,लोड हो रहा है…
+hi,diagnostics_no_session_logs,इस सत्र में कोई चेतावनी या त्रुटि नहीं है
+hi,diagnostics_no_crashes,कोई क्रैश रिकॉर्ड नहीं किया गया
+hi,diagnostics_clear_crashes,क्रैश रिपोर्ट साफ़ करें
+hi,diagnostics_clear_confirm_title,क्रैश रिपोर्ट साफ़ करें?
+hi,diagnostics_clear_confirm_body,सभी सहेजे गए क्रैश लॉग स्थायी रूप से हटा दिए जाएंगे।
+hi,diagnostics_clear,साफ़ करें
+hi,diagnostics_cancel,रद्द करें
+in,permission_return_channel_name,Kembali ke aplikasi
+in,permission_return_channel_desc,Notifikasi untuk kembali ke aplikasi setelah memberikan izin di pengaturan sistem.
+in,permission_return_title,Izin diberikan
+in,permission_return_body,Ketuk untuk kembali ke Universal Installer.
+in,setting_about_subtitle,"Info aplikasi, tautan, dan detail perangkat"
+in,about_section_app,Aplikasi
+in,about_section_community,Komunitas
+in,about_section_legal,Hukum
+in,about_section_device,Perangkat
+in,about_creator_title,Dibuat oleh
+in,about_license_title,Lisensi
+in,about_device_info_title,Info perangkat
+in,about_device_manufacturer,Produsen: %s
+in,about_device_model,Model: %s
+in,about_device_board,Papan: %s
+in,about_device_arch,ABI: %s
+in,about_device_sdk,Android SDK: %s
+in,about_device_os,Versi OS: %s
+in,about_device_density,Kerapatan layar: %s
+in,about_btn_copy,Salin
+in,about_copied,Info perangkat disalin
+in,setting_diagnostics_title,Diagnostik
+in,setting_diagnostics_subtitle,Lihat log dan laporan kerusakan
+in,diagnostics_title,Diagnostik
+in,diagnostics_tab_session,Log Sesi
+in,diagnostics_tab_crashes,Laporan Kerusakan
+in,diagnostics_share,Bagikan laporan
+in,diagnostics_copy,Salin
+in,diagnostics_copied,Disalin ke papan klip
+in,diagnostics_loading,Memuat…
+in,diagnostics_no_session_logs,Tidak ada peringatan atau kesalahan dalam sesi ini
+in,diagnostics_no_crashes,Tidak ada kerusakan yang terekam
+in,diagnostics_clear_crashes,Hapus laporan kerusakan
+in,diagnostics_clear_confirm_title,Hapus laporan kerusakan?
+in,diagnostics_clear_confirm_body,Semua log kerusakan yang tersimpan akan dihapus secara permanen.
+in,diagnostics_clear,Hapus
+in,diagnostics_cancel,Batal
+ja,permission_return_channel_name,アプリに戻る
+ja,permission_return_channel_desc,システム設定で権限を許可した後、アプリに戻るための通知。
+ja,permission_return_title,権限が許可されました
+ja,permission_return_body,タップして Universal Installer に戻ります。
+ja,setting_about_subtitle,"アプリ情報、リンク、デバイスの詳細"
+ja,about_section_app,アプリ
+ja,about_section_community,コミュニティ
+ja,about_section_legal,法的情報
+ja,about_section_device,デバイス
+ja,about_creator_title,作成者
+ja,about_license_title,ライセンス
+ja,about_device_info_title,デバイス情報
+ja,about_device_manufacturer,製造元: %s
+ja,about_device_model,モデル: %s
+ja,about_device_board,ボード: %s
+ja,about_device_arch,ABIs: %s
+ja,about_device_sdk,Android SDK: %s
+ja,about_device_os,OS バージョン: %s
+ja,about_device_density,画面密度: %s
+ja,about_btn_copy,コピー
+ja,about_copied,デバイス情報をコピーしました
+ja,setting_diagnostics_title,診断
+ja,setting_diagnostics_subtitle,ログとクラッシュレポートを表示
+ja,diagnostics_title,診断
+ja,diagnostics_tab_session,セッションログ
+ja,diagnostics_tab_crashes,クラッシュレポート
+ja,diagnostics_share,レポートを共有
+ja,diagnostics_copy,コピー
+ja,diagnostics_copied,クリップボードにコピーしました
+ja,diagnostics_loading,読み込み中…
+ja,diagnostics_no_session_logs,このセッションに警告やエラーはありません
+ja,diagnostics_no_crashes,クラッシュは記録されていません
+ja,diagnostics_clear_crashes,クラッシュレポートを消去
+ja,diagnostics_clear_confirm_title,クラッシュレポートを消去しますか？
+ja,diagnostics_clear_confirm_body,保存されているすべてのクラッシュログが永久に削除されます。
+ja,diagnostics_clear,消去
+ja,diagnostics_cancel,キャンセル
+ko,permission_return_channel_name,앱으로 돌아가기
+ko,permission_return_channel_desc,시스템 설정에서 권한을 허용한 후 앱으로 돌아가기 위한 알림입니다.
+ko,permission_return_title,권한 허용됨
+ko,permission_return_body,Universal Installer로 돌아가려면 누르세요.
+ko,setting_about_subtitle,"앱 정보, 링크 및 기기 세부 정보"
+ko,about_section_app,앱
+ko,about_section_community,커뮤니티
+ko,about_section_legal,법적 고지
+ko,about_section_device,기기
+ko,about_creator_title,제작자
+ko,about_license_title,라이선스
+ko,about_device_info_title,기기 정보
+ko,about_device_manufacturer,제조사: %s
+ko,about_device_model,모델: %s
+ko,about_device_board,보드: %s
+ko,about_device_arch,ABIs: %s
+ko,about_device_sdk,Android SDK: %s
+ko,about_device_os,OS 버전: %s
+ko,about_device_density,화면 밀도: %s
+ko,about_btn_copy,복사
+ko,about_copied,기기 정보가 복사되었습니다
+ko,setting_diagnostics_title,진단
+ko,setting_diagnostics_subtitle,로그 및 충돌 보고서 보기
+ko,diagnostics_title,진단
+ko,diagnostics_tab_session,세션 로그
+ko,diagnostics_tab_crashes,충돌 보고서
+ko,diagnostics_share,보고서 공유
+ko,diagnostics_copy,복사
+ko,diagnostics_copied,클립보드에 복사됨
+ko,diagnostics_loading,로딩 중…
+ko,diagnostics_no_session_logs,이 세션에 경고나 오류가 없습니다
+ko,diagnostics_no_crashes,기록된 충돌이 없습니다
+ko,diagnostics_clear_crashes,충돌 보고서 삭제
+ko,diagnostics_clear_confirm_title,충돌 보고서를 삭제할까요?
+ko,diagnostics_clear_confirm_body,저장된 모든 충돌 로그가 영구적으로 삭제됩니다.
+ko,diagnostics_clear,삭제
+ko,diagnostics_cancel,취소
+pt-rBR,permission_return_channel_name,Voltar para o app
+pt-rBR,permission_return_channel_desc,Notificação para voltar ao app após conceder uma permissão nas configurações do sistema.
+pt-rBR,permission_return_title,Permissão concedida
+pt-rBR,permission_return_body,Toque para voltar ao Universal Installer.
+pt-rBR,setting_about_subtitle,"Informações do app, links e detalhes do dispositivo"
+pt-rBR,about_section_app,App
+pt-rBR,about_section_community,Comunidade
+pt-rBR,about_section_legal,Jurídico
+pt-rBR,about_section_device,Dispositivo
+pt-rBR,about_creator_title,Criado por
+pt-rBR,about_license_title,Licença
+pt-rBR,about_device_info_title,Informações do dispositivo
+pt-rBR,about_device_manufacturer,Fabricante: %s
+pt-rBR,about_device_model,Modelo: %s
+pt-rBR,about_device_board,Placa: %s
+pt-rBR,about_device_arch,ABIs: %s
+pt-rBR,about_device_sdk,Android SDK: %s
+pt-rBR,about_device_os,Versão do SO: %s
+pt-rBR,about_device_density,Densidade da tela: %s
+pt-rBR,about_btn_copy,Copiar
+pt-rBR,about_copied,Informações do dispositivo copiadas
+pt-rBR,setting_diagnostics_title,Diagnóstico
+pt-rBR,setting_diagnostics_subtitle,Ver logs e relatórios de erros
+pt-rBR,diagnostics_title,Diagnóstico
+pt-rBR,diagnostics_tab_session,Logs de sessão
+pt-rBR,diagnostics_tab_crashes,Relatórios de erros
+pt-rBR,diagnostics_share,Compartilhar relatório
+pt-rBR,diagnostics_copy,Copiar
+pt-rBR,diagnostics_copied,Copiado para a área de transferência
+pt-rBR,diagnostics_loading,Carregando…
+pt-rBR,diagnostics_no_session_logs,Sem avisos ou erros nesta sessão
+pt-rBR,diagnostics_no_crashes,Nenhum erro registrado
+pt-rBR,diagnostics_clear_crashes,Limpar relatórios de erros
+pt-rBR,diagnostics_clear_confirm_title,Limpar relatórios de erros?
+pt-rBR,diagnostics_clear_confirm_body,Todos os logs de erros persistidos serão removidos permanentemente.
+pt-rBR,diagnostics_clear,Limpar
+pt-rBR,diagnostics_cancel,Cancelar
+ru,permission_return_channel_name,Вернуться в приложение
+ru,permission_return_channel_desc,Уведомление для возврата в приложение после предоставления разрешения в системных настройках.
+ru,permission_return_title,Разрешение предоставлено
+ru,permission_return_body,Нажмите, чтобы вернуться в Universal Installer.
+ru,setting_about_subtitle,"О приложении, ссылки и сведения об устройстве"
+ru,about_section_app,Приложение
+ru,about_section_community,Сообщество
+ru,about_section_legal,Юридическая информация
+ru,about_section_device,Устройство
+ru,about_creator_title,Создатель
+ru,about_license_title,Лицензия
+ru,about_device_info_title,Сведения об устройстве
+ru,about_device_manufacturer,Производитель: %s
+ru,about_device_model,Модель: %s
+ru,about_device_board,Плата: %s
+ru,about_device_arch,ABIs: %s
+ru,about_device_sdk,Android SDK: %s
+ru,about_device_os,Версия ОС: %s
+ru,about_device_density,Плотность экрана: %s
+ru,about_btn_copy,Копировать
+ru,about_copied,Сведения об устройстве скопированы
+ru,setting_diagnostics_title,Диагностика
+ru,setting_diagnostics_subtitle,Просмотр логов и отчетов об ошибках
+ru,diagnostics_title,Диагностика
+ru,diagnostics_tab_session,Логи сессии
+ru,diagnostics_tab_crashes,Отчеты об ошибках
+ru,diagnostics_share,Поделиться отчетом
+ru,diagnostics_copy,Копировать
+ru,diagnostics_copied,Скопировано в буфер обмена
+ru,diagnostics_loading,Загрузка…
+ru,diagnostics_no_session_logs,В этой сессии нет предупреждений или ошибок
+ru,diagnostics_no_crashes,Ошибок не зафиксировано
+ru,diagnostics_clear_crashes,Очистить отчеты об ошибках
+ru,diagnostics_clear_confirm_title,Очистить отчеты об ошибках?
+ru,diagnostics_clear_confirm_body,Все сохраненные логи ошибок будут удалены безвозвратно.
+ru,diagnostics_clear,Очистить
+ru,diagnostics_cancel,Отмена
+tr,permission_return_channel_name,Uygulamaya dön
+tr,permission_return_channel_desc,Sistem ayarlarında izin verdikten sonra uygulamaya dönmek için bildirim.
+tr,permission_return_title,İzin verildi
+tr,permission_return_body,Universal Installer'a dönmek için dokunun.
+tr,setting_about_subtitle,"Uygulama bilgisi, bağlantılar ve cihaz ayrıntıları"
+tr,about_section_app,Uygulama
+tr,about_section_community,Topluluk
+tr,about_section_legal,Yasal
+tr,about_section_device,Cihaz
+tr,about_creator_title,Oluşturan
+tr,about_license_title,Lisans
+tr,about_device_info_title,Cihaz bilgisi
+tr,about_device_manufacturer,Üretici: %s
+tr,about_device_model,Model: %s
+tr,about_device_board,Kart: %s
+tr,about_device_arch,ABI'lar: %s
+tr,about_device_sdk,Android SDK: %s
+tr,about_device_os,İS Sürümü: %s
+tr,about_device_density,Ekran yoğunluğu: %s
+tr,about_btn_copy,Kopyala
+tr,about_copied,Cihaz bilgisi kopyalandı
+tr,setting_diagnostics_title,Tanılama
+tr,setting_diagnostics_subtitle,Günlükleri ve kilitlenme raporlarını görüntüle
+tr,diagnostics_title,Tanılama
+tr,diagnostics_tab_session,Oturum Günlükleri
+tr,diagnostics_tab_crashes,Kilitlenme Raporları
+tr,diagnostics_share,Raporu paylaş
+tr,diagnostics_copy,Kopyala
+tr,diagnostics_copied,Panoya kopyalandı
+tr,diagnostics_loading,Yükleniyor…
+tr,diagnostics_no_session_logs,Bu oturumda uyarı veya hata yok
+tr,diagnostics_no_crashes,Kayıtlı kilitlenme yok
+tr,diagnostics_clear_crashes,Kilitlenme raporlarını temizle
+tr,diagnostics_clear_confirm_title,Kilitlenme raporları temizlensin mi?
+tr,diagnostics_clear_confirm_body,Tüm kayıtlı kilitlenme günlükleri kalıcı olarak kaldırılacaktır.
+tr,diagnostics_clear,Temizle
+tr,diagnostics_cancel,İptal
+vi,permission_return_channel_name,Quay lại ứng dụng
+vi,permission_return_channel_desc,Thông báo để quay lại ứng dụng sau khi cấp quyền trong cài đặt hệ thống.
+vi,permission_return_title,Đã cấp quyền
+vi,permission_return_body,Nhấn để quay lại Universal Installer.
+vi,setting_about_subtitle,"Thông tin ứng dụng, liên kết và chi tiết thiết bị"
+vi,about_section_app,Ứng dụng
+vi,about_section_community,Cộng đồng
+vi,about_section_legal,Pháp lý
+vi,about_section_device,Thiết bị
+vi,about_creator_title,Được tạo bởi
+vi,about_license_title,Giấy phép
+vi,about_device_info_title,Thông tin thiết bị
+vi,about_device_manufacturer,Nhà sản xuất: %s
+vi,about_device_model,Kiểu máy: %s
+vi,about_device_board,Bo mạch: %s
+vi,about_device_arch,Kiến trúc (ABIs): %s
+vi,about_device_sdk,Android SDK: %s
+vi,about_device_os,Phiên bản hệ điều hành: %s
+vi,about_device_density,Mật độ màn hình: %s
+vi,about_btn_copy,Sao chép
+vi,about_copied,Đã sao chép thông tin thiết bị
+vi,setting_diagnostics_title,Chẩn đoán
+vi,setting_diagnostics_subtitle,Xem nhật ký và báo cáo lỗi
+vi,diagnostics_title,Chẩn đoán
+vi,diagnostics_tab_session,Nhật ký phiên
+vi,diagnostics_tab_crashes,Báo cáo lỗi
+vi,diagnostics_share,Chia sẻ báo cáo
+vi,diagnostics_copy,Sao chép
+vi,diagnostics_copied,Đã sao chép vào bộ nhớ tạm
+vi,diagnostics_loading,Đang tải…
+vi,diagnostics_no_session_logs,Không có cảnh báo hoặc lỗi trong phiên này
+vi,diagnostics_no_crashes,Không có lỗi nào được ghi lại
+vi,diagnostics_clear_crashes,Xóa báo cáo lỗi
+vi,diagnostics_clear_confirm_title,Xóa báo cáo lỗi?
+vi,diagnostics_clear_confirm_body,Tất cả nhật ký lỗi đã lưu sẽ bị xóa vĩnh viễn.
+vi,diagnostics_clear,Xóa
+vi,diagnostics_cancel,Hủy
+zh,permission_return_channel_name,返回应用
+zh,permission_return_channel_desc,在系统设置中授予权限后返回应用的通知。
+zh,permission_return_title,已授予权限
+zh,permission_return_body,点击返回 Universal Installer。
+zh,setting_about_subtitle,"应用信息、链接和设备详情"
+zh,about_section_app,应用
+zh,about_section_community,社区
+zh,about_section_legal,法律信息
+zh,about_section_device,设备
+zh,about_creator_title,创建者
+zh,about_license_title,许可证
+zh,about_device_info_title,设备信息
+zh,about_device_manufacturer,制造商: %s
+zh,about_device_model,型号: %s
+zh,about_device_board,主板: %s
+zh,about_device_arch,ABIs: %s
+zh,about_device_sdk,Android SDK: %s
+zh,about_device_os,系统版本: %s
+zh,about_device_density,屏幕密度: %s
+zh,about_btn_copy,复制
+zh,about_copied,设备信息已复制
+zh,setting_diagnostics_title,诊断
+zh,setting_diagnostics_subtitle,查看日志和崩溃报告
+zh,diagnostics_title,诊断
+zh,diagnostics_tab_session,会话日志
+zh,diagnostics_tab_crashes,崩溃报告
+zh,diagnostics_share,分享报告
+zh,diagnostics_copy,复制
+zh,diagnostics_copied,已复制到剪貼板
+zh,diagnostics_loading,正在加载…
+zh,diagnostics_no_session_logs,本次会话中没有警告或错误
+zh,diagnostics_no_crashes,未记录任何崩溃
+zh,diagnostics_clear_crashes,清除崩溃报告
+zh,diagnostics_clear_confirm_title,清除崩溃报告？
+zh,diagnostics_clear_confirm_body,所有持久化的崩溃日志将被永久删除。
+zh,diagnostics_clear,清除
+zh,diagnostics_cancel,取消
