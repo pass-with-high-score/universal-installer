@@ -51,6 +51,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -362,23 +363,24 @@ private fun AboutRowDivider() {
 @Composable
 private fun DeviceInfoDialog(onDismiss: () -> Unit) {
     val context = LocalContext.current
+    val resource = LocalResources.current
     val clipboardManager = LocalClipboardManager.current
 
     val deviceInfo = remember {
         buildString {
-            appendLine(context.getString(R.string.about_device_manufacturer, Build.MANUFACTURER))
-            appendLine(context.getString(R.string.about_device_model, Build.MODEL))
-            appendLine(context.getString(R.string.about_device_board, Build.BOARD))
+            appendLine(resource.getString(R.string.about_device_manufacturer, Build.MANUFACTURER))
+            appendLine(resource.getString(R.string.about_device_model, Build.MODEL))
+            appendLine(resource.getString(R.string.about_device_board, Build.BOARD))
             appendLine(
-                context.getString(
+                resource.getString(
                     R.string.about_device_arch,
                     Build.SUPPORTED_ABIS.joinToString(", "),
                 )
             )
-            appendLine(context.getString(R.string.about_device_sdk, Build.VERSION.SDK_INT.toString()))
-            appendLine(context.getString(R.string.about_device_os, Build.VERSION.RELEASE))
+            appendLine(resource.getString(R.string.about_device_sdk, Build.VERSION.SDK_INT.toString()))
+            appendLine(resource.getString(R.string.about_device_os, Build.VERSION.RELEASE))
             appendLine(
-                context.getString(
+                resource.getString(
                     R.string.about_device_density,
                     android.content.res.Resources.getSystem().displayMetrics.density.toString(),
                 )

@@ -71,6 +71,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import app.pwhs.universalinstaller.R
@@ -79,25 +80,59 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-private enum class LogLevel { ERROR, WARN, INFO, DEBUG, OTHER }
+private enum class LogLevel { VERBOSE, DEBUG, INFO, WARN, ERROR, OTHER }
 
-private fun detectLevel(line: String): LogLevel = when {
-    line.contains(Regex("""\s[EF]\s""")) -> LogLevel.ERROR
-    line.contains(Regex("""\sW\s""")) -> LogLevel.WARN
-    line.contains(Regex("""\sI\s""")) -> LogLevel.INFO
-    line.contains(Regex("""\sD\s""")) -> LogLevel.DEBUG
-    else -> LogLevel.OTHER
+private data class LogEntry(
+    val time: String,
+    val level: LogLevel,
+    val tag: String,
+    val message: String,
+    val raw: String
+)
+
+private fun parseLogLine(line: String): LogEntry {
+    // Regex for: 05-09 15:30:12.123 1234 5678 W MyTag : My message
+    val regex = Regex("""^(\d{2}-\d{2}\s\d{2}:\d{2}:\d{2}\.\d{3})\s+\d+\s+\d+\s([VDIWEF])\s+(.*?):\s(.*)$""")
+    val match = regex.find(line)
+
+    return if (match != null) {
+        val (time, levelChar, tag, message) = match.destructured
+        LogEntry(
+            time = time.substringAfter(" "),
+            level = when (levelChar) {
+                "V" -> LogLevel.VERBOSE
+                "D" -> LogLevel.DEBUG
+                "I" -> LogLevel.INFO
+                "W" -> LogLevel.WARN
+                "E", "F" -> LogLevel.ERROR
+                else -> LogLevel.OTHER
+            },
+            tag = tag.trim(),
+            message = message,
+            raw = line
+        )
+    } else {
+        val level = when {
+            line.contains(" E ") || line.contains(" F ") || line.startsWith("E/") -> LogLevel.ERROR
+            line.contains(" W ") || line.startsWith("W/") -> LogLevel.WARN
+            line.contains(" I ") || line.startsWith("I/") -> LogLevel.INFO
+            line.contains(" D ") || line.startsWith("D/") -> LogLevel.DEBUG
+            line.contains(" V ") || line.startsWith("V/") -> LogLevel.VERBOSE
+            else -> LogLevel.OTHER
+        }
+        LogEntry("", level, "", line, line)
+    }
 }
 
 @Composable
 private fun levelColor(level: LogLevel): Color {
-    val cs = MaterialTheme.colorScheme
     return when (level) {
-        LogLevel.ERROR -> Color(0xFFFF6B6B)
-        LogLevel.WARN -> Color(0xFFFFD93D)
-        LogLevel.INFO -> cs.onSurface.copy(alpha = 0.85f)
-        LogLevel.DEBUG -> cs.onSurface.copy(alpha = 0.50f)
-        LogLevel.OTHER -> cs.onSurface.copy(alpha = 0.65f)
+        LogLevel.VERBOSE -> Color(0xFFBBBBBB)
+        LogLevel.DEBUG -> Color(0xFF3382DD)
+        LogLevel.INFO -> Color(0xFF2BBAC5)
+        LogLevel.WARN -> Color(0xFFFF9100)
+        LogLevel.ERROR -> Color(0xFFFF5353)
+        LogLevel.OTHER -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.65f)
     }
 }
 
@@ -357,44 +392,121 @@ private fun LoadingState() {
 }
 
 @Composable
-private fun LogList(lines: List<String>, listState: LazyListState) {
-    val surfaceColor = MaterialTheme.colorScheme.surface
+private fun LogItem(entry: LogEntry) {
+    val color = levelColor(entry.level)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 1.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        if (entry.time.isNotEmpty()) {
+            Text(
+                text = entry.time,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 9.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.4f)
+                ),
+                modifier = Modifier.width(66.dp)
+            )
+            Spacer(Modifier.width(4.dp))
+        }
 
+        Text(
+            text = when (entry.level) {
+                LogLevel.VERBOSE -> "V"
+                LogLevel.DEBUG -> "D"
+                LogLevel.INFO -> "I"
+                LogLevel.WARN -> "W"
+                LogLevel.ERROR -> "E"
+                LogLevel.OTHER -> "?"
+            },
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontFamily = FontFamily.Monospace,
+                fontSize = 9.sp,
+                fontWeight = FontWeight.Bold,
+                color = color
+            ),
+            modifier = Modifier.width(10.dp)
+        )
+
+        Spacer(Modifier.width(4.dp))
+
+        if (entry.tag.isNotEmpty()) {
+            Text(
+                text = entry.tag,
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontFamily = FontFamily.Monospace,
+                    fontSize = 9.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = color.copy(alpha = 0.7f)
+                ),
+                modifier = Modifier.width(80.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            Spacer(Modifier.width(4.dp))
+        }
+
+        Text(
+            text = entry.message,
+            style = MaterialTheme.typography.bodySmall.copy(
+                fontFamily = FontFamily.Monospace,
+                fontSize = 10.sp,
+                lineHeight = 13.sp,
+                color = if (entry.level == LogLevel.OTHER) MaterialTheme.colorScheme.onSurface else color
+            ),
+            modifier = Modifier.weight(1f)
+        )
+    }
+}
+
+@Composable
+private fun LogList(lines: List<String>, listState: LazyListState) {
     if (lines.isEmpty() || (lines.size == 1 && lines[0].isBlank())) {
         EmptyLogsState(stringResource(R.string.diagnostics_no_session_logs))
         return
     }
 
     val parsed = remember(lines) {
-        lines.map { line -> Pair(line, detectLevel(line)) }
+        lines.map { parseLogLine(it) }
     }
 
     Card(
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = surfaceColor),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFF121212),
+        ),
         modifier = Modifier.fillMaxSize(),
     ) {
-        LazyColumn(
-            state = listState,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp, vertical = 6.dp),
-            contentPadding = PaddingValues(bottom = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-        ) {
-            itemsIndexed(parsed, key = { index, _ -> index }) { _, (line, level) ->
-                Text(
-                    text = line,
-                    style = MaterialTheme.typography.bodySmall.copy(
-                        fontFamily = FontFamily.Monospace,
-                        lineHeight = 16.sp,
-                        fontSize = 11.sp,
-                    ),
-                    color = levelColor(level),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                )
+        Column(modifier = Modifier.fillMaxSize()) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("TIME", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.width(66.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("L", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.width(10.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("TAG", style = MaterialTheme.typography.labelSmall, color = Color.Gray, modifier = Modifier.width(80.dp))
+                Spacer(Modifier.width(4.dp))
+                Text("MESSAGE", style = MaterialTheme.typography.labelSmall, color = Color.Gray)
+            }
+            HorizontalDivider(color = Color.DarkGray)
+
+            LazyColumn(
+                state = listState,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 8.dp),
+                contentPadding = PaddingValues(bottom = 8.dp),
+            ) {
+                itemsIndexed(parsed, key = { index, _ -> index }) { _, entry ->
+                    LogItem(entry = entry)
+                }
             }
         }
     }
@@ -419,7 +531,7 @@ private fun CrashContent(text: String, onClearRequest: () -> Unit) {
             Card(
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = Color(0xFF121212),
                 ),
                 modifier = Modifier
                     .weight(1f)
@@ -432,23 +544,28 @@ private fun CrashContent(text: String, onClearRequest: () -> Unit) {
                     verticalArrangement = Arrangement.spacedBy(1.dp),
                 ) {
                     items(lines) { line ->
-                        Text(
-                            text = line,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontFamily = FontFamily.Monospace,
-                                lineHeight = 16.sp,
-                                fontSize = 11.sp,
-                            ),
-                            color = when {
-                                line.contains("Exception") || line.contains("CRASH") ->
-                                    Color(0xFFFF6B6B)
-                                line.startsWith("=") ->
-                                    MaterialTheme.colorScheme.primary
-                                else ->
-                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.82f)
-                            },
-                            modifier = Modifier.fillMaxWidth(),
-                        )
+                        val entry = remember(line) { parseLogLine(line) }
+                        if (entry.time.isNotEmpty() || entry.tag.isNotEmpty()) {
+                            LogItem(entry = entry)
+                        } else {
+                            Text(
+                                text = line,
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontFamily = FontFamily.Monospace,
+                                    lineHeight = 14.sp,
+                                    fontSize = 10.sp,
+                                ),
+                                color = when {
+                                    line.contains("Exception") || line.contains("CRASH") || line.contains("Error") ->
+                                        Color(0xFFFF5353)
+                                    line.startsWith("=") ->
+                                        MaterialTheme.colorScheme.primary
+                                    else ->
+                                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f)
+                                },
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
                     }
                 }
             }

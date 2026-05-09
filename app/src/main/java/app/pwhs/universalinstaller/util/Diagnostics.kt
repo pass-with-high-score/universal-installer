@@ -15,7 +15,7 @@ object Diagnostics {
         return try {
             val pid = android.os.Process.myPid()
             val process = ProcessBuilder(
-                "logcat", "--pid=$pid", "-d", "-t", maxLines.toString(), "*:W"
+                "logcat", "--pid=$pid", "-d", "-t", maxLines.toString()
             )
                 .redirectErrorStream(true)
                 .start()
@@ -45,7 +45,7 @@ object Diagnostics {
         appendLine(buildDeviceInfo(context))
         appendLine()
         appendLine("=".repeat(60))
-        appendLine("SESSION LOGS  (W/E level, current session)")
+        appendLine("SESSION LOGS (current session)")
         appendLine("=".repeat(60))
         appendLine(sessionLogs)
         val crashes = getCrashLogs(context)
