@@ -51,20 +51,23 @@ import app.pwhs.universalinstaller.util.LocaleHelper
 data class AppLanguage(val tag: String, val nativeName: String)
 
 private val SUPPORTED_LANGUAGES = listOf(
-    AppLanguage("en", "English"),
-    AppLanguage("ar", "العربية"),
-    AppLanguage("de", "Deutsch"),
-    AppLanguage("es", "Español"),
-    AppLanguage("fr", "Français"),
-    AppLanguage("hi", "हिन्दी"),
-    AppLanguage("in", "Bahasa Indonesia"),
-    AppLanguage("ja", "日本語"),
-    AppLanguage("ko", "한국어"),
-    AppLanguage("pt-BR", "Português (Brasil)"),
-    AppLanguage("ru", "Русский"),
-    AppLanguage("tr", "Türkçe"),
-    AppLanguage("vi", "Tiếng Việt"),
-    AppLanguage("zh", "中文"),
+    AppLanguage("en", "🇺🇸 English"),
+    AppLanguage("ar", "SA العربية"),
+    AppLanguage("de", "🇩🇪 Deutsch"),
+    AppLanguage("el", "🇬🇷 Ελληνικά"),
+    AppLanguage("es", "🇪🇸 Español"),
+    AppLanguage("fr", "🇫🇷 Français"),
+    AppLanguage("hi", "🇮🇳 हिन्दी"),
+    AppLanguage("in", "🇮🇩 Bahasa Indonesia"),
+    AppLanguage("it", "🇮🇹 Italiano"),
+    AppLanguage("ja", "🇯🇵 日本語"),
+    AppLanguage("ko", "🇰🇷 한국어"),
+    AppLanguage("pt-BR", "🇧🇷 Português (Brasil)"),
+    AppLanguage("ru", "🇷🇺 Русский"),
+    AppLanguage("tr", "🇹🇷 Türkçe"),
+    AppLanguage("uk", "🇺🇦 Українська"),
+    AppLanguage("vi", "🇻🇳 Tiếng Việt"),
+    AppLanguage("zh", "🇨🇳 中文"),
 )
 
 
