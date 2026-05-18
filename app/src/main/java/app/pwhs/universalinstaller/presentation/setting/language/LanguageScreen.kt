@@ -161,9 +161,14 @@ private fun LanguageUi(
                     ),
                 ) {
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
+                        LanguageRow(
+                            name = stringResource(R.string.language_system_default),
+                            selected = selected == "",
+                            onClick = { onSelected("") },
+                        )
                         SUPPORTED_LANGUAGES.forEach { lang ->
                             LanguageRow(
-                                language = lang,
+                                name = lang.nativeName,
                                 selected = selected == lang.tag,
                                 onClick = { onSelected(lang.tag) },
                             )
@@ -180,13 +185,13 @@ private fun LanguageUi(
 
 @Composable
 private fun LanguageRow(
-    language: AppLanguage,
+    name: String,
     selected: Boolean,
     onClick: () -> Unit,
 ) {
     ListItem(
         headlineContent = {
-            Text(language.nativeName, style = MaterialTheme.typography.bodyLarge)
+            Text(name, style = MaterialTheme.typography.bodyLarge)
         },
         trailingContent = {
             RadioButton(
