@@ -256,7 +256,6 @@
     <string name="obb_notif_done_text">تم وضع %d ملف(ملفات) في Android/obb</string>
     <string name="obb_notif_failed_title">فشل نسخ OBB · %s</string>
     <string name="apk_info_vt_no_api_key">لم يتم إعداد مفتاح VirusTotal API. افتح الإعدادات → الأمان → مفتاح VirusTotal API لإضافة واحد — مفتاح مجاني في virustotal.com/gui/my-apikey.</string>
-    <string name="uninstall_app_count">%d تطبيق(تطبيقات)</string>
     <string name="uninstall_sort_name">الاسم</string>
     <string name="uninstall_sort_size">الحجم</string>
     <string name="uninstall_sort_installed">تاريخ التثبيت</string>

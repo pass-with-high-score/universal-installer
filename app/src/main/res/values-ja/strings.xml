@@ -256,7 +256,6 @@
     <string name="obb_notif_done_text">%d 個のファイルを Android/obb に配置しました</string>
     <string name="obb_notif_failed_title">OBBのコピーに失敗しました · %s</string>
     <string name="apk_info_vt_no_api_key">VirusTotal APIキーが設定されていません。設定 → セキュリティ → VirusTotal APIキー を開いて追加してください — 無料キーは virustotal.com/gui/my-apikey で取得できます。</string>
-    <string name="uninstall_app_count">%d 個のアプリ</string>
     <string name="uninstall_sort_name">名前</string>
     <string name="uninstall_sort_size">サイズ</string>
     <string name="uninstall_sort_installed">インストール日時</string>

@@ -256,7 +256,6 @@
     <string name="obb_notif_done_text">%d berkas ditempatkan di Android/obb</string>
     <string name="obb_notif_failed_title">Salin OBB gagal · %s</string>
     <string name="apk_info_vt_no_api_key">Kunci API VirusTotal belum dikonfigurasi. Buka Pengaturan → Keamanan → Kunci API VirusTotal untuk menambahkannya — kunci gratis di virustotal.com/gui/my-apikey.</string>
-    <string name="uninstall_app_count">%d aplikasi</string>
     <string name="uninstall_sort_name">Nama</string>
     <string name="uninstall_sort_size">Ukuran</string>
     <string name="uninstall_sort_installed">Terinstal</string>

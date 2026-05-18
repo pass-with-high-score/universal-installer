@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
     <string name="txt_manage">Manage</string>
     <string name="txt_setting">Settings</string>
@@ -118,7 +117,6 @@
     <string name="download_notif_channel_name">Package downloads</string>
     <string name="download_notif_channel_description">Progress of downloading APK/XAPK/APKS files from a URL</string>
     <string name="download_notif_running_title">Downloading %s</string>
-    <string name="download_notif_running_text" translatable="false">%1$s / %2$s · %3$d%%</string>
     <string name="download_notif_running_text_unknown">Downloaded %s</string>
     <string name="download_notif_done_title">Download complete</string>
     <string name="download_notif_done_text">%s · open the app to install</string>
@@ -147,7 +145,6 @@
     <string name="source_action_find_automatic">Find automatic</string>
     <string name="source_action_find_automatic_sub">Scan this device for installable packages</string>
     <string name="source_action_browse_packages">Browse packages</string>
-    <string name="source_action_browse_packages_sub" translatable="false">.APK · .APK+ · .XAPK · .APKS · .APKM</string>
     <string name="source_action_browse_all">Browse all files</string>
     <string name="source_action_browse_all_sub">Any file type — use at your own risk</string>
     <string name="source_download_header">Download from URL</string>
@@ -206,15 +203,12 @@
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_min_sdk_chip" translatable="false">Android %s+</string>
     <string name="apk_info_splits_count">%d splits</string>
-    <string name="apk_info_obb_chip" translatable="false">%d OBB</string>
     <string name="apk_info_obb_attach_title">Attach OBB files (optional)</string>
     <string name="apk_info_obb_attach_desc">Pick .obb files that belong to this app — they\'ll be copied to Android/obb after install.</string>
     <string name="apk_info_obb_attach_button">Add OBB file</string>
     <string name="apk_info_obb_attach_remove">Remove</string>
     <string name="obb_copy_title">Copying OBB files…</string>
-    <string name="obb_copy_progress" translatable="false">%1$s / %2$s · %3$d%%</string>
     <string name="obb_copy_done">%1$s · %2$d OBB file(s) copied</string>
     <string name="obb_copy_error">OBB copy failed: %s</string>
     <string name="obb_copy_dismiss">Dismiss</string>
@@ -224,11 +218,9 @@
     <string name="obb_notif_channel_name">OBB file copy</string>
     <string name="obb_notif_channel_description">Progress of copying OBB data files to Android/obb</string>
     <string name="obb_notif_running_title">Copying OBB · %s</string>
-    <string name="obb_notif_running_text" translatable="false">%d%%</string>
     <string name="obb_notif_done_title">OBB copied · %s</string>
     <string name="obb_notif_done_text">%d file(s) placed in Android/obb</string>
     <string name="obb_notif_failed_title">OBB copy failed · %s</string>
-    <string name="apk_info_version_detail" translatable="false">%1$s (%2$d)</string>
     <string name="apk_info_sdk_detail">API %1$d (Android %2$s)</string>
     <string name="apk_info_section_architectures">Supported Architectures</string>
     <string name="apk_info_section_permissions">Permissions (%d)</string>
@@ -281,7 +273,6 @@
     <string name="uninstall_sort_usage_toast">Grant Usage access to sort by last used</string>
     <string name="uninstall_row_installed">Installed %s</string>
     <string name="uninstall_row_used">Used %s</string>
-    <string name="uninstall_current_sort_summary" translatable="false">%1$s %2$s</string>
     <string name="uninstall_filter_sheet_title">Sort &amp; filter</string>
     <string name="uninstall_filter_sort_section">Sort by</string>
     <string name="uninstall_no_apps_found">No apps found</string>
@@ -363,13 +354,6 @@
     <string name="setting_shizuku_set_source">Set install source</string>
     <string name="setting_shizuku_set_source_sub">Defaults to this app when off</string>
     <string name="setting_shizuku_installer_label">installed by (package name)</string>
-    <string name="setting_shizuku_installer_preset_play" translatable="false">Google Play Store</string>
-    <string name="setting_shizuku_installer_preset_aurora" translatable="false">Aurora Store</string>
-    <string name="setting_shizuku_installer_preset_fdroid" translatable="false">F-Droid</string>
-    <string name="setting_shizuku_installer_preset_amazon" translatable="false">Amazon Appstore</string>
-    <string name="setting_shizuku_installer_preset_samsung" translatable="false">Samsung Galaxy Store</string>
-    <string name="setting_shizuku_installer_preset_huawei" translatable="false">Huawei AppGallery</string>
-    <string name="setting_shizuku_installer_preset_xiaomi" translatable="false">Xiaomi GetApps</string>
     <string name="setting_section_security">Security</string>
     <string name="setting_vt_key_title">VirusTotal API Key</string>
     <string name="setting_vt_key_subtitle">Enable malware scanning before install</string>
@@ -381,16 +365,11 @@
     <string name="back_cd">Back</string>
     <string name="done_cd">Done</string>
     <string name="setting_section_about">About</string>
-    <string name="setting_about_app_name" translatable="false">Universal Installer</string>
-    <string name="setting_github_title" translatable="false">GitHub</string>
     <string name="setting_github_subtitle">Source code &amp; contributions</string>
-    <string name="setting_telegram_title" translatable="false">Telegram</string>
     <string name="setting_telegram_subtitle">Join our community</string>
     <string name="setting_sponsor_title">Sponsor</string>
     <string name="setting_sponsor_subtitle">Support development on GitHub Sponsors</string>
     <string name="setting_website_title">Website</string>
-    <string name="setting_website_subtitle" translatable="false">universal-installer.pwhs.app</string>
-    <string name="setting_rate_title" translatable="false">Rate App</string>
     <string name="setting_rate_subtitle">Review us on Google Play</string>
     <string name="setting_privacy_title">Privacy policy</string>
     <string name="setting_privacy_subtitle">How we handle your data</string>
@@ -402,9 +381,7 @@
     <string name="about_section_legal">Legal</string>
     <string name="about_section_device">Device</string>
     <string name="about_creator_title">Created by</string>
-    <string name="about_creator_subtitle" translatable="false">Pass With High Score</string>
     <string name="about_license_title">License</string>
-    <string name="about_license_subtitle" translatable="false">GNU GPL v3</string>
     <string name="about_device_info_title">Device info</string>
     <string name="about_device_manufacturer">Manufacturer: %s</string>
     <string name="about_device_model">Model: %s</string>
@@ -413,7 +390,6 @@
     <string name="about_device_sdk">Android SDK: %s</string>
     <string name="about_device_os">OS Version: %s</string>
     <string name="about_device_density">Screen density: %s</string>
-    <string name="about_btn_ok" translatable="false">OK</string>
     <string name="about_btn_copy">Copy</string>
     <string name="about_copied">Device info copied</string>
     <string name="setting_diagnostics_title">Diagnostics</string>
@@ -432,8 +408,6 @@
     <string name="diagnostics_clear_confirm_body">All persisted crash logs will be removed permanently.</string>
     <string name="diagnostics_clear">Clear</string>
     <string name="diagnostics_cancel">Cancel</string>
-    <string name="installer_mode_shizuku" translatable="false">Shizuku</string>
-    <string name="installer_mode_root" translatable="false">Root</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Using %s</string>
     <string name="setting_root_backend">Root Backend</string>

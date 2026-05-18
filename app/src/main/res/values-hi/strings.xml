@@ -256,7 +256,6 @@
     <string name="obb_notif_done_text">%d फ़ाइल(फ़ाइलें) Android/obb में रखी गईं</string>
     <string name="obb_notif_failed_title">OBB कॉपी विफल · %s</string>
     <string name="apk_info_vt_no_api_key">कोई VirusTotal API कुंजी कॉन्फ़िगर नहीं की गई है। एक जोड़ने के लिए सेटिंग्स → सुरक्षा → VirusTotal API कुंजी खोलें — virustotal.com/gui/my-apikey पर निःशुल्क कुंजी।</string>
-    <string name="uninstall_app_count">%d ऐप्स</string>
     <string name="uninstall_sort_name">नाम</string>
     <string name="uninstall_sort_size">आकार</string>
     <string name="uninstall_sort_installed">इंस्टॉल किया गया</string>

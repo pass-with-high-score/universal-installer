@@ -256,7 +256,6 @@
     <string name="obb_notif_done_text">%d Datei(en) in Android/obb platziert</string>
     <string name="obb_notif_failed_title">OBB-Kopiervorgang fehlgeschlagen · %s</string>
     <string name="apk_info_vt_no_api_key">Kein VirusTotal API-Schlüssel konfiguriert. Öffne Einstellungen → Sicherheit → VirusTotal API-Schlüssel, um einen hinzuzufügen — kostenloser Schlüssel unter virustotal.com/gui/my-apikey.</string>
-    <string name="uninstall_app_count">%d Apps</string>
     <string name="uninstall_sort_name">Name</string>
     <string name="uninstall_sort_size">Größe</string>
     <string name="uninstall_sort_installed">Installiert</string>

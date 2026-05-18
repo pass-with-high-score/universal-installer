@@ -256,7 +256,6 @@
     <string name="obb_notif_done_text">%d dosya Android/obb klasörüne yerleştirildi</string>
     <string name="obb_notif_failed_title">OBB kopyalama başarısız · %s</string>
     <string name="apk_info_vt_no_api_key">VirusTotal API anahtarı yapılandırılmamış. Bir tane eklemek için Ayarlar → Güvenlik → VirusTotal API Anahtarı bölümünü açın — virustotal.com/gui/my-apikey adresinden ücretsiz anahtar alabilirsiniz.</string>
-    <string name="uninstall_app_count">%d uygulama</string>
     <string name="uninstall_sort_name">Ad</string>
     <string name="uninstall_sort_size">Boyut</string>
     <string name="uninstall_sort_installed">Yüklü</string>

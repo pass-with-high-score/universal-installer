@@ -260,7 +260,6 @@
     <string name="obb_notif_done_text">%d tệp đã được đặt trong Android/obb</string>
     <string name="obb_notif_failed_title">Sao chép OBB thất bại · %s</string>
     <string name="apk_info_vt_no_api_key">Chưa định cấu hình khóa API VirusTotal. Mở Cài đặt → Bảo mật → Khóa API VirusTotal để thêm khóa — nhận khóa miễn phí tại virustotal.com/gui/my-apikey.</string>
-    <string name="uninstall_app_count">%d ứng dụng</string>
     <string name="uninstall_sort_name">Tên</string>
     <string name="uninstall_sort_size">Kích thước</string>
     <string name="uninstall_sort_installed">Đã cài đặt</string>
