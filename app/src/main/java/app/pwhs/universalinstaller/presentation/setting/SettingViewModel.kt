@@ -7,6 +7,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -32,6 +33,7 @@ object PreferencesKeys {
     val AMOLED_MODE = booleanPreferencesKey("amoled_mode")
     val USE_SHIZUKU = booleanPreferencesKey("use_shizuku")
     val USE_ROOT = booleanPreferencesKey("use_root")
+    val INSTALL_USER_ID = intPreferencesKey("install_user_id")
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")
     val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
 
@@ -103,6 +105,10 @@ object PreferencesKeys {
     val MANAGE_SORT_DIRECTION = stringPreferencesKey("manage_sort_direction")
     val MANAGE_GROUP_BY = stringPreferencesKey("manage_group_by")
     val MANAGE_APP_FILTER = stringSetPreferencesKey("manage_app_filter")
+
+    // APK Extractor options
+    val APK_EXTRACTOR_OUTPUT_PATH = stringPreferencesKey("apk_extractor_output_path")
+    val APK_EXTRACTOR_FILENAME_TEMPLATE = stringPreferencesKey("apk_extractor_filename_template")
 }
 
 data class SyncOptions(
@@ -172,6 +178,8 @@ data class SettingUiState(
     val biometricLockUninstall: Boolean = false,
     val dialogInstallMode: Boolean = true,
     val autoConfirmExternalInstall: Boolean = false,
+    val extractorOutputPath: String = "",
+    val extractorFilenameTemplate: String = "{name}-{version}",
     /**
      * True when the device has at least one biometric or device-credential enrolled.
      * Used to greyly inform the user that the toggles will be no-ops until they
@@ -296,6 +304,10 @@ class SettingViewModel(
                 prefs[PreferencesKeys.AUTO_CONFIRM_EXTERNAL_INSTALL] ?: false
             )
         },
+        dataStore.data.map { prefs ->
+            (prefs[PreferencesKeys.APK_EXTRACTOR_OUTPUT_PATH] ?: "") to
+                (prefs[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] ?: "{name}-{version}")
+        },
     ) { flows ->
         val theme = flows[0] as ThemeMode
         val dynamicColor = flows[1] as Boolean
@@ -316,6 +328,8 @@ class SettingViewModel(
         val dialogMode = tripleFlags.first
         val autoOpen = tripleFlags.second
         val autoConfirm = tripleFlags.third
+        @Suppress("UNCHECKED_CAST")
+        val extractorFlags = flows[14] as Pair<String, String>
         val versionName = try {
             application.packageManager
                 .getPackageInfo(application.packageName, 0)
@@ -346,6 +360,8 @@ class SettingViewModel(
                 .BiometricGate.canAuthenticate(application),
             dialogInstallMode = dialogMode,
             autoConfirmExternalInstall = autoConfirm,
+            extractorOutputPath = extractorFlags.first,
+            extractorFilenameTemplate = extractorFlags.second,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -569,6 +585,22 @@ class SettingViewModel(
         viewModelScope.launch {
             dataStore.edit { prefs ->
                 prefs[PreferencesKeys.AUTO_CONFIRM_EXTERNAL_INSTALL] = enabled
+            }
+        }
+    }
+
+    fun setExtractorOutputPath(path: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.APK_EXTRACTOR_OUTPUT_PATH] = path
+            }
+        }
+    }
+
+    fun setExtractorFilenameTemplate(template: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] = template
             }
         }
     }

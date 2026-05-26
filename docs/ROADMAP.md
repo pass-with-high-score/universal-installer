@@ -42,8 +42,8 @@ Self-contained features, no external dependencies (no OAuth review, no Play Serv
 
 ## Backlog — needs discovery before scoping
 
+- **"Open Android" advocacy & strategic defense** ([#13](https://github.com/.../issues/13), [#31](https://github.com/.../issues/31)). Take a public stance against Google's increasing sideloading restrictions (developer verification mandates). Maintain ADB/Shizuku/Root as resilient installation paths that bypass standard PackageInstaller blocks.
 - **Sandbox / isolated install** ([#3](https://github.com/.../issues/3)). Real sandboxing on stock Android is hard. Options to spike: Work Profile API, Island/Shelter integration, custom user via root. Don't promise a release date until an approach is validated.
-- **"Open Android" advocacy banner** ([#13](https://github.com/.../issues/13)). One-time dismissible banner re: Google's developer-verification / sideloading policy. Low effort but a public stance — decide whether the project takes it before building.
 - **Different notification/interaction forms** ([#5](https://github.com/.../issues/5), one of several). Reporter was vague; ask for a concrete example before scoping.
 - **Additional cloud providers** (Dropbox, OneDrive). Defer until Drive ships and we see usage.
 

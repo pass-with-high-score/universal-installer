@@ -132,6 +132,7 @@ fun DialogMenuContent(
     
     val prefs by context.dataStore.data.collectAsState(initial = null)
     val allUsers = prefs?.get(PreferencesKeys.SHIZUKU_ALL_USERS) ?: false
+    val selectedUserId = prefs?.get<Int>(PreferencesKeys.INSTALL_USER_ID)
     val spoofSource = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
     val installerPkg = prefs?.get(PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME) ?: DEFAULT_INSTALLER_PACKAGE_NAME
     val overridesSerialized = prefs?.get(PreferencesKeys.INSTALLER_OVERRIDES)
@@ -144,6 +145,23 @@ fun DialogMenuContent(
             context.dataStore.edit {
                 it[PreferencesKeys.SHIZUKU_ALL_USERS] = enabled
                 it[PreferencesKeys.ROOT_ALL_USERS] = enabled
+                if (enabled) {
+                    it.remove(PreferencesKeys.INSTALL_USER_ID)
+                }
+            }
+        }
+    }
+
+    val onSelectUserId: (Int?) -> Unit = { id ->
+        scope.launch {
+            context.dataStore.edit {
+                if (id != null) {
+                    it[PreferencesKeys.INSTALL_USER_ID] = id
+                    it[PreferencesKeys.SHIZUKU_ALL_USERS] = false
+                    it[PreferencesKeys.ROOT_ALL_USERS] = false
+                } else {
+                    it.remove(PreferencesKeys.INSTALL_USER_ID)
+                }
             }
         }
     }
@@ -330,15 +348,17 @@ fun DialogMenuContent(
                         onAttachObb = onAttachObb,
                         onToggleSplit = onToggleSplit,
                         allUsers = allUsers,
+                        selectedUserId = selectedUserId,
                         spoofSource = spoofSource,
                         installerPkg = installerPkg,
                         rememberForThisApp = packageOverride != null,
-                        replaceExisting = prefs?.get(PreferencesKeys.SHIZUKU_REPLACE_EXISTING) ?: false,
+                        replaceExisting = prefs?.get(PreferencesKeys.SHIZUKU_REPLACE_EXISTING) ?: true,
                         allowTest = prefs?.get(PreferencesKeys.SHIZUKU_ALLOW_TEST) ?: false,
                         requestDowngrade = prefs?.get(PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE) ?: false,
                         grantAllPermissions = prefs?.get(PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS) ?: false,
                         bypassLowTargetSdk = prefs?.get(PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK) ?: false,
                         onToggleAllUsers = onToggleAllUsers,
+                        onSelectUserId = onSelectUserId,
                         onToggleSpoofSource = onToggleSpoofSource,
                         onChangeInstallerPkg = onChangeInstallerPkg,
                         onSetRemember = onSetRemember,
@@ -604,6 +624,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     onAttachObb: () -> Unit,
     onToggleSplit: (Int) -> Unit,
     allUsers: Boolean,
+    selectedUserId: Int?,
     spoofSource: Boolean,
     installerPkg: String,
     rememberForThisApp: Boolean,
@@ -613,6 +634,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     grantAllPermissions: Boolean,
     bypassLowTargetSdk: Boolean,
     onToggleAllUsers: (Boolean) -> Unit,
+    onSelectUserId: (Int?) -> Unit,
     onToggleSpoofSource: (Boolean) -> Unit,
     onChangeInstallerPkg: (String) -> Unit,
     onSetRemember: (Boolean) -> Unit,
@@ -751,7 +773,9 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
                 InstallTargetPicker(
                     profiles = profiles,
                     allUsers = allUsers,
+                    selectedUserId = selectedUserId,
                     onSelectAllUsers = onToggleAllUsers,
+                    onSelectUserId = onSelectUserId,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
                 )
             }
@@ -1265,6 +1289,7 @@ private fun InstallerSourcePicker(
 // ─────────────────────────────────────────────────────────────────────────
 
 private data class DeviceUserProfile(
+    val id: Int,
     val displayName: String,
     val isOwner: Boolean,
     val isWorkProfile: Boolean,
@@ -1279,14 +1304,34 @@ private fun rememberDeviceUserProfiles(): List<DeviceUserProfile> {
 private fun loadDeviceUserProfiles(context: Context): List<DeviceUserProfile> {
     val um = context.getSystemService(Context.USER_SERVICE) as? UserManager ?: return emptyList()
     val ownHandle = Process.myUserHandle()
+    val ownId = getUserId(ownHandle)
     val handles: List<UserHandle> = runCatching { um.userProfiles }.getOrElse { listOf(ownHandle) }
     return handles.map { handle ->
-        val isOwner = handle == ownHandle
+        val id = getUserId(handle)
+        val isOwner = id == ownId
         DeviceUserProfile(
-            displayName = if (isOwner) "Owner" else "Work profile",
+            id = id,
+            displayName = if (isOwner) "Owner" else "Work profile ($id)",
             isOwner = isOwner,
             isWorkProfile = !isOwner,
         )
+    }
+}
+
+private fun getUserId(handle: UserHandle): Int {
+    return try {
+        val method = UserHandle::class.java.getDeclaredMethod("getIdentifier")
+        method.invoke(handle) as Int
+    } catch (e: Exception) {
+        // Fallback: UserHandle.toString() is usually "UserHandle{ID}"
+        val str = handle.toString()
+        val start = str.indexOf('{')
+        val end = str.indexOf('}')
+        if (start != -1 && end > start) {
+            str.substring(start + 1, end).toIntOrNull() ?: 0
+        } else {
+            0
+        }
     }
 }
 
@@ -1294,7 +1339,9 @@ private fun loadDeviceUserProfiles(context: Context): List<DeviceUserProfile> {
 private fun InstallTargetPicker(
     profiles: List<DeviceUserProfile>,
     allUsers: Boolean,
+    selectedUserId: Int?,
     onSelectAllUsers: (Boolean) -> Unit,
+    onSelectUserId: (Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
@@ -1302,15 +1349,21 @@ private fun InstallTargetPicker(
             icon = Icons.Rounded.Person,
             title = stringResource(R.string.dialog_menu_target_current),
             subtitle = stringResource(R.string.dialog_menu_target_current_sub),
-            selected = !allUsers,
-            onClick = { onSelectAllUsers(false) },
+            selected = !allUsers && selectedUserId == null,
+            onClick = {
+                onSelectAllUsers(false)
+                onSelectUserId(null)
+            },
         )
         TargetOptionRow(
             icon = Icons.Rounded.Lock,
             title = stringResource(R.string.dialog_menu_target_all),
             subtitle = stringResource(R.string.dialog_menu_target_all_sub),
             selected = allUsers,
-            onClick = { onSelectAllUsers(true) },
+            onClick = {
+                onSelectAllUsers(true)
+                onSelectUserId(null)
+            },
         )
 
         if (profiles.size > 1) {
@@ -1323,29 +1376,20 @@ private fun InstallTargetPicker(
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp),
             )
             profiles.forEach { profile ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = when {
-                            profile.isWorkProfile -> Icons.Rounded.Work
-                            profile.isOwner -> Icons.Rounded.Person
-                            else -> Icons.Rounded.Lock
-                        },
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(16.dp),
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = profile.displayName,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
+                TargetOptionRow(
+                    icon = when {
+                        profile.isWorkProfile -> Icons.Rounded.Work
+                        profile.isOwner -> Icons.Rounded.Person
+                        else -> Icons.Rounded.Lock
+                    },
+                    title = profile.displayName,
+                    subtitle = "User ID: ${profile.id}",
+                    selected = !allUsers && selectedUserId == profile.id,
+                    onClick = {
+                        onSelectAllUsers(false)
+                        onSelectUserId(profile.id)
+                    },
+                )
             }
         }
 

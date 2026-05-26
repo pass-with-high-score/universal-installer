@@ -22,6 +22,8 @@ import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.BugReport
 import androidx.compose.material.icons.rounded.CleaningServices
+import androidx.compose.material.icons.rounded.DriveFileRenameOutline
+import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material.icons.rounded.Fingerprint
 import androidx.compose.material.icons.rounded.Info
@@ -98,6 +100,8 @@ fun SettingScreen(
         onBiometricLockInstallChanged = viewModel::setBiometricLockInstall,
         onBiometricLockUninstallChanged = viewModel::setBiometricLockUninstall,
         onAutoConfirmExternalInstallChanged = viewModel::setAutoConfirmExternalInstall,
+        onExtractorOutputPathChanged = viewModel::setExtractorOutputPath,
+        onExtractorFilenameTemplateChanged = viewModel::setExtractorFilenameTemplate,
     )
 }
 
@@ -123,6 +127,8 @@ private fun SettingUi(
     onBiometricLockInstallChanged: (Boolean) -> Unit = {},
     onBiometricLockUninstallChanged: (Boolean) -> Unit = {},
     onAutoConfirmExternalInstallChanged: (Boolean) -> Unit = {},
+    onExtractorOutputPathChanged: (String) -> Unit = {},
+    onExtractorFilenameTemplateChanged: (String) -> Unit = {},
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -304,6 +310,58 @@ private fun SettingUi(
                         },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
+                }
+            }
+
+            // ── APK Extractor Section ──
+            item {
+                SettingsSection(
+                    title = stringResource(R.string.setting_section_extractor),
+                    icon = Icons.Rounded.Folder
+                ) {
+                    var pathText by remember(uiState.extractorOutputPath) {
+                        mutableStateOf(uiState.extractorOutputPath)
+                    }
+                    var templateText by remember(uiState.extractorFilenameTemplate) {
+                        mutableStateOf(uiState.extractorFilenameTemplate)
+                    }
+
+                    Column(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = pathText,
+                            onValueChange = {
+                                pathText = it
+                                onExtractorOutputPathChanged(it)
+                            },
+                            label = { Text(stringResource(R.string.setting_extractor_path_title)) },
+                            placeholder = { Text(stringResource(R.string.setting_extractor_path_placeholder)) },
+                            supportingText = { Text(stringResource(R.string.setting_extractor_path_subtitle)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            leadingIcon = {
+                                Icon(Icons.Rounded.Folder, contentDescription = null)
+                            }
+                        )
+
+                        OutlinedTextField(
+                            value = templateText,
+                            onValueChange = {
+                                templateText = it
+                                onExtractorFilenameTemplateChanged(it)
+                            },
+                            label = { Text(stringResource(R.string.setting_extractor_template_title)) },
+                            placeholder = { Text(stringResource(R.string.setting_extractor_template_placeholder)) },
+                            supportingText = { Text(stringResource(R.string.setting_extractor_template_subtitle)) },
+                            modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
+                            leadingIcon = {
+                                Icon(Icons.Rounded.DriveFileRenameOutline, contentDescription = null)
+                            }
+                        )
+                    }
                 }
             }
 

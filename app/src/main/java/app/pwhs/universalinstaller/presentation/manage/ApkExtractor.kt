@@ -43,6 +43,7 @@ object ApkExtractor {
         context: Context,
         packageName: String,
         outputDir: File? = null,
+        filenameTemplate: String = "{name}-{version}",
         onProgress: (bytesCopied: Long, totalBytes: Long) -> Unit = { _, _ -> },
     ): Result = withContext(Dispatchers.IO) {
         val pm = context.packageManager
@@ -81,12 +82,16 @@ object ApkExtractor {
             SUBFOLDER,
         )).apply { mkdirs() }
 
-        val baseName = sanitize(appName) +
-            (if (versionName.isNotBlank()) "-$versionName" else "")
+        val resolvedName = resolveTemplate(
+            template = filenameTemplate,
+            name = appName,
+            version = versionName,
+            pkg = packageName,
+        )
         val targetExt = if (splitDirs.isEmpty()) "apk" else "apks"
         val target = File(
             effectiveOutputDir,
-            uniqueName(effectiveOutputDir, "$baseName.$targetExt"),
+            uniqueName(effectiveOutputDir, "$resolvedName.$targetExt"),
         )
 
         val totalBytes = baseApk.length() + splitDirs.sumOf { it.length() }
@@ -204,6 +209,20 @@ object ApkExtractor {
             }
         }.joinToString("").trim().ifBlank { "app" }
         return cleaned.take(80)
+    }
+
+    private fun resolveTemplate(
+        template: String,
+        name: String,
+        version: String,
+        pkg: String,
+    ): String {
+        val resolved = template
+            .replace("{name}", name)
+            .replace("{version}", version)
+            .replace("{package}", pkg)
+            .replace("{pkg}", pkg)
+        return sanitize(resolved)
     }
 
     private fun uniqueName(dir: File, desired: String): String {

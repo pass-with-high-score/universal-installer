@@ -240,7 +240,24 @@ class ManageViewModel(
         extractJob?.cancel()
         _extractState.value = ExtractState.Running(packageName, appName, 0L, 1L, mode)
         extractJob = viewModelScope.launch {
-            val result = ApkExtractor.extract(application, packageName, outputDir) { bytes, total ->
+            val prefs = application.dataStore.data.first()
+            val customPath = prefs[PreferencesKeys.APK_EXTRACTOR_OUTPUT_PATH]
+            val template = prefs[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] ?: "{name}-{version}"
+
+            val effectiveOutputDir = if (mode == ExtractMode.Share) {
+                outputDir
+            } else if (!customPath.isNullOrBlank()) {
+                java.io.File(customPath).apply { mkdirs() }
+            } else {
+                outputDir
+            }
+
+            val result = ApkExtractor.extract(
+                context = application,
+                packageName = packageName,
+                outputDir = effectiveOutputDir,
+                filenameTemplate = template
+            ) { bytes, total ->
                 _extractState.value = ExtractState.Running(packageName, appName, bytes, total, mode)
             }
             _extractState.value = when (result) {

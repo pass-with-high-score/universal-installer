@@ -1224,8 +1224,9 @@ class InstallViewModel(
         val prefs = try { application.dataStore.data.first() } catch (_: Exception) { null }
         val useRoot = prefs?.get(PreferencesKeys.USE_ROOT) ?: false
         val spoofRoot = prefs?.get(PreferencesKeys.ROOT_SET_INSTALL_SOURCE) ?: false
+        val targetedUser = prefs?.get<Int>(PreferencesKeys.INSTALL_USER_ID) != null
 
-        if ((useRoot || spoofRoot) && rootController != null) {
+        if ((useRoot || spoofRoot || targetedUser) && rootController != null) {
             // Verify root is still granted. If it's UNKNOWN (no shell yet) or was 
             // previously DENIED, try an active request. This ensures the install 
             // actually uses the root controller if possible.
@@ -1243,11 +1244,11 @@ class InstallViewModel(
         val useShizuku = prefs?.get(PreferencesKeys.USE_SHIZUKU) ?: false
         val spoofShizuku = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
 
-        if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) {
+        if ((useShizuku || spoofShizuku || targetedUser) && isShizukuReadyForInstall()) {
             return shizukuController
         }
 
-        if (useShizuku || spoofShizuku) {
+        if (useShizuku || spoofShizuku || targetedUser) {
             Timber.w("Shizuku prioritized but not ready — falling back to default installer")
         }
         return defaultController

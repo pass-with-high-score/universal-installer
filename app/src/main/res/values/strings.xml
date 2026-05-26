@@ -343,6 +343,13 @@
     <string name="setting_auto_open_subtitle">Launch the installed app from the success screen — with a 3-second cancellable countdown</string>
     <string name="setting_auto_confirm_title">Auto-confirm external installs</string>
     <string name="setting_auto_confirm_subtitle">Skip the confirmation dialog when an APK is opened from another app</string>
+    <string name="setting_section_extractor">APK Extractor</string>
+    <string name="setting_extractor_path_title">Output folder</string>
+    <string name="setting_extractor_path_subtitle">Custom directory for extracted files</string>
+    <string name="setting_extractor_path_placeholder">Defaults to Download/UniversalInstaller/Extracted</string>
+    <string name="setting_extractor_template_title">Filename template</string>
+    <string name="setting_extractor_template_subtitle">Placeholders: {name}, {version}, {package}</string>
+    <string name="setting_extractor_template_placeholder">{name}-{version}</string>
     <string name="setting_section_shizuku_options">Shizuku Options</string>
     <string name="setting_shizuku_options_install_group">Install</string>
     <string name="setting_shizuku_options_uninstall_group">Uninstall</string>
