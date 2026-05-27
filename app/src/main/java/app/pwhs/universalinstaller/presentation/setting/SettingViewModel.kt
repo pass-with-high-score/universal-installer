@@ -100,12 +100,6 @@ object PreferencesKeys {
      */
     val DIALOG_INSTALL_MODE = booleanPreferencesKey("dialog_install_mode")
 
-    /**
-     * When true, the installation bottom sheet starts in a compact/minimalist view,
-     * hiding advanced details until expanded.
-     */
-    val COMPACT_INSTALL_UI = booleanPreferencesKey("compact_install_ui")
-
     // Manage screen filter-sheet state — persisted so the user's sort/group/filter survives
     // process death. Enums stored by `name` so renaming a constant breaks loudly rather
     // than silently mapping to ordinal 0.
@@ -189,7 +183,6 @@ data class SettingUiState(
     val biometricLockInstall: Boolean = false,
     val biometricLockUninstall: Boolean = false,
     val dialogInstallMode: Boolean = true,
-    val compactInstallUi: Boolean = false,
     val autoConfirmExternalInstall: Boolean = false,
     val extractorOutputPath: String = "",
     val extractorFilenameTemplate: String = "{name}-{version}",
@@ -309,12 +302,6 @@ class SettingViewModel(
     fun setDialogInstallMode(enabled: Boolean) {
         viewModelScope.launch {
             dataStore.edit { prefs -> prefs[PreferencesKeys.DIALOG_INSTALL_MODE] = enabled }
-        }
-    }
-
-    fun setCompactInstallUi(enabled: Boolean) {
-        viewModelScope.launch {
-            dataStore.edit { prefs -> prefs[PreferencesKeys.COMPACT_INSTALL_UI] = enabled }
         }
     }
 
@@ -487,10 +474,9 @@ class SettingViewModel(
                     (prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] ?: false)
         },
         dataStore.data.map { prefs ->
-            // Quartet: dialog-mode, compact-ui, auto-open-after-install, and auto-confirm-external-install
-            listOf(
+            // Trio: dialog-mode, auto-open-after-install, and auto-confirm-external-install
+            Triple(
                 prefs[PreferencesKeys.DIALOG_INSTALL_MODE] ?: true,
-                prefs[PreferencesKeys.COMPACT_INSTALL_UI] ?: false,
                 prefs[PreferencesKeys.AUTO_OPEN_AFTER_INSTALL] ?: false,
                 prefs[PreferencesKeys.AUTO_CONFIRM_EXTERNAL_INSTALL] ?: false
             )
@@ -521,11 +507,10 @@ class SettingViewModel(
         @Suppress("UNCHECKED_CAST")
         val biometricFlags = flows[12] as Pair<Boolean, Boolean>
         @Suppress("UNCHECKED_CAST")
-        val quadFlags = flows[13] as List<Boolean>
-        val dialogMode = quadFlags[0]
-        val compactUi = quadFlags[1]
-        val autoOpen = quadFlags[2]
-        val autoConfirm = quadFlags[3]
+        val tripleFlags = flows[13] as Triple<Boolean, Boolean, Boolean>
+        val dialogMode = tripleFlags.first
+        val autoOpen = tripleFlags.second
+        val autoConfirm = tripleFlags.third
         @Suppress("UNCHECKED_CAST")
         val extractorAndProfiles = flows[14] as List<String>
         val extractorPath = extractorAndProfiles[0]
@@ -565,7 +550,6 @@ class SettingViewModel(
             biometricEnrolmentAvailable = app.pwhs.universalinstaller.util
                 .BiometricGate.canAuthenticate(application),
             dialogInstallMode = dialogMode,
-            compactInstallUi = compactUi,
             autoConfirmExternalInstall = autoConfirm,
             extractorOutputPath = extractorPath,
             extractorFilenameTemplate = extractorTemplate,

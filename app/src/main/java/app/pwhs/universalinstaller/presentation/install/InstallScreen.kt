@@ -397,7 +397,7 @@ private fun InstallUi(
                 appProfileMapping = uiState.appProfileMapping,
                 onProfileSelected = onProfileSelected,
                 onMappingChanged = onMappingChanged,
-                startCompact = uiState.compactUi,
+                startCompact = true,
             )
         }
     }
