@@ -242,6 +242,16 @@ internal fun ApkInfoContent(
 
         if (isExpanded) {
             Spacer(Modifier.height(16.dp))
+            
+            // Move Installer Profiles higher up
+            ProfilePickerCard(
+                profiles = profiles,
+                currentMappingProfileId = currentMappingProfileId,
+                onProfileSelected = onProfileSelected,
+                onMappingToggle = { profileId -> onMappingChanged(apkInfo.packageName, profileId) }
+            )
+
+            Spacer(Modifier.height(16.dp))
             ObbAttachCard(attached = attachedObbFiles, onAttach = onAttachObb, onRemove = onRemoveObb)
             Spacer(Modifier.height(16.dp))
             DetailsCard(apkInfo)
@@ -258,15 +268,6 @@ internal fun ApkInfoContent(
             if (apkInfo.permissions.isNotEmpty()) {
                 Spacer(Modifier.height(16.dp))
                 PermissionsCard(apkInfo.permissions)
-            }
-            if (profiles.isNotEmpty()) {
-                Spacer(Modifier.height(16.dp))
-                ProfilePickerCard(
-                    profiles = profiles,
-                    currentMappingProfileId = currentMappingProfileId,
-                    onProfileSelected = onProfileSelected,
-                    onMappingToggle = { profileId -> onMappingChanged(apkInfo.packageName, profileId) }
-                )
             }
         }
 
@@ -286,11 +287,11 @@ internal fun ApkInfoContent(
             }
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 OutlinedButton(
-                    onClick = { if (isExpanded) isExpanded = false else onCancel() },
+                    onClick = { if (isExpanded && startCompact) isExpanded = false else onCancel() },
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
                 ) {
-                    Text(if (isExpanded) "Back" else stringResource(R.string.cancel))
+                    Text(if (isExpanded && startCompact) "Back" else stringResource(R.string.cancel))
                 }
                 Button(
                     onClick = onInstall,
@@ -322,31 +323,46 @@ private fun ProfilePickerCard(
         icon = Icons.Rounded.Badge,
         title = stringResource(R.string.setting_profiles_title),
         summary = selectedProfile?.name ?: stringResource(R.string.install_profile_none),
-        defaultExpanded = false
+        defaultExpanded = profiles.isNotEmpty()
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            Text(stringResource(R.string.install_profile_picker_label), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
-            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
-                OutlinedTextField(
-                    value = selectedProfile?.name ?: stringResource(R.string.install_profile_none),
-                    onValueChange = {},
-                    readOnly = true,
-                    modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+        if (profiles.isEmpty()) {
+            Column(modifier = Modifier.padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                Text(
+                    text = "No profiles created yet.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                    DropdownMenuItem(text = { Text(stringResource(R.string.install_profile_none)) }, onClick = { onProfileSelected(null); onMappingToggle(null); expanded = false })
-                    profiles.forEach { profile ->
-                        DropdownMenuItem(text = { Text(profile.name) }, onClick = { onProfileSelected(profile); onMappingToggle(profile.id); expanded = false })
+                Text(
+                    text = "Go to Settings -> Installer Profiles to create one and save your favorite install configurations.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(R.string.install_profile_picker_label), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
+                ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) {
+                    OutlinedTextField(
+                        value = selectedProfile?.name ?: stringResource(R.string.install_profile_none),
+                        onValueChange = {},
+                        readOnly = true,
+                        modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable).fillMaxWidth(),
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.outlinedTextFieldColors()
+                    )
+                    ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(text = { Text(stringResource(R.string.install_profile_none)) }, onClick = { onProfileSelected(null); onMappingToggle(null); expanded = false })
+                        profiles.forEach { profile ->
+                            DropdownMenuItem(text = { Text(profile.name) }, onClick = { onProfileSelected(profile); onMappingToggle(profile.id); expanded = false })
+                        }
                     }
                 }
-            }
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { if (currentMappingProfileId != null) onMappingToggle(null) }) {
-                Checkbox(checked = currentMappingProfileId != null, onCheckedChange = { checked -> if (!checked) onMappingToggle(null) }, enabled = currentMappingProfileId != null)
-                Column(modifier = Modifier.padding(start = 8.dp)) {
-                    Text(stringResource(R.string.profile_mapping_header), style = MaterialTheme.typography.bodyMedium)
-                    Text(stringResource(R.string.profile_mapping_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().clickable { if (currentMappingProfileId != null) onMappingToggle(null) }) {
+                    Checkbox(checked = currentMappingProfileId != null, onCheckedChange = { checked -> if (!checked) onMappingToggle(null) }, enabled = currentMappingProfileId != null)
+                    Column(modifier = Modifier.padding(start = 8.dp)) {
+                        Text(stringResource(R.string.profile_mapping_header), style = MaterialTheme.typography.bodyMedium)
+                        Text(stringResource(R.string.profile_mapping_desc), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
                 }
             }
         }
@@ -430,20 +446,18 @@ private fun VtBreakdownSection(vt: VtResult, warningColor: Color) {
 
 @Composable
 private fun PermissionsCard(permissions: List<String>) {
-    val context = LocalContext.current
-    val entries = remember(permissions) { resolvePermissionEntries(context, permissions) }
     var expanded by remember { mutableStateOf(false) }
-    val visible = if (expanded) entries else entries.take(5)
-    SectionCard(icon = Icons.Rounded.Security, title = stringResource(R.string.apk_info_section_permissions, permissions.size), badge = entries.size.toString(), defaultExpanded = false) {
+    val visible = if (expanded) permissions else permissions.take(5)
+    SectionCard(icon = Icons.Rounded.Security, title = stringResource(R.string.apk_info_section_permissions, permissions.size), badge = permissions.size.toString(), defaultExpanded = false) {
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            visible.forEach { entry ->
+            visible.forEach { perm ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(if (entry.isDangerous) Icons.Rounded.Warning else Icons.Rounded.CheckCircle, null, tint = if (entry.isDangerous) Color.Red else Color.Gray, modifier = Modifier.size(16.dp))
+                    Icon(Icons.Rounded.CheckCircle, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text(entry.label, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(perm.substringAfterLast('.'), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 }
             }
-            if (entries.size > 5) TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) { Text(if (expanded) "Show less" else "Show more") }
+            if (permissions.size > 5) TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) { Text(if (expanded) "Show less" else "Show more") }
         }
     }
 }
@@ -506,16 +520,16 @@ internal fun sdkToAndroid(sdk: Int): String = when {
 
 @Composable
 private fun ObbAttachCard(attached: List<AttachedObb>, onAttach: () -> Unit, onRemove: (AttachedObb) -> Unit) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large) {
+    ElevatedCard(modifier = Modifier.fillMaxWidth(), shape = MaterialTheme.shapes.large, colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow)) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("OBB Files", style = MaterialTheme.typography.titleSmall)
+            Text(stringResource(R.string.apk_info_obb_attach_title), style = MaterialTheme.typography.titleSmall)
             attached.forEach { obb ->
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(obb.fileName, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodySmall)
                     IconButton(onClick = { onRemove(obb) }) { Icon(Icons.Rounded.Delete, null) }
                 }
             }
-            OutlinedButton(onClick = onAttach, modifier = Modifier.fillMaxWidth()) { Text("Attach OBB") }
+            OutlinedButton(onClick = onAttach, modifier = Modifier.fillMaxWidth()) { Text(stringResource(R.string.apk_info_obb_attach_button)) }
         }
     }
 }
