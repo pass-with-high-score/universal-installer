@@ -69,6 +69,12 @@ interface InstallerBackendFactory {
     suspend fun clearAppDataViaRoot(packageName: String): Result<String>
 
     /**
+     * Enables or disables a system app via root shell.
+     * Store flavor always returns failure.
+     */
+    suspend fun setSystemAppEnabled(packageName: String, enabled: Boolean): Result<String>
+
+    /**
      * Installs one or more APKs (uris) for a specific user ID.
      * Implementations should use elevated privileges (Root/Shizuku) to bypass
      * PackageInstaller limitations.

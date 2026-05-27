@@ -124,6 +124,11 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
     override suspend fun clearAppDataViaRoot(packageName: String): Result<String> =
         runRootShell(packageName, "pm clear $packageName", successToken = "Success")
 
+    override suspend fun setSystemAppEnabled(packageName: String, enabled: Boolean): Result<String> {
+        val cmd = if (enabled) "pm enable $packageName" else "pm disable-user $packageName"
+        return runRootShell(packageName, cmd, successToken = null)
+    }
+
     override suspend fun installTargeted(
         context: android.content.Context,
         uris: List<android.net.Uri>,

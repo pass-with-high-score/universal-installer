@@ -343,6 +343,8 @@
     <string name="setting_auto_open_subtitle">Launch the installed app from the success screen — with a 3-second cancellable countdown</string>
     <string name="setting_auto_confirm_title">Auto-confirm external installs</string>
     <string name="setting_auto_confirm_subtitle">Skip the confirmation dialog when an APK is opened from another app</string>
+    <string name="setting_default_installer_title">Set as default installer</string>
+    <string name="setting_default_installer_subtitle">Disable system installer to always use Universal Installer for APK files (requires Shizuku or Root)</string>
     <string name="setting_section_extractor">APK Extractor</string>
     <string name="setting_extractor_path_title">Output folder</string>
     <string name="setting_extractor_path_subtitle">Custom directory for extracted files</string>

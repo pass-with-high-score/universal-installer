@@ -91,6 +91,7 @@ fun SettingScreen(
         onBiometricLockInstallChanged = viewModel::setBiometricLockInstall,
         onBiometricLockUninstallChanged = viewModel::setBiometricLockUninstall,
         onAutoConfirmExternalInstallChanged = viewModel::setAutoConfirmExternalInstall,
+        onDefaultInstallerChanged = viewModel::toggleDefaultInstaller,
         onProfilesClick = {
             context.startActivity(android.content.Intent(context, app.pwhs.universalinstaller.presentation.setting.profile.ProfileActivity::class.java))
         },
@@ -119,6 +120,7 @@ private fun SettingUi(
     onBiometricLockInstallChanged: (Boolean) -> Unit = {},
     onBiometricLockUninstallChanged: (Boolean) -> Unit = {},
     onAutoConfirmExternalInstallChanged: (Boolean) -> Unit = {},
+    onDefaultInstallerChanged: (Boolean) -> Unit = {},
     onProfilesClick: () -> Unit = {},
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
@@ -214,6 +216,16 @@ private fun SettingUi(
                         subtitle = stringResource(R.string.setting_auto_confirm_subtitle),
                         checked = uiState.autoConfirmExternalInstall,
                         onCheckedChange = onAutoConfirmExternalInstallChanged,
+                    )
+
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), thickness = 0.5.dp)
+
+                    SwitchPreference(
+                        title = stringResource(R.string.setting_default_installer_title),
+                        subtitle = stringResource(R.string.setting_default_installer_subtitle),
+                        checked = uiState.isDefaultInstaller,
+                        onCheckedChange = onDefaultInstallerChanged,
+                        enabled = uiState.shizukuAvailable || uiState.rootState == RootState.READY
                     )
                 }
             }

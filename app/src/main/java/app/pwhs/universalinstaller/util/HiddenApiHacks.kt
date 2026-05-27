@@ -61,4 +61,57 @@ object HiddenApiHacks {
             null
         }
     }
+
+    /**
+     * Toggles the enabled state of a package using Shizuku.
+     * Uses reflection to handle different IPackageManager.setApplicationEnabledSetting signatures.
+     */
+    fun setApplicationEnabledSetting(packageName: String, newState: Int, flags: Int) {
+        try {
+            val packageBinder = SystemServiceHelper.getSystemService("package")
+            val iPackageManager = IPackageManager.Stub.asInterface(ShizukuBinderWrapper(packageBinder))
+            
+            // Try 5-param version (Android 10+)
+            try {
+                val method = iPackageManager.javaClass.getMethod(
+                    "setApplicationEnabledSetting",
+                    String::class.java,
+                    Int::class.java,
+                    Int::class.java,
+                    Int::class.java,
+                    String::class.java
+                )
+                method.invoke(iPackageManager, packageName, newState, flags, 0, "com.android.shell")
+                return
+            } catch (e: NoSuchMethodException) {
+                // Try 4-param version (Older Android)
+                val method = iPackageManager.javaClass.getMethod(
+                    "setApplicationEnabledSetting",
+                    String::class.java,
+                    Int::class.java,
+                    Int::class.java,
+                    Int::class.java
+                )
+                method.invoke(iPackageManager, packageName, newState, flags, 0)
+            }
+        } catch (e: Exception) {
+            try {
+                val newProcessMethod = rikka.shizuku.Shizuku::class.java.getMethod(
+                    "newProcess",
+                    Array<String>::class.java,
+                    Array<String>::class.java,
+                    String::class.java
+                )
+                val process = newProcessMethod.invoke(
+                    null,
+                    arrayOf("pm", if (newState <= 1) "enable" else "disable-user", packageName),
+                    null,
+                    null
+                ) as Process
+                process.waitFor()
+            } catch (ex: Exception) {
+                // Ignore
+            }
+        }
+    }
 }

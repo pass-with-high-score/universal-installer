@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.setting
 import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.Intent
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -15,6 +16,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -188,6 +190,7 @@ data class SettingUiState(
     val extractorFilenameTemplate: String = "{name}-{version}",
     val installerProfiles: List<InstallerProfile> = emptyList(),
     val appProfileMapping: Map<String, String> = emptyMap(),
+    val isDefaultInstaller: Boolean = false,
     val selectedLanguage: String = "",
     /**
      * True when the device has at least one biometric or device-credential enrolled.
@@ -224,6 +227,14 @@ class SettingViewModel(
         updateShizukuState()
         Shizuku.addBinderReceivedListener(binderReceivedListener)
         Shizuku.addBinderDeadListener(binderDeadListener)
+
+        // Cheap non-blocking root probe — does not trigger a SuperUser prompt.
+        if (backendFactory.rootSupportCompiledIn) {
+            viewModelScope.launch {
+                _rootState.value = backendFactory.probeRootState()
+            }
+        }
+        updateDefaultInstallerStatus()
     }
 
     override fun onCleared() {
@@ -403,6 +414,82 @@ class SettingViewModel(
         }
     }
 
+    private val _isDefaultInstaller = MutableStateFlow(false)
+
+    /**
+     * Toggles Universal Installer as the default system installer.
+     * Requires Root or Shizuku (ADB).
+     */
+    fun toggleDefaultInstaller(enabled: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val systemInstallers = getSystemInstallerPackages()
+            if (systemInstallers.isEmpty()) {
+                Timber.w("No system installer found to toggle")
+                return@launch
+            }
+
+            try {
+                val newState = if (enabled) {
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED
+                } else {
+                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED_USER
+                }
+
+                if (_shizukuState.value == ShizukuState.READY) {
+                    systemInstallers.forEach { pkg ->
+                        app.pwhs.universalinstaller.util.HiddenApiHacks.setApplicationEnabledSetting(pkg, newState, 0)
+                    }
+                } else if (_rootState.value == RootState.READY) {
+                    systemInstallers.forEach { pkg ->
+                        backendFactory.setSystemAppEnabled(pkg, enabled)
+                    }
+                }
+                updateDefaultInstallerStatus()
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to toggle default installer")
+            }
+        }
+    }
+
+    private fun updateDefaultInstallerStatus() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val systemInstallers = getSystemInstallerPackages()
+            if (systemInstallers.isEmpty()) {
+                _isDefaultInstaller.value = false
+                return@launch
+            }
+            val allDisabled = systemInstallers.all { pkg ->
+                try {
+                    val info = application.packageManager.getApplicationInfo(pkg, 0)
+                    !info.enabled
+                } catch (e: Exception) {
+                    // If we can't find it, assume it's not a concern
+                    true
+                }
+            }
+            _isDefaultInstaller.value = allDisabled
+        }
+    }
+
+    private fun getSystemInstallerPackages(): List<String> {
+        val intent = Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
+            val file = java.io.File(application.cacheDir, "test.apk")
+            setDataAndType(android.net.Uri.fromFile(file), "application/vnd.android.package-archive")
+        }
+        val resolveInfos = application.packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL)
+        return resolveInfos.map { it.activityInfo.packageName }
+            .filter { it != application.packageName && isSystemApp(it) }
+    }
+
+    private fun isSystemApp(packageName: String): Boolean {
+        return try {
+            val info = application.packageManager.getApplicationInfo(packageName, 0)
+            (info.flags and android.content.pm.ApplicationInfo.FLAG_SYSTEM) != 0
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     private fun updateShizukuState() {
         _shizukuState.value = when {
             !Shizuku.pingBinder() -> ShizukuState.NOT_RUNNING
@@ -491,6 +578,7 @@ class SettingViewModel(
             )
         },
         _selectedLanguage,
+        _isDefaultInstaller,
     ) { flows ->
         val theme = flows[0] as ThemeMode
         val dynamicColor = flows[1] as Boolean
@@ -518,6 +606,7 @@ class SettingViewModel(
         val profilesJson = extractorAndProfiles[2]
         val mappingJson = extractorAndProfiles[3]
         val selectedLang = flows[15] as String
+        val isDefault = flows[16] as Boolean
 
         val versionName = try {
             application.packageManager
@@ -556,6 +645,7 @@ class SettingViewModel(
             installerProfiles = ProfileManager.parseProfiles(profilesJson),
             appProfileMapping = ProfileManager.parseMapping(mappingJson),
             selectedLanguage = selectedLang,
+            isDefaultInstaller = isDefault,
         )
     }.stateIn(
         scope = viewModelScope,

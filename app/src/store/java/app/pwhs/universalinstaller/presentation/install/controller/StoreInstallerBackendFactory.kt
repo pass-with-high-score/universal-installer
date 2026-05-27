@@ -46,6 +46,9 @@ class StoreInstallerBackendFactory : InstallerBackendFactory {
     override suspend fun clearAppDataViaRoot(packageName: String): Result<String> =
         Result.failure(UnsupportedOperationException("Root not available in this build"))
 
+    override suspend fun setSystemAppEnabled(packageName: String, enabled: Boolean): Result<String> =
+        Result.failure(UnsupportedOperationException("Root not available in this build"))
+
     override suspend fun installTargeted(
         context: android.content.Context,
         uris: List<android.net.Uri>,
