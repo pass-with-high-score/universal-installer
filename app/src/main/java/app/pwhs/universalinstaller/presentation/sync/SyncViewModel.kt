@@ -6,19 +6,59 @@ import android.os.Environment
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.presentation.setting.SyncOptions
+import app.pwhs.universalinstaller.presentation.setting.dataStore
+import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+data class SyncUiState(
+    val state: SyncState = SyncState.STOPPED,
+    val serverUrl: String? = null,
+    val pinCode: String? = null,
+    val activeConnections: Int = 0,
+    val sharedFiles: List<File> = emptyList(),
+    val activeTransfers: Map<String, TransferProgress> = emptyMap(),
+    val syncOptions: SyncOptions = SyncOptions()
+)
+
 class SyncViewModel(application: Application) : AndroidViewModel(application) {
-    val state: StateFlow<SyncState> = SyncManager.state
-    val serverUrl: StateFlow<String?> = SyncManager.serverUrl
-    val pinCode: StateFlow<String?> = SyncManager.pinCode
-    val activeConnections: StateFlow<Int> = SyncManager.activeConnections
-    val sharedFiles: StateFlow<List<File>> = SyncManager.sharedFiles
-    val activeTransfers: StateFlow<Map<String, TransferProgress>> = SyncManager.activeTransfers
+    private val dataStore = application.dataStore
+
+    val uiState: StateFlow<SyncUiState> = combine(
+        SyncManager.state,
+        SyncManager.serverUrl,
+        SyncManager.pinCode,
+        SyncManager.activeConnections,
+        SyncManager.sharedFiles,
+        SyncManager.activeTransfers,
+        dataStore.data.map { prefs ->
+            SyncOptions(
+                requirePin = prefs[PreferencesKeys.SYNC_REQUIRE_PIN] ?: true,
+                pinCode = prefs[PreferencesKeys.SYNC_PIN_CODE] ?: "",
+                serverPort = prefs[PreferencesKeys.SYNC_SERVER_PORT] ?: "8080"
+            )
+        }
+    ) { flows ->
+        SyncUiState(
+            state = flows[0] as SyncState,
+            serverUrl = flows[1] as? String,
+            pinCode = flows[2] as? String,
+            activeConnections = flows[3] as Int,
+            sharedFiles = flows[4] as List<File>,
+            activeTransfers = flows[5] as Map<String, TransferProgress>,
+            syncOptions = flows[6] as SyncOptions
+        )
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SyncUiState())
 
     private val baseDir = File(
         Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
@@ -41,6 +81,24 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
         }
         // Refresh file list when toggling
         refreshSharedFiles()
+    }
+
+    fun setSyncRequirePin(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.edit { prefs -> prefs[PreferencesKeys.SYNC_REQUIRE_PIN] = enabled }
+        }
+    }
+
+    fun setSyncPinCode(code: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs -> prefs[PreferencesKeys.SYNC_PIN_CODE] = code }
+        }
+    }
+
+    fun setSyncServerPort(port: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs -> prefs[PreferencesKeys.SYNC_SERVER_PORT] = port }
+        }
     }
 
     fun refreshSharedFiles() {

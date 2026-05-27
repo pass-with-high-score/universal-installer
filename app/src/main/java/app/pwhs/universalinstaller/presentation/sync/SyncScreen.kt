@@ -10,12 +10,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Android
@@ -45,12 +47,8 @@ import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.composable.QrCode
-
-
-
 import org.koin.androidx.compose.koinViewModel
 import java.io.File
-
 
 @Composable
 fun SyncScreen(
@@ -58,12 +56,7 @@ fun SyncScreen(
     viewModel: SyncViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val state by viewModel.state.collectAsState()
-    val serverUrl by viewModel.serverUrl.collectAsState()
-    val pinCode by viewModel.pinCode.collectAsState()
-    val activeConnections by viewModel.activeConnections.collectAsState()
-    val sharedFiles by viewModel.sharedFiles.collectAsState()
-    val activeTransfers by viewModel.activeTransfers.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     // Storage permission check
     var hasStoragePermission by remember { mutableStateOf(checkStoragePermission()) }
@@ -133,12 +126,7 @@ fun SyncScreen(
 
     SyncUi(
         modifier = modifier,
-        state = state,
-        serverUrl = serverUrl,
-        pinCode = pinCode,
-        activeConnections = activeConnections,
-        sharedFiles = sharedFiles,
-        activeTransfers = activeTransfers,
+        uiState = uiState,
         onBack = { val a = context as? android.app.Activity; a?.finish() },
         onToggle = { enabled ->
             if (enabled && !hasStoragePermission) {
@@ -155,6 +143,9 @@ fun SyncScreen(
             }
         },
         onDeleteFile = { viewModel.deleteSharedFile(it) },
+        onSetPort = viewModel::setSyncServerPort,
+        onSetRequirePin = viewModel::setSyncRequirePin,
+        onSetPinCode = viewModel::setSyncPinCode
     )
 }
 
@@ -170,21 +161,19 @@ private fun checkStoragePermission(): Boolean {
 @Composable
 private fun SyncUi(
     modifier: Modifier = Modifier,
-    state: SyncState = SyncState.STOPPED,
-    serverUrl: String? = null,
-    pinCode: String? = null,
-    activeConnections: Int = 0,
-    sharedFiles: List<File> = emptyList(),
-    activeTransfers: Map<String, TransferProgress> = emptyMap(),
+    uiState: SyncUiState = SyncUiState(),
     onBack: () -> Unit = {},
     onToggle: (Boolean) -> Unit = {},
     onPickFiles: () -> Unit = {},
     onDeleteFile: (File) -> Unit = {},
+    onSetPort: (String) -> Unit = {},
+    onSetRequirePin: (Boolean) -> Unit = {},
+    onSetPinCode: (String) -> Unit = {},
 ) {
     var showQrDialog by remember { mutableStateOf(false) }
 
     // QR Code Dialog
-    if (showQrDialog && serverUrl != null) {
+    if (showQrDialog && uiState.serverUrl != null) {
         Dialog(onDismissRequest = { showQrDialog = false }) {
             Surface(
                 shape = MaterialTheme.shapes.extraLarge,
@@ -214,13 +203,13 @@ private fun SyncUi(
                         modifier = Modifier.size(240.dp),
                     ) {
                         QrCode(
-                            data = serverUrl,
+                            data = uiState.serverUrl,
                             modifier = Modifier.padding(16.dp).fillMaxSize()
                         )
                     }
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        text = serverUrl,
+                        text = uiState.serverUrl,
                         style = MaterialTheme.typography.labelLarge,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Bold,
@@ -245,7 +234,7 @@ private fun SyncUi(
                     }
                 },
                 actions = {
-                    AnimatedVisibility(visible = state == SyncState.RUNNING && serverUrl != null, enter = fadeIn(), exit = fadeOut()) {
+                    AnimatedVisibility(visible = uiState.state == SyncState.RUNNING && uiState.serverUrl != null, enter = fadeIn(), exit = fadeOut()) {
                         IconButton(onClick = { showQrDialog = true }) {
                             Icon(Icons.Rounded.QrCode, contentDescription = "Show QR Code")
                         }
@@ -275,7 +264,7 @@ private fun SyncUi(
                     Spacer(modifier = Modifier.height(16.dp))
                     Surface(
                         shape = CircleShape,
-                        color = if (state == SyncState.RUNNING)
+                        color = if (uiState.state == SyncState.RUNNING)
                             MaterialTheme.colorScheme.primaryContainer
                         else
                             MaterialTheme.colorScheme.surfaceContainerHigh,
@@ -286,7 +275,7 @@ private fun SyncUi(
                                 imageVector = Icons.Rounded.WifiTethering,
                                 contentDescription = null,
                                 modifier = Modifier.size(56.dp),
-                                tint = if (state == SyncState.RUNNING)
+                                tint = if (uiState.state == SyncState.RUNNING)
                                     MaterialTheme.colorScheme.onPrimaryContainer
                                 else
                                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -295,7 +284,7 @@ private fun SyncUi(
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(
-                        text = when (state) {
+                        text = when (uiState.state) {
                             SyncState.STOPPED -> "Server Offline"
                             SyncState.STARTING -> "Starting..."
                             SyncState.RUNNING -> "Server Online"
@@ -330,7 +319,7 @@ private fun SyncUi(
                         Icon(
                             imageVector = Icons.Rounded.Cloud,
                             contentDescription = null,
-                            tint = if (state == SyncState.RUNNING) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                            tint = if (uiState.state == SyncState.RUNNING) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(Modifier.width(16.dp))
                         Column(modifier = Modifier.weight(1f)) {
@@ -339,21 +328,83 @@ private fun SyncUi(
                                 style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
-                                text = if (state == SyncState.RUNNING) "Running" else "Tap to start",
+                                text = if (uiState.state == SyncState.RUNNING) "Running" else "Tap to start",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         Switch(
-                            checked = state == SyncState.RUNNING || state == SyncState.STARTING,
+                            checked = uiState.state == SyncState.RUNNING || uiState.state == SyncState.STARTING,
                             onCheckedChange = onToggle
                         )
                     }
                 }
             }
 
+            // Server Settings Card
+            item(key = "settings") {
+                Surface(
+                    shape = MaterialTheme.shapes.large,
+                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Text(
+                            text = "Server Settings",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+
+                        OutlinedTextField(
+                            value = uiState.syncOptions.serverPort,
+                            onValueChange = onSetPort,
+                            label = { Text("Port") },
+                            modifier = Modifier.fillMaxWidth(),
+                            keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                                imeAction = androidx.compose.ui.text.input.ImeAction.Next
+                            ),
+                            singleLine = true,
+                            enabled = uiState.state == SyncState.STOPPED
+                        )
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth().clickable { onSetRequirePin(!uiState.syncOptions.requirePin) },
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text("Require PIN", style = MaterialTheme.typography.bodyLarge)
+                                Text("Guard transfers with a password", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            }
+                            Switch(
+                                checked = uiState.syncOptions.requirePin,
+                                onCheckedChange = onSetRequirePin
+                            )
+                        }
+
+                        if (uiState.syncOptions.requirePin) {
+                            OutlinedTextField(
+                                value = uiState.syncOptions.pinCode,
+                                onValueChange = onSetPinCode,
+                                label = { Text("PIN Code") },
+                                modifier = Modifier.fillMaxWidth(),
+                                keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                                    keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                                    imeAction = androidx.compose.ui.text.input.ImeAction.Done
+                                ),
+                                singleLine = true
+                            )
+                        }
+                    }
+                }
+            }
+
             // Server info card (only when running)
-            if (state == SyncState.RUNNING) {
+            if (uiState.state == SyncState.RUNNING) {
                 item(key = "info") {
                     Surface(
                         shape = MaterialTheme.shapes.large,
@@ -366,9 +417,9 @@ private fun SyncUi(
                                 headlineContent = { Text("Active Downloads") },
                                 supportingContent = {
                                     Text(
-                                        if (activeConnections > 0) "$activeConnections downloading"
+                                        if (uiState.activeConnections > 0) "${uiState.activeConnections} downloading"
                                         else "No active downloads",
-                                        color = if (activeConnections > 0) MaterialTheme.colorScheme.primary
+                                        color = if (uiState.activeConnections > 0) MaterialTheme.colorScheme.primary
                                         else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 },
@@ -376,7 +427,7 @@ private fun SyncUi(
                                     Icon(
                                         Icons.Rounded.People,
                                         contentDescription = null,
-                                        tint = if (activeConnections > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                                        tint = if (uiState.activeConnections > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 },
                                 colors = ListItemDefaults.colors(containerColor = Color.Transparent)
@@ -389,7 +440,7 @@ private fun SyncUi(
                                 headlineContent = { Text("Server URL") },
                                 supportingContent = {
                                     Text(
-                                        serverUrl ?: "",
+                                        uiState.serverUrl ?: "",
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.Bold,
                                         color = MaterialTheme.colorScheme.primary
@@ -404,7 +455,7 @@ private fun SyncUi(
                             HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
                             // Port
-                            val port = serverUrl?.substringAfterLast(":") ?: "8080"
+                            val port = uiState.serverUrl?.substringAfterLast(":") ?: "8080"
                             ListItem(
                                 headlineContent = { Text("Port") },
                                 supportingContent = {
@@ -421,13 +472,13 @@ private fun SyncUi(
                             )
 
                             // PIN (if enabled)
-                            if (pinCode != null) {
+                            if (uiState.pinCode != null) {
                                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                                 ListItem(
                                     headlineContent = { Text("PIN Code") },
                                     supportingContent = {
                                         Text(
-                                            pinCode,
+                                            uiState.pinCode,
                                             style = MaterialTheme.typography.bodyLarge,
                                             fontWeight = FontWeight.Bold,
                                             letterSpacing = 3.sp,
@@ -444,7 +495,7 @@ private fun SyncUi(
                 }
 
                 // Transfer progress cards (supports multiple concurrent transfers)
-                if (activeTransfers.isNotEmpty()) {
+                if (uiState.activeTransfers.isNotEmpty()) {
                     item(key = "transfers_header") {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -458,7 +509,7 @@ private fun SyncUi(
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = if (activeTransfers.size == 1) "Active Transfer" else "Active Transfers (${activeTransfers.size})",
+                                text = if (uiState.activeTransfers.size == 1) "Active Transfer" else "Active Transfers (${uiState.activeTransfers.size})",
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.primary,
                             )
@@ -466,7 +517,7 @@ private fun SyncUi(
                     }
 
                     items(
-                        items = activeTransfers.entries.toList(),
+                        items = uiState.activeTransfers.entries.toList(),
                         key = { it.key }
                     ) { (_, progress) ->
                         Surface(
@@ -530,7 +581,7 @@ private fun SyncUi(
                 }
 
                 // Shared files list header
-                if (sharedFiles.isNotEmpty()) {
+                if (uiState.sharedFiles.isNotEmpty()) {
                     item(key = "files_header") {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -544,7 +595,7 @@ private fun SyncUi(
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                text = "Shared Files (${sharedFiles.size})",
+                                text = "Shared Files (${uiState.sharedFiles.size})",
                                 style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.primary,
                             )
@@ -553,7 +604,7 @@ private fun SyncUi(
                 }
 
                 // File items
-                items(items = sharedFiles, key = { it.absolutePath }) { file ->
+                items(items = uiState.sharedFiles, key = { it.absolutePath }) { file ->
                     SharedFileItem(
                         file = file,
                         onDelete = { onDeleteFile(file) },
@@ -563,7 +614,7 @@ private fun SyncUi(
             }
 
             // Empty state for stopped server
-            if (state == SyncState.STOPPED) {
+            if (uiState.state == SyncState.STOPPED) {
                 item(key = "empty") {
                     Column(
                         modifier = Modifier
