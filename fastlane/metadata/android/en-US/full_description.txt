@@ -32,9 +32,11 @@ OBB Support
 Root & Shizuku Power User Features
 With Root access or Shizuku enabled:
 
-- Silent install / uninstall (no system prompts)
-- Replace existing, allow downgrade, grant all permissions, allow test/debug packages, bypass low target SDK block, install for all users
-- Set Install Source — Spoof the installer package (Google Play, Aurora, F-Droid, Amazon, Samsung, Huawei, Xiaomi, or custom) so apps with "installed from Play Store" checks accept your sideload
+- Installer Profiles — Save and reuse custom install configurations (spoofing, flags, user targets) per app or globally.
+- Targeted User Installs — Install apps to specific profiles (Work profile, Island, etc.) or all users at once.
+- Silent install / uninstall — No system confirmation prompts.
+- Advanced flags — Replace existing, allow downgrade, grant all permissions, allow test packages, bypass low target SDK block.
+- Set Install Source — Spoof the installer package name so apps with "installed from Play Store" checks accept your sideload.
 
 App Manager
 
@@ -62,6 +64,12 @@ Device Utilities
 - Storage card on the Install screen — free / total space at a glance
 - Install history with per-app success/failure and error reasons
 - Progress notifications for downloads, installs, and OBB copy
+
+Other
+
+- Expressive UI — Bouncy spring animations and fluid dialogs (inspired by InstallerX-Revived).
+- Brand Identity — Sleek default Orange theme for a premium look (Dynamic Color still available).
+- Multi-language — Arabic, German, Greek, English, Spanish, French, Hindi, Indonesian, Italian, Japanese, Korean, Portuguese (BR), Russian, Turkish, Ukrainian, Vietnamese, Chinese.
 
 Privacy
 
