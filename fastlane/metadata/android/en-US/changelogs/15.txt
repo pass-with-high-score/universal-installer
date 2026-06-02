@@ -1,0 +1,3 @@
+- Restored opaque dialog background to resolve transparency issues on Android 14.
+- Reverted to classic v1.7.2 dialog styling for improved clarity and consistency.
+- Enhanced button visibility with primary color outlines for better navigation.
