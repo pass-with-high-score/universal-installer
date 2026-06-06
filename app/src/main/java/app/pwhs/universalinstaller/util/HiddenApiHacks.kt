@@ -9,6 +9,7 @@ import android.os.IBinder
 import org.lsposed.hiddenapibypass.HiddenApiBypass
 import rikka.shizuku.ShizukuBinderWrapper
 import rikka.shizuku.SystemServiceHelper
+import timber.log.Timber
 
 /**
  * Utility to access hidden Android APIs for multi-user installation support.
@@ -18,11 +19,15 @@ object HiddenApiHacks {
 
     fun createPackageInstallerForUser(context: Context, userId: Int): PackageInstaller? {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            // Prefix match — keep trailing `;` off so e.g. `IPackageInstaller$Stub` is covered
+            // too. With `;` the prefix terminates at the outer class and nested Stubs throw
+            // NoSuchMethodError at runtime when calling asInterface (bug reported on
+            // PermissionPilot / various ROMs).
             HiddenApiBypass.addHiddenApiExemptions(
-                "Landroid/content/pm/IPackageManager;",
-                "Landroid/content/pm/IPackageInstaller;",
-                "Landroid/content/pm/PackageInstaller;",
-                "Landroid/os/UserHandle;"
+                "Landroid/content/pm/IPackageManager",
+                "Landroid/content/pm/IPackageInstaller",
+                "Landroid/content/pm/PackageInstaller",
+                "Landroid/os/UserHandle",
             )
         }
 
@@ -32,7 +37,7 @@ object HiddenApiHacks {
             val iPackageInstaller = IPackageInstaller.Stub.asInterface(
                 ShizukuBinderWrapper(iPackageManager.packageInstaller.asBinder())
             )
-            
+
             val installerPackageName = if (rikka.shizuku.Shizuku.getUid() == 0) {
                 context.packageName
             } else {
@@ -57,7 +62,11 @@ object HiddenApiHacks {
                 constructor.isAccessible = true
                 constructor.newInstance(iPackageInstaller, installerPackageName, userId)
             }
-        } catch (e: Exception) {
+        } catch (t: Throwable) {
+            // Catch Throwable, not Exception — Android throws NoSuchMethodError (a subclass of
+            // Error, not Exception) when hidden-API enforcement blocks a method, and silently
+            // returning null on Error swallowed every diagnostic for issue #46-style reports.
+            Timber.e(t, "createPackageInstallerForUser failed (userId=$userId)")
             null
         }
     }
