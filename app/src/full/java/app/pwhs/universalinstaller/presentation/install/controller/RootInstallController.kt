@@ -45,7 +45,10 @@ class RootInstallController(
             libsu {
                 bypassLowTargetSdkBlock = prefs[PreferencesKeys.ROOT_BYPASS_LOW_TARGET_SDK] ?: false
                 allowTest = prefs[PreferencesKeys.ROOT_ALLOW_TEST] ?: false
-                replaceExisting = prefs[PreferencesKeys.ROOT_REPLACE_EXISTING] ?: false
+                // Default ON to match the UI (`?: true` in Settings/dialog). ackpine only sets
+                // INSTALL_REPLACE_EXISTING when true; false makes an upgrade of an existing package
+                // fail with INSTALL_FAILED_ALREADY_EXISTS. Explicit user choice still honored.
+                replaceExisting = prefs[PreferencesKeys.ROOT_REPLACE_EXISTING] ?: true
                 requestDowngrade = prefs[PreferencesKeys.ROOT_REQUEST_DOWNGRADE] ?: false
                 grantAllRequestedPermissions = prefs[PreferencesKeys.ROOT_GRANT_ALL_PERMISSIONS] ?: false
                 allUsers = prefs[PreferencesKeys.ROOT_ALL_USERS] ?: false

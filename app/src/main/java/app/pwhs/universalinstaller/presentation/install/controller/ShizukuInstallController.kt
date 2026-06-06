@@ -37,7 +37,12 @@ class ShizukuInstallController(
             shizuku {
                 bypassLowTargetSdkBlock = prefs[PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK] ?: false
                 allowTest = prefs[PreferencesKeys.SHIZUKU_ALLOW_TEST] ?: false
-                replaceExisting = prefs[PreferencesKeys.SHIZUKU_REPLACE_EXISTING] ?: false
+                // Default ON to match the UI (Settings/dialog show this as `?: true`). ackpine only
+                // ORs INSTALL_REPLACE_EXISTING into the session when this is true; with it false a
+                // privileged upgrade of an existing package fails with INSTALL_FAILED_ALREADY_EXISTS
+                // (the "package conflict" error). An explicit user choice is still honored — `?:`
+                // only fills the never-set case.
+                replaceExisting = prefs[PreferencesKeys.SHIZUKU_REPLACE_EXISTING] ?: true
                 requestDowngrade = prefs[PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE] ?: false
                 grantAllRequestedPermissions = prefs[PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS] ?: false
                 allUsers = prefs[PreferencesKeys.SHIZUKU_ALL_USERS] ?: false
