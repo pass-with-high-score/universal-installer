@@ -139,8 +139,21 @@ When Root access or Shizuku is enabled, unlocks:
 ### Requirements
 
 * [Android Studio](https://developer.android.com/studio)
-* Java 17+
+* JDK 17+ (required by AGP 8.11)
 * Android SDK 36
+
+### Modules
+
+The project is a multi-module Gradle build:
+
+| Module    | Type        | What it is                                                            |
+|-----------|-------------|-----------------------------------------------------------------------|
+| `:mobile` | application | The phone/tablet app (the main, shipping app)                         |
+| `:tv`     | application | The Android TV (10-foot, D-pad) app                                   |
+| `:core`   | library     | Shared, UI-agnostic install/manage engine consumed by `:mobile`/`:tv` |
+
+> A single distribution ships Shizuku, Root (libsu), and the default system
+> installer together — the old `store` / `full` product flavors were removed.
 
 ### Steps
 
@@ -150,20 +163,24 @@ When Root access or Shizuku is enabled, unlocks:
    cd universal-installer
    ```
 2. Open the project in Android Studio
-3. Sync Gradle and run on a device (emulator works for most features except Shizuku-backed install)
+3. Pick the **`mobile`** (phone) or **`tv`** run configuration, sync Gradle, and run on
+   a device (an emulator works for most features except Shizuku-backed install)
 
 ### Gradle
 
-Universal Installer uses two product flavors: `store` (F-Droid/Play Store compliant, no bundled Root binaries) and `full` (All features, including Root backend).
-
 ```bash
-# Debug builds
-./gradlew assembleStoreDebug
-./gradlew assembleFullDebug
+# Phone app
+./gradlew :mobile:assembleDebug
+./gradlew :mobile:assembleRelease
 
-# Release builds
-./gradlew assembleStoreRelease
-./gradlew assembleFullRelease
+# Android TV app
+./gradlew :tv:assembleDebug
+
+# Release App Bundle (phone)
+./gradlew :mobile:bundleRelease
+
+# Everything at once
+./gradlew assembleDebug
 ```
 
 ### Fastlane
@@ -182,7 +199,7 @@ bundle exec fastlane build_release
 bundle exec fastlane beta
 
 # Deploy to Play Store internal track
-bundle exec fastlane deploy_internal
+bundle exec fastlane internal
 
 # Bump version code
 bundle exec fastlane bump_version
