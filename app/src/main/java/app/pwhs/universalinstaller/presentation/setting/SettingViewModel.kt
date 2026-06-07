@@ -411,12 +411,20 @@ class SettingViewModel(
     fun setBiometricLockInstall(enabled: Boolean) {
         viewModelScope.launch {
             dataStore.edit { prefs -> prefs[PreferencesKeys.BIOMETRIC_LOCK_INSTALL] = enabled }
+            _events.send(
+                if (enabled) R.string.setting_biometric_install_enabled
+                else R.string.setting_biometric_install_disabled,
+            )
         }
     }
 
     fun setBiometricLockUninstall(enabled: Boolean) {
         viewModelScope.launch {
             dataStore.edit { prefs -> prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] = enabled }
+            _events.send(
+                if (enabled) R.string.setting_biometric_uninstall_enabled
+                else R.string.setting_biometric_uninstall_disabled,
+            )
         }
     }
 

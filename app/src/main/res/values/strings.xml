@@ -240,6 +240,12 @@
     <string name="vt_notif_queued">Queued on VirusTotal</string>
     <string name="vt_notif_analyzing">VirusTotal analyzing</string>
     <string name="install_targeted_no_backend">To install into a specific profile, enable Shizuku or Root in Settings</string>
+    <string name="apk_info_permissions_empty">This app requests no permissions</string>
+    <string name="apk_info_vt_error">Scan failed — tap to retry</string>
+    <string name="setting_biometric_install_enabled">Install will now require biometric auth</string>
+    <string name="setting_biometric_install_disabled">Install no longer requires biometric auth</string>
+    <string name="setting_biometric_uninstall_enabled">Uninstall will now require biometric auth</string>
+    <string name="setting_biometric_uninstall_disabled">Uninstall no longer requires biometric auth</string>
     <string name="install_notif_channel_name">Install progress</string>
     <string name="install_notif_channel_description">Shows install progress and results for apps installed in the background</string>
     <string name="install_notif_progress_title_single">Installing %1$s</string>

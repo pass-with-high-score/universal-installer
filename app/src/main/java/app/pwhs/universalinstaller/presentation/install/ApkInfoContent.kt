@@ -463,15 +463,27 @@ private fun PermissionsCard(permissions: List<String>) {
     var expanded by remember { mutableStateOf(false) }
     val visible = if (expanded) permissions else permissions.take(5)
     SectionCard(icon = Icons.Rounded.Security, title = stringResource(R.string.apk_info_section_permissions, permissions.size), badge = permissions.size.toString(), defaultExpanded = false) {
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            visible.forEach { perm ->
-                Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Rounded.CheckCircle, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
-                    Spacer(Modifier.width(8.dp))
-                    Text(perm.substringAfterLast('.'), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                }
+        if (permissions.isEmpty()) {
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.apk_info_permissions_empty),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
             }
-            if (permissions.size > 5) TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) { Text(if (expanded) "Show less" else "Show more") }
+        } else {
+            Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                visible.forEach { perm ->
+                    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Rounded.CheckCircle, null, tint = Color.Gray, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(perm.substringAfterLast('.'), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    }
+                }
+                if (permissions.size > 5) TextButton(onClick = { expanded = !expanded }, modifier = Modifier.fillMaxWidth()) { Text(if (expanded) "Show less" else "Show more") }
+            }
         }
     }
 }

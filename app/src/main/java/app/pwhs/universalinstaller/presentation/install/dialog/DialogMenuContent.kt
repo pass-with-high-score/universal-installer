@@ -519,6 +519,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     // 1. VirusTotal
     item(key = "virustotal") {
         val vtResult = apkInfo.vtResult
+        val vtErrorMsg = vtResult?.errorMessage?.takeIf { it.isNotBlank() }
         val vtDesc = when (vtResult?.status) {
             VtStatus.CLEAN -> stringResource(R.string.apk_info_vt_clean)
             VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vtResult.malicious)
@@ -526,12 +527,14 @@ private fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             VtStatus.SCANNING -> stringResource(R.string.apk_info_vt_scanning)
             VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_uploading, vtResult.uploadProgress)
             VtStatus.NO_API_KEY -> stringResource(R.string.apk_info_vt_no_api_key)
+            VtStatus.ERROR -> vtErrorMsg ?: stringResource(R.string.apk_info_vt_error)
             else -> stringResource(R.string.dialog_menu_virustotal_desc)
         }
         val vtColor = when (vtResult?.status) {
             VtStatus.CLEAN -> MaterialTheme.colorScheme.tertiary
-            VtStatus.MALICIOUS -> MaterialTheme.colorScheme.error
-            VtStatus.SUSPICIOUS -> MaterialTheme.colorScheme.error
+            VtStatus.MALICIOUS,
+            VtStatus.SUSPICIOUS,
+            VtStatus.ERROR -> MaterialTheme.colorScheme.error
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
         val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current

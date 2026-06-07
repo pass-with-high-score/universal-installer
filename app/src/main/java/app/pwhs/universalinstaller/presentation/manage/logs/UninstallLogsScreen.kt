@@ -263,7 +263,10 @@ private fun UninstallLogCard(
 
             StatusChip(success = log.success, accent = accent)
 
-            IconButton(onClick = onDelete, modifier = Modifier.size(32.dp)) {
+            // 40dp ripple area with an 18dp icon — keeps the row visually tight but the
+            // touch target above the Material3 minimum (40dp also = `IconButtonDefaults`
+            // minimum after the 1.2 rework).
+            IconButton(onClick = onDelete) {
                 Icon(
                     imageVector = Icons.Rounded.Close,
                     contentDescription = stringResource(R.string.logs_delete_entry_cd),

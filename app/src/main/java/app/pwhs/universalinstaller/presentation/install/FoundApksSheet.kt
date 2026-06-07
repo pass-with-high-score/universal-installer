@@ -53,6 +53,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -249,11 +250,24 @@ private fun ResultsBody(
     var searchQuery by rememberSaveable { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Filter files based on search query (case-insensitive, matches name or path).
-    val filteredFiles = remember(files, searchQuery) {
-        if (searchQuery.isBlank()) files
+    // Debounce the active filter so each keystroke doesn't re-filter a list that can
+    // realistically have 1000+ files. The user keeps typing into `searchQuery`; the
+    // expensive `.filter { contains }` only runs against `debouncedQuery`.
+    var debouncedQuery by remember { mutableStateOf(searchQuery) }
+    LaunchedEffect(searchQuery) {
+        if (searchQuery.isBlank()) {
+            debouncedQuery = ""
+        } else {
+            kotlinx.coroutines.delay(300)
+            debouncedQuery = searchQuery
+        }
+    }
+
+    // Filter files based on the debounced query (case-insensitive, matches name or path).
+    val filteredFiles = remember(files, debouncedQuery) {
+        if (debouncedQuery.isBlank()) files
         else {
-            val q = searchQuery.trim().lowercase()
+            val q = debouncedQuery.trim().lowercase()
             files.filter { f ->
                 f.name.lowercase().contains(q) || f.path.lowercase().contains(q)
             }
