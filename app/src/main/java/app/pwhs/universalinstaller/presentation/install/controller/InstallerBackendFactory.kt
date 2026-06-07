@@ -6,12 +6,10 @@ import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import ru.solrudev.ackpine.installer.PackageInstaller
 
 /**
- * Flavor-bound entry point for Root-backed installs. The `store` flavor returns a no-op
- * implementation so neither the libsu classes nor its native `.so` end up in the APK that
- * ships to Google Play. The `full` flavor returns the real RootInstallController.
- *
- * We keep every touchpoint that mentions the Root controller behind this interface so no
- * `main` code needs conditional `BuildConfig.FLAVOR` checks.
+ * Entry point for Root-backed installs. Originally there were two implementations behind
+ * this interface (a no-op store one and a real full one) so the Play build wouldn't ship
+ * libsu. That split was retired — we keep the interface because the seam is convenient
+ * for tests and to confine libsu-touching code to one class.
  */
 interface InstallerBackendFactory {
 
