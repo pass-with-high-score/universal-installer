@@ -65,10 +65,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.ClipEntry
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -147,7 +147,7 @@ private fun levelColor(level: LogLevel): Color {
 fun DiagnosticsScreen(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    val clipboard = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
 
     var selectedTab by remember { mutableIntStateOf(0) }
 
@@ -181,8 +181,9 @@ fun DiagnosticsScreen(modifier: Modifier = Modifier) {
             0 -> Diagnostics.buildFullReport(context, sessionLines.joinToString("\n"))
             else -> "$deviceInfo\n\n$crashText"
         }
-        clipboard.setText(AnnotatedString(text))
         scope.launch {
+            val clip = android.content.ClipData.newPlainText("diagnostics", text)
+            clipboard.setClipEntry(ClipEntry(clip))
             snackbarHost.showSnackbar(
                 message = context.getString(R.string.diagnostics_copied),
                 duration = SnackbarDuration.Short,

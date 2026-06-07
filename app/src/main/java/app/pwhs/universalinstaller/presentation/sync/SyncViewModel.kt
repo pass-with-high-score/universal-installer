@@ -49,6 +49,7 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
             )
         }
     ) { flows ->
+        @Suppress("UNCHECKED_CAST")
         SyncUiState(
             state = flows[0] as SyncState,
             serverUrl = flows[1] as? String,

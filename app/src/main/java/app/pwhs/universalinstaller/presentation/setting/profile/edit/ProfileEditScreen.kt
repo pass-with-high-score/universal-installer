@@ -23,7 +23,7 @@ import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.DriveFileRenameOutline
 import androidx.compose.material.icons.rounded.Layers
-import androidx.compose.material.icons.rounded.List
+import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -294,7 +294,7 @@ private fun ProfileEditUi(
             item {
                 SettingsSection(
                     title = stringResource(R.string.dialog_menu_title),
-                    icon = Icons.Rounded.List
+                    icon = Icons.AutoMirrored.Rounded.List
                 ) {
                     Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         ProfileFlagItem(stringResource(R.string.setting_shizuku_replace), replaceExisting, onReplaceExistingChange)

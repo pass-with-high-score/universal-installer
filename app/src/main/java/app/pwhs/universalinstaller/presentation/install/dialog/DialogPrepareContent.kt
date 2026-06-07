@@ -56,7 +56,7 @@ fun DialogPrepareContent(
 ) {
     val context = LocalContext.current
     val isUpdate = installedVersionCode != null && installedVersionCode > 0
-    val isDowngrade = isUpdate && apkInfo.versionCode < (installedVersionCode ?: 0)
+    val isDowngrade = isUpdate && apkInfo.versionCode < installedVersionCode
 
     Column(
         modifier = Modifier

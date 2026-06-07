@@ -49,13 +49,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.platform.ClipEntry
+import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -364,7 +365,8 @@ private fun AboutRowDivider() {
 private fun DeviceInfoDialog(onDismiss: () -> Unit) {
     val context = LocalContext.current
     val resource = LocalResources.current
-    val clipboardManager = LocalClipboardManager.current
+    val clipboard = LocalClipboard.current
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
 
     val deviceInfo = remember {
         buildString {
@@ -408,8 +410,11 @@ private fun DeviceInfoDialog(onDismiss: () -> Unit) {
         },
         dismissButton = {
             TextButton(onClick = {
-                clipboardManager.setText(AnnotatedString(deviceInfo))
-                Toast.makeText(context, R.string.about_copied, Toast.LENGTH_SHORT).show()
+                scope.launch {
+                    val clip = android.content.ClipData.newPlainText("device-info", deviceInfo)
+                    clipboard.setClipEntry(ClipEntry(clip))
+                    Toast.makeText(context, R.string.about_copied, Toast.LENGTH_SHORT).show()
+                }
             }) { Text(stringResource(R.string.about_btn_copy)) }
         },
     )

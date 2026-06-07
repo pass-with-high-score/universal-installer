@@ -123,14 +123,14 @@ gives at least one recovery path.
 
 Sweep of compile-time warnings. Pure refactor, no behavior change.
 
-- [ ] **6.1 LocalClipboardManager → LocalClipboard**
+- [x] **6.1 LocalClipboardManager → LocalClipboard**
   - `AboutScreen.kt:367`, `DiagnosticsScreen.kt:150`. Suspend variant — propagate
     to `LaunchedEffect`.
-- [ ] **6.2 Icons.Rounded.List → AutoMirrored** — `ProfileEditScreen.kt:297`
-- [ ] **6.3 Remove !! on non-null** — `DialogInstallStages.kt:185`,
+- [x] **6.2 Icons.Rounded.List → AutoMirrored** — `ProfileEditScreen.kt:297`
+- [x] **6.3 Remove !! on non-null** — `DialogInstallStages.kt:185`,
     `InstallScreen.kt:411`
-- [ ] **6.4 Elvis on non-null type** — `DialogPrepareContent.kt:59`
-- [ ] **6.5 Unchecked casts** — `SyncViewModel.kt:57-58`
+- [x] **6.4 Elvis on non-null type** — `DialogPrepareContent.kt:59`
+- [x] **6.5 Unchecked casts** — `SyncViewModel.kt:57-58`
 
 ---
 

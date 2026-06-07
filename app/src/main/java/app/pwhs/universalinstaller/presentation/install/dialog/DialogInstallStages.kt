@@ -182,7 +182,7 @@ fun DialogSuccessContent(
     // would silently fail and the user would just see the dialog dismiss.
     val countdownActive = canOpen && autoOpenCountdownStartSeconds != null
     var remaining by remember(autoOpenCountdownStartSeconds, canOpen) {
-        mutableStateOf(if (countdownActive) autoOpenCountdownStartSeconds!! else 0)
+        mutableStateOf(autoOpenCountdownStartSeconds.takeIf { countdownActive } ?: 0)
     }
     if (countdownActive) {
         LaunchedEffect(autoOpenCountdownStartSeconds) {
