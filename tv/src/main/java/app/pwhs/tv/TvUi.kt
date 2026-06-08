@@ -26,12 +26,12 @@ fun formatSize(bytes: Long): String {
 
 /** Loads an app's launcher icon off the main thread; null until ready (or on failure). */
 @Composable
-fun rememberAppIcon(packageName: String): ImageBitmap? {
+fun rememberAppIcon(packageName: String, sizePx: Int = 96): ImageBitmap? {
     val context = LocalContext.current
-    val icon by produceState<ImageBitmap?>(initialValue = null, key1 = packageName) {
+    val icon by produceState<ImageBitmap?>(initialValue = null, key1 = packageName, key2 = sizePx) {
         value = withContext(Dispatchers.IO) {
             runCatching {
-                context.packageManager.getApplicationIcon(packageName).toBitmap(96, 96).asImageBitmap()
+                context.packageManager.getApplicationIcon(packageName).toBitmap(sizePx, sizePx).asImageBitmap()
             }.getOrNull()
         }
     }

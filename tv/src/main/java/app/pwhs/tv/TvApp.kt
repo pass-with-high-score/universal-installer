@@ -38,10 +38,12 @@ fun TvApp(repo: AppRepository, modifier: Modifier = Modifier) {
             ) {
                 TabButton("Install", selected = tab == 0) { tab = 0 }
                 TabButton("Manage", selected = tab == 1) { tab = 1 }
+                TabButton("Settings", selected = tab == 2) { tab = 2 }
             }
             when (tab) {
                 0 -> ReceiveScreen(modifier = Modifier.weight(1f))
-                else -> ManageScreen(repo = repo, modifier = Modifier.weight(1f))
+                1 -> ManageScreen(repo = repo, modifier = Modifier.weight(1f))
+                else -> SettingsScreen(modifier = Modifier.weight(1f))
             }
         }
     }
