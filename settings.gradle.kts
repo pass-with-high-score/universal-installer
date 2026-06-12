@@ -26,6 +26,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "Universal Installer"
-include(":mobile")
+include(":app")
 include(":core")
 include(":tv")

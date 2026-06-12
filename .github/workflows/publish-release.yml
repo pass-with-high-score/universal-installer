@@ -85,8 +85,8 @@ jobs:
         with:
           name: release-build
           path: |
-            mobile/build/outputs/bundle/release/mobile-release.aab
-            mobile/build/outputs/apk/release/mobile-release.apk
+            app/build/outputs/bundle/release/app-release.aab
+            app/build/outputs/apk/release/app-release.apk
             tv/build/outputs/bundle/release/tv-release.aab
             tv/build/outputs/apk/release/tv-release.apk
           retention-days: 30
@@ -99,8 +99,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            mobile/build/outputs/apk/release/mobile-release.apk
-            mobile/build/outputs/bundle/release/mobile-release.aab
+            app/build/outputs/apk/release/app-release.apk
+            app/build/outputs/bundle/release/app-release.aab
             tv/build/outputs/apk/release/tv-release.apk
             tv/build/outputs/bundle/release/tv-release.aab
           token: ${{ secrets.GITHUB_TOKEN }}

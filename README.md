@@ -149,9 +149,9 @@ The project is a multi-module Gradle build:
 
 | Module    | Type        | What it is                                                            |
 |-----------|-------------|-----------------------------------------------------------------------|
-| `:mobile` | application | The phone/tablet app (the main, shipping app)                         |
+| `:app`    | application | The phone/tablet app (the main, shipping app)                         |
 | `:tv`     | application | The Android TV (10-foot, D-pad) app                                   |
-| `:core`   | library     | Shared, UI-agnostic install/manage engine consumed by `:mobile`/`:tv` |
+| `:core`   | library     | Shared, UI-agnostic install/manage engine consumed by `:app`/`:tv` |
 
 > A single distribution ships Shizuku, Root (libsu), and the default system
 > installer together — the old `store` / `full` product flavors were removed.
@@ -164,15 +164,15 @@ The project is a multi-module Gradle build:
    cd universal-installer
    ```
 2. Open the project in Android Studio
-3. Pick the **`mobile`** (phone) or **`tv`** run configuration, sync Gradle, and run on
+3. Pick the **`app`** (phone) or **`tv`** run configuration, sync Gradle, and run on
    a device (an emulator works for most features except Shizuku-backed install)
 
 ### Gradle
 
 ```bash
 # Phone app
-./gradlew :mobile:assembleDebug
-./gradlew :mobile:assembleRelease
+./gradlew :app:assembleDebug
+./gradlew :app:assembleRelease
 
 # Android TV app
 ./gradlew :tv:assembleDebug
