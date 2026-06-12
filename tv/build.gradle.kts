@@ -1,4 +1,6 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -18,6 +20,24 @@ android {
 
     }
 
+    // Load signing config from key.properties (CI/CD)
+    val keyPropertiesFile = rootProject.file("key.properties")
+    val useReleaseKeystore = keyPropertiesFile.exists()
+
+    if (useReleaseKeystore) {
+        val keyProperties = Properties().apply {
+            load(keyPropertiesFile.inputStream())
+        }
+        signingConfigs {
+            create("release") {
+                storeFile = rootProject.file(keyProperties["storeFile"] as String)
+                storePassword = keyProperties["storePassword"] as String
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -25,6 +45,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (useReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {

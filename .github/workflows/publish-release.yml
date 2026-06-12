@@ -48,7 +48,7 @@ jobs:
 
       # Signing
       - name: Decode keystore
-        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/universal-installer-release.jks
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > universal-installer-release.jks
 
       - name: Create key.properties
         run: |
@@ -76,8 +76,8 @@ jobs:
 
       # Both Play and GitHub now get the same artifact — Play gets the AAB built above
       # via fastlane, GitHub gets a side-loadable APK from the same single build.
-      - name: Build release APK
-        run: ./gradlew assembleRelease
+      - name: Build release APK & AAB
+        run: ./gradlew assembleRelease bundleRelease
 
       # Artifacts
       - name: Upload release AAB & APK
@@ -85,8 +85,10 @@ jobs:
         with:
           name: release-build
           path: |
-            app/build/outputs/bundle/release/app-release.aab
-            app/build/outputs/apk/release/app-release.apk
+            mobile/build/outputs/bundle/release/mobile-release.aab
+            mobile/build/outputs/apk/release/mobile-release.apk
+            tv/build/outputs/bundle/release/tv-release.aab
+            tv/build/outputs/apk/release/tv-release.apk
           retention-days: 30
 
       - name: Create GitHub Release
@@ -97,6 +99,8 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            app/build/outputs/apk/release/app-release.apk
-            app/build/outputs/bundle/release/app-release.aab
+            mobile/build/outputs/apk/release/mobile-release.apk
+            mobile/build/outputs/bundle/release/mobile-release.aab
+            tv/build/outputs/apk/release/tv-release.apk
+            tv/build/outputs/bundle/release/tv-release.aab
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -2,7 +2,7 @@
   <img src="fastlane/metadata/android/en-US/images/icon.png" width="128" height="128">
   <h1>Universal Installer</h1>
   <p><strong>Universal Installer</strong> is a modern Android package manager that handles what the default installer can't.</p>
-  <p>Install <strong>APK, APK+, APKS, XAPK, APKM</strong> (with split APKs and OBB files), download packages from URLs, manage installed apps, and silent-install via Shizuku — all in one Material 3 app.</p>
+  <p>Install <strong>APK, APK+, APKS, XAPK, APKM</strong> (with split APKs and OBB files), download packages from URLs, manage installed apps, and silent-install via Shizuku — all in one Material 3 app. Now with <strong>Android TV</strong> support.</p>
   <br><br>
   <a href="https://github.com/pass-with-high-score/universal-installer/releases">
     <img src="https://img.shields.io/github/v/release/pass-with-high-score/universal-installer">
@@ -90,12 +90,13 @@ When Root access or Shizuku is enabled, unlocks:
 * **Replace existing**, **Allow downgrade**, **Grant all requested permissions**, **Allow test packages**, **Bypass low target SDK block**, **Install for all users**
 * **Set install source** — Spoof the installer package name (Google Play, Aurora, F-Droid, Amazon, Samsung, Huawei, Xiaomi presets, or custom) so apps with "installed from Play Store" checks accept your sideload
 
-### Sync & Share (LAN File Server)
+### Sync & Share (LAN File Server & TV)
 
-* **Built-in HTTP server** — Share and manage your packages across a local Wi-Fi network from any browser
-* **Web dashboard** — Download APKs straight to your PC or upload new packages directly to your phone
-* **Live tracking** — Real-time progress updates visible inside the app as files transfer
-* **PIN security** — Set an optional 4–8 digit PIN code to restrict local access to your shared folder
+* **Send to TV** — Quickly transfer and install packages on your Android TV by scanning a QR code.
+* **Built-in HTTP server** — Share and manage your packages across a local Wi-Fi network from any browser.
+* **Web dashboard** — Download APKs straight to your PC or upload new packages directly to your phone.
+* **Live tracking** — Real-time progress updates visible inside the app as files transfer.
+* **PIN security** — Set an optional 4–8 digit PIN code to restrict local access to your shared folder.
 
 ### Uninstall / app manager
 
@@ -175,9 +176,10 @@ The project is a multi-module Gradle build:
 
 # Android TV app
 ./gradlew :tv:assembleDebug
+./gradlew :tv:assembleRelease
 
-# Release App Bundle (phone)
-./gradlew :mobile:bundleRelease
+# Release App Bundle (phone + TV)
+./gradlew assembleBundleRelease
 
 # Everything at once
 ./gradlew assembleDebug
