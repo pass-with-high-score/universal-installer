@@ -322,14 +322,16 @@ private fun AppListRow(
     onFocus: () -> Unit
 ) {
     val icon = rememberAppIcon(app.packageName, sizePx = 120)
+    val shape = RoundedCornerShape(12.dp)
     
     Surface(
         onClick = { /* Detail pane updates on focus */ },
         modifier = Modifier
             .fillMaxWidth()
+            .clip(shape)
             .onFocusChanged { if (it.isFocused) onFocus() },
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f), // Minimal scale to avoid overlap
-        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(12.dp)),
+        shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = Color.Transparent,
             focusedContainerColor = Color.White,
@@ -378,13 +380,15 @@ private fun ActionItem(
     label: String,
     onClick: () -> Unit
 ) {
+    val shape = RoundedCornerShape(8.dp)
     Surface(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
-            .height(52.dp),
+            .height(52.dp)
+            .clip(shape),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
-        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(8.dp)),
+        shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = Color.Transparent,
             focusedContainerColor = Color.White.copy(alpha = 0.1f),
@@ -408,15 +412,16 @@ private fun ActionItem(
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun SmallFilterChip(selected: Boolean, label: String, onClick: () -> Unit) {
+    val shape = CircleShape
     Button(
         onClick = onClick,
-        shape = ButtonDefaults.shape(CircleShape),
+        shape = ButtonDefaults.shape(shape),
         scale = ButtonDefaults.scale(focusedScale = 1.05f),
         colors = ButtonDefaults.colors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.White.copy(alpha = 0.05f),
             contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else Color.Gray
         ),
-        modifier = Modifier.height(32.dp)
+        modifier = Modifier.height(32.dp).clip(shape)
     ) {
         Text(label, style = MaterialTheme.typography.labelSmall)
     }

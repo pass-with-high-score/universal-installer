@@ -110,7 +110,7 @@ class ManageViewModel(application: Application) : AndroidViewModel(application) 
             val result = ApkExtractor.extract(
                 context = appContext,
                 packageName = packageName,
-                outputDirUri = null, // Uses default public Downloads dir
+                outputDir = null, // Uses default public Downloads dir
                 filenameTemplate = "{name}-{version}"
             ) { bytes, total ->
                 _extractState.value = ExtractState.Running(packageName, appName, bytes, total)

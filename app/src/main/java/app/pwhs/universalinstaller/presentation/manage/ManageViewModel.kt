@@ -5,6 +5,7 @@ import android.net.Uri
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.universalinstaller.R
@@ -249,7 +250,11 @@ class ManageViewModel(
             val result = ApkExtractor.extract(
                 context = application,
                 packageName = packageName,
-                outputDirUri = if (mode == ExtractMode.Share) null else customPathUri,
+                outputDir = if (mode == ExtractMode.Share) {
+                    outputDir?.let { DocumentFile.fromFile(it) }
+                } else {
+                    customPathUri?.let { DocumentFile.fromTreeUri(application, Uri.parse(it)) }
+                },
                 filenameTemplate = template
             ) { bytes, total ->
                 _extractState.value = ExtractState.Running(packageName, appName, bytes, total, mode)

@@ -259,11 +259,12 @@ private fun ThemeOptionCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val shape = RoundedCornerShape(16.dp)
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.clip(shape),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f),
-        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
+        shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
             focusedContainerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
@@ -286,11 +287,14 @@ private fun ThemeOptionCard(
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun SettingsCard(onClick: () -> Unit, content: @Composable () -> Unit) {
+    val shape = RoundedCornerShape(20.dp)
     Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.03f),
-        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(20.dp)),
+        shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),

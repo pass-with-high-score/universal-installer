@@ -20,10 +20,20 @@ object BiometricGate {
 
     /** True when the device has at least one biometric or device-credential enrolled. */
     fun canAuthenticate(context: Context): Boolean {
-        val mgr = BiometricManager.from(context)
-        val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or
-            BiometricManager.Authenticators.DEVICE_CREDENTIAL
-        return mgr.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            val mgr = BiometricManager.from(context)
+            val authenticators = BiometricManager.Authenticators.BIOMETRIC_WEAK or
+                BiometricManager.Authenticators.DEVICE_CREDENTIAL
+            return mgr.canAuthenticate(authenticators) == BiometricManager.BIOMETRIC_SUCCESS
+        } else {
+            // On API < 30, canAuthenticate(DEVICE_CREDENTIAL) can throw or be unreliable.
+            // Use KeyguardManager to check if any lock screen security is set.
+            val km = context.getSystemService(Context.KEYGUARD_SERVICE) as android.app.KeyguardManager
+            val biometricMgr = BiometricManager.from(context)
+            @Suppress("DEPRECATION")
+            val hasBiometric = biometricMgr.canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
+            return hasBiometric || km.isDeviceSecure
+        }
     }
 
     /**
@@ -62,14 +72,22 @@ object BiometricGate {
             }
         }
         val prompt = BiometricPrompt(activity, executor, callback)
-        val info = BiometricPrompt.PromptInfo.Builder()
+        val infoBuilder = BiometricPrompt.PromptInfo.Builder()
             .setTitle(title)
             .apply { subtitle?.let { setSubtitle(it) } }
-            .setAllowedAuthenticators(
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.R) {
+            infoBuilder.setAllowedAuthenticators(
                 BiometricManager.Authenticators.BIOMETRIC_WEAK or
                     BiometricManager.Authenticators.DEVICE_CREDENTIAL,
             )
-            .build()
-        prompt.authenticate(info)
+        } else {
+            // API 23-29: Use the deprecated method for device credential fallback.
+            // IMPORTANT: setNegativeButtonText MUST NOT be called when this is true.
+            @Suppress("DEPRECATION")
+            infoBuilder.setDeviceCredentialAllowed(true)
+        }
+
+        prompt.authenticate(infoBuilder.build())
     }
 }

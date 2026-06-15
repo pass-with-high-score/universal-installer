@@ -32,7 +32,7 @@ object ApkExtractor {
     suspend fun extract(
         context: Context,
         packageName: String,
-        outputDirUri: String? = null,
+        outputDir: DocumentFile? = null,
         filenameTemplate: String = "{name}-{version}",
         onProgress: (bytesCopied: Long, totalBytes: Long) -> Unit = { _, _ -> },
     ): Result = withContext(Dispatchers.IO) {
@@ -68,10 +68,7 @@ object ApkExtractor {
 
         val appName = appInfo.loadLabel(pm).toString()
         
-        val outputDir: DocumentFile = if (!outputDirUri.isNullOrBlank()) {
-            DocumentFile.fromTreeUri(context, Uri.parse(outputDirUri))
-                ?: return@withContext Result.Failure("Invalid output directory URI")
-        } else {
+        val targetDir: DocumentFile = outputDir ?: run {
             val defaultPath = File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 SUBFOLDER,
@@ -79,7 +76,7 @@ object ApkExtractor {
             DocumentFile.fromFile(defaultPath)
         }
 
-        if (!outputDir.exists() || !outputDir.isDirectory) {
+        if (!targetDir.exists() || !targetDir.isDirectory) {
             return@withContext Result.Failure("Output directory does not exist or is not a directory")
         }
 
@@ -92,14 +89,14 @@ object ApkExtractor {
         val targetExt = if (splitDirs.isEmpty()) "apk" else "apks"
         val mimeType = if (splitDirs.isEmpty()) "application/vnd.android.package-archive" else "application/zip"
         
-        val finalFileName = uniqueName(outputDir, "$resolvedName.$targetExt")
+        val finalFileName = uniqueName(targetDir, "$resolvedName.$targetExt")
         // Both RawDocumentFile (the default Downloads path) and the SAF providers append a
         // MIME-derived extension to whatever display name we pass — ".apk" for the package
         // MIME, ".zip" for zip. Passing our already-suffixed name doubled it
         // ("App.apk" → "App.apk.apk", "App.apks" → "App.apks.zip"). So we create with the
         // bare stem (provider appends one clean extension) and then rename to the exact name
         // we want; renameTo writes the literal name with no further mangling.
-        val targetFile = outputDir.createFile(mimeType, finalFileName.substringBeforeLast('.'))
+        val targetFile = targetDir.createFile(mimeType, finalFileName.substringBeforeLast('.'))
             ?: return@withContext Result.Failure("Could not create target file")
         if (targetFile.name != finalFileName) {
             runCatching { targetFile.renameTo(finalFileName) }

@@ -79,8 +79,9 @@ class AppPermissionsViewModel(
 
         val entries = names.mapIndexed { i, name ->
             val info: PermissionInfo? = try { pm.getPermissionInfo(name, 0) } catch (_: Exception) { null }
-            val protection = info?.let { it.protection } ?: PermissionInfo.PROTECTION_NORMAL
-            val isDangerous = protection == PermissionInfo.PROTECTION_DANGEROUS
+            @Suppress("DEPRECATION")
+            val protectionLevel = info?.protectionLevel ?: PermissionInfo.PROTECTION_NORMAL
+            val isDangerous = (protectionLevel and 0x0f) == PermissionInfo.PROTECTION_DANGEROUS
             val grantedFlag = (flags.getOrNull(i) ?: 0) and PackageInfo.REQUESTED_PERMISSION_GRANTED != 0
             // Normal permissions are auto-granted at install — flags may report 0 even though
             // they're always granted at runtime, so the displayed state would be misleading.

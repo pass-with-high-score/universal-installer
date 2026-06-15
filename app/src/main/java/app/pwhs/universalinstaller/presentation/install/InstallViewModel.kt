@@ -1175,11 +1175,13 @@ class InstallViewModel(
     fun pickFromScan(context: Context, found: FoundPackageFile) {
         val file = File(found.path)
         if (!file.exists()) return
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${BuildConfig.APPLICATION_ID}.fileprovider",
-            file,
-        )
+        val uri = runCatching {
+            FileProvider.getUriForFile(
+                context,
+                "${BuildConfig.APPLICATION_ID}.fileprovider",
+                file,
+            )
+        }.getOrElse { Uri.fromFile(file) }
         val splitProvider = if (found.extension == "apk") {
             SingletonApkSequence(uri, context).toSplitPackage()
         } else {
@@ -1208,7 +1210,7 @@ class InstallViewModel(
                     "${BuildConfig.APPLICATION_ID}.fileprovider",
                     f,
                 )
-            }.getOrNull()
+            }.getOrElse { Uri.fromFile(f) }
         }
         _scanState.value = ScanState.Idle
         deviceScanJob?.cancel()
@@ -1220,11 +1222,13 @@ class InstallViewModel(
     }
 
     private fun handleDownloadedFile(context: Context, file: File, displayName: String, extension: String) {
-        val uri = FileProvider.getUriForFile(
-            context,
-            "${BuildConfig.APPLICATION_ID}.fileprovider",
-            file,
-        )
+        val uri = runCatching {
+            FileProvider.getUriForFile(
+                context,
+                "${BuildConfig.APPLICATION_ID}.fileprovider",
+                file,
+            )
+        }.getOrElse { Uri.fromFile(file) }
         val splitProvider = if (extension == "apk") {
             SingletonApkSequence(uri, context).toSplitPackage()
         } else {

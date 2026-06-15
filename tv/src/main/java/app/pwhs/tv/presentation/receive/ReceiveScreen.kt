@@ -239,10 +239,13 @@ private fun SidebarTab(
     icon: ImageVector,
     onClick: () -> Unit
 ) {
+    val shape = RoundedCornerShape(12.dp)
     Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(12.dp)),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape),
+        shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
             focusedContainerColor = MaterialTheme.colorScheme.primary,
@@ -381,7 +384,12 @@ private fun LocalFilesContent(
                 Spacer(Modifier.height(12.dp))
                 Text(stringResource(R.string.tv_receive_allow_storage_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
                 Spacer(Modifier.height(32.dp))
-                Button(onClick = onGrantPermission) {
+                val shape = CircleShape
+                Button(
+                    onClick = onGrantPermission,
+                    shape = ButtonDefaults.shape(shape),
+                    modifier = Modifier.clip(shape)
+                ) {
                     Text(stringResource(R.string.tv_receive_grant_all_files))
                 }
             }
@@ -409,11 +417,14 @@ private fun LocalFilesContent(
 private fun ApkWideItem(apk: ApkFile, onClick: () -> Unit) {
     val context = LocalContext.current
     val meta = apk.metadata
+    val shape = RoundedCornerShape(16.dp)
     Surface(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(shape),
         scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
-        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
+        shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
             focusedContainerColor = MaterialTheme.colorScheme.primary,
@@ -481,10 +492,13 @@ private fun HeroPendingCard(
 ) {
     val context = LocalContext.current
     val meta = apk.metadata
+    val shape = RoundedCornerShape(28.dp)
     Surface(
         onClick = onInstall,
-        modifier = Modifier.width(600.dp),
-        shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(28.dp)),
+        modifier = Modifier
+            .width(600.dp)
+            .clip(shape),
+        shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
             focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
@@ -517,17 +531,23 @@ private fun HeroPendingCard(
                 Text(formatSize(context, apk.sizeBytes), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(32.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                    val btnShape = CircleShape
                     Button(
                         onClick = onInstall,
-                        modifier = Modifier.focusRequester(installFocus).weight(1f),
-                        shape = ButtonDefaults.shape(CircleShape)
+                        modifier = Modifier
+                            .focusRequester(installFocus)
+                            .weight(1f)
+                            .clip(btnShape),
+                        shape = ButtonDefaults.shape(btnShape)
                     ) {
                         Text(if (isInstalling) stringResource(R.string.tv_receive_installing_plain) else stringResource(R.string.tv_receive_install), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                     }
                     Button(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = ButtonDefaults.shape(CircleShape),
+                        modifier = Modifier
+                            .weight(1f)
+                            .clip(btnShape),
+                        shape = ButtonDefaults.shape(btnShape),
                         colors = ButtonDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                     ) {
                         Text(stringResource(R.string.tv_receive_dismiss), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
@@ -698,10 +718,13 @@ private fun ApkDetailsDialog(
 
                 Spacer(Modifier.height(32.dp))
 
+                val btnShape = RoundedCornerShape(14.dp)
                 Button(
                     onClick = { onInstall(uri, isBundle, name) },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = ButtonDefaults.shape(RoundedCornerShape(14.dp))
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(btnShape),
+                    shape = ButtonDefaults.shape(btnShape)
                 ) {
                     Text(
                         if (isInstalling) stringResource(R.string.tv_receive_installing_plain) else stringResource(R.string.tv_receive_install),
@@ -715,8 +738,10 @@ private fun ApkDetailsDialog(
 
                 Button(
                     onClick = onDismiss,
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = ButtonDefaults.shape(RoundedCornerShape(14.dp)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(btnShape),
+                    shape = ButtonDefaults.shape(btnShape),
                     colors = ButtonDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                 ) {
                     Text(

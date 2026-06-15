@@ -58,8 +58,9 @@ fun resolvePermissionEntries(context: Context, names: List<String>): List<Permis
     val pm = context.packageManager
     return names.map { name ->
         val info = runCatching { pm.getPermissionInfo(name, 0) }.getOrNull()
-        val protection = info?.protection ?: PermissionInfo.PROTECTION_NORMAL
-        val isDangerous = protection == PermissionInfo.PROTECTION_DANGEROUS
+        @Suppress("DEPRECATION")
+        val protectionLevel = info?.protectionLevel ?: PermissionInfo.PROTECTION_NORMAL
+        val isDangerous = (protectionLevel and 0x0f) == PermissionInfo.PROTECTION_DANGEROUS
         val label = info?.loadLabel(pm)?.toString()?.takeIf { it.isNotBlank() && it != name }
             ?: name.substringAfterLast('.').replace('_', ' ').lowercase(Locale.getDefault())
                 .replaceFirstChar { it.titlecase(Locale.getDefault()) }
