@@ -555,7 +555,9 @@ private fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             },
             onClick = {
                 if (vtResult?.status in listOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)) {
-                    uriHandler.openUri("https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
+                    if (apkInfo.sha256.isNotBlank()) {
+                        uriHandler.openUri("https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
+                    }
                 } else {
                     onCheckVirusTotal()
                 }
