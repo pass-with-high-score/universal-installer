@@ -319,6 +319,7 @@ fun DialogMenuContent(
                         requestDowngrade = prefs?.get(PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE) ?: false,
                         grantAllPermissions = prefs?.get(PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS) ?: false,
                         bypassLowTargetSdk = prefs?.get(PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK) ?: false,
+                        showAdvancedFlags = (prefs?.get(PreferencesKeys.USE_SHIZUKU) == true) || (prefs?.get(PreferencesKeys.USE_ROOT) == true),
                         onToggleAllUsers = onToggleAllUsers,
                         onSelectUserId = onSelectUserId,
                         onToggleSpoofSource = onToggleSpoofSource,
@@ -622,6 +623,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     requestDowngrade: Boolean,
     grantAllPermissions: Boolean,
     bypassLowTargetSdk: Boolean,
+    showAdvancedFlags: Boolean,
     onToggleAllUsers: (Boolean) -> Unit,
     onSelectUserId: (Int?) -> Unit,
     onToggleSpoofSource: (Boolean) -> Unit,
@@ -807,7 +809,8 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     }
 
     // 4. Advanced Install Flags
-    item(key = "advanced_flags") {
+    if (showAdvancedFlags) {
+        item(key = "advanced_flags") {
         var expanded by remember { mutableStateOf(false) }
         MenuCard(
             title = stringResource(R.string.manage_section_advanced),
@@ -858,6 +861,7 @@ private fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
                 )
             }
         }
+    }
     }
 }
 
