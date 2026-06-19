@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Пропустити</string>
+    <string name="onboarding_next">Далі</string>
+    <string name="onboarding_get_started">Почніть роботу</string>
+    <string name="onboarding_permission_granted">Дозвіл надано</string>
+    <string name="onboarding_grant_permission">Надати дозвіл</string>
+    <string name="onboarding_page1_title">Встановити будь-який пакет</string>
+    <string name="onboarding_page1_desc">Підтримка форматів APK, APKS, XAPK і APKM. Легко встановлюйте розділені файли APK.</string>
+    <string name="onboarding_page2_title">Керуйте своїми програмами</string>
+    <string name="onboarding_page2_desc">Переглядайте встановлені програми, видаляйте непотрібні та легко керуйте своїм пристроєм.</string>
+    <string name="onboarding_page3_title">Дозволити встановлення</string>
+    <string name="onboarding_page3_desc">Щоб установити пакети, додатку потрібен дозвіл на встановлення з невідомих джерел. Натисніть кнопку нижче, щоб надати це.</string>
+    <string name="permission_return_channel_name">Повернутися до програми</string>
+    <string name="permission_return_channel_desc">Сповіщення про повернення до програми після надання дозволу в налаштуваннях системи.</string>
+    <string name="permission_return_title">Дозвіл надано</string>
+    <string name="permission_return_body">Натисніть, щоб повернутися до універсального інсталятора.</string>
+</resources>

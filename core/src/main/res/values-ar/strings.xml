@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">يتخطى</string>
+    <string name="onboarding_next">التالي</string>
+    <string name="onboarding_get_started">ابدأ</string>
+    <string name="onboarding_permission_granted">تم منح الإذن</string>
+    <string name="onboarding_grant_permission">إذن المنح</string>
+    <string name="onboarding_page1_title">تثبيت أي حزمة</string>
+    <string name="onboarding_page1_desc">دعم تنسيقات APK وAPKS وXAPK وAPKM. قم بتثبيت ملفات APK المقسمة بسهولة.</string>
+    <string name="onboarding_page2_title">إدارة تطبيقاتك</string>
+    <string name="onboarding_page2_desc">تصفح التطبيقات المثبتة، وقم بإلغاء تثبيت التطبيقات غير المرغوب فيها، وقم بإدارة جهازك دون عناء.</string>
+    <string name="onboarding_page3_title">السماح بالتثبيت</string>
+    <string name="onboarding_page3_desc">لتثبيت الحزم، يحتاج التطبيق إلى إذن للتثبيت من مصادر غير معروفة. اضغط على الزر أدناه لمنحه.</string>
+    <string name="permission_return_channel_name">العودة إلى التطبيق</string>
+    <string name="permission_return_channel_desc">إشعار بالعودة إلى التطبيق بعد منح الإذن في إعدادات النظام.</string>
+    <string name="permission_return_title">تم منح الإذن</string>
+    <string name="permission_return_body">انقر للعودة إلى Universal Installer.</string>
+</resources>

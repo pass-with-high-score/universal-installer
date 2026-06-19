@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">スキップ</string>
+    <string name="onboarding_next">次</string>
+    <string name="onboarding_get_started">始めましょう</string>
+    <string name="onboarding_permission_granted">許可が与えられました</string>
+    <string name="onboarding_grant_permission">許可を与える</string>
+    <string name="onboarding_page1_title">任意のパッケージをインストールする</string>
+    <string name="onboarding_page1_desc">APK、APKS、XAPK、APKM 形式のサポート。分割 APK を簡単にインストールします。</string>
+    <string name="onboarding_page2_title">アプリを管理する</string>
+    <string name="onboarding_page2_desc">インストールされているアプリを参照し、不要なアプリをアンインストールして、デバイスを簡単に管理します。</string>
+    <string name="onboarding_page3_title">インストールを許可する</string>
+    <string name="onboarding_page3_desc">パッケージをインストールするには、アプリに不明なソースからインストールする権限が必要です。下のボタンをタップして許可してください。</string>
+    <string name="permission_return_channel_name">アプリに戻る</string>
+    <string name="permission_return_channel_desc">システム設定で権限を付与した後にアプリに戻るための通知。</string>
+    <string name="permission_return_title">許可が与えられました</string>
+    <string name="permission_return_body">タップしてユニバーサル インストーラーに戻ります。</string>
+</resources>

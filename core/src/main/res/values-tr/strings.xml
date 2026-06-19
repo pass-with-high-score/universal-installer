@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Atlamak</string>
+    <string name="onboarding_next">Sonraki</string>
+    <string name="onboarding_get_started">Başlayın</string>
+    <string name="onboarding_permission_granted">İzin verildi</string>
+    <string name="onboarding_grant_permission">İzin Ver</string>
+    <string name="onboarding_page1_title">Herhangi Bir Paketi Yükleyin</string>
+    <string name="onboarding_page1_desc">APK, APKS, XAPK ve APKM formatları desteği. Bölünmüş AP\'ları kolaylıkla yükleyin.</string>
+    <string name="onboarding_page2_title">Uygulamalarınızı Yönetin</string>
+    <string name="onboarding_page2_desc">Yüklü uygulamalara göz atın, istenmeyen uygulamaları kaldırın ve cihazınızı zahmetsizce yönetin.</string>
+    <string name="onboarding_page3_title">Kuruluma İzin Ver</string>
+    <string name="onboarding_page3_desc">Paketleri yüklemek için uygulamanın bilinmeyen kaynaklardan yükleme iznine ihtiyacı var. İzin vermek için aşağıdaki düğmeye dokunun.</string>
+    <string name="permission_return_channel_name">Uygulamaya dön</string>
+    <string name="permission_return_channel_desc">Sistem ayarlarında izin verildikten sonra uygulamaya dönme bildirimi.</string>
+    <string name="permission_return_title">İzin verildi</string>
+    <string name="permission_return_body">Evrensel Yükleyiciye dönmek için dokunun.</string>
+</resources>

@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Melewati</string>
+    <string name="onboarding_next">Berikutnya</string>
+    <string name="onboarding_get_started">Memulai</string>
+    <string name="onboarding_permission_granted">Izin diberikan</string>
+    <string name="onboarding_grant_permission">Berikan Izin</string>
+    <string name="onboarding_page1_title">Instal Paket Apa Pun</string>
+    <string name="onboarding_page1_desc">Dukungan untuk format APK, APKS, XAPK, dan APKM. Instal APK terpisah dengan mudah.</string>
+    <string name="onboarding_page2_title">Kelola Aplikasi Anda</string>
+    <string name="onboarding_page2_desc">Jelajahi aplikasi yang terinstal, hapus instalan aplikasi yang tidak diinginkan, dan kelola perangkat Anda dengan mudah.</string>
+    <string name="onboarding_page3_title">Izinkan Instalasi</string>
+    <string name="onboarding_page3_desc">Untuk menginstal paket, aplikasi memerlukan izin untuk menginstal dari sumber yang tidak dikenal. Ketuk tombol di bawah untuk memberikannya.</string>
+    <string name="permission_return_channel_name">Kembali ke aplikasi</string>
+    <string name="permission_return_channel_desc">Pemberitahuan untuk kembali ke aplikasi setelah memberikan izin dalam pengaturan sistem.</string>
+    <string name="permission_return_title">Izin diberikan</string>
+    <string name="permission_return_body">Ketuk untuk kembali ke Penginstal Universal.</string>
+</resources>

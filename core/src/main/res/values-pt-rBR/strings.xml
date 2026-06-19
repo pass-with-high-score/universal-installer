@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Pular</string>
+    <string name="onboarding_next">Próximo</string>
+    <string name="onboarding_get_started">Comece</string>
+    <string name="onboarding_permission_granted">Permissão concedida</string>
+    <string name="onboarding_grant_permission">Conceder permissão</string>
+    <string name="onboarding_page1_title">Instale qualquer pacote</string>
+    <string name="onboarding_page1_desc">Suporte para formatos APK, APKS, XAPK e APKM. Instale APKs divididos com facilidade.</string>
+    <string name="onboarding_page2_title">Gerencie seus aplicativos</string>
+    <string name="onboarding_page2_desc">Navegue pelos aplicativos instalados, desinstale os indesejados e gerencie seu dispositivo sem esforço.</string>
+    <string name="onboarding_page3_title">Permitir instalação</string>
+    <string name="onboarding_page3_desc">Para instalar pacotes, o aplicativo precisa de permissão para instalar de fontes desconhecidas. Toque no botão abaixo para concedê-lo.</string>
+    <string name="permission_return_channel_name">Voltar ao aplicativo</string>
+    <string name="permission_return_channel_desc">Notificação para retornar ao aplicativo após conceder permissão nas configurações do sistema.</string>
+    <string name="permission_return_title">Permissão concedida</string>
+    <string name="permission_return_body">Toque para retornar ao Instalador Universal.</string>
+</resources>

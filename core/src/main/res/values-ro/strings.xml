@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Sari peste</string>
+    <string name="onboarding_next">Următorul</string>
+    <string name="onboarding_get_started">Începeți</string>
+    <string name="onboarding_permission_granted">Permisiune acordată</string>
+    <string name="onboarding_grant_permission">Acordați permisiunea</string>
+    <string name="onboarding_page1_title">Instalați orice pachet</string>
+    <string name="onboarding_page1_desc">Suport pentru formatele APK, APK, XAPK și APKM. Instalați APK-uri împărțite cu ușurință.</string>
+    <string name="onboarding_page2_title">Gestionați-vă aplicațiile</string>
+    <string name="onboarding_page2_desc">Răsfoiți aplicațiile instalate, dezinstalați cele nedorite și gestionați-vă dispozitivul fără efort.</string>
+    <string name="onboarding_page3_title">Permite instalarea</string>
+    <string name="onboarding_page3_desc">Pentru a instala pachete, aplicația are nevoie de permisiunea de instalare din surse necunoscute. Atingeți butonul de mai jos pentru a-l acorda.</string>
+    <string name="permission_return_channel_name">Reveniți la aplicație</string>
+    <string name="permission_return_channel_desc">Notificare pentru a reveni la aplicație după acordarea unei permisiuni în setările sistemului.</string>
+    <string name="permission_return_title">Permisiune acordată</string>
+    <string name="permission_return_body">Atingeți pentru a reveni la Universal Installer.</string>
+</resources>

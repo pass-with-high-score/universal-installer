@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Überspringen</string>
+    <string name="onboarding_next">Nächste</string>
+    <string name="onboarding_get_started">Legen Sie los</string>
+    <string name="onboarding_permission_granted">Erlaubnis erteilt</string>
+    <string name="onboarding_grant_permission">Erlaubnis erteilen</string>
+    <string name="onboarding_page1_title">Installieren Sie ein beliebiges Paket</string>
+    <string name="onboarding_page1_desc">Unterstützung für die Formate APK, APKS, XAPK und APKM. Installieren Sie Split-APKs ganz einfach.</string>
+    <string name="onboarding_page2_title">Verwalten Sie Ihre Apps</string>
+    <string name="onboarding_page2_desc">Durchsuchen Sie installierte Apps, deinstallieren Sie unerwünschte Apps und verwalten Sie Ihr Gerät mühelos.</string>
+    <string name="onboarding_page3_title">Installation zulassen</string>
+    <string name="onboarding_page3_desc">Um Pakete zu installieren, benötigt die App die Erlaubnis zur Installation aus unbekannten Quellen. Tippen Sie auf die Schaltfläche unten, um es zu gewähren.</string>
+    <string name="permission_return_channel_name">Zurück zur App</string>
+    <string name="permission_return_channel_desc">Benachrichtigung, zur App zurückzukehren, nachdem in den Systemeinstellungen eine Berechtigung erteilt wurde.</string>
+    <string name="permission_return_title">Erlaubnis erteilt</string>
+    <string name="permission_return_body">Tippen Sie hier, um zum Universal Installer zurückzukehren.</string>
+</resources>

@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">छोडना</string>
+    <string name="onboarding_next">अगला</string>
+    <string name="onboarding_get_started">शुरू हो जाओ</string>
+    <string name="onboarding_permission_granted">की अनुमति दी</string>
+    <string name="onboarding_grant_permission">अनुमति प्रदान करें</string>
+    <string name="onboarding_page1_title">कोई भी पैकेज स्थापित करें</string>
+    <string name="onboarding_page1_desc">एपीके, एपीकेएस, एक्सएपीके और एपीकेएम प्रारूपों के लिए समर्थन। आसानी से स्प्लिट एपीके इंस्टॉल करें।</string>
+    <string name="onboarding_page2_title">अपने ऐप्स प्रबंधित करें</string>
+    <string name="onboarding_page2_desc">इंस्टॉल किए गए ऐप्स ब्राउज़ करें, अवांछित ऐप्स अनइंस्टॉल करें और अपने डिवाइस को सहजता से प्रबंधित करें।</string>
+    <string name="onboarding_page3_title">स्थापना की अनुमति दें</string>
+    <string name="onboarding_page3_desc">पैकेज इंस्टॉल करने के लिए, ऐप को अज्ञात स्रोतों से इंस्टॉल करने की अनुमति की आवश्यकता होती है। इसे प्रदान करने के लिए नीचे दिए गए बटन पर टैप करें।</string>
+    <string name="permission_return_channel_name">ऐप पर लौटें</string>
+    <string name="permission_return_channel_desc">सिस्टम सेटिंग्स में अनुमति देने के बाद ऐप पर वापस लौटने की अधिसूचना।</string>
+    <string name="permission_return_title">की अनुमति दी</string>
+    <string name="permission_return_body">यूनिवर्सल इंस्टालर पर लौटने के लिए टैप करें।</string>
+</resources>

@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Παραλείπω</string>
+    <string name="onboarding_next">Επόμενος</string>
+    <string name="onboarding_get_started">Ξεκινήστε</string>
+    <string name="onboarding_permission_granted">Χορηγήθηκε άδεια</string>
+    <string name="onboarding_grant_permission">Χορήγηση άδειας</string>
+    <string name="onboarding_page1_title">Εγκαταστήστε οποιοδήποτε πακέτο</string>
+    <string name="onboarding_page1_desc">Υποστήριξη για μορφές APK, APKS, XAPK και APKM. Εγκαταστήστε τα διαχωρισμένα APK εύκολα.</string>
+    <string name="onboarding_page2_title">Διαχειριστείτε τις εφαρμογές σας</string>
+    <string name="onboarding_page2_desc">Περιηγηθείτε σε εγκατεστημένες εφαρμογές, απεγκαταστήστε τις ανεπιθύμητες και διαχειριστείτε τη συσκευή σας χωρίς κόπο.</string>
+    <string name="onboarding_page3_title">Να επιτρέπεται η εγκατάσταση</string>
+    <string name="onboarding_page3_desc">Για την εγκατάσταση πακέτων, η εφαρμογή χρειάζεται άδεια εγκατάστασης από άγνωστες πηγές. Πατήστε το κουμπί παρακάτω για να το παραχωρήσετε.</string>
+    <string name="permission_return_channel_name">Επιστροφή στην εφαρμογή</string>
+    <string name="permission_return_channel_desc">Ειδοποίηση για επιστροφή στην εφαρμογή μετά τη χορήγηση άδειας στις ρυθμίσεις συστήματος.</string>
+    <string name="permission_return_title">Χορηγήθηκε άδεια</string>
+    <string name="permission_return_body">Πατήστε για να επιστρέψετε στο Universal Installer.</string>
+</resources>

@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Sauter</string>
+    <string name="onboarding_next">Suivant</string>
+    <string name="onboarding_get_started">Commencer</string>
+    <string name="onboarding_permission_granted">Autorisation accordée</string>
+    <string name="onboarding_grant_permission">Accorder \'autorisation</string>
+    <string name="onboarding_page1_title">Installer \'importe quel package</string>
+    <string name="onboarding_page1_desc">Prise en charge des formats APK, APKS, XAPK et APKM. Installez facilement des APK divisés.</string>
+    <string name="onboarding_page2_title">Gérez vos applications</string>
+    <string name="onboarding_page2_desc">Parcourez les applications installées, désinstallez celles indésirables et gérez votre appareil sans effort.</string>
+    <string name="onboarding_page3_title">Autoriser \'installation</string>
+    <string name="onboarding_page3_desc">Pour installer des packages, \'application doit obtenir \'autorisation \'installer à partir de sources inconnues. Appuyez sur le bouton ci-dessous pour \'accorder.</string>
+    <string name="permission_return_channel_name">Revenir à \'application</string>
+    <string name="permission_return_channel_desc">Notification pour revenir à \'application après avoir accordé une autorisation dans les paramètres système.</string>
+    <string name="permission_return_title">Autorisation accordée</string>
+    <string name="permission_return_body">Appuyez pour revenir à Universal Installer.</string>
+</resources>

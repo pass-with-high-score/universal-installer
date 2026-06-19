@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Пропускать</string>
+    <string name="onboarding_next">Следующий</string>
+    <string name="onboarding_get_started">Начать</string>
+    <string name="onboarding_permission_granted">Разрешение получено</string>
+    <string name="onboarding_grant_permission">Предоставить разрешение</string>
+    <string name="onboarding_page1_title">Установить любой пакет</string>
+    <string name="onboarding_page1_desc">Поддержка форматов APK, APKS, XAPK и APKM. Легко устанавливайте разделенные APK-файлы.</string>
+    <string name="onboarding_page2_title">Управляйте своими приложениями</string>
+    <string name="onboarding_page2_desc">Просматривайте установленные приложения, удаляйте ненужные и легко управляйте своим устройством.</string>
+    <string name="onboarding_page3_title">Разрешить установку</string>
+    <string name="onboarding_page3_desc">Для установки пакетов приложению необходимо разрешение на установку из неизвестных источников. Нажмите кнопку ниже, чтобы предоставить его.</string>
+    <string name="permission_return_channel_name">Вернуться в приложение</string>
+    <string name="permission_return_channel_desc">Уведомление о возврате в приложение после предоставления разрешения в настройках системы.</string>
+    <string name="permission_return_title">Разрешение получено</string>
+    <string name="permission_return_body">Нажмите, чтобы вернуться к универсальному установщику.</string>
+</resources>

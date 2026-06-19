@@ -1,0 +1,16 @@
+<resources>    <string name="onboarding_skip">Nhảy</string>
+    <string name="onboarding_next">Kế tiếp</string>
+    <string name="onboarding_get_started">Bắt đầu</string>
+    <string name="onboarding_permission_granted">Đã cấp quyền</string>
+    <string name="onboarding_grant_permission">Cấp quyền</string>
+    <string name="onboarding_page1_title">Cài đặt bất kỳ gói nào</string>
+    <string name="onboarding_page1_desc">Hỗ trợ các định dạng APK, APKS, XAPK và APKM. Cài đặt APK chia nhỏ một cách dễ dàng.</string>
+    <string name="onboarding_page2_title">Quản lý ứng dụng của bạn</string>
+    <string name="onboarding_page2_desc">Duyệt qua các ứng dụng đã cài đặt, gỡ cài đặt những ứng dụng không mong muốn và quản lý thiết bị của bạn một cách dễ dàng.</string>
+    <string name="onboarding_page3_title">Cho phép cài đặt</string>
+    <string name="onboarding_page3_desc">Để cài đặt các gói, ứng dụng cần có quyền cài đặt từ các nguồn không xác định. Nhấn vào nút bên dưới để cấp nó.</string>
+    <string name="permission_return_channel_name">Quay lại ứng dụng</string>
+    <string name="permission_return_channel_desc">Thông báo quay lại ứng dụng sau khi cấp quyền trong cài đặt hệ thống.</string>
+    <string name="permission_return_title">Đã cấp quyền</string>
+    <string name="permission_return_body">Nhấn để quay lại Trình cài đặt chung.</string>
+</resources>
