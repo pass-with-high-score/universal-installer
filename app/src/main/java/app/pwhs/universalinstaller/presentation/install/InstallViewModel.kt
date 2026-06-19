@@ -1929,10 +1929,9 @@ class InstallViewModel(
         val abiPriority = Build.SUPPORTED_ABIS.orEmpty().mapIndexed { i, abi ->
             abi.replace('-', '_').lowercase() to i
         }.toMap()
-        val libsBest = entries
+        val bestLibsPriority = entries
             .filter { it.type == SplitType.Libs }
-            .minByOrNull { abiPriority[it.name.lowercase()] ?: Int.MAX_VALUE }
-            ?.name
+            .minOfOrNull { abiPriority[it.name.replace('-', '_').lowercase()] ?: Int.MAX_VALUE }
 
         // Density: closest dpi to the device's actual densityDpi. Names parse as "${dpi}dpi".
         val deviceDpi = context.resources.displayMetrics.densityDpi
@@ -1959,7 +1958,10 @@ class InstallViewModel(
             val e = entries[i]
             val keep = when (e.type) {
                 SplitType.Base, SplitType.Feature, SplitType.Other -> true
-                SplitType.Libs -> e.name.equals(libsBest, ignoreCase = true)
+                SplitType.Libs -> {
+                    val p = abiPriority[e.name.replace('-', '_').lowercase()] ?: Int.MAX_VALUE
+                    p == bestLibsPriority && bestLibsPriority != null
+                }
                 SplitType.ScreenDensity -> e.name.equals(densityBest, ignoreCase = true)
                 SplitType.Locale -> e.name.lowercase() in userLangs
             }
