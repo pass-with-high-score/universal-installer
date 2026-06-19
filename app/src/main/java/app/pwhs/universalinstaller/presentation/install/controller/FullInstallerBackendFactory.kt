@@ -197,7 +197,9 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
                     onProgress(((index + 1).toFloat() / uris.size * 100).toInt())
                 }
                 
-                val intent = android.content.Intent("app.pwhs.universalinstaller.INSTALL_STATUS")
+                val intent = android.content.Intent("app.pwhs.universalinstaller.INSTALL_STATUS").apply {
+                    setPackage(context.packageName)
+                }
                 val receiver = android.app.PendingIntent.getBroadcast(
                     context, sessionId, intent,
                     android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
