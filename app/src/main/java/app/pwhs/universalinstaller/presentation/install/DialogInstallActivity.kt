@@ -265,29 +265,20 @@ class DialogInstallActivity : ComponentActivity() {
                 }
             }
 
-            // Transition from Loading → Installing (or Risk confirm) when parse completes
+            // Transition from Loading → Prepare when parse completes
             LaunchedEffect(uiState.pendingApkInfo, uiState.dialogStage) {
-                val info = uiState.pendingApkInfo
-                if (info != null && uiState.dialogStage == DialogStage.Loading) {
-                    val risks = detectInstallRisks(info)
-                    if (risks.isNotEmpty()) {
-                        viewModel.dialogShowPrepare()
-                        pendingRisks = risks
-                    } else {
-                        proceedInstall()
-                    }
+                if (uiState.pendingApkInfo != null && uiState.dialogStage == DialogStage.Loading) {
+                    viewModel.dialogShowPrepare()
                 }
             }
 
-            // Auto-confirm logic for external intents
+            // Auto-confirm logic for external intents (auto-install from Prepare stage)
             LaunchedEffect(uiState.dialogStage, autoConfirmExternalInstall) {
-                if (autoConfirmExternalInstall) {
-                    if (uiState.dialogStage == DialogStage.Prepare) {
-                        handleInstallTap()
-                    } else if (uiState.dialogStage == DialogStage.Success) {
-                        viewModel.dialogClose()
-                        finish()
-                    }
+                if (uiState.dialogStage == DialogStage.Prepare) {
+                    handleInstallTap()
+                } else if (uiState.dialogStage == DialogStage.Success && autoConfirmExternalInstall) {
+                    viewModel.dialogClose()
+                    finish()
                 }
             }
 

@@ -424,7 +424,35 @@ private fun InstallUi(
         onDeleteMany = onDeleteScannedFiles,
     )
 
-    // APK Info Preview Bottom Sheet is bypassed and auto-installed
+    // APK Info Preview Bottom Sheet
+    if (uiState.pendingApkInfo != null) {
+        val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+        ModalBottomSheet(
+            onDismissRequest = onDismissPreview,
+            sheetState = sheetState,
+            shape = MaterialTheme.shapes.extraLarge,
+        ) {
+            ApkInfoContent(
+                apkInfo = uiState.pendingApkInfo,
+                onInstall = onConfirmInstall,
+                onCancel = onDismissPreview,
+                onCheckVirusTotal = onCheckVirusTotal,
+                attachedObbFiles = uiState.attachedObbFiles,
+                onAttachObb = { obbPickerLauncher.launch(arrayOf("*/*")) },
+                onRemoveObb = onRemoveObb,
+                onToggleSplit = onToggleSplit,
+                profiles = uiState.installerProfiles,
+                appProfileMapping = uiState.appProfileMapping,
+                allUsers = uiState.allUsers,
+                selectedUserId = uiState.selectedUserId,
+                onProfileSelected = onProfileSelected,
+                onMappingChanged = onMappingChanged,
+                onToggleAllUsers = onToggleAllUsers,
+                onSelectUserId = onSelectUserId,
+                startCompact = true,
+            )
+        }
+    }
 
     BatchInstallSheet(
         state = uiState.batchState,
