@@ -585,7 +585,7 @@
   <string name="setting_profiles_title">Perfis</string>
   <string name="setting_profiles_subtitle">Salvar e reutilizar configurações de instalação</string>
   <string name="profile_list_title">Perfis do Instalador</string>
-  <string name="profile_empty_state">\&quot;Nenhum perfil criado ainda. Use perfis para salvar pacotes de instaladores específicos</string>
+  <string name="profile_empty_state">Nenhum perfil criado ainda. Use perfis para salvar pacotes de instaladores específicos, backends ou combinações de flags.</string>
   <string name="profile_add_button">Adicionar Perfil</string>
   <string name="profile_edit_title">Editar Perfil</string>
   <string name="profile_create_title">Criar Perfil</string>
