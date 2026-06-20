@@ -47,12 +47,20 @@ fun LoadingContent(
             ShimmerBox(modifier = Modifier.width(80.dp).height(28.dp), shape = RoundedCornerShape(14.dp))
             ShimmerBox(modifier = Modifier.width(64.dp).height(28.dp), shape = RoundedCornerShape(14.dp))
         }
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
         // Button row
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(Spacing.S)) {
             ShimmerBox(modifier = Modifier.weight(1f).height(40.dp), shape = RoundedCornerShape(20.dp))
             ShimmerBox(modifier = Modifier.weight(1f).height(40.dp), shape = RoundedCornerShape(20.dp))
         }
-        
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Cancel button placeholder
+        ShimmerBox(modifier = Modifier.fillMaxWidth().height(40.dp), shape = RoundedCornerShape(20.dp))
+
         if (onSkipParse != null) {
             Spacer(modifier = Modifier.height(16.dp))
             androidx.compose.material3.TextButton(onClick = onSkipParse) {
