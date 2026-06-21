@@ -31,6 +31,8 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -274,7 +276,7 @@ class DialogInstallActivity : ComponentActivity() {
 
             // Auto-confirm logic for external intents (auto-install from Prepare stage)
             LaunchedEffect(uiState.dialogStage, autoConfirmExternalInstall) {
-                if (uiState.dialogStage == DialogStage.Prepare) {
+                if (uiState.dialogStage == DialogStage.Prepare && autoConfirmExternalInstall) {
                     handleInstallTap()
                 } else if (uiState.dialogStage == DialogStage.Success && autoConfirmExternalInstall) {
                     viewModel.dialogClose()
@@ -426,6 +428,11 @@ class DialogInstallActivity : ComponentActivity() {
                         )
 
                         PositionDialog(
+                            modifier = if (uiState.dialogStage != DialogStage.Menu) {
+                                Modifier.verticalScroll(rememberScrollState())
+                            } else {
+                                Modifier
+                            },
                             centerIcon = dialogInnerWidget(params.icon),
                             centerTitle = dialogInnerWidget(params.title),
                             centerSubtitle = dialogInnerWidget(params.subtitle),

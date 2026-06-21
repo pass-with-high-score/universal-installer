@@ -126,18 +126,6 @@ fun InstallScreen(
         )
     }
 
-    LaunchedEffect(uiState.pendingApkInfo) {
-        val info = uiState.pendingApkInfo
-        if (info != null) {
-            val risks = app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks(info)
-            if (risks.isNotEmpty()) {
-                pendingRisks = risks
-            } else {
-                proceedWithBiometric()
-            }
-        }
-    }
-
     InstallUi(
         modifier = modifier,
         uiState = uiState,
