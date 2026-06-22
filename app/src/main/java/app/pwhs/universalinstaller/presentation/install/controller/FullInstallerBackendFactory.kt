@@ -39,6 +39,23 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
      *   - false → DENIED (manager said no)
      */
     override suspend fun probeRootState(): RootState = withContext(Dispatchers.IO) {
+        val suPaths = arrayOf(
+            "/system/app/Superuser.apk",
+            "/sbin/su",
+            "/system/bin/su",
+            "/system/xbin/su",
+            "/data/local/xbin/su",
+            "/data/local/bin/su",
+            "/system/sd/xbin/su",
+            "/system/bin/failsafe/su",
+            "/data/local/su",
+            "/su/bin/su"
+        )
+        val hasSu = suPaths.any { java.io.File(it).exists() }
+        if (!hasSu) {
+            return@withContext RootState.NOT_ROOTED
+        }
+
         try {
             when (Shell.isAppGrantedRoot()) {
                 null -> RootState.UNKNOWN

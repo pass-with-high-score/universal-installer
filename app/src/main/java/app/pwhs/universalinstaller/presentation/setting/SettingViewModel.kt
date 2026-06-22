@@ -345,9 +345,13 @@ class SettingViewModel(
                 setUseShizuku(true)
             }
             InstallMode.ROOT -> viewModelScope.launch {
-                dataStore.edit { p ->
-                    p[PreferencesKeys.USE_SHIZUKU] = false
-                    p[PreferencesKeys.USE_ROOT] = true
+                val state = backendFactory.requestRoot()
+                _rootState.value = state
+                if (state == RootState.READY) {
+                    dataStore.edit { p ->
+                        p[PreferencesKeys.USE_SHIZUKU] = false
+                        p[PreferencesKeys.USE_ROOT] = true
+                    }
                 }
             }
         }
@@ -394,7 +398,15 @@ class SettingViewModel(
 
     fun setUseRoot(enabled: Boolean) {
         viewModelScope.launch {
-            dataStore.edit { prefs -> prefs[PreferencesKeys.USE_ROOT] = enabled }
+            if (enabled) {
+                val state = backendFactory.requestRoot()
+                _rootState.value = state
+                if (state == RootState.READY) {
+                    dataStore.edit { prefs -> prefs[PreferencesKeys.USE_ROOT] = true }
+                }
+            } else {
+                dataStore.edit { prefs -> prefs[PreferencesKeys.USE_ROOT] = false }
+            }
         }
     }
 
