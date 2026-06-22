@@ -12,6 +12,7 @@
     <string name="extract_done_action_open">Open folder</string>
     <string name="extract_failed">Extract failed: %1$s</string>
     <string name="extract_action_backups">Backups</string>
+1    <string name="extract_progress_title">Extracting %1$s…</string>
     <string name="manage_action_open_app">Open app</string>
     <string name="manage_action_open_app_sub">Launch %1$s</string>
     <string name="manage_action_app_info">App info</string>

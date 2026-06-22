@@ -381,6 +381,36 @@ private fun UninstallUi(
         )
     }
 
+    if (uiState.extractState is ExtractState.Running) {
+        val runningState = uiState.extractState
+        AlertDialog(
+            onDismissRequest = { /* Cannot dismiss, it's running */ },
+            title = { Text(stringResource(R.string.extract_progress_title, runningState.appName)) },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    if (runningState.totalBytes > 0) {
+                        val progress = runningState.bytesCopied.toFloat() / runningState.totalBytes.toFloat()
+                        androidx.compose.material3.LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "${android.text.format.Formatter.formatShortFileSize(context, runningState.bytesCopied)} / ${android.text.format.Formatter.formatShortFileSize(context, runningState.totalBytes)}",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    } else {
+                        androidx.compose.material3.LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+    }
+
     // Privileged-action snackbar (Force stop / Disable / Enable). Lives alongside the
     // extract snackbar — both share the same SnackbarHostState; the system Material
     // queue handles back-to-back messages.
