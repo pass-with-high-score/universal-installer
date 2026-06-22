@@ -62,11 +62,7 @@ data class UsageBucket(
     val foregroundMillis: Long,
 )
 
-internal fun InstalledApp.category(): AppFilter = when {
-    !enabled -> AppFilter.Disabled
-    isSystemApp -> AppFilter.System
-    else -> AppFilter.User
-}
+
 
 /**
  * Surfaced to the UI when the pending uninstall touches one or more system apps. The UI
@@ -192,7 +188,22 @@ class ManageViewModel(
         val groupBy = flows[12] as GroupBy
         val filtered = apps
             .filter { app ->
-                if (app.category() !in appFilter) return@filter false
+                val typeFilters = appFilter.filter { it == AppFilter.User || it == AppFilter.System }
+                val matchesType = if (typeFilters.isEmpty()) {
+                    true
+                } else {
+                    (AppFilter.User in appFilter && !app.isSystemApp) ||
+                    (AppFilter.System in appFilter && app.isSystemApp)
+                }
+
+                val matchesState = if (AppFilter.Disabled in appFilter) {
+                    !app.enabled
+                } else {
+                    app.enabled
+                }
+
+                if (!(matchesType && matchesState)) return@filter false
+
                 if (query.isBlank()) return@filter true
                 app.appName.contains(query, ignoreCase = true) ||
                         app.packageName.contains(query, ignoreCase = true)
