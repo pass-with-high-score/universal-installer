@@ -1,0 +1,2 @@
+package_name("app.pwhs.universalinstaller.tv")
+json_key_file("fastlane/play-store-key.json")

@@ -1,0 +1,7 @@
+- Initial release of Universal Installer for Android TV
+- D-pad optimized app manager with uninstall support
+- QR code transfer: send APKs from phone to TV over Wi-Fi
+- Local Downloads folder scanner
+- APK/XAPK/APKS/APKM/APK+ format support
+- PackageInstaller session-based installation
+- PIN-protected receiver server

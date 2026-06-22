@@ -74,6 +74,11 @@ jobs:
         continue-on-error: true
         run: bundle exec fastlane internal
 
+      - name: Deploy TV to internal track
+        id: play_store_tv
+        continue-on-error: true
+        run: bundle exec fastlane internal --fastlane_dir=fastlane_tv
+
       # Both Play and GitHub now get the same artifact — Play gets the AAB built above
       # via fastlane, GitHub gets a side-loadable APK from the same single build.
       - name: Build release APK & AAB

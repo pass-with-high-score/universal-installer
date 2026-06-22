@@ -1,0 +1,45 @@
+Universal Installer TV brings the power of the #1 Android package manager to your big screen. Designed from the ground up for the 10-foot experience with full D-pad navigation, it makes sideloading and managing apps on Android TV effortless.
+
+🎮 Built for TV
+- Full D-pad & remote navigation — no touch required.
+- Large, focused UI cards optimized for the big screen.
+- Leanback-friendly design that follows Android TV guidelines.
+
+📲 QR Code Transfer
+- Show a QR code on your TV screen.
+- Scan it with any phone to open a web upload page.
+- Send APKs from your phone to your TV over Wi-Fi — no cables, no USB drives.
+- PIN-protected sessions for security.
+
+📦 Supported Formats
+- APK: Standard Android packages
+- APK+: Advanced split bundles
+- APKS: Split APK bundles
+- XAPK: Compressed split bundles with OBB (APKPure format)
+- APKM: Split bundles (APKMirror format)
+
+📂 Local File Scanner
+- Auto-detect APKs already in your Downloads folder.
+- Browse and install without a file manager.
+
+👀 Preview Before Installing
+See app name, icon, version, package, size, SDK targets, CPU architectures, permissions, and split count — all before you install.
+
+📱 App Manager
+- View all installed apps with size and install date.
+- Uninstall apps directly with D-pad selection.
+- Sort by name, size, or date.
+- Batch uninstall via multi-select.
+
+🔒 Security & Privacy
+- No ads, no tracking, no data collection.
+- Fully open source.
+- Offline first — no internet required for core features.
+
+⚡ Power User Features (Root / Shizuku)
+- Silent install & uninstall without prompts.
+- Advanced install flags: replace, downgrade, grant permissions.
+- Set install source to bypass sideload restrictions.
+- Many TV boxes are rooted — take full advantage.
+
+Universal Installer TV — sideloading on the big screen, made simple.
