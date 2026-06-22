@@ -1,14 +1,10 @@
 package app.pwhs.universalinstaller.presentation.install.controller
 
-import android.content.BroadcastReceiver
 import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.PackageInstaller
 import android.net.Uri
 import android.os.Build
 import app.pwhs.universalinstaller.util.HiddenApiHacks
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -35,28 +31,6 @@ object ManualTargetedInstaller {
             )
             
             val sessionId = targetedInstaller.createSession(params)
-            val action = "app.pwhs.universalinstaller.INSTALL_STATUS_$sessionId"
-            val resultDeferred = CompletableDeferred<Result<Unit>>()
-            
-            val receiver = object : BroadcastReceiver() {
-                override fun onReceive(ctx: Context, intent: Intent) {
-                    val status = intent.getIntExtra(PackageInstaller.EXTRA_STATUS, PackageInstaller.STATUS_FAILURE)
-                    if (status == PackageInstaller.STATUS_SUCCESS) {
-                        resultDeferred.complete(Result.success(Unit))
-                    } else {
-                        val message = intent.getStringExtra(PackageInstaller.EXTRA_STATUS_MESSAGE)
-                        resultDeferred.complete(Result.failure(RuntimeException(message ?: "Installation failed (status $status)")))
-                    }
-                    ctx.unregisterReceiver(this)
-                }
-            }
-            
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.registerReceiver(receiver, IntentFilter(action), Context.RECEIVER_NOT_EXPORTED)
-            } else {
-                context.registerReceiver(receiver, IntentFilter(action))
-            }
-
             try {
                 targetedInstaller.openSession(sessionId).use { session ->
                     uris.forEachIndexed { index, uri ->
@@ -72,20 +46,37 @@ object ManualTargetedInstaller {
                         }
                         onProgress((index + 1).toFloat() / uris.size)
                     }
-                    
-                    val intent = Intent(action)
-                    intent.setPackage(context.packageName)
-                    val pendingIntent = android.app.PendingIntent.getBroadcast(
-                        context, sessionId, intent,
-                        android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_MUTABLE
-                    )
-                    session.commit(pendingIntent.intentSender)
                 }
-                resultDeferred.await().getOrThrow()
+
+                // Commit the session using Shizuku shell.
+                // This avoids "Session does not belong to uid" on Android 11,
+                // which happens when the app (UID 10xxx) tries to supply a PendingIntent
+                // to a session owned by shell (UID 2000).
+                val newProcessMethod = rikka.shizuku.Shizuku::class.java.getDeclaredMethod(
+                    "newProcess",
+                    Array<String>::class.java,
+                    Array<String>::class.java,
+                    String::class.java
+                ).apply { isAccessible = true }
+                
+                val process = newProcessMethod.invoke(
+                    null,
+                    arrayOf("pm", "install-commit", sessionId.toString()),
+                    null,
+                    null
+                ) as Process
+                process.waitFor()
+                
+                val output = process.inputStream.bufferedReader().readText()
+                val error = process.errorStream.bufferedReader().readText()
+                
+                if (output.contains("Success", ignoreCase = true)) {
+                    return@withContext Result.success(Unit)
+                } else {
+                    val msg = output.ifBlank { error }.trim()
+                    return@withContext Result.failure(RuntimeException(msg.ifBlank { "Installation failed" }))
+                }
             } catch (e: Exception) {
-                try {
-                    context.unregisterReceiver(receiver)
-                } catch (_: Exception) {}
                 throw e
             }
         }
