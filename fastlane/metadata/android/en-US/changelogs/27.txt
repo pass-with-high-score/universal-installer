@@ -1,0 +1,2 @@
+- Fix searching for APK files on external SD cards (Issue #68).
+- Improve accessibility for selected items in the Manage Tab (Issue #69).
