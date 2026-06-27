@@ -1,0 +1,10 @@
+• Add install engine picker (default, Shizuku, or root)
+• Redesign list cards with flat outline style
+• Fix APK extract crash on certain filename templates
+• Fix installer profile not accessible from install flow
+• Fix long package names overlapping in app details
+• Sort installed apps by last updated
+• Split app badge on installed apps list
+• Built-in directory picker for extract output
+• XAPK format for split app extraction
+• Bulk extract for selected installed apps
