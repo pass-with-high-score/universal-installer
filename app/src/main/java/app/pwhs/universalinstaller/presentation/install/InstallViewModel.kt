@@ -508,40 +508,46 @@ class InstallViewModel(
         // My refactored activeController(profileId) solves the backend issue.
         // For flags (replace, etc.), we still need them in the DataStore for the controller to read them.
         
-        viewModelScope.launch {
-            application.dataStore.edit { p ->
-                profile?.let { prof ->
-                    prof.installerPackageName?.let { pkg ->
-                        p[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME] = pkg
-                        p[PreferencesKeys.ROOT_INSTALLER_PACKAGE_NAME] = pkg
-                        p[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] = pkg.isNotBlank()
-                        p[PreferencesKeys.ROOT_SET_INSTALL_SOURCE] = pkg.isNotBlank()
-                    }
-                    prof.replaceExisting?.let {
-                        p[PreferencesKeys.SHIZUKU_REPLACE_EXISTING] = it
-                        p[PreferencesKeys.ROOT_REPLACE_EXISTING] = it
-                    }
-                    prof.allowTest?.let {
-                        p[PreferencesKeys.SHIZUKU_ALLOW_TEST] = it
-                        p[PreferencesKeys.ROOT_ALLOW_TEST] = it
-                    }
-                    prof.requestDowngrade?.let {
-                        p[PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE] = it
-                        p[PreferencesKeys.ROOT_REQUEST_DOWNGRADE] = it
-                    }
-                    prof.grantAllPermissions?.let {
-                        p[PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS] = it
-                        p[PreferencesKeys.ROOT_GRANT_ALL_PERMISSIONS] = it
-                    }
-                    prof.bypassLowTargetSdk?.let {
-                        p[PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK] = it
-                        p[PreferencesKeys.ROOT_BYPASS_LOW_TARGET_SDK] = it
-                    }
-                    prof.allUsers?.let {
-                        p[PreferencesKeys.SHIZUKU_ALL_USERS] = it
-                        p[PreferencesKeys.ROOT_ALL_USERS] = it
-                    }
-                }
+        viewModelScope.launch { writeProfileFlags(profile) }
+    }
+
+    /**
+     * Persist [profile]'s install flags into DataStore so the controller (which reads prefs
+     * directly) picks them up. Suspends until the write commits — batch install awaits this
+     * before enqueuing sessions so the flags are guaranteed live for every entry.
+     */
+    private suspend fun writeProfileFlags(profile: InstallerProfile?) {
+        profile ?: return
+        application.dataStore.edit { p ->
+            profile.installerPackageName?.let { pkg ->
+                p[PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME] = pkg
+                p[PreferencesKeys.ROOT_INSTALLER_PACKAGE_NAME] = pkg
+                p[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] = pkg.isNotBlank()
+                p[PreferencesKeys.ROOT_SET_INSTALL_SOURCE] = pkg.isNotBlank()
+            }
+            profile.replaceExisting?.let {
+                p[PreferencesKeys.SHIZUKU_REPLACE_EXISTING] = it
+                p[PreferencesKeys.ROOT_REPLACE_EXISTING] = it
+            }
+            profile.allowTest?.let {
+                p[PreferencesKeys.SHIZUKU_ALLOW_TEST] = it
+                p[PreferencesKeys.ROOT_ALLOW_TEST] = it
+            }
+            profile.requestDowngrade?.let {
+                p[PreferencesKeys.SHIZUKU_REQUEST_DOWNGRADE] = it
+                p[PreferencesKeys.ROOT_REQUEST_DOWNGRADE] = it
+            }
+            profile.grantAllPermissions?.let {
+                p[PreferencesKeys.SHIZUKU_GRANT_ALL_PERMISSIONS] = it
+                p[PreferencesKeys.ROOT_GRANT_ALL_PERMISSIONS] = it
+            }
+            profile.bypassLowTargetSdk?.let {
+                p[PreferencesKeys.SHIZUKU_BYPASS_LOW_TARGET_SDK] = it
+                p[PreferencesKeys.ROOT_BYPASS_LOW_TARGET_SDK] = it
+            }
+            profile.allUsers?.let {
+                p[PreferencesKeys.SHIZUKU_ALL_USERS] = it
+                p[PreferencesKeys.ROOT_ALL_USERS] = it
             }
         }
     }
@@ -960,7 +966,14 @@ class InstallViewModel(
 
         viewModelScope.launch {
             val deleteAfterInstall = readDeleteApkPref()
-            val controller = activeController()
+            // Apply the chosen Installer Profile to the whole batch: resolve the right backend
+            // and write its flags once, up front, so every enqueued session inherits them.
+            val currentProfileId = _selectedProfileId.value
+            val prefs = try { application.dataStore.data.first() } catch (_: Exception) { null }
+            val profile = ProfileManager.parseProfiles(prefs?.get(PreferencesKeys.INSTALLER_PROFILES))
+                .find { it.id == currentProfileId }
+            writeProfileFlags(profile)
+            val controller = activeController(currentProfileId)
             for (entry in picked) {
                 val iconPath = cacheIcon(entry.apkInfo)
                 val sessionData = SessionData(

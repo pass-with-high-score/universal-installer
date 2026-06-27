@@ -32,6 +32,8 @@ data class BackupsUiState(
     val isLoading: Boolean = true,
     val extractorOutputPath: String = "",
     val extractorFilenameTemplate: String = "{name}-{version}",
+    /** "apks" (default) or "xapk" — container for apps that have split APKs. */
+    val extractorSplitFormat: String = "apks",
 )
 
 class BackupsViewModel(
@@ -46,14 +48,16 @@ class BackupsViewModel(
         _filesState,
         _isLoading,
         dataStore.data.map { it[PreferencesKeys.APK_EXTRACTOR_OUTPUT_PATH] ?: "" },
-        dataStore.data.map { it[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] ?: "{name}-{version}" }
-    ) { files, loading, path, template ->
+        dataStore.data.map { it[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] ?: "{name}-{version}" },
+        dataStore.data.map { it[PreferencesKeys.APK_EXTRACTOR_SPLIT_FORMAT] ?: "apks" }
+    ) { files, loading, path, template, splitFormat ->
         BackupsUiState(
             files = files,
             totalBytes = files.sumOf { it.sizeBytes },
             isLoading = loading,
             extractorOutputPath = path,
-            extractorFilenameTemplate = template
+            extractorFilenameTemplate = template,
+            extractorSplitFormat = splitFormat,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), BackupsUiState())
 
@@ -109,6 +113,12 @@ class BackupsViewModel(
     fun setExtractorFilenameTemplate(template: String) {
         viewModelScope.launch {
             dataStore.edit { prefs -> prefs[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] = template }
+        }
+    }
+
+    fun setExtractorSplitFormat(format: String) {
+        viewModelScope.launch {
+            dataStore.edit { prefs -> prefs[PreferencesKeys.APK_EXTRACTOR_SPLIT_FORMAT] = format }
         }
     }
 

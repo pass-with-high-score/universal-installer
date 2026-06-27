@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
+import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -182,6 +183,10 @@ fun DialogPrepareContent(
                 }
             }
         }
+
+        // ── Install engine (tap to switch) ──
+        Spacer(modifier = Modifier.height(16.dp))
+        InstallerModeBadge()
 
         Spacer(modifier = Modifier.height(20.dp))
 

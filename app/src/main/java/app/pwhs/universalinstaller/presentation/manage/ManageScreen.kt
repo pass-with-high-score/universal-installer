@@ -61,11 +61,12 @@ import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.Store
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -170,6 +171,8 @@ fun ManageScreen(
         onForceStopSelected = viewModel::forceStopSelected,
         onDisableSelected = viewModel::disableSelected,
         onClearDataSelected = viewModel::clearDataSelected,
+        onExtractSelected = viewModel::extractSelected,
+        onDismissBatchExtractResult = viewModel::dismissBatchExtractResult,
         onOpenLogs = {
             context.startActivity(Intent(context, UninstallLogsActivity::class.java))
         },
@@ -225,6 +228,8 @@ private fun UninstallUi(
     onForceStopSelected: () -> Unit = {},
     onDisableSelected: () -> Unit = {},
     onClearDataSelected: () -> Unit = {},
+    onExtractSelected: () -> Unit = {},
+    onDismissBatchExtractResult: () -> Unit = {},
     onOpenLogs: () -> Unit = {},
     onOpenBackups: () -> Unit = {},
     onRefresh: () -> Unit = {},
@@ -411,6 +416,52 @@ private fun UninstallUi(
             },
             confirmButton = {}
         )
+    }
+
+    (uiState.batchExtractState as? BatchExtractState.Running)?.let { batch ->
+        AlertDialog(
+            onDismissRequest = { /* running — not dismissable */ },
+            title = {
+                Text(stringResource(R.string.manage_batch_extract_title, batch.completed + 1, batch.total))
+            },
+            text = {
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+                ) {
+                    Text(
+                        text = batch.currentName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val progress = if (batch.totalBytes > 0) {
+                        batch.bytesCopied.toFloat() / batch.totalBytes.toFloat()
+                    } else 0f
+                    androidx.compose.material3.LinearProgressIndicator(
+                        progress = { progress },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            },
+            confirmButton = {},
+        )
+    }
+
+    LaunchedEffect(uiState.batchExtractState) {
+        val s = uiState.batchExtractState as? BatchExtractState.Done ?: return@LaunchedEffect
+        val msg = if (s.failed == 0) {
+            resource.getString(R.string.manage_batch_extract_done, s.success)
+        } else {
+            resource.getString(R.string.manage_batch_extract_partial, s.success, s.failed)
+        }
+        val res = snackbarHostState.showSnackbar(
+            message = msg,
+            actionLabel = resource.getString(R.string.extract_done_action_open),
+            withDismissAction = true,
+        )
+        if (res == SnackbarResult.ActionPerformed) onOpenBackups()
+        onDismissBatchExtractResult()
     }
 
     // Privileged-action snackbar (Force stop / Disable / Enable). Lives alongside the
@@ -632,6 +683,12 @@ private fun UninstallUi(
                                     MaterialTheme.colorScheme.primary
                                 else
                                     MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                        }
+                        IconButton(onClick = onExtractSelected) {
+                            Icon(
+                                Icons.Rounded.Inventory2,
+                                contentDescription = stringResource(R.string.manage_batch_action_extract),
                             )
                         }
                         IconButton(onClick = {
@@ -1045,6 +1102,9 @@ private fun FilterSheet(
                 SortChip(UninstallSortBy.InstalledAt, sortBy, direction, stringResource(R.string.uninstall_sort_installed)) {
                     onSortChange(UninstallSortBy.InstalledAt)
                 }
+                SortChip(UninstallSortBy.LastUpdated, sortBy, direction, stringResource(R.string.uninstall_sort_last_updated)) {
+                    onSortChange(UninstallSortBy.LastUpdated)
+                }
                 SortChip(UninstallSortBy.LastUsed, sortBy, direction, stringResource(R.string.uninstall_sort_last_used)) {
                     if (!usageGranted) {
                         android.widget.Toast.makeText(
@@ -1102,6 +1162,7 @@ private fun sortLabelRes(sortBy: UninstallSortBy): Int = when (sortBy) {
     UninstallSortBy.Name -> R.string.uninstall_sort_name
     UninstallSortBy.Size -> R.string.uninstall_sort_size
     UninstallSortBy.InstalledAt -> R.string.uninstall_sort_installed
+    UninstallSortBy.LastUpdated -> R.string.uninstall_sort_last_updated
     UninstallSortBy.LastUsed -> R.string.uninstall_sort_last_used
 }
 
@@ -1147,12 +1208,14 @@ private fun ManageSkeleton() {
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         repeat(6) {
-            ElevatedCard(
+            Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.large,
-                colors = CardDefaults.elevatedCardColors(
+                colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
                 ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
             ) {
                 Row(
                     modifier = Modifier
@@ -1197,7 +1260,7 @@ private fun AppCard(
 ) {
     val context = LocalContext.current
 
-    ElevatedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
@@ -1213,8 +1276,17 @@ private fun AppCard(
                 onLongClick = onLongClick,
             ),
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
+        // Flat card — no shadow. A thin outline separates each row; a primary border marks
+        // the current selection so it reads even without the leading check icon.
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(
+            1.dp,
+            if (isSelected) MaterialTheme.colorScheme.primary
+                else MaterialTheme.colorScheme.outlineVariant,
         ),
     ) {
         Row(
@@ -1280,6 +1352,17 @@ private fun AppCard(
                                 .padding(horizontal = 6.dp, vertical = 2.dp),
                         )
                     }
+                    if (app.hasSplits) {
+                        Text(
+                            text = stringResource(R.string.manage_split_badge),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSecondaryContainer,
+                            modifier = Modifier
+                                .clip(MaterialTheme.shapes.small)
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                                .padding(horizontal = 6.dp, vertical = 2.dp),
+                        )
+                    }
                     if (!app.enabled) {
                         // Reuse the error palette so disabled apps stand out the same way
                         // as the destructive Uninstall icon does at the row's trailing edge.
@@ -1326,6 +1409,20 @@ private fun AppCard(
                             android.text.format.DateUtils.formatDateTime(
                                 context,
                                 app.installedAt,
+                                android.text.format.DateUtils.FORMAT_SHOW_DATE or
+                                    android.text.format.DateUtils.FORMAT_ABBREV_MONTH,
+                            )
+                        ))
+                    }
+                    // Only surface "Updated" when it actually differs from the install date —
+                    // a never-updated app has lastUpdateTime == firstInstallTime, so showing
+                    // both would just be noise.
+                    if (app.lastUpdatedAt > 0 && app.lastUpdatedAt != app.installedAt) {
+                        add(stringResource(
+                            R.string.uninstall_row_updated,
+                            android.text.format.DateUtils.formatDateTime(
+                                context,
+                                app.lastUpdatedAt,
                                 android.text.format.DateUtils.FORMAT_SHOW_DATE or
                                     android.text.format.DateUtils.FORMAT_ABBREV_MONTH,
                             )

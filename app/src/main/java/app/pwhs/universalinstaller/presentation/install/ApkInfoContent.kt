@@ -88,6 +88,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import androidx.core.graphics.drawable.toBitmap
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.InstallerProfile
@@ -232,6 +233,12 @@ internal fun ApkInfoContent(
                 }
             }
         }
+
+        Spacer(Modifier.height(16.dp))
+
+        // Tap to switch the install engine (PackageInstaller / Shizuku / Root) inline,
+        // without leaving the install sheet.
+        InstallerModeBadge()
 
         Spacer(Modifier.height(16.dp))
 

@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.install
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,8 +22,8 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,15 +64,19 @@ internal fun HistoryCard(
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
 
-    ElevatedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .animateContentSize()
             .clickable(enabled = canExpand) { expanded = !expanded },
         shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.elevatedCardColors(
+        colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
         ),
+        // Flat card — no shadow. A thin outline separates each item instead of elevation,
+        // since the flat container colour blends into the screen background.
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column {
             Row(

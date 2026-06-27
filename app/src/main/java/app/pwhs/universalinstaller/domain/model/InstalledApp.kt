@@ -9,6 +9,8 @@ data class InstalledApp(
     val sizeBytes: Long = 0L,
     /** First install time, epoch ms. 0 if unknown. */
     val installedAt: Long = 0L,
+    /** Last update (re-install / upgrade) time, epoch ms. 0 if unknown. */
+    val lastUpdatedAt: Long = 0L,
     /** Last time the app was used (UsageStatsManager). 0 if unknown or no permission. */
     val lastUsedAt: Long = 0L,
     /** True when the install has split APKs (`splitSourceDirs` non-empty). */
