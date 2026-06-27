@@ -66,18 +66,25 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      # Play Store upload is allowed to fail (e.g. metadata/changelog/permission policy
-      # rejection) without blocking the GitHub release — we still want the signed artifacts
-      # published so users on side-load tracks can grab them.
-      - name: Deploy to internal track
-        id: play_store
+      - name: Deploy to production track
+        id: play_store_production
         continue-on-error: true
-        run: bundle exec fastlane internal
+        run: bundle exec fastlane production
 
-      - name: Deploy TV to internal track
-        id: play_store_tv
+      - name: Deploy to closed testing track
+        id: play_store_beta
         continue-on-error: true
-        run: bundle exec fastlane internal --fastlane_dir=fastlane_tv
+        run: bundle exec fastlane beta
+
+      - name: Deploy TV to production track
+        id: play_store_tv_production
+        continue-on-error: true
+        run: bundle exec fastlane production --fastlane_dir=fastlane_tv
+
+      - name: Deploy TV to closed testing track
+        id: play_store_tv_beta
+        continue-on-error: true
+        run: bundle exec fastlane beta --fastlane_dir=fastlane_tv
 
       # Both Play and GitHub now get the same artifact — Play gets the AAB built above
       # via fastlane, GitHub gets a side-loadable APK from the same single build.

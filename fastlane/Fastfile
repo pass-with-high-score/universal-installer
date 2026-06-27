@@ -35,15 +35,17 @@ platform :android do
     )
   end
 
-  desc "Promote internal to closed beta"
+  desc "Deploy to closed testing track"
   lane :beta do
+    gradle(task: "bundleRelease")
     upload_to_play_store(
-      track: "internal",
-      track_promote_to: "beta",
+      track: "beta",
+      aab: "app/build/outputs/bundle/release/app-release.aab",
       json_key: "fastlane/play-store-key.json",
-      skip_upload_metadata: true,
-      skip_upload_images: true,
-      skip_upload_screenshots: true
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: false,
     )
   end
 
