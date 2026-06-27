@@ -133,6 +133,8 @@ object PreferencesKeys {
     // APK Extractor options
     val APK_EXTRACTOR_OUTPUT_PATH = stringPreferencesKey("apk_extractor_output_path")
     val APK_EXTRACTOR_FILENAME_TEMPLATE = stringPreferencesKey("apk_extractor_filename_template")
+    /** Output container for apps that have split APKs: "apks" (default) or "xapk". */
+    val APK_EXTRACTOR_SPLIT_FORMAT = stringPreferencesKey("apk_extractor_split_format")
 
     // Installer Profiles
     val INSTALLER_PROFILES = stringPreferencesKey("installer_profiles")

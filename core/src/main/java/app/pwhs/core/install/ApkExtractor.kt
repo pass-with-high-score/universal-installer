@@ -24,16 +24,26 @@ object ApkExtractor {
     private const val SUBFOLDER = "UniversalInstaller/Extracted"
     private const val COPY_BUFFER = 64 * 1024
 
+    /** Any "{...}" token — used to strip template tags we don't recognise. */
+    private val UNRESOLVED_TAG = Regex("\\{[^}]*}")
+
+    /** A run of 2+ of the SAME separator char (e.g. "__", "  ", "..") → collapse to one. */
+    private val REPEATED_SEPARATOR = Regex("([-_. ])\\1+")
+
     sealed interface Result {
         data class Success(val uri: Uri) : Result
         data class Failure(val message: String) : Result
     }
+
+    /** Container used for apps that ship split APKs. Single-APK apps always extract as ".apk". */
+    enum class SplitFormat { APKS, XAPK }
 
     suspend fun extract(
         context: Context,
         packageName: String,
         outputDir: DocumentFile? = null,
         filenameTemplate: String = "{name}-{version}",
+        splitFormat: SplitFormat = SplitFormat.APKS,
         onProgress: (bytesCopied: Long, totalBytes: Long) -> Unit = { _, _ -> },
     ): Result = withContext(Dispatchers.IO) {
         val pm = context.packageManager
@@ -57,14 +67,24 @@ object ApkExtractor {
             ?.mapNotNull { path -> path?.let(::File)?.takeIf { it.exists() && it.canRead() } }
             ?: emptyList()
 
-        val versionName = try {
+        val pkgInfo = try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0)).versionName
+                pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0))
             } else {
                 @Suppress("DEPRECATION")
-                pm.getPackageInfo(packageName, 0).versionName
+                pm.getPackageInfo(packageName, 0)
             }
-        } catch (_: Exception) { null } ?: ""
+        } catch (_: Exception) { null }
+
+        val versionName = pkgInfo?.versionName ?: ""
+        val versionCode = pkgInfo?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                it.longVersionCode
+            } else {
+                @Suppress("DEPRECATION")
+                it.versionCode.toLong()
+            }
+        } ?: 0L
 
         val appName = appInfo.loadLabel(pm).toString()
         
@@ -84,9 +104,15 @@ object ApkExtractor {
             template = filenameTemplate,
             name = appName,
             version = versionName,
+            code = versionCode.toString(),
             pkg = packageName,
         )
-        val targetExt = if (splitDirs.isEmpty()) "apk" else "apks"
+        val isXapk = splitDirs.isNotEmpty() && splitFormat == SplitFormat.XAPK
+        val targetExt = when {
+            splitDirs.isEmpty() -> "apk"
+            isXapk -> "xapk"
+            else -> "apks"
+        }
         val mimeType = if (splitDirs.isEmpty()) "application/vnd.android.package-archive" else "application/zip"
         
         val finalFileName = uniqueName(targetDir, "$resolvedName.$targetExt")
@@ -105,10 +131,24 @@ object ApkExtractor {
         val totalBytes = baseApk.length() + splitDirs.sumOf { it.length() }
 
         return@withContext try {
-            if (splitDirs.isEmpty()) {
-                copyFile(context, baseApk, targetFile, totalBytes, 0L, onProgress)
-            } else {
-                writeSplitBundle(context, baseApk, splitDirs, targetFile, totalBytes, onProgress)
+            when {
+                splitDirs.isEmpty() ->
+                    copyFile(context, baseApk, targetFile, totalBytes, 0L, onProgress)
+                isXapk -> {
+                    val manifest = buildXapkManifest(
+                        packageName = packageName,
+                        appName = appName,
+                        versionName = versionName,
+                        versionCode = versionCode,
+                        minSdk = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) appInfo.minSdkVersion else 0,
+                        targetSdk = appInfo.targetSdkVersion,
+                        baseApk = baseApk,
+                        splits = splitDirs,
+                    )
+                    writeXapkBundle(context, baseApk, splitDirs, manifest, targetFile, totalBytes, onProgress)
+                }
+                else ->
+                    writeSplitBundle(context, baseApk, splitDirs, targetFile, totalBytes, onProgress)
             }
             Result.Success(targetFile.uri)
         } catch (t: Throwable) {
@@ -165,6 +205,82 @@ object ApkExtractor {
         }
     }
 
+    /**
+     * Write an XAPK bundle: a ZIP holding `manifest.json` plus the base + split APKs under
+     * their original names. This is the layout APKPure / SAI and similar installers expect,
+     * so an extracted XAPK can be re-installed by those tools (and by our own importer).
+     */
+    private fun writeXapkBundle(
+        context: Context,
+        baseApk: File,
+        splits: List<File>,
+        manifestJson: String,
+        target: DocumentFile,
+        totalBytes: Long,
+        onProgress: (Long, Long) -> Unit,
+    ) {
+        var copied = 0L
+        val os = context.contentResolver.openOutputStream(target.uri)
+            ?: throw IllegalStateException("Could not open output stream")
+
+        ZipOutputStream(os.buffered()).use { zip ->
+            // manifest.json is small text — let it deflate (default). APK entries are already
+            // compressed, so they go in STORED to avoid wasting CPU re-compressing.
+            val manifestBytes = manifestJson.toByteArray(Charsets.UTF_8)
+            zip.putNextEntry(ZipEntry("manifest.json"))
+            zip.write(manifestBytes)
+            zip.closeEntry()
+
+            zip.setLevel(0)
+            copied += addStoredEntry(zip, baseApk, "base.apk") { delta ->
+                onProgress(copied + delta, totalBytes)
+            }
+            for (split in splits) {
+                copied += addStoredEntry(zip, split, split.name) { delta ->
+                    onProgress(copied + delta, totalBytes)
+                }
+            }
+        }
+    }
+
+    /** Build the XAPK v2 `manifest.json` describing the base + split APKs. */
+    private fun buildXapkManifest(
+        packageName: String,
+        appName: String,
+        versionName: String,
+        versionCode: Long,
+        minSdk: Int,
+        targetSdk: Int,
+        baseApk: File,
+        splits: List<File>,
+    ): String {
+        val splitApks = org.json.JSONArray()
+        splitApks.put(org.json.JSONObject().put("file", "base.apk").put("id", "base"))
+        for (split in splits) {
+            splitApks.put(
+                org.json.JSONObject()
+                    .put("file", split.name)
+                    .put("id", splitId(split.name)),
+            )
+        }
+        val totalSize = baseApk.length() + splits.sumOf { it.length() }
+        return org.json.JSONObject()
+            .put("xapk_version", 2)
+            .put("package_name", packageName)
+            .put("name", appName)
+            .put("version_code", versionCode.toString())
+            .put("version_name", versionName)
+            .put("min_sdk_version", if (minSdk > 0) minSdk.toString() else "")
+            .put("target_sdk_version", if (targetSdk > 0) targetSdk.toString() else "")
+            .put("total_size", totalSize)
+            .put("split_apks", splitApks)
+            .toString(2)
+    }
+
+    /** "split_config.arm64_v8a.apk" → "config.arm64_v8a"; otherwise the bare filename stem. */
+    private fun splitId(fileName: String): String =
+        fileName.removeSuffix(".apk").removePrefix("split_")
+
     private fun addStoredEntry(
         zip: ZipOutputStream,
         source: File,
@@ -218,14 +334,26 @@ object ApkExtractor {
         template: String,
         name: String,
         version: String,
+        code: String,
         pkg: String,
     ): String {
         val resolved = template
             .replace("{name}", name)
             .replace("{version}", version)
+            .replace("{code}", code)
             .replace("{package}", pkg)
             .replace("{pkg}", pkg)
-        return sanitize(resolved)
+            // Drop any tags we don't recognise (e.g. a typo'd "{foo}"). Without this they'd
+            // survive into sanitize(), which turns the stray "{" / "}" into "_" and leaves
+            // litter like "App__foo_" in the filename.
+            .replace(UNRESOLVED_TAG, "")
+            // A removed tag can leave a dangling separator ("App-" from "{name}-{foo}", or
+            // "App__" from "{name}_{foo}"). Collapse runs and trim edges so the result is clean.
+            .replace(REPEATED_SEPARATOR, "$1")
+            .trim(' ', '-', '_', '.')
+        // If the template resolved to nothing usable (e.g. just "{foo}"), fall back to the
+        // app name so we never emit a file literally named "app".
+        return sanitize(resolved.ifBlank { name })
     }
 
     private fun uniqueName(dir: DocumentFile, desired: String): String {

@@ -37,7 +37,7 @@ import ru.solrudev.ackpine.session.parameters.Confirmation
 import ru.solrudev.ackpine.shizuku.shizuku
 import timber.log.Timber
 
-enum class UninstallSortBy { Name, Size, InstalledAt, LastUsed }
+enum class UninstallSortBy { Name, Size, InstalledAt, LastUpdated, LastUsed }
 enum class SortDirection { Asc, Desc }
 
 /**
@@ -110,6 +110,19 @@ sealed interface ExtractState {
     ) : ExtractState
 }
 
+/** Progress for a bulk extract over the current selection. */
+sealed interface BatchExtractState {
+    data object Idle : BatchExtractState
+    data class Running(
+        val completed: Int,
+        val total: Int,
+        val currentName: String,
+        val bytesCopied: Long,
+        val totalBytes: Long,
+    ) : BatchExtractState
+    data class Done(val success: Int, val failed: Int) : BatchExtractState
+}
+
 /**
  * One-shot snackbar payload for privileged actions (force-stop, disable/enable). Cleared
  * after the UI consumes it via `dismissPrivilegedActionResult`.
@@ -135,6 +148,7 @@ data class ManageUiState(
     val usageAccessGranted: Boolean = false,
     val systemAppPrompt: SystemAppPrompt? = null,
     val extractState: ExtractState = ExtractState.Idle,
+    val batchExtractState: BatchExtractState = BatchExtractState.Idle,
     /** True when Root or Shizuku is currently ready to run shell commands. */
     val privilegedReady: Boolean = false,
     val privilegedActionResult: PrivilegedActionResult? = null,
@@ -160,6 +174,7 @@ class ManageViewModel(
     private val _usageAccess = MutableStateFlow(false)
     private val _systemAppPrompt = MutableStateFlow<SystemAppPrompt?>(null)
     private val _extractState = MutableStateFlow<ExtractState>(ExtractState.Idle)
+    private val _batchExtractState = MutableStateFlow<BatchExtractState>(BatchExtractState.Idle)
     private val _privilegedReady = MutableStateFlow(false)
     private val _privilegedActionResult = MutableStateFlow<PrivilegedActionResult?>(null)
 
@@ -168,7 +183,7 @@ class ManageViewModel(
     val uiState: StateFlow<ManageUiState> = combine(
         listOf(_apps, _searchQuery, _isLoading, _appFilter, _selectedPackages,
             _sortBy, _sortDirection, _usageAccess, _systemAppPrompt, _extractState,
-            _privilegedReady, _privilegedActionResult, _groupBy)
+            _privilegedReady, _privilegedActionResult, _groupBy, _batchExtractState)
     ) { flows ->
         @Suppress("UNCHECKED_CAST")
         val apps = flows[0] as List<InstalledApp>
@@ -186,6 +201,7 @@ class ManageViewModel(
         val privReady = flows[10] as Boolean
         val privResult = flows[11] as PrivilegedActionResult?
         val groupBy = flows[12] as GroupBy
+        val batchExtract = flows[13] as BatchExtractState
         val filtered = apps
             .filter { app ->
                 val typeFilters = appFilter.filter { it == AppFilter.User || it == AppFilter.System }
@@ -224,6 +240,7 @@ class ManageViewModel(
             usageAccessGranted = usage,
             systemAppPrompt = prompt,
             extractState = extract,
+            batchExtractState = batchExtract,
             privilegedReady = privReady,
             privilegedActionResult = privResult,
         )
@@ -302,23 +319,14 @@ class ManageViewModel(
         outputDir: java.io.File?,
     ) {
         if (_extractState.value is ExtractState.Running) return
+        if (_batchExtractState.value is BatchExtractState.Running) return
         extractJob?.cancel()
         _extractState.value = ExtractState.Running(packageName, appName, 0L, 1L, mode)
         extractJob = viewModelScope.launch {
-            val prefs = application.dataStore.data.first()
-            val customPathUri = prefs[PreferencesKeys.APK_EXTRACTOR_OUTPUT_PATH]
-            val template = prefs[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] ?: "{name}-{version}"
-
-            val result = ApkExtractor.extract(
-                context = application,
-                packageName = packageName,
-                outputDir = if (mode == ExtractMode.Share || mode == ExtractMode.Server || mode == ExtractMode.Reinstall) {
-                    outputDir?.let { DocumentFile.fromFile(it) }
-                } else {
-                    customPathUri?.let { DocumentFile.fromTreeUri(application, Uri.parse(it)) }
-                },
-                filenameTemplate = template
-            ) { bytes, total ->
+            // Share / Server / Reinstall target an app-managed cache or server dir; only
+            // Backup honours the user's configured output path.
+            val useConfiguredPath = mode == ExtractMode.Backup
+            val result = performExtract(packageName, outputDir, useConfiguredPath) { bytes, total ->
                 _extractState.value = ExtractState.Running(packageName, appName, bytes, total, mode)
             }
             _extractState.value = when (result) {
@@ -328,8 +336,110 @@ class ManageViewModel(
         }
     }
 
+    /**
+     * Shared extraction core used by both the single-app entry points and [extractSelected].
+     * Reads the extractor prefs (output path, filename template, split format) each call so
+     * settings changes take effect immediately.
+     */
+    private suspend fun performExtract(
+        packageName: String,
+        cacheOutputDir: java.io.File?,
+        useConfiguredPath: Boolean,
+        onProgress: (Long, Long) -> Unit,
+    ): ApkExtractor.Result {
+        val prefs = application.dataStore.data.first()
+        val customPathUri = prefs[PreferencesKeys.APK_EXTRACTOR_OUTPUT_PATH]
+        val template = prefs[PreferencesKeys.APK_EXTRACTOR_FILENAME_TEMPLATE] ?: "{name}-{version}"
+        val splitFormat = if (prefs[PreferencesKeys.APK_EXTRACTOR_SPLIT_FORMAT] == "xapk") {
+            ApkExtractor.SplitFormat.XAPK
+        } else {
+            ApkExtractor.SplitFormat.APKS
+        }
+        return ApkExtractor.extract(
+            context = application,
+            packageName = packageName,
+            outputDir = if (useConfiguredPath) {
+                resolveConfiguredOutputDir(customPathUri)
+            } else {
+                cacheOutputDir?.let { DocumentFile.fromFile(it) }
+            },
+            filenameTemplate = template,
+            splitFormat = splitFormat,
+            onProgress = onProgress,
+        )
+    }
+
     fun dismissExtractResult() {
         _extractState.value = ExtractState.Idle
+    }
+
+    /**
+     * The configured output path can be either a SAF tree URI (`content://…`, from the system
+     * picker) or a plain filesystem path (from the built-in directory selector — see #78,
+     * lets the user reach folders SAF blocks like Download). Resolve to a [DocumentFile]
+     * accordingly; null/blank → extractor falls back to the default Download subfolder.
+     */
+    private fun resolveConfiguredOutputDir(path: String?): DocumentFile? {
+        if (path.isNullOrBlank()) return null
+        return if (path.startsWith("content://")) {
+            DocumentFile.fromTreeUri(application, Uri.parse(path))
+        } else {
+            val dir = java.io.File(path).apply { if (!exists()) mkdirs() }
+            if (dir.isDirectory) DocumentFile.fromFile(dir) else null
+        }
+    }
+
+    // ── Bulk extract (selection mode) ───────────────────────────────────────
+    //
+    // Extracts every selected app to the configured backup output path, one at a time so a
+    // 30-app batch doesn't try to open 30 output streams at once. Progress is reported at the
+    // batch level (N of M) with the current file's byte progress; a single summary snackbar
+    // fires at the end rather than one per app.
+
+    fun extractSelected() {
+        val packages = _selectedPackages.value.toList()
+        if (packages.isEmpty()) return
+        if (_extractState.value is ExtractState.Running) return
+        if (_batchExtractState.value is BatchExtractState.Running) return
+        _selectedPackages.value = emptySet()
+
+        val lookup = _apps.value.associateBy { it.packageName }
+        extractJob = viewModelScope.launch {
+            var success = 0
+            var failed = 0
+            val total = packages.size
+            packages.forEachIndexed { index, pkg ->
+                val name = lookup[pkg]?.appName ?: pkg
+                _batchExtractState.value = BatchExtractState.Running(
+                    completed = index,
+                    total = total,
+                    currentName = name,
+                    bytesCopied = 0L,
+                    totalBytes = 1L,
+                )
+                val result = performExtract(pkg, cacheOutputDir = null, useConfiguredPath = true) { bytes, totalBytes ->
+                    _batchExtractState.value = BatchExtractState.Running(
+                        completed = index,
+                        total = total,
+                        currentName = name,
+                        bytesCopied = bytes,
+                        totalBytes = totalBytes,
+                    )
+                }
+                when (result) {
+                    is ApkExtractor.Result.Success -> success++
+                    is ApkExtractor.Result.Failure -> {
+                        failed++
+                        Timber.w("Bulk extract failed for $pkg: ${result.message}")
+                    }
+                }
+            }
+            _batchExtractState.value = BatchExtractState.Done(success = success, failed = failed)
+        }
+    }
+
+    fun dismissBatchExtractResult() {
+        _batchExtractState.value = BatchExtractState.Idle
     }
 
     // ── Privileged actions ──────────────────────────────────────────────────
@@ -647,6 +757,7 @@ class ManageViewModel(
             UninstallSortBy.Name -> compareBy(nameKey)
             UninstallSortBy.Size -> compareBy<InstalledApp> { it.sizeBytes }.thenBy(nameKey)
             UninstallSortBy.InstalledAt -> compareBy<InstalledApp> { it.installedAt }.thenBy(nameKey)
+            UninstallSortBy.LastUpdated -> compareBy<InstalledApp> { it.lastUpdatedAt }.thenBy(nameKey)
             UninstallSortBy.LastUsed -> compareBy<InstalledApp> { it.lastUsedAt }.thenBy(nameKey)
         }
         val sorted = list.sortedWith(comparator)
@@ -1127,6 +1238,7 @@ class ManageViewModel(
                         isSystemApp = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
                         sizeBytes = sizeBytes,
                         installedAt = pkgInfo?.firstInstallTime ?: 0L,
+                        lastUpdatedAt = pkgInfo?.lastUpdateTime ?: 0L,
                         lastUsedAt = lastUsedMap[appInfo.packageName] ?: 0L,
                         hasSplits = !appInfo.splitSourceDirs.isNullOrEmpty(),
                         enabled = appInfo.enabled,

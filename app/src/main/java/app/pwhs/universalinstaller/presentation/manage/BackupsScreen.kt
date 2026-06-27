@@ -218,6 +218,16 @@ fun BackupsScreen(
                     title = "APK Extractor",
                     icon = Icons.Rounded.Folder
                 ) {
+                    var showDirPicker by remember { mutableStateOf(false) }
+                    if (showDirPicker) {
+                        DirectoryPickerDialog(
+                            onPick = { path ->
+                                viewModel.setExtractorOutputPath(path)
+                                showDirPicker = false
+                            },
+                            onDismiss = { showDirPicker = false },
+                        )
+                    }
                     val folderPickerLauncher = androidx.activity.compose.rememberLauncherForActivityResult(
                         androidx.activity.result.contract.ActivityResultContracts.OpenDocumentTree()
                     ) { uri ->
@@ -260,9 +270,36 @@ fun BackupsScreen(
                             }
                     )
 
+                    // SAF (above) blocks folders like Download; this built-in browser reaches
+                    // them via the File API (needs All-files access). See #78.
+                    TextButton(
+                        onClick = { showDirPicker = true },
+                        modifier = Modifier.padding(horizontal = 16.dp),
+                    ) {
+                        Icon(
+                            Icons.Rounded.Folder,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.size(8.dp))
+                        Text(stringResource(R.string.dir_picker_browse_action))
+                    }
+
+                    // Drive the field from LOCAL state, not directly from uiState. Persisting
+                    // each keystroke through DataStore and reading the value back is async, so
+                    // binding `value` to the flow made the caret jump to the end mid-edit.
+                    // Local state updates synchronously (caret stays put); DataStore is just a sink.
+                    var templateField by remember {
+                        mutableStateOf(
+                            androidx.compose.ui.text.input.TextFieldValue(uiState.extractorFilenameTemplate)
+                        )
+                    }
                     OutlinedTextField(
-                        value = uiState.extractorFilenameTemplate,
-                        onValueChange = viewModel::setExtractorFilenameTemplate,
+                        value = templateField,
+                        onValueChange = {
+                            templateField = it
+                            viewModel.setExtractorFilenameTemplate(it.text)
+                        },
                         label = { Text(stringResource(R.string.backup_filename_template)) },
                         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                         leadingIcon = { Icon(Icons.Rounded.DriveFileRenameOutline, null) },
@@ -271,6 +308,29 @@ fun BackupsScreen(
                         singleLine = true,
                         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done)
                     )
+
+                    // Split-app output container. Single-APK apps are always saved as .apk;
+                    // this only affects apps that ship split APKs (.apks vs .xapk).
+                    Text(
+                        text = stringResource(R.string.backup_split_format_label),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        listOf("apks" to "APKS", "xapk" to "XAPK").forEach { (value, label) ->
+                            androidx.compose.material3.FilterChip(
+                                selected = uiState.extractorSplitFormat == value,
+                                onClick = { viewModel.setExtractorSplitFormat(value) },
+                                label = { Text(label) },
+                            )
+                        }
+                    }
                 }
 
                 TextButton(

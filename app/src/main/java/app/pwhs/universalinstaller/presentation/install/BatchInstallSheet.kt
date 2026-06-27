@@ -29,9 +29,12 @@ import androidx.compose.material.icons.rounded.CheckBoxOutlineBlank
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.automirrored.rounded.MergeType
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.TriStateCheckbox
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.material3.CircularProgressIndicator
@@ -45,6 +48,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -56,12 +63,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.domain.model.InstallerProfile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BatchInstallSheet(
     state: BatchInstallState,
     mergeSplits: Boolean,
+    profiles: List<InstallerProfile> = emptyList(),
+    selectedProfileId: String? = null,
+    onProfileSelected: (InstallerProfile?) -> Unit = {},
     onDismiss: () -> Unit,
     onToggleEntry: (Uri) -> Unit,
     onToggleAll: (Boolean) -> Unit,
@@ -81,6 +92,9 @@ internal fun BatchInstallSheet(
             is BatchInstallState.Ready -> ReadyBody(
                 state = state,
                 mergeSplits = mergeSplits,
+                profiles = profiles,
+                selectedProfileId = selectedProfileId,
+                onProfileSelected = onProfileSelected,
                 onDismiss = onDismiss,
                 onToggleEntry = onToggleEntry,
                 onToggleAll = onToggleAll,
@@ -127,6 +141,9 @@ private fun ParsingBody(state: BatchInstallState.Parsing, onSkipParse: () -> Uni
 private fun ReadyBody(
     state: BatchInstallState.Ready,
     mergeSplits: Boolean,
+    profiles: List<InstallerProfile>,
+    selectedProfileId: String?,
+    onProfileSelected: (InstallerProfile?) -> Unit,
     onDismiss: () -> Unit,
     onToggleEntry: (Uri) -> Unit,
     onToggleAll: (Boolean) -> Unit,
@@ -215,6 +232,56 @@ private fun ReadyBody(
                         leadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     ) else AssistChipDefaults.assistChipColors(),
                 )
+
+                // Installer Profile picker — applies the chosen profile's backend + flags to
+                // the whole batch. Hidden when the user hasn't created any profiles.
+                if (profiles.isNotEmpty()) {
+                    val active = profiles.firstOrNull { it.id == selectedProfileId }
+                    Box {
+                        var menuOpen by remember { mutableStateOf(false) }
+                        AssistChip(
+                            onClick = { menuOpen = true },
+                            label = {
+                                Text(
+                                    text = active?.name
+                                        ?: stringResource(R.string.batch_install_profile_chip),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.Tune,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(AssistChipDefaults.IconSize),
+                                )
+                            },
+                            colors = if (active != null) AssistChipDefaults.assistChipColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                labelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                                leadingIconContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                            ) else AssistChipDefaults.assistChipColors(),
+                        )
+                        DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.batch_install_profile_none)) },
+                                onClick = {
+                                    menuOpen = false
+                                    onProfileSelected(null)
+                                },
+                            )
+                            profiles.forEach { profile ->
+                                DropdownMenuItem(
+                                    text = { Text(profile.name) },
+                                    onClick = {
+                                        menuOpen = false
+                                        onProfileSelected(profile)
+                                    },
+                                )
+                            }
+                        }
+                    }
+                }
 
                 if (failedCount > 0) {
                     AssistChip(

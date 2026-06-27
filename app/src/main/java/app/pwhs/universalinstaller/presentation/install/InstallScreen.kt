@@ -182,7 +182,8 @@ fun InstallScreen(
         },
         onSetMergeSplits = viewModel::setMergeSplits,
         onProfileSelected = { profile ->
-            if (profile != null) viewModel.applyProfile(profile)
+            // selectProfile accepts null, so "None" in the batch picker clears the selection.
+            viewModel.selectProfile(profile?.id)
         },
         onMappingChanged = viewModel::setAppProfileMapping,
         onToggleAllUsers = viewModel::setAllUsers,
@@ -445,6 +446,9 @@ private fun InstallUi(
     BatchInstallSheet(
         state = uiState.batchState,
         mergeSplits = uiState.mergeSplits,
+        profiles = uiState.installerProfiles,
+        selectedProfileId = uiState.selectedProfileId,
+        onProfileSelected = onProfileSelected,
         onDismiss = onBatchDismiss,
         onToggleEntry = onBatchToggleEntry,
         onToggleAll = onBatchToggleAll,

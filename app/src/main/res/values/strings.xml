@@ -40,12 +40,17 @@
     <string name="manage_batch_action_force_stop">Force stop</string>
     <string name="manage_batch_action_disable">Disable</string>
     <string name="manage_batch_action_clear_data">Clear data</string>
+    <string name="manage_batch_action_extract">Extract selected</string>
+    <string name="manage_batch_extract_title">Extracting %1$d of %2$d</string>
+    <string name="manage_batch_extract_done">Extracted %1$d apps</string>
+    <string name="manage_batch_extract_partial">Extracted %1$d apps, %2$d failed</string>
     <string name="manage_batch_result_success">%1$s: %2$d apps</string>
     <string name="manage_batch_result_partial">%1$s: %2$d done, %3$d failed</string>
     <string name="manage_batch_clear_data_confirm_title">Clear data for %1$d apps?</string>
     <string name="manage_batch_clear_data_confirm_text">This permanently erases all data and settings for the selected apps. This can\'t be undone.</string>
     <string name="more_actions_cd">More actions</string>
     <string name="manage_disabled_badge">Disabled</string>
+    <string name="manage_split_badge">Split</string>
     <string name="manage_filter_user">User</string>
     <string name="manage_filter_system">System</string>
     <string name="manage_filter_disabled">Disabled</string>
@@ -118,6 +123,8 @@
     <string name="batch_install_action">Install %1$d · %2$s</string>
     <string name="batch_install_dup_package">Duplicate package</string>
     <string name="batch_install_merge_splits">Merge split APKs</string>
+    <string name="batch_install_profile_chip">Profile</string>
+    <string name="batch_install_profile_none">None</string>
     <string name="batch_install_merged_splits">Merged</string>
     <string name="download_notif_channel_name">Package downloads</string>
     <string name="download_notif_channel_description">Progress of downloading APK/XAPK/APKS files from a URL</string>
@@ -276,9 +283,11 @@
     <string name="uninstall_sort_name">Name</string>
     <string name="uninstall_sort_size">Size</string>
     <string name="uninstall_sort_installed">Installed</string>
+    <string name="uninstall_sort_last_updated">Last updated</string>
     <string name="uninstall_sort_last_used">Last used</string>
     <string name="uninstall_sort_usage_toast">Grant Usage access to sort by last used</string>
     <string name="uninstall_row_installed">Installed %s</string>
+    <string name="uninstall_row_updated">Updated %s</string>
     <string name="uninstall_row_used">Used %s</string>
     <string name="uninstall_current_sort_summary" translatable="false">%1$s %2$s</string>
     <string name="uninstall_filter_sheet_title">Sort &amp; filter</string>
@@ -683,6 +692,16 @@
     <string name="backup_output_path">Output Path</string>
     <string name="backup_filename_template">Filename Template</string>
     <string name="backup_tags_hint">Tags: {name}, {pkg}, {version}, {code}</string>
+    <string name="backup_split_format_label">Split app format</string>
+    <string name="dir_picker_browse_action">Browse folders</string>
+    <string name="dir_picker_use_folder">Use this folder</string>
+    <string name="dir_picker_new_folder">New folder</string>
+    <string name="dir_picker_create">Create</string>
+    <string name="dir_picker_folder_name">Folder name</string>
+    <string name="dir_picker_empty">No subfolders here</string>
+    <string name="dir_picker_grant_title">Storage access needed</string>
+    <string name="dir_picker_grant_message">To save into folders like Download, Universal Installer needs All files access. Grant it, then try again.</string>
+    <string name="dir_picker_grant_action">Grant access</string>
     <string name="manage_action_reinstall">Reinstall</string>
     <string name="manage_action_reinstall_sub">Extract and reinstall with Universal Installer</string>
     <string name="manage_action_check_vt">Check VirusTotal</string>
