@@ -25,7 +25,7 @@ object ApkExtractor {
     private const val COPY_BUFFER = 64 * 1024
 
     /** Any "{...}" token — used to strip template tags we don't recognise. */
-    private val UNRESOLVED_TAG = Regex("\\{[^}]*}")
+    private val UNRESOLVED_TAG = Regex("\\{[^}]*\\}")
 
     /** A run of 2+ of the SAME separator char (e.g. "__", "  ", "..") → collapse to one. */
     private val REPEATED_SEPARATOR = Regex("([-_. ])\\1+")
