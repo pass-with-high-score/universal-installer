@@ -10,6 +10,7 @@ import app.pwhs.universalinstaller.presentation.install.controller.InstallerBack
 import app.pwhs.universalinstaller.util.ApkFileIconFetcher
 import app.pwhs.universalinstaller.util.AppIconFetcher
 import app.pwhs.universalinstaller.util.CrashHandler
+import com.topjohnwu.superuser.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -21,6 +22,21 @@ import org.koin.core.context.GlobalContext.startKoin
 import timber.log.Timber
 
 class App : Application(), SingletonImageLoader.Factory {
+
+    init {
+        // libsu setup MUST run before the first Shell.getShell() (ackpine's libsu plugin and
+        // our RootServices both rely on it). A companion init runs at class-load, before
+        // onCreate and any shell use. MOUNT_MASTER so install/uninstall changes apply in the
+        // global mount namespace; without an explicit builder libsu's first shell could be
+        // created non-root and cached, making root installs silently fall back to the system
+        // PackageInstaller (the "shows a confirm dialog like PackageInstaller" bug). #82
+        Shell.enableVerboseLogging = BuildConfig.DEBUG
+        Shell.setDefaultBuilder(
+            Shell.Builder.create()
+                .setFlags(Shell.FLAG_MOUNT_MASTER)
+                .setTimeout(10),
+        )
+    }
 
     private val backendFactory: InstallerBackendFactory by inject()
 

@@ -252,6 +252,15 @@
             android:name="ru.solrudev.ackpine.libsu.RootProxyService"
             android:exported="false" />
 
+        <!--
+            Our own libsu RootService (UID-0 IPC for hidden IPackageManager — set-default-installer).
+            libsu's RootService.bind() instantiates this in a root process; it must be declared
+            here or the bind silently fails.
+        -->
+        <service
+            android:name=".privileged.PrivilegedRootService"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
