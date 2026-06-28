@@ -127,7 +127,11 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
         // Shizuku is disabled only when it genuinely can't run here (not installed /
         // unsupported); NOT_RUNNING / NO_PERMISSION stay tappable since picking them kicks
         // off the start/permission flow, same as Settings.
-        val rootReady = settingState.rootState == RootState.READY
+        // Treat Root as "ready" (not dimmed) when it's the active engine too — a fresh
+        // SettingViewModel probes su as UNKNOWN (libsu only confirms READY after a shell
+        // attempt), so keying purely off rootState == READY left Root greyed even after the
+        // user had granted it and was actively using it.
+        val rootReady = settingState.rootState == RootState.READY || current == InstallMode.ROOT
         val shizukuSelectable = settingState.shizukuState != ShizukuState.UNSUPPORTED &&
             settingState.shizukuState != ShizukuState.NOT_INSTALLED
         AlertDialog(

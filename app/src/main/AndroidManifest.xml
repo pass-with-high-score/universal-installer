@@ -242,6 +242,16 @@
             </intent-filter>
         </service>
 
+        <!--
+            ackpine's libsu RootService. The AAR ships the class but (by libsu's design)
+            leaves the <service> declaration to the consuming app — without it ackpine can't
+            bind the root proxy, so root installs silently fall back to the system
+            PackageInstaller (showing the confirm dialog instead of installing silently). #82
+        -->
+        <service
+            android:name="ru.solrudev.ackpine.libsu.RootProxyService"
+            android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

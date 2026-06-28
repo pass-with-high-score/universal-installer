@@ -861,7 +861,10 @@ private fun InstallModeSelector(
         // Root stays tappable whenever libsu shipped (it's only in the row then) — tapping it
         // when su isn't ready fires the root request. We only DIM it (greyed label) to show
         // it isn't the ready engine, rather than disabling the click.
-        val rootDimmed = rootState != RootState.READY
+        // Not dimmed when Root is the active engine — a fresh probe reads su as UNKNOWN
+        // (libsu confirms READY only after a shell attempt), which otherwise left Root greyed
+        // even after it had been granted and selected.
+        val rootDimmed = rootState != RootState.READY && currentMode != InstallMode.ROOT
         SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
             options.forEachIndexed { index, mode ->
                 val dim = mode == InstallMode.ROOT && rootDimmed
