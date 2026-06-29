@@ -90,6 +90,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.activity.compose.BackHandler
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -248,6 +249,10 @@ private fun UninstallUi(
     val resource = LocalResources.current
     var actionTarget by remember { mutableStateOf<InstalledApp?>(null) }
     var confirmUninstallTarget by remember { mutableStateOf<InstalledApp?>(null) }
+
+    BackHandler(enabled = uiState.isSelectionMode) {
+        onClearSelection()
+    }
     var confirmClearDataTarget by remember { mutableStateOf<InstalledApp?>(null) }
     val extractInProgress = uiState.extractState is ExtractState.Running
     // Biometric gate state — flag tracked per-attempt rather than per-target so toggling
