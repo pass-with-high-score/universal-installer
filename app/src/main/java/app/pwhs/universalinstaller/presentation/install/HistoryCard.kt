@@ -22,6 +22,7 @@ import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Error
 import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -34,8 +35,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.asImageBitmap
@@ -63,12 +66,35 @@ internal fun HistoryCard(
     val canExpand = !entry.success && !entry.errorMessage.isNullOrBlank()
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
+    val isInstalled = remember(entry.packageName) {
+        try {
+            context.packageManager.getPackageInfo(entry.packageName, 0)
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+    
+    val cardAlpha = if (entry.success && !isInstalled) 0.5f else 1f
 
     Card(
         modifier = modifier
             .fillMaxWidth()
             .animateContentSize()
-            .clickable(enabled = canExpand) { expanded = !expanded },
+            .clip(MaterialTheme.shapes.large)
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .clickable(enabled = if (entry.success) isInstalled else canExpand) {
+                if (entry.success) {
+                    val intent = context.packageManager.getLaunchIntentForPackage(entry.packageName)
+                    if (intent != null) {
+                        context.startActivity(intent)
+                    } else {
+                        Toast.makeText(context, "Cannot open app", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    expanded = !expanded
+                }
+            },
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
@@ -78,7 +104,7 @@ internal fun HistoryCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Column {
+        Column(modifier = Modifier.alpha(cardAlpha)) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -135,14 +161,35 @@ internal fun HistoryCard(
                     )
                 }
 
-                // Status badge
-                Icon(
-                    imageVector = if (entry.success) Icons.Rounded.CheckCircle else Icons.Rounded.Error,
-                    contentDescription = if (entry.success) stringResource(R.string.status_success) else stringResource(R.string.status_failed),
-                    tint = if (entry.success) MaterialTheme.colorScheme.primary
-                    else MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp),
-                )
+                // Status badge / Open button
+                if (entry.success && isInstalled) {
+                    IconButton(
+                        onClick = {
+                            val intent = context.packageManager.getLaunchIntentForPackage(entry.packageName)
+                            if (intent != null) {
+                                context.startActivity(intent)
+                            } else {
+                                Toast.makeText(context, "Cannot open app", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.size(36.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
+                            contentDescription = "Open App",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(22.dp),
+                        )
+                    }
+                } else {
+                    Icon(
+                        imageVector = if (entry.success) Icons.Rounded.CheckCircle else Icons.Rounded.Error,
+                        contentDescription = if (entry.success) stringResource(R.string.status_success) else stringResource(R.string.status_failed),
+                        tint = if (entry.success) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.error,
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
             }
 
             if (canExpand) {
