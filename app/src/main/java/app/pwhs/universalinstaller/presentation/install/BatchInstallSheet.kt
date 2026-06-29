@@ -164,6 +164,10 @@ private fun ReadyBody(
         else -> ToggleableState.Indeterminate
     }
 
+    androidx.activity.compose.BackHandler(enabled = selectedCount > 0) {
+        onToggleAll(false)
+    }
+
     Column(modifier = Modifier.fillMaxWidth()) {
         // Header: big title + meta chips
         Column(

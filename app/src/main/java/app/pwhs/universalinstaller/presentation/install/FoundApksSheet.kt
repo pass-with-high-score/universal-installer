@@ -278,6 +278,10 @@ private fun ResultsBody(
     val selectedBytes = selectedFiles.sumOf { it.sizeBytes.coerceAtLeast(0L) }
     val hasSelection = selected.isNotEmpty()
 
+    androidx.activity.compose.BackHandler(enabled = hasSelection) {
+        selected = emptySet()
+    }
+
     // Toggle state considers only visible (filtered) files.
     val filteredSelected = filteredFiles.count { it.path in selected }
     val toggleState = when {
