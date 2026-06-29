@@ -66,16 +66,6 @@ internal fun HistoryCard(
     val canExpand = !entry.success && !entry.errorMessage.isNullOrBlank()
     val clipboardManager = LocalClipboardManager.current
     val context = LocalContext.current
-    val isInstalled = remember(entry.packageName) {
-        try {
-            context.packageManager.getPackageInfo(entry.packageName, 0)
-            true
-        } catch (e: Exception) {
-            false
-        }
-    }
-    
-    val cardAlpha = if (entry.success && !isInstalled) 0.5f else 1f
 
     Card(
         modifier = modifier
@@ -83,7 +73,7 @@ internal fun HistoryCard(
             .animateContentSize()
             .clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .clickable(enabled = if (entry.success) isInstalled else canExpand) {
+            .clickable(enabled = if (entry.success) true else canExpand) {
                 if (entry.success) {
                     val intent = context.packageManager.getLaunchIntentForPackage(entry.packageName)
                     if (intent != null) {
@@ -104,7 +94,7 @@ internal fun HistoryCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
-        Column(modifier = Modifier.alpha(cardAlpha)) {
+        Column(modifier = Modifier) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -162,7 +152,7 @@ internal fun HistoryCard(
                 }
 
                 // Status badge / Open button
-                if (entry.success && isInstalled) {
+                if (entry.success) {
                     IconButton(
                         onClick = {
                             val intent = context.packageManager.getLaunchIntentForPackage(entry.packageName)
