@@ -365,6 +365,7 @@ class InstallViewModel(
     }
 
     fun confirmInstall(trackDialogTarget: Boolean = false) {
+        _scanState.value = ScanState.Idle
         // Use selected splits from ApkInfo if available, otherwise fall back to cached URIs
         val apkInfo = _pendingApkInfo.value
         val uris = if (apkInfo != null && apkInfo.splitEntries.isNotEmpty()) {
@@ -959,6 +960,7 @@ class InstallViewModel(
      * surface per-app progress.
      */
     fun confirmBatchInstall() {
+        _scanState.value = ScanState.Idle
         val ready = _batchState.value as? BatchInstallState.Ready ?: return
         val picked = ready.entries.filter { it.selected && it.splitUris.isNotEmpty() }
         _batchState.value = BatchInstallState.Idle
@@ -997,6 +999,7 @@ class InstallViewModel(
     }
 
     fun skipParseAndInstallSingle() {
+        _scanState.value = ScanState.Idle
         parseJob?.cancel()
         val uri = pendingOriginalUri ?: return
         val fileName = pendingFileName ?: uri.lastPathSegment ?: "Unknown"
@@ -1038,6 +1041,7 @@ class InstallViewModel(
     }
 
     fun skipBatchParseAndInstall() {
+        _scanState.value = ScanState.Idle
         val parsing = _batchState.value as? BatchInstallState.Parsing ?: return
         val uris = parsing.uris
         batchParseJob?.cancel()
@@ -1281,8 +1285,6 @@ class InstallViewModel(
                 .toSplitPackage()
                 .filterCompatible(context)
         }
-        _scanState.value = ScanState.Idle
-        deviceScanJob?.cancel()
         parseApkInfo(context, uri, splitProvider, found.name)
     }
 
@@ -1303,8 +1305,6 @@ class InstallViewModel(
                 )
             }.getOrElse { Uri.fromFile(f) }
         }
-        _scanState.value = ScanState.Idle
-        deviceScanJob?.cancel()
         if (uris.size >= 2) parseBatch(context, uris)
         else if (uris.size == 1) {
             // Degenerate case: only one file survived — fall back to single flow.
