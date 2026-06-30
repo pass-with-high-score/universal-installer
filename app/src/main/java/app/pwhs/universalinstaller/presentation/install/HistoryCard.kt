@@ -77,26 +77,8 @@ internal fun HistoryCard(
             .animateContentSize()
             .clip(MaterialTheme.shapes.large)
             .background(MaterialTheme.colorScheme.surfaceContainerLow)
-            .clickable(enabled = if (entry.success) true else canExpand) {
-                if (entry.success) {
-                    val intent = context.packageManager.getLaunchIntentForPackage(entry.packageName)
-                    if (intent != null) {
-                        context.startActivity(intent)
-                    } else if (app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor.isReady()) {
-                        scope.launch {
-                            val res = app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor.launchApp(entry.packageName)
-                            if (res.isFailure) {
-                                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                    Toast.makeText(context, "Cannot open app (no launcher activity)", Toast.LENGTH_SHORT).show()
-                                }
-                            }
-                        }
-                    } else {
-                        Toast.makeText(context, "Cannot open app", Toast.LENGTH_SHORT).show()
-                    }
-                } else {
-                    expanded = !expanded
-                }
+            .clickable(enabled = canExpand) {
+                expanded = !expanded
             },
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
@@ -165,25 +147,10 @@ internal fun HistoryCard(
                 }
 
                 // Status badge / Open button
-                if (entry.success) {
+                val launchIntent = if (entry.success) context.packageManager.getLaunchIntentForPackage(entry.packageName) else null
+                if (launchIntent != null) {
                     IconButton(
-                        onClick = {
-                            val intent = context.packageManager.getLaunchIntentForPackage(entry.packageName)
-                            if (intent != null) {
-                                context.startActivity(intent)
-                            } else if (app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor.isReady()) {
-                                scope.launch {
-                                    val res = app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor.launchApp(entry.packageName)
-                                    if (res.isFailure) {
-                                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                                            Toast.makeText(context, "Cannot open app (no launcher activity)", Toast.LENGTH_SHORT).show()
-                                        }
-                                    }
-                                }
-                            } else {
-                                Toast.makeText(context, "Cannot open app", Toast.LENGTH_SHORT).show()
-                            }
-                        },
+                        onClick = { context.startActivity(launchIntent) },
                         modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
