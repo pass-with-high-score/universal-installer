@@ -179,7 +179,7 @@ abstract class BaseInstallController(
             historyDao.insert(
                 InstallHistoryEntity(
                     appName = sessionData.appName.ifEmpty { sessionData.name },
-                    packageName = "",
+                    packageName = sessionData.packageName,
                     fileName = sessionData.name,
                     iconPath = sessionData.iconPath,
                     success = success,

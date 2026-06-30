@@ -62,7 +62,9 @@ internal fun HistoryCard(
     entry: InstallHistoryEntity,
     modifier: Modifier = Modifier,
 ) {
-    val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+    val dateFormat = remember(androidx.compose.ui.text.intl.Locale.current) {
+        SimpleDateFormat("dd/MM/yyyy HH:mm", java.util.Locale.getDefault())
+    }
     var expanded by rememberSaveable(entry.id) { mutableStateOf(false) }
     val canExpand = !entry.success && !entry.errorMessage.isNullOrBlank()
     val clipboardManager = LocalClipboardManager.current
