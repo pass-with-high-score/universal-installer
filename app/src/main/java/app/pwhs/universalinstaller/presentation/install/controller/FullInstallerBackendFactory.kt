@@ -264,10 +264,12 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
                     cont.invokeOnCancellation {
                         runCatching { RootService.unbind(connection) }
                     }
-                    try {
-                        RootService.bind(intent, connection)
-                    } catch (t: Throwable) {
-                        if (cont.isActive) cont.resumeWithException(t)
+                    android.os.Handler(android.os.Looper.getMainLooper()).post {
+                        try {
+                            RootService.bind(intent, connection)
+                        } catch (t: Throwable) {
+                            if (cont.isActive) cont.resumeWithException(t)
+                        }
                     }
                 }
             }

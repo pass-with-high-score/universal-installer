@@ -16,8 +16,16 @@ import com.topjohnwu.superuser.ipc.RootService
  */
 class PrivilegedRootService : RootService() {
 
-    override fun onBind(intent: Intent): IBinder = ServiceBinder() as IBinder
-
+    override fun onBind(intent: Intent): IBinder {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.P) {
+            org.lsposed.hiddenapibypass.HiddenApiBypass.addHiddenApiExemptions(
+                "Landroid/content/pm/IPackageManager",
+                "Landroid/os/ServiceManager"
+            )
+        }
+        return ServiceBinder() as IBinder
+    }
+    
     private class ServiceBinder : IPrivilegedService.Stub() {
         override fun setDefaultInstaller(component: ComponentName, lock: Boolean) {
             // ServiceManager.getService runs in this root process so the returned binder is
