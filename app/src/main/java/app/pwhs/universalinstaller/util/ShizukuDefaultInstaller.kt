@@ -25,7 +25,7 @@ object ShizukuDefaultInstaller {
             runCatching {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                     HiddenApiBypass.addHiddenApiExemptions(
-                        "Landroid/content/pm/IPackageManager;",
+                        "Landroid/content/pm/IPackageManager"
                     )
                 }
                 val packageBinder = SystemServiceHelper.getSystemService("package")
