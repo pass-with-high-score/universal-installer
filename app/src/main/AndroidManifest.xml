@@ -242,26 +242,7 @@
             </intent-filter>
         </service>
 
-        <!--
-            ackpine's libsu RootService. The AAR ships the class but (by libsu's design)
-            leaves the <service> declaration to the consuming app — without it ackpine can't
-            bind the root proxy, so root installs silently fall back to the system
-            PackageInstaller (showing the confirm dialog instead of installing silently). #82
-        -->
-        <service
-            android:name="ru.solrudev.ackpine.libsu.RootProxyService"
-            android:exported="false"
-            tools:ignore="Instantiatable" />
 
-        <!--
-            Our own libsu RootService (UID-0 IPC for hidden IPackageManager — set-default-installer).
-            libsu's RootService.bind() instantiates this in a root process; it must be declared
-            here or the bind silently fails.
-        -->
-        <service
-            android:name=".privileged.PrivilegedRootService"
-            android:exported="false"
-            tools:ignore="Instantiatable" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
