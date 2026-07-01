@@ -250,7 +250,8 @@
         -->
         <service
             android:name="ru.solrudev.ackpine.libsu.RootProxyService"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
 
         <!--
             Our own libsu RootService (UID-0 IPC for hidden IPackageManager — set-default-installer).
@@ -259,7 +260,8 @@
         -->
         <service
             android:name=".privileged.PrivilegedRootService"
-            android:exported="false" />
+            android:exported="false"
+            tools:ignore="Instantiatable" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
