@@ -550,6 +550,7 @@
     <string name="dialog_failed_title">Installation failed</string>
     <string name="dialog_failed_retry">Retry</string>
     <string name="dialog_failed_close">Close</string>
+    <string name="dialog_failed_fallback_install">Install via System Installer</string>
     <string name="dialog_version_downgrade">⚠ Downgrade: %1$s → %2$s</string>
     <string name="dialog_chip_downgrade">Downgrade</string>
     <string name="dialog_chip_split_apk">Split APK</string>

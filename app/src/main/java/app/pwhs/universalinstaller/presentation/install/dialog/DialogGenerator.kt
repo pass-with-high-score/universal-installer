@@ -52,6 +52,7 @@ fun generateDialogParams(
     onToggleAllUsers: (Boolean) -> Unit,
     onSelectUserId: (Int?) -> Unit,
     onSkipParse: (() -> Unit)? = null,
+    onFallbackInstall: (() -> Unit)? = null,
 ): DialogParams {
     return when (val stage = uiState.dialogStage) {
         DialogStage.Loading -> {
@@ -217,6 +218,7 @@ fun generateDialogParams(
                             errorMessage = stage.errorMessage,
                             onClose = onCloseAfterResult,
                             onRetry = onRetry,
+                            onFallbackInstall = onFallbackInstall
                         )
                     }
                 )

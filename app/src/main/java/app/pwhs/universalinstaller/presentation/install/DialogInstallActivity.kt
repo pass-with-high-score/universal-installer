@@ -425,6 +425,24 @@ class DialogInstallActivity : ComponentActivity() {
                             onSkipParse = if (isApk) {
                                 { viewModel.skipParseAndInstallSingle() }
                             } else null,
+                            onFallbackInstall = {
+                                val apkUri = dialogTarget?.apkUri
+                                if (isApk && apkUri != null) {
+                                    try {
+                                        val intent = Intent(Intent.ACTION_VIEW).apply {
+                                            setDataAndType(apkUri, "application/vnd.android.package-archive")
+                                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION
+                                        }
+                                        startActivity(intent)
+                                    } catch (e: Exception) {
+                                        Timber.e(e, "Failed to launch system installer fallback")
+                                        Toast.makeText(context, "System installer not available", Toast.LENGTH_SHORT).show()
+                                    }
+                                    viewModel.dialogClose()
+                                    viewModel.clearDialogTarget()
+                                    finish()
+                                }
+                            }.takeIf { isApk && dialogTarget?.apkUri != null },
                         )
 
                         PositionDialog(

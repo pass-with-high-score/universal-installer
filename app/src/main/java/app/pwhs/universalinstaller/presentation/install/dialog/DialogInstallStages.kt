@@ -275,6 +275,7 @@ fun DialogFailedContent(
     errorMessage: String,
     onClose: () -> Unit,
     onRetry: (() -> Unit)? = null,
+    onFallbackInstall: (() -> Unit)? = null,
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val clipboard = androidx.compose.ui.platform.LocalClipboard.current
@@ -345,6 +346,16 @@ fun DialogFailedContent(
         }
 
         Spacer(modifier = Modifier.height(12.dp))
+
+        if (onFallbackInstall != null) {
+            Button(
+                onClick = onFallbackInstall,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                Text(stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer"))
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+        }
 
         if (onRetry != null) {
             Row(
