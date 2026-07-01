@@ -50,13 +50,8 @@
         android:name="android.permission.ENFORCE_UPDATE_OWNERSHIP"
         tools:node="remove" />
 
-    <!-- Query all installed packages on Android 11+ without QUERY_ALL_PACKAGES -->
-    <queries>
-        <intent>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent>
-    </queries>
+    <!-- Require QUERY_ALL_PACKAGES to see background services without launcher intents -->
+    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 
     <application
         android:name=".App"

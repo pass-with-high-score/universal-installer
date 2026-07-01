@@ -323,7 +323,7 @@ object ApkExtractor {
         val cleaned = name.map { c ->
             when {
                 c.isLetterOrDigit() -> c
-                c == ' ' || c == '-' || c == '_' || c == '.' -> c
+                c == ' ' || c == '-' || c == '_' || c == '.' || c == '(' || c == ')' -> c
                 else -> '_'
             }
         }.joinToString("").trim().ifBlank { "app" }
