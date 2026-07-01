@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">Được cài bởi %1$s</string>
     <string name="manage_action_installer_source_sub">Cài thủ công / Nguồn không xác định</string>
     <string name="installer_engine_root_request">Nhấn để cấp quyền root</string>
+    <string name="dialog_failed_fallback_install">Cài đặt qua trình cài đặt hệ thống</string>
 </resources>

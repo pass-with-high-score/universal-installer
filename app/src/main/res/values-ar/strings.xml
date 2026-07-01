@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">تم التثبيت بواسطة %1$s</string>
     <string name="manage_action_installer_source_sub">تحميل جانبي / مصدر غير معروف</string>
     <string name="installer_engine_root_request">اضغط لمنح صلاحيات الروت</string>
+    <string name="dialog_failed_fallback_install">التثبيت عبر مثبت النظام</string>
 </resources>

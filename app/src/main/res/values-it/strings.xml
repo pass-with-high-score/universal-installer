@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">Installato da %1$s</string>
     <string name="manage_action_installer_source_sub">Installazione manuale / Fonte sconosciuta</string>
     <string name="installer_engine_root_request">Tocca per concedere l\'accesso root</string>
+    <string name="dialog_failed_fallback_install">Installa tramite il programma di installazione del sistema</string>
 </resources>

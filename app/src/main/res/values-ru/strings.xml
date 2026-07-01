@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">Установлено: %1$s</string>
     <string name="manage_action_installer_source_sub">Загружено вручную / Неизвестный источник</string>
     <string name="installer_engine_root_request">Нажмите, чтобы предоставить root-доступ</string>
+    <string name="dialog_failed_fallback_install">Установить через системный установщик</string>
 </resources>

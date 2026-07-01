@@ -708,4 +708,5 @@
     <string name="dir_picker_grant_message">Para salvar em pastas como Download, o Universal Installer precisa de acesso a todos os arquivos. Conceda a permissão e tente novamente.</string>
     <string name="dir_picker_grant_action">Conceder acesso</string>
     <string name="installer_engine_root_request">Toque para conceder acesso root</string>
+    <string name="dialog_failed_fallback_install">Instalar pelo instalador do sistema</string>
 </resources>
