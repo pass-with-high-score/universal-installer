@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">由 %1$s 安装</string>
     <string name="manage_action_installer_source_sub">手动安装 / 未知来源</string>
     <string name="installer_engine_root_request">点击以授予 root 权限</string>
+    <string name="dialog_failed_fallback_install">通过系统安装程序安装</string>
 </resources>

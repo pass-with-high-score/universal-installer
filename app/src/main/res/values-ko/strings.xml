@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">%1$s에서 설치됨</string>
     <string name="manage_action_installer_source_sub">사이드로드 / 알 수 없는 소스</string>
     <string name="installer_engine_root_request">탭하여 루트 권한 부여</string>
+    <string name="dialog_failed_fallback_install">시스템 설치 프로그램을 통해 설치</string>
 </resources>

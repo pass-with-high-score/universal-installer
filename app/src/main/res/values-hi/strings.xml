@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">%1$s द्वारा इंस्टॉल किया गया</string>
     <string name="manage_action_installer_source_sub">साइडलोड / अज्ञात स्रोत</string>
     <string name="installer_engine_root_request">रूट एक्सेस देने के लिए टैप करें</string>
+    <string name="dialog_failed_fallback_install">सिस्टम इंस्टॉलर के माध्यम से इंस्टॉल करें</string>
 </resources>

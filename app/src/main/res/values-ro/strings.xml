@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">Instalat de %1$s</string>
     <string name="manage_action_installer_source_sub">Încărcat manual / Sursă necunoscută</string>
     <string name="installer_engine_root_request">Apăsați pentru a acorda acces root</string>
+    <string name="dialog_failed_fallback_install">Instalați prin programul de instalare a sistemului</string>
 </resources>

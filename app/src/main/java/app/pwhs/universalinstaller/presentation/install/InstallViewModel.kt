@@ -464,6 +464,7 @@ class InstallViewModel(
                                 packageName = pkgForTarget,
                                 appName = nameForTarget,
                                 iconPath = iconPath,
+                                apkUri = originalUri,
                             )
                         }
                     } else null,
@@ -487,6 +488,7 @@ class InstallViewModel(
                                 packageName = pkgForTarget,
                                 appName = nameForTarget,
                                 iconPath = iconPath,
+                                apkUri = originalUri,
                             )
                         }
                     } else null,

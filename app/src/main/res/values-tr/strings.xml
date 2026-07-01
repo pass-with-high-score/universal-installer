@@ -708,4 +708,5 @@
     <string name="manage_action_installer_source">%1$s tarafından kuruldu</string>
     <string name="manage_action_installer_source_sub">Elle yüklendi / Bilinmeyen kaynak</string>
     <string name="installer_engine_root_request">Root erişimi vermek için dokunun</string>
+    <string name="dialog_failed_fallback_install">Sistem Yükleyicisi aracılığıyla yükle</string>
 </resources>
