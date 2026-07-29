@@ -521,12 +521,12 @@
     <string name="setting_profiles_title">Профили</string>
     <string name="setting_profiles_subtitle">Сохранение и повторное использование конфигураций установки</string>
     <string name="profile_list_title">Профили установщика</string>
-    <string name="profile_empty_state">\&quot;Профили еще не созданы. Используйте профили для сохранения определенных пакетов установщика</string>
+    <string name="profile_empty_state">Профили еще не созданы. Используйте профили для сохранения определенных пакетов установщика, бэкендов или комбинаций флагов.</string>
     <string name="profile_add_button">Добавить профиль</string>
     <string name="profile_edit_title">Редактировать профиль</string>
     <string name="profile_create_title">Создать профиль</string>
     <string name="profile_name_label">Название профиля</string>
-    <string name="profile_name_placeholder">\&quot;например</string>
+    <string name="profile_name_placeholder">например, Подмена Play Store</string>
     <string name="profile_delete_confirm_title">Удалить профиль?</string>
     <string name="profile_delete_confirm_msg">Это также удалит все автоматические сопоставления для этого профиля.</string>
     <string name="profile_save">Сохранить</string>

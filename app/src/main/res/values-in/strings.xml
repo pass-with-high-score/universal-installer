@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">Profil</string>
     <string name="setting_profiles_subtitle">Simpan dan gunakan kembali konfigurasi instalasi</string>
     <string name="profile_list_title">Profil Penginstal</string>
-    <string name="profile_empty_state">\&quot;Belum ada profil yang dibuat. Gunakan profil untuk menyimpan paket penginstal</string>
+    <string name="profile_empty_state">Belum ada profil yang dibuat. Gunakan profil untuk menyimpan paket penginstal, backend, atau kombinasi flag tertentu.</string>
     <string name="profile_add_button">Tambah Profil</string>
     <string name="profile_edit_title">Edit Profil</string>
     <string name="profile_create_title">Buat Profil</string>

@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">プロファイル</string>
     <string name="setting_profiles_subtitle">インストール設定を保存して再利用します</string>
     <string name="profile_list_title">インストーラープロファイル</string>
-    <string name="profile_empty_state">\&quot;プロファイルはまだ作成されていません。特定のインストーラーパッケージ、バックエンド、またはフラグの組み合わせを保存するにはプロファイルを使用してください。\&quot;</string>
+    <string name="profile_empty_state">プロファイルはまだ作成されていません。特定のインストーラーパッケージ、バックエンド、またはフラグの組み合わせを保存するにはプロファイルを使用してください。</string>
     <string name="profile_add_button">プロファイルを追加</string>
     <string name="profile_edit_title">プロファイルを編集</string>
     <string name="profile_create_title">プロファイルを作成</string>

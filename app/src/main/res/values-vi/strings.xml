@@ -528,7 +528,7 @@
     <string name="setting_profiles_title">Hồ sơ</string>
     <string name="setting_profiles_subtitle">Lưu và tái sử dụng các cấu hình cài đặt</string>
     <string name="profile_list_title">Hồ sơ trình cài đặt</string>
-    <string name="profile_empty_state">\&quot;Chưa có hồ sơ nào được tạo. Sử dụng hồ sơ để lưu các gói trình cài đặt</string>
+    <string name="profile_empty_state">Chưa có hồ sơ nào được tạo. Sử dụng hồ sơ để lưu các gói trình cài đặt, backend hoặc tổ hợp cờ cụ thể.</string>
     <string name="profile_add_button">Thêm hồ sơ</string>
     <string name="profile_edit_title">Chỉnh sửa hồ sơ</string>
     <string name="profile_create_title">Tạo hồ sơ</string>

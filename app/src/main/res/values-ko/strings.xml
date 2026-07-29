@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">프로필</string>
     <string name="setting_profiles_subtitle">설치 구성을 저장하고 재사용합니다</string>
     <string name="profile_list_title">설치 프로그램 프로필</string>
-    <string name="profile_empty_state">\&quot;아직 생성된 프로필이 없습니다. 프로필을 사용하여 특정 설치 프로그램 패키지</string>
+    <string name="profile_empty_state">아직 생성된 프로필이 없습니다. 프로필을 사용하여 특정 설치 프로그램 패키지, 백엔드 또는 플래그 조합을 저장하세요.</string>
     <string name="profile_add_button">프로필 추가</string>
     <string name="profile_edit_title">프로필 편집</string>
     <string name="profile_create_title">프로필 생성</string>

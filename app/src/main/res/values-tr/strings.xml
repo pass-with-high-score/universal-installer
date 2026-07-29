@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">Profiller</string>
     <string name="setting_profiles_subtitle">Kurulum yapılandırmalarını kaydedin ve yeniden kullanın</string>
     <string name="profile_list_title">Yükleyici Profilleri</string>
-    <string name="profile_empty_state">\&quot;Henüz profil oluşturulmadı. Belirli yükleyici paketlerini</string>
+    <string name="profile_empty_state">Henüz profil oluşturulmadı. Belirli yükleyici paketlerini, arka uçları veya bayrak kombinasyonlarını kaydetmek için profilleri kullanın.</string>
     <string name="profile_add_button">Profil Ekle</string>
     <string name="profile_edit_title">Profili Düzenle</string>
     <string name="profile_create_title">Profil Oluştur</string>

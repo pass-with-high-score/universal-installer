@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">प्रोफाइल</string>
     <string name="setting_profiles_subtitle">इंस्टॉल कॉन्फ़िگرेशन सहेजें और पुनः उपयोग करें</string>
     <string name="profile_list_title">इंस्टॉलर प्रोफाइल</string>
-    <string name="profile_empty_state">\&quot;अभी तक कोई प्रोफाइल नहीं बनाई गई है। विशिष्ट इंस्टॉलर पैकेज</string>
+    <string name="profile_empty_state">अभी तक कोई प्रोफाइल नहीं बनाई गई है। विशिष्ट इंस्टॉलर पैकेज, बैकएंड या फ़्लैग संयोजन सहेजने के लिए प्रोफाइल का उपयोग करें।</string>
     <string name="profile_add_button">प्रोफाइल जोड़ें</string>
     <string name="profile_edit_title">प्रोफाइल संपादित करें</string>
     <string name="profile_create_title">प्रोफाइल बनाएं</string>

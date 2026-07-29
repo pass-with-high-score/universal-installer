@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">Profili</string>
     <string name="setting_profiles_subtitle">Salva e riutilizza le configurazioni di installazione</string>
     <string name="profile_list_title">Profili programma di installazione</string>
-    <string name="profile_empty_state">\&quot;Nessun profilo creato. Usa i profili per salvare pacchetti di installazione</string>
+    <string name="profile_empty_state">Nessun profilo creato. Usa i profili per salvare pacchetti di installazione, backend o combinazioni di flag specifici.</string>
     <string name="profile_add_button">Aggiungi profilo</string>
     <string name="profile_edit_title">Modifica profilo</string>
     <string name="profile_create_title">Crea profilo</string>

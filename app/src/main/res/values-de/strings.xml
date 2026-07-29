@@ -502,7 +502,7 @@
     <string name="setting_auto_confirm_title">Externe Installationen automatisch bestätigen</string>
     <string name="setting_auto_confirm_subtitle">Bestätigungsdialog überspringen</string>
     <string name="setting_default_installer_title">Als Standard-Installer festlegen</string>
-    <string name="setting_default_installer_subtitle">\&quot;System-Installer deaktivieren</string>
+    <string name="setting_default_installer_subtitle">System-Installer deaktivieren, um für APK-Dateien immer Universal Installer zu verwenden (erfordert Shizuku oder Root)</string>
     <string name="setting_default_installer_needs_backend">Aktiviere zuerst Shizuku oder Root</string>
     <string name="setting_default_installer_enabled">Universal Installer ist jetzt the Standard</string>
     <string name="setting_default_installer_disabled">System-Installer wiederhergestellt</string>
@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">Profile</string>
     <string name="setting_profiles_subtitle">Installationskonfigurationen speichern und wiederverwenden</string>
     <string name="profile_list_title">Installer-Profile</string>
-    <string name="profile_empty_state">\&quot;Noch keine Profile erstellt. Verwende Profile</string>
+    <string name="profile_empty_state">Noch keine Profile erstellt. Verwende Profile, um bestimmte Installer-Pakete, Backends oder Flag-Kombinationen zu speichern.</string>
     <string name="profile_add_button">Profil hinzufügen</string>
     <string name="profile_edit_title">Profil bearbeiten</string>
     <string name="profile_create_title">Profil erstellen</string>

@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">Профілі</string>
     <string name="setting_profiles_subtitle">Зберігайте та повторно використовуйте конфігурації встановлення</string>
     <string name="profile_list_title">Профілі інсталятора</string>
-    <string name="profile_empty_state">\&quot;Профілів ще не створено. Використовуйте профілі для збереження певних пакетів інсталятора</string>
+    <string name="profile_empty_state">Профілів ще не створено. Використовуйте профілі для збереження певних пакетів інсталятора, бекендів або комбінацій прапорців.</string>
     <string name="profile_add_button">Додати профіль</string>
     <string name="profile_edit_title">Редагувати профіль</string>
     <string name="profile_create_title">Створити профіль</string>

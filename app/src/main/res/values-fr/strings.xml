@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">Profils</string>
     <string name="setting_profiles_subtitle">Enregistrer et réutiliser les configurations d\'installation</string>
     <string name="profile_list_title">Profils d\'installateur</string>
-    <string name="profile_empty_state">\&quot;Aucun profil créé pour le moment. Utilisez les profils pour enregistrer des paquets d\'installateur</string>
+    <string name="profile_empty_state">Aucun profil créé pour le moment. Utilisez les profils pour enregistrer des paquets d\'installateur, des backends ou des combinaisons d\'options spécifiques.</string>
     <string name="profile_add_button">Ajouter un profil</string>
     <string name="profile_edit_title">Modifier le profil</string>
     <string name="profile_create_title">Créer un profil</string>

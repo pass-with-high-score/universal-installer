@@ -502,7 +502,7 @@
     <string name="setting_auto_confirm_title">Αυτόματη επιβεβαίωση εξωτερικών εγκαταστάσεων</string>
     <string name="setting_auto_confirm_subtitle">Παράλειψη του διαλόγου επιβεβαίωσης όταν ένα APK ανοίγει από άλλη εφαρμογή</string>
     <string name="setting_default_installer_title">Ορισμός ως προεπιλεγμένου προγράμματος εγκατάστασης</string>
-    <string name="setting_default_installer_subtitle">\&quot;Απενεργοποιήστε το πρόγραμμα εγκατάστασης συστήματος για να χρησιμοποιείτε πάντα το Universal Installer για αρχεία APK (απαιτεί Σχίζουκου ή Root)\&quot;</string>
+    <string name="setting_default_installer_subtitle">Απενεργοποιήστε το πρόγραμμα εγκατάστασης συστήματος για να χρησιμοποιείτε πάντα το Universal Installer για αρχεία APK (απαιτεί Σχίζουκου ή Root)</string>
     <string name="setting_default_installer_needs_backend">Ενεργοποιήστε πρώτα το Shizuku ή το Root για να αλλάξετε το προεπιλεγμένο πρόγραμμα εγκατάστασης</string>
     <string name="setting_default_installer_enabled">Το Universal Installer είναι τώρα το προεπιλεγμένο</string>
     <string name="setting_default_installer_disabled">Το πρόγραμμα εγκατάστασης συστήματος αποκαταστάθηκε</string>
@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">Προφίλ</string>
     <string name="setting_profiles_subtitle">Αποθήκευση και επαναχρησιμοποίηση ρυθμίσεων εγκατάστασης</string>
     <string name="profile_list_title">Προφίλ προγράμματος εγκατάστασης</string>
-    <string name="profile_empty_state">\&quot;Δεν έχουν δημιουργηθεί προφίλ ακόμα. Χρησιμοποιήστε προφίλ για να αποθηκεύσετε συγκεκριμένα πακέτα εγκατάστασης</string>
+    <string name="profile_empty_state">Δεν έχουν δημιουργηθεί προφίλ ακόμα. Χρησιμοποιήστε προφίλ για να αποθηκεύσετε συγκεκριμένα πακέτα εγκατάστασης, backend ή συνδυασμούς σημαιών.</string>
     <string name="profile_add_button">Προσθήκη προφίλ</string>
     <string name="profile_edit_title">Επεξεργασία προφίλ</string>
     <string name="profile_create_title">Δημιουργία προφίλ</string>

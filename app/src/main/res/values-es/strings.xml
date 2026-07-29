@@ -502,7 +502,7 @@
     <string name="setting_auto_confirm_title">Confirmar automáticamente instalaciones externas</string>
     <string name="setting_auto_confirm_subtitle">Omitir el diálogo de confirmación cuando se abre un APK desde otra aplicación</string>
     <string name="setting_default_installer_title">Establecer como instalador predeterminado</string>
-    <string name="setting_default_installer_subtitle">\&quot;Desactiva el instalador del sistema para usar siempre Universal Installer para archivos APK (requiere Shizuku o Root)\&quot;</string>
+    <string name="setting_default_installer_subtitle">Desactiva el instalador del sistema para usar siempre Universal Installer para archivos APK (requiere Shizuku o Root)</string>
     <string name="setting_default_installer_needs_backend">Habilita Shizuku o Root primero para cambiar el instalador predeterminado</string>
     <string name="setting_default_installer_enabled">Universal Installer es ahora el predeterminado</string>
     <string name="setting_default_installer_disabled">Instalador del sistema restaurado</string>
@@ -521,12 +521,12 @@
     <string name="setting_profiles_title">Perfiles</string>
     <string name="setting_profiles_subtitle">Guardar y reutilizar configuraciones de instalación</string>
     <string name="profile_list_title">Perfiles de instalador</string>
-    <string name="profile_empty_state">\&quot;Aún no se han creado perfiles. Usa perfiles para guardar paquetes de instalador específicos</string>
+    <string name="profile_empty_state">Aún no se han creado perfiles. Usa perfiles para guardar paquetes de instalador específicos, backends o combinaciones de flags.</string>
     <string name="profile_add_button">Añadir perfil</string>
     <string name="profile_edit_title">Editar perfil</string>
     <string name="profile_create_title">Crear perfil</string>
     <string name="profile_name_label">Nombre del perfil</string>
-    <string name="profile_name_placeholder">\&quot;p. ej.</string>
+    <string name="profile_name_placeholder">p. ej., Simulación de Play Store</string>
     <string name="profile_delete_confirm_title">¿Eliminar perfil?</string>
     <string name="profile_delete_confirm_msg">Esto también eliminará cualquier asignación automática para este perfil.</string>
     <string name="profile_save">Guardar</string>

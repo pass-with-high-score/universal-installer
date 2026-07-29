@@ -521,7 +521,7 @@
     <string name="setting_profiles_title">配置文件</string>
     <string name="setting_profiles_subtitle">保存并重复使用安装配置</string>
     <string name="profile_list_title">安装程序配置文件</string>
-    <string name="profile_empty_state">\&quot;尚未创建配置文件。使用配置文件来保存特定的安装程序包、后端或标志组合。\&quot;</string>
+    <string name="profile_empty_state">尚未创建配置文件。使用配置文件来保存特定的安装程序包、后端或标志组合。</string>
     <string name="profile_add_button">添加配置文件</string>
     <string name="profile_edit_title">编辑配置文件</string>
     <string name="profile_create_title">创建配置文件</string>
