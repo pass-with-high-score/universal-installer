@@ -296,4 +296,4 @@ See the full [LICENSE](LICENSE) file for details.
 
 ## Star History
 
-[![Star History Chart](https://api.star-history.com/svg?repos=pass-with-high-score/universal-installer&type=Date)](https://www.star-history.com/#pass-with-high-score/universal-installer&Date)
+[![Star History Chart](https://star-history.dera.page/svg?repos=pass-with-high-score/universal-installer&type=Date)](https://star-history.dera.page/#pass-with-high-score/universal-installer&Date)
