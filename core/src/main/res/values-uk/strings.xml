@@ -17,4 +17,19 @@
     <string name="onboarding_analytics_desc">Встановлення застосунків працює по-різному на кожному телефоні, і ми дізнаємося про збої, лише якщо застосунок повідомляє про них. Він надсилає, чи вдалося встановлення і що пішло не так, — але ніколи не надсилає, який застосунок ви встановили.</string>
     <string name="onboarding_analytics_switch">Надсилати анонімну діагностику</string>
     <string name="onboarding_analytics_switch_sub">Це можна змінити будь-коли в налаштуваннях.</string>
+    <string name="onboarding_virustotal_title">Скануйте перед встановленням</string>
+    <string name="onboarding_virustotal_desc">Перевіряйте будь-який пакет за допомогою понад 70 антивірусних рушіїв прямо з екрана встановлення. Потрібен безкоштовний ключ API VirusTotal.</string>
+    <string name="onboarding_security_normal">Звичайний</string>
+    <string name="onboarding_security_strict">Суворий</string>
+    <string name="onboarding_security_normal_sub">«Встановити» лишається основною кнопкою. Скануйте, коли забажаєте.</string>
+    <string name="onboarding_security_strict_sub">«Перевірити» стає основною кнопкою, а встановлення неперевірених файлів спершу запитує підтвердження.</string>
+    <string name="onboarding_virustotal_get_key">Отримати безкоштовний ключ API</string>
+    <string name="onboarding_virustotal_key_label">API-ключ VirusTotal</string>
+    <string name="onboarding_virustotal_paste">Вставити з буфера обміну</string>
+    <string name="onboarding_virustotal_key_hint">Необов\'язково — можна додати пізніше в Налаштуваннях.</string>
+    <string name="onboarding_virustotal_key_saved">Збережено. Сканування готове до роботи.</string>
+    <string name="onboarding_virustotal_key_malformed">Ключ складається з 64 символів — перевірте, чи коректно він вставився.</string>
+    <string name="onboarding_xiaomi_title">Якщо встановлення не вдається на MIUI</string>
+    <string name="onboarding_xiaomi_desc">Оптимізація MIUI/HyperOS може мовчки блокувати встановлення сторонніх застосунків. Якщо так сталося, відкрийте «Для розробників», вимкніть «Оптимізацію MIUI», встановіть застосунок, а потім увімкніть її знову. Поки вона вимкнена, системна тема може виглядати спотвореною — перезавантаження телефона це виправляє.</string>
+    <string name="onboarding_xiaomi_open_developer_options">Відкрити «Для розробників»</string>
 </resources>
