@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.wearos.data
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
 import android.util.Log
@@ -14,10 +15,7 @@ import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -32,12 +30,6 @@ import org.koin.android.ext.android.inject
 class WearReceiverService : WearableListenerService() {
 
     private val repository: WearApkRepository by inject()
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.cancel()
-    }
 
     override fun onChannelOpened(channel: ChannelClient.Channel) {
         val payload = channel.path.removePrefix(CHANNEL_PATH_PREFIX)
@@ -51,7 +43,7 @@ class WearReceiverService : WearableListenerService() {
         }
 
         Log.d(TAG, "Receiving $fileName ($expectedBytes bytes)")
-        scope.launch { receive(channel, fileName, expectedBytes) }
+        WearReceiveScope.launch { receive(channel, fileName, expectedBytes) }
     }
 
     private suspend fun receive(
@@ -59,8 +51,9 @@ class WearReceiverService : WearableListenerService() {
         fileName: String,
         expectedBytes: Long,
     ) = withContext(Dispatchers.IO) {
-        val channelClient = Wearable.getChannelClient(this@WearReceiverService)
-        val wakeLock = getSystemService(PowerManager::class.java)
+        val context = applicationContext
+        val channelClient = Wearable.getChannelClient(context)
+        val wakeLock = context.getSystemService(PowerManager::class.java)
             .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG)
 
         // The watch sleeps long before a Bluetooth transfer of an APK finishes.
@@ -97,31 +90,31 @@ class WearReceiverService : WearableListenerService() {
             }
 
             Log.d(TAG, "Received ${apkInfo.appName} ($written bytes)")
-            postNotification(apkInfo)
+            postNotification(context, apkInfo)
         } finally {
             runCatching { Tasks.await(channelClient.close(channel)) }
             if (wakeLock.isHeld) wakeLock.release()
         }
     }
 
-    private fun postNotification(apkInfo: WearApkInfo) {
-        val nm = getSystemService(NotificationManager::class.java)
+    private fun postNotification(context: Context, apkInfo: WearApkInfo) {
+        val nm = context.getSystemService(NotificationManager::class.java)
         nm.createNotificationChannel(
             NotificationChannel(CHANNEL_ID, "APK Received", NotificationManager.IMPORTANCE_DEFAULT)
         )
 
         val requestCode = apkInfo.id.hashCode()
-        val intent = Intent(this, MainActivity::class.java)
+        val intent = Intent(context, MainActivity::class.java)
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
             .putExtra(MainActivity.EXTRA_APK_ID, apkInfo.id)
         val pi = PendingIntent.getActivity(
-            this, requestCode, intent,
+            context, requestCode, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
+        val notification = NotificationCompat.Builder(context, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_notification)
-            .setContentTitle(getString(R.string.apk_received_title))
+            .setContentTitle(context.getString(R.string.apk_received_title))
             .setContentText(apkInfo.appName)
             .setContentIntent(pi)
             .setAutoCancel(true)
