@@ -1,5 +1,0 @@
-• Support installing zipped APK archives and scan .zip files
-• Overhauled phone-to-TV transfer with zero-config discovery and instant connection
-• Live real-time upload and receive progress indicators
-• Improved TV pairing layout and typography
-• Stability fixes and performance optimizations

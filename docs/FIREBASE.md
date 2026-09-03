@@ -31,7 +31,8 @@ The file is **not** in the repository — it carries our Firebase project's app 
 this repo is public.
 
 1. In the [Firebase console](https://console.firebase.google.com/), open the project and add (or
-   select) Android apps with package names `app.pwhs.universalinstaller` and `app.pwhs.universalinstaller.tv`.
+   select) an Android app with package name `app.pwhs.universalinstaller`. :app, :tv and :wearos all
+   share it — one Play listing, three form factors — so one Firebase client covers all three.
 2. Download `google-services.json`.
 3. Put it at `app/src/play/google-services.json` and `tv/google-services.json`. They are gitignored; do not commit them.
 

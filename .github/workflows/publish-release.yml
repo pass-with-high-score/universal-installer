@@ -74,17 +74,12 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
-      # Ships the phone AAB and the watch AAB in one release — they share a package name, so
-      # Play treats them as two form factors of the same listing.
+      # Ships the phone, watch and TV AABs in one release — they share a package name, so Play
+      # treats them as three form factors of the same listing.
       - name: Deploy to production track
         id: play_store_production
         continue-on-error: true
         run: bundle exec fastlane production
-
-      - name: Deploy TV to production track
-        id: play_store_tv_production
-        continue-on-error: true
-        run: bundle exec fastlane production_tv
 
       # F-Droid rebuilds the opensource APK from a plain checkout and requires it to match the
       # one published here byte for byte. A checkout has no google-services.json, so leaving

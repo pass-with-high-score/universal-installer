@@ -1,10 +1,12 @@
 default_platform(:android)
 
-# :wearos shares :app's applicationId, so Play sees one listing with two form factors and a
-# release must carry both artifacts — uploading the phone AAB alone would drop the watch build
-# from the track, and the watch AAB alone would drop the phone build.
+# :app, :wearos and :tv all share one applicationId, so Play sees a single listing with three
+# form factors and every release has to carry all three artifacts — shipping one alone drops the
+# other two from that track. Play routes them by uses-feature: leanback to TV, watch to Wear OS,
+# and the phone build to everything else.
 PHONE_AAB = "app/build/outputs/bundle/playRelease/app-play-release.aab"
 WEAR_AAB = "wearos/build/outputs/bundle/release/wearos-release.aab"
+TV_AAB = "tv/build/outputs/bundle/release/tv-release.aab"
 
 platform :android do
 
@@ -30,12 +32,11 @@ platform :android do
 
   desc "Deploy internal testing track"
   lane :internal do
-    gradle(task: ":app:bundlePlayRelease")
-    gradle(task: ":wearos:bundleRelease")
+    build_all_form_factors
     upload_to_play_store(
       track: "internal",
       package_name: "app.pwhs.universalinstaller",
-      aab_paths: [PHONE_AAB, WEAR_AAB],
+      aab_paths: [PHONE_AAB, WEAR_AAB, TV_AAB],
       json_key: "fastlane/play-store-key.json",
       skip_upload_metadata: false,
       skip_upload_images: false,
@@ -46,12 +47,11 @@ platform :android do
 
   desc "Deploy to closed testing track"
   lane :beta do
-    gradle(task: ":app:bundlePlayRelease")
-    gradle(task: ":wearos:bundleRelease")
+    build_all_form_factors
     upload_to_play_store(
       track: "beta",
       package_name: "app.pwhs.universalinstaller",
-      aab_paths: [PHONE_AAB, WEAR_AAB],
+      aab_paths: [PHONE_AAB, WEAR_AAB, TV_AAB],
       json_key: "fastlane/play-store-key.json",
       skip_upload_metadata: false,
       skip_upload_images: false,
@@ -62,12 +62,11 @@ platform :android do
 
   desc "Deploy to production"
   lane :production do
-    gradle(task: ":app:bundlePlayRelease")
-    gradle(task: ":wearos:bundleRelease")
+    build_all_form_factors
     upload_to_play_store(
       track: "production",
       package_name: "app.pwhs.universalinstaller",
-      aab_paths: [PHONE_AAB, WEAR_AAB],
+      aab_paths: [PHONE_AAB, WEAR_AAB, TV_AAB],
       json_key: "fastlane/play-store-key.json",
       skip_upload_metadata: false,
       skip_upload_images: false,
@@ -76,52 +75,10 @@ platform :android do
     )
   end
 
-  desc "Deploy TV to internal testing track"
-  lane :internal_tv do
+  private_lane :build_all_form_factors do
+    gradle(task: ":app:bundlePlayRelease")
+    gradle(task: ":wearos:bundleRelease")
     gradle(task: ":tv:bundleRelease")
-    upload_to_play_store(
-      track: "internal",
-      package_name: "app.pwhs.universalinstaller.tv",
-      aab: "tv/build/outputs/bundle/release/tv-release.aab",
-      json_key: "fastlane/play-store-key.json",
-      metadata_path: "./fastlane_tv/metadata/android",
-      skip_upload_metadata: false,
-      skip_upload_images: false,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: false,
-    )
-  end
-
-  desc "Deploy TV to closed testing track"
-  lane :beta_tv do
-    gradle(task: ":tv:bundleRelease")
-    upload_to_play_store(
-      track: "beta",
-      package_name: "app.pwhs.universalinstaller.tv",
-      aab: "tv/build/outputs/bundle/release/tv-release.aab",
-      json_key: "fastlane/play-store-key.json",
-      metadata_path: "./fastlane_tv/metadata/android",
-      skip_upload_metadata: false,
-      skip_upload_images: false,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: false,
-    )
-  end
-
-  desc "Deploy TV to production"
-  lane :production_tv do
-    gradle(task: ":tv:bundleRelease")
-    upload_to_play_store(
-      track: "production",
-      package_name: "app.pwhs.universalinstaller.tv",
-      aab: "tv/build/outputs/bundle/release/tv-release.aab",
-      json_key: "fastlane/play-store-key.json",
-      metadata_path: "./fastlane_tv/metadata/android",
-      skip_upload_metadata: false,
-      skip_upload_images: false,
-      skip_upload_screenshots: false,
-      release_status: "draft"
-    )
   end
 
   desc "Increment version code"

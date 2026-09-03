@@ -1,4 +1,0 @@
-• Upgraded core installer engine with multi-user work profile support
-• Improved auto-open and source file deletion after installation
-• Enhanced build engine to Gradle 9 & AGP 9 with full R8 optimization
-• UI/UX optimizations and stability improvements for Android TV

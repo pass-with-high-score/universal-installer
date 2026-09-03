@@ -26,10 +26,13 @@ android {
     }
 
     defaultConfig {
-        applicationId = "app.pwhs.universalinstaller.tv"
+        // One Play listing, three form factors. Play tells the artifacts apart by their
+        // uses-feature requirements — leanback here, watch in :wearos, neither in :app — so each
+        // needs its own versionCode band: phone 1-999, watch 1000+, TV 2000+.
+        applicationId = "app.pwhs.universalinstaller"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 26
+        versionCode = 2026
         versionName = "1.12.0"
 
     }

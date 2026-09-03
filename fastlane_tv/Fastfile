@@ -1,5 +1,11 @@
 default_platform(:android)
 
+# :tv shares :app's applicationId, so a Play release has to carry every form factor's artifact —
+# uploading the TV AAB alone would drop the phone and watch builds from that track.
+PHONE_AAB = "app/build/outputs/bundle/playRelease/app-play-release.aab"
+WEAR_AAB = "wearos/build/outputs/bundle/release/wearos-release.aab"
+TV_AAB = "tv/build/outputs/bundle/release/tv-release.aab"
+
 platform :android do
 
   desc "Run tests"
@@ -22,61 +28,32 @@ platform :android do
     gradle(task: ":tv:assembleRelease")
   end
 
-  desc "Deploy TV to internal testing track"
+  desc "Deploy every form factor to internal testing track"
   lane :internal do
-    gradle(task: ":tv:bundleRelease")
-    upload_to_play_store(
-      track: "internal",
-      aab: "tv/build/outputs/bundle/release/tv-release.aab",
-      skip_upload_metadata: false,
-      skip_upload_images: false,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: false,
-    )
+    deploy_all(track: "internal", skip_screenshots: true, release_status: "completed")
   end
 
-  desc "Deploy TV to closed testing track"
+  desc "Deploy every form factor to closed testing track"
   lane :beta do
-    gradle(task: ":tv:bundleRelease")
-    upload_to_play_store(
-      track: "beta",
-      aab: "tv/build/outputs/bundle/release/tv-release.aab",
-      json_key: "fastlane/play-store-key.json",
-      skip_upload_metadata: false,
-      skip_upload_images: false,
-      skip_upload_screenshots: true,
-      skip_upload_changelogs: false,
-    )
+    deploy_all(track: "beta", skip_screenshots: true, release_status: "completed")
   end
 
-  desc "Deploy TV to production"
+  desc "Deploy every form factor to production"
   lane :production do
-    gradle(task: ":tv:bundleRelease")
-    upload_to_play_store(
-      track: "production",
-      aab: "tv/build/outputs/bundle/release/tv-release.aab",
-      json_key: "fastlane/play-store-key.json",
-      skip_upload_metadata: false,
-      skip_upload_images: false,
-      skip_upload_screenshots: false,
-      release_status: "draft"
-    )
+    deploy_all(track: "production", skip_screenshots: false, release_status: "draft")
   end
 
   desc "Increment TV version code"
   lane :bump_version do |options|
     version_name = options[:version] || "1.0"
-    # Read current versionCode from tv/build.gradle.kts
     build_gradle = File.read("../tv/build.gradle.kts")
     current_code = build_gradle.match(/versionCode = (\d+)/)[1].to_i
     new_code = current_code + 1
 
-    # Update versionCode
     new_content = build_gradle.gsub(
       /versionCode = \d+/,
       "versionCode = #{new_code}"
     )
-    # Update versionName if provided
     new_content = new_content.gsub(
       /versionName = ".*"/,
       "versionName = \"#{version_name}\""
@@ -84,5 +61,24 @@ platform :android do
     File.write("../tv/build.gradle.kts", new_content)
 
     UI.success("✅ TV bumped to versionCode=#{new_code}, versionName=#{version_name}")
+  end
+
+  private_lane :deploy_all do |options|
+    gradle(task: ":app:bundlePlayRelease")
+    gradle(task: ":wearos:bundleRelease")
+    gradle(task: ":tv:bundleRelease")
+    upload_to_play_store(
+      track: options[:track],
+      package_name: "app.pwhs.universalinstaller",
+      aab_paths: [PHONE_AAB, WEAR_AAB, TV_AAB],
+      json_key: "fastlane/play-store-key.json",
+      # One listing, so the store text comes from the phone's metadata.
+      metadata_path: "./fastlane/metadata/android",
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: options[:skip_screenshots],
+      skip_upload_changelogs: false,
+      release_status: options[:release_status],
+    )
   end
 end

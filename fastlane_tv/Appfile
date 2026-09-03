@@ -1,2 +1,4 @@
-package_name("app.pwhs.universalinstaller.tv")
+# Same package as the phone app: :tv is a form factor of one Play listing, not an app of its own.
+# Play routes this artifact to TV devices by its `android.software.leanback` requirement.
+package_name("app.pwhs.universalinstaller")
 json_key_file("fastlane/play-store-key.json")
