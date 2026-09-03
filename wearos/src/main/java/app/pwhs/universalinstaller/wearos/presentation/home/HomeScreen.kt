@@ -32,10 +32,15 @@ fun HomeScreen(
     val apks by viewModel.apks.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val receiveState by viewModel.receiveState.collectAsState()
+    val storage by viewModel.storage.collectAsState()
+    val queueBytes by viewModel.queueBytes.collectAsState()
     HomeScreenContent(
         apks = apks,
         isLoading = isLoading,
         receiveState = receiveState,
+        queueBytes = queueBytes,
+        freeBytes = storage.freeBytes,
+        usedFraction = storage.progress,
         onApkClick = onApkClick,
         onMoreClick = onMoreClick,
         onDelete = viewModel::delete,
@@ -47,6 +52,9 @@ fun HomeScreenContent(
     apks: List<WearApkInfo>,
     isLoading: Boolean,
     receiveState: WearReceiveState,
+    queueBytes: Long,
+    freeBytes: Long,
+    usedFraction: Float,
     onApkClick: (String) -> Unit,
     onMoreClick: () -> Unit,
     onDelete: (String) -> Unit,
@@ -75,6 +83,15 @@ fun HomeScreenContent(
                     ) {
                         Text(text = stringResource(R.string.home_title))
                     }
+                }
+
+                item {
+                    StorageSummary(
+                        queueBytes = queueBytes,
+                        freeBytes = freeBytes,
+                        usedFraction = usedFraction,
+                        modifier = Modifier.transformedHeight(this, spec),
+                    )
                 }
 
                 if (receiveState !is WearReceiveState.Idle) {
@@ -140,6 +157,9 @@ private fun HomeScreenPreview() {
             ),
             isLoading = false,
             receiveState = WearReceiveState.Idle,
+            queueBytes = 160_000_000L,
+            freeBytes = 5_300_000_000L,
+            usedFraction = 0.34f,
             onApkClick = {},
             onMoreClick = {},
             onDelete = {},
@@ -155,6 +175,9 @@ private fun HomeScreenReceivingPreview() {
             apks = listOf(previewApk()),
             isLoading = false,
             receiveState = WearReceiveState.Receiving("watchface.apk", 4_000_000, 12_000_000),
+            queueBytes = 160_000_000L,
+            freeBytes = 5_300_000_000L,
+            usedFraction = 0.34f,
             onApkClick = {},
             onMoreClick = {},
             onDelete = {},
@@ -166,7 +189,7 @@ private fun HomeScreenReceivingPreview() {
 @Composable
 private fun HomeScreenEmptyPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(emptyList(), false, WearReceiveState.Idle, {}, {}, {})
+        HomeScreenContent(emptyList(), false, WearReceiveState.Idle, 0L, 5_300_000_000L, 0.34f, {}, {}, {})
     }
 }
 
@@ -174,6 +197,6 @@ private fun HomeScreenEmptyPreview() {
 @Composable
 private fun HomeScreenLoadingPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(emptyList(), true, WearReceiveState.Idle, {}, {}, {})
+        HomeScreenContent(emptyList(), true, WearReceiveState.Idle, 0L, 5_300_000_000L, 0.34f, {}, {}, {})
     }
 }

@@ -1,21 +1,15 @@
 package app.pwhs.universalinstaller.wearos.presentation.home
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -26,6 +20,7 @@ import androidx.wear.compose.material3.Text
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import app.pwhs.universalinstaller.wearos.R
 import app.pwhs.universalinstaller.wearos.data.WearReceiveState
+import app.pwhs.universalinstaller.wearos.presentation.component.ThinProgressBar
 import app.pwhs.universalinstaller.wearos.presentation.theme.UniversalInstallerTheme
 
 /** Live view of the transfer the phone is streaming, so an empty list is never a mystery. */
@@ -72,7 +67,7 @@ fun ReceivingCard(state: WearReceiveState, modifier: Modifier = Modifier) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                TransferBar(progress = progress, modifier = Modifier.weight(1f))
+                ThinProgressBar(progress = progress, modifier = Modifier.weight(1f))
                 Text(
                     text = "${(progress * 100).toInt()}%",
                     style = MaterialTheme.typography.labelSmall,
@@ -80,27 +75,6 @@ fun ReceivingCard(state: WearReceiveState, modifier: Modifier = Modifier) {
                 )
             }
         }
-    }
-}
-
-// Wear's LinearProgressIndicator animates every progress change, and this transfer reports one
-// per percent — each update restarts the animation before the fill has travelled anywhere, so it
-// stays empty while only the position dot tracks. Drawing the bar directly sidesteps that.
-@Composable
-private fun TransferBar(progress: Float, modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .height(8.dp)
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh),
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxHeight()
-                .fillMaxWidth(progress.coerceIn(0f, 1f))
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-        )
     }
 }
 
