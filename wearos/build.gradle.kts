@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -12,20 +14,44 @@ android {
     }
 
     defaultConfig {
-        applicationId = "app.pwhs.universalinstaller.wearos"
+        // Must match the phone app: the Wearable Data Layer only routes a channel to the app with
+        // the same package name and signing certificate on the other node.
+        applicationId = "app.pwhs.universalinstaller"
         minSdk = 30
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 1035
+        versionName = "1.12.0"
+    }
+
+    // Same keystore as :app — a matching package name is not enough, the certificates must match too.
+    val keyPropertiesFile = rootProject.file("key.properties")
+    val useReleaseKeystore = keyPropertiesFile.exists()
+
+    if (useReleaseKeystore) {
+        val keyProperties = Properties().apply {
+            load(keyPropertiesFile.inputStream())
+        }
+        signingConfigs {
+            create("release") {
+                storeFile = rootProject.file(keyProperties["storeFile"] as String)
+                storePassword = keyProperties["storePassword"] as String
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+            }
+        }
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            if (useReleaseKeystore) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {
@@ -39,6 +65,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core"))
+
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.splashscreen)
