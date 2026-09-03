@@ -25,7 +25,22 @@
     <string name="manage_show_system">Arată aplicațiile de sistem</string>
     <string name="manage_hide_system">Ascunde aplicațiile de sistem</string>
     <string name="manage_empty">Încă nu ai instalat nicio aplicație.</string>
-    <string name="manage_open">Gestionează aplicațiile</string>
     <string name="uninstall">Dezinstalează</string>
     <string name="unknown_sources_hidden">Acest ceas ascunde setarea. Acord-o prin depanare wireless:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Mai multe</string>
+    <string name="settings_title">Setări</string>
+    <string name="settings_storage">Stocare</string>
+    <string name="settings_storage_summary">Coadă %1$s · %2$s liberi</string>
+    <string name="settings_clear_queue">Golește coada</string>
+    <string name="settings_clear_queue_confirm">Ștergi toate pachetele din coadă?</string>
+    <string name="settings_keep_after_install">Păstrează APK-ul după instalare</string>
+    <string name="settings_keep_after_install_on">Păstrat, poate fi reinstalat</string>
+    <string name="settings_keep_after_install_off">Șters după instalare</string>
+    <string name="settings_install_permission">Permisiune de instalare</string>
+    <string name="settings_install_permission_summary">Permite instalarea aplicațiilor necunoscute</string>
+    <string name="settings_about">Despre</string>
+    <string name="settings_about_summary">Versiunea și numele pachetului</string>
+    <string name="about_version">Versiune</string>
+    <string name="about_package">Pachet</string>
+    <string name="cancel">Anulează</string>
 </resources>

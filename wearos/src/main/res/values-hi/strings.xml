@@ -25,7 +25,22 @@
     <string name="manage_show_system">सिस्टम ऐप्स दिखाएँ</string>
     <string name="manage_hide_system">सिस्टम ऐप्स छिपाएँ</string>
     <string name="manage_empty">आपने अभी तक कोई ऐप इंस्टॉल नहीं किया।</string>
-    <string name="manage_open">ऐप्स प्रबंधित करें</string>
     <string name="uninstall">अनइंस्टॉल करें</string>
     <string name="unknown_sources_hidden">यह घड़ी यह सेटिंग छिपाती है। वायरलेस डीबगिंग से अनुमति दें:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">और</string>
+    <string name="settings_title">सेटिंग</string>
+    <string name="settings_storage">स्टोरेज</string>
+    <string name="settings_storage_summary">कतार %1$s · %2$s खाली</string>
+    <string name="settings_clear_queue">कतार खाली करें</string>
+    <string name="settings_clear_queue_confirm">कतार में इंतज़ार कर रहे सभी पैकेज मिटाएँ?</string>
+    <string name="settings_keep_after_install">इंस्टॉल के बाद APK रखें</string>
+    <string name="settings_keep_after_install_on">रखा जाता है, फिर से इंस्टॉल कर सकते हैं</string>
+    <string name="settings_keep_after_install_off">इंस्टॉल होने पर मिटा दिया जाता है</string>
+    <string name="settings_install_permission">इंस्टॉल की अनुमति</string>
+    <string name="settings_install_permission_summary">अनजान ऐप्स इंस्टॉल करने दें</string>
+    <string name="settings_about">बारे में</string>
+    <string name="settings_about_summary">वर्शन और पैकेज नाम</string>
+    <string name="about_version">वर्शन</string>
+    <string name="about_package">पैकेज</string>
+    <string name="cancel">रद्द करें</string>
 </resources>

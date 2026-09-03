@@ -6,11 +6,13 @@ import androidx.lifecycle.viewModelScope
 import app.pwhs.core.install.ApkInstaller
 import app.pwhs.universalinstaller.wearos.data.WearApkInfo
 import app.pwhs.universalinstaller.wearos.data.WearApkRepository
+import app.pwhs.universalinstaller.wearos.data.WearSettings
 import app.pwhs.universalinstaller.wearos.domain.ApkCompatibilityCheck
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -21,6 +23,7 @@ class DetailViewModel(
     private val repository: WearApkRepository,
     private val installer: ApkInstaller,
     private val compatibility: ApkCompatibilityCheck,
+    private val settings: WearSettings,
     application: Application,
 ) : AndroidViewModel(application) {
 
@@ -73,7 +76,7 @@ class DetailViewModel(
             when (result) {
                 is ApkInstaller.Result.Success -> {
                     _installState.value = InstallState.Success
-                    repository.deleteById(apkId)
+                    if (!settings.keepAfterInstall.first()) repository.deleteById(apkId)
                 }
                 // The cached file stays put so the user can retry.
                 is ApkInstaller.Result.Failure ->

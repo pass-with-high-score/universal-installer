@@ -25,7 +25,22 @@
     <string name="manage_show_system">Sistem uygulamalarını göster</string>
     <string name="manage_hide_system">Sistem uygulamalarını gizle</string>
     <string name="manage_empty">Henüz kendi kurduğunuz bir uygulama yok.</string>
-    <string name="manage_open">Uygulamaları yönet</string>
     <string name="uninstall">Kaldır</string>
     <string name="unknown_sources_hidden">Bu saat bu ayarı gizliyor. Kablosuz hata ayıklama ile izin verin:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Daha fazla</string>
+    <string name="settings_title">Ayarlar</string>
+    <string name="settings_storage">Depolama</string>
+    <string name="settings_storage_summary">Kuyruk %1$s · %2$s boş</string>
+    <string name="settings_clear_queue">Kuyruğu temizle</string>
+    <string name="settings_clear_queue_confirm">Kuyrukta bekleyen tüm paketler silinsin mi?</string>
+    <string name="settings_keep_after_install">Kurulumdan sonra APK\'yı sakla</string>
+    <string name="settings_keep_after_install_on">Saklanır, yeniden kurulabilir</string>
+    <string name="settings_keep_after_install_off">Kurulduktan sonra silinir</string>
+    <string name="settings_install_permission">Kurulum izni</string>
+    <string name="settings_install_permission_summary">Bilinmeyen uygulamaların kurulmasına izin ver</string>
+    <string name="settings_about">Hakkında</string>
+    <string name="settings_about_summary">Sürüm ve paket adı</string>
+    <string name="about_version">Sürüm</string>
+    <string name="about_package">Paket</string>
+    <string name="cancel">İptal</string>
 </resources>

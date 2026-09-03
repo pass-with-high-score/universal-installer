@@ -25,7 +25,22 @@
     <string name="manage_show_system">Afficher les applications système</string>
     <string name="manage_hide_system">Masquer les applications système</string>
     <string name="manage_empty">Vous n\'avez encore installé aucune application.</string>
-    <string name="manage_open">Gérer les applications</string>
     <string name="uninstall">Désinstaller</string>
     <string name="unknown_sources_hidden">Cette montre masque ce paramètre. Accordez-le via le débogage sans fil :\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Plus</string>
+    <string name="settings_title">Paramètres</string>
+    <string name="settings_storage">Stockage</string>
+    <string name="settings_storage_summary">File %1$s · %2$s libre</string>
+    <string name="settings_clear_queue">Vider la file</string>
+    <string name="settings_clear_queue_confirm">Supprimer tous les paquets en attente ?</string>
+    <string name="settings_keep_after_install">Conserver l\'APK après installation</string>
+    <string name="settings_keep_after_install_on">Conservé, réinstallable</string>
+    <string name="settings_keep_after_install_off">Supprimé une fois installé</string>
+    <string name="settings_install_permission">Autorisation d\'installation</string>
+    <string name="settings_install_permission_summary">Autoriser l\'installation d\'applications inconnues</string>
+    <string name="settings_about">À propos</string>
+    <string name="settings_about_summary">Version et nom du paquet</string>
+    <string name="about_version">Version</string>
+    <string name="about_package">Paquet</string>
+    <string name="cancel">Annuler</string>
 </resources>

@@ -25,7 +25,22 @@
     <string name="manage_show_system">显示系统应用</string>
     <string name="manage_hide_system">隐藏系统应用</string>
     <string name="manage_empty">你还没有安装任何应用。</string>
-    <string name="manage_open">管理应用</string>
     <string name="uninstall">卸载</string>
     <string name="unknown_sources_hidden">此手表隐藏了该设置。请通过无线调试授予权限：\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">更多</string>
+    <string name="settings_title">设置</string>
+    <string name="settings_storage">存储空间</string>
+    <string name="settings_storage_summary">队列 %1$s · 剩余 %2$s</string>
+    <string name="settings_clear_queue">清空队列</string>
+    <string name="settings_clear_queue_confirm">删除队列中所有等待的软件包？</string>
+    <string name="settings_keep_after_install">安装后保留 APK</string>
+    <string name="settings_keep_after_install_on">保留，可再次安装</string>
+    <string name="settings_keep_after_install_off">安装后删除</string>
+    <string name="settings_install_permission">安装权限</string>
+    <string name="settings_install_permission_summary">允许安装未知应用</string>
+    <string name="settings_about">关于</string>
+    <string name="settings_about_summary">版本与软件包名</string>
+    <string name="about_version">版本</string>
+    <string name="about_package">软件包</string>
+    <string name="cancel">取消</string>
 </resources>

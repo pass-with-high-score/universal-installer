@@ -25,7 +25,22 @@
     <string name="manage_show_system">Показать системные</string>
     <string name="manage_hide_system">Скрыть системные</string>
     <string name="manage_empty">Вы ещё не установили ни одного приложения.</string>
-    <string name="manage_open">Управление приложениями</string>
     <string name="uninstall">Удалить</string>
     <string name="unknown_sources_hidden">Эти часы скрывают эту настройку. Выдайте разрешение через беспроводную отладку:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Ещё</string>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_storage">Память</string>
+    <string name="settings_storage_summary">Очередь %1$s · свободно %2$s</string>
+    <string name="settings_clear_queue">Очистить очередь</string>
+    <string name="settings_clear_queue_confirm">Удалить все пакеты из очереди?</string>
+    <string name="settings_keep_after_install">Сохранять APK после установки</string>
+    <string name="settings_keep_after_install_on">Сохраняется для повторной установки</string>
+    <string name="settings_keep_after_install_off">Удаляется после установки</string>
+    <string name="settings_install_permission">Разрешение на установку</string>
+    <string name="settings_install_permission_summary">Разрешить установку неизвестных приложений</string>
+    <string name="settings_about">О приложении</string>
+    <string name="settings_about_summary">Версия и имя пакета</string>
+    <string name="about_version">Версия</string>
+    <string name="about_package">Пакет</string>
+    <string name="cancel">Отмена</string>
 </resources>

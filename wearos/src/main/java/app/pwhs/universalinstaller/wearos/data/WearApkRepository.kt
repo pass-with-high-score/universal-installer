@@ -56,6 +56,16 @@ class WearApkRepository(
 
     fun getById(id: String): WearApkInfo? = _apks.value.find { it.id == id }
 
+    /** Bytes the queue occupies — measured on disk, so files that failed to parse still count. */
+    suspend fun queueBytes(): Long = withContext(Dispatchers.IO) {
+        cacheDir.listFiles().orEmpty().filter { it.isFile }.sumOf { it.length() }
+    }
+
+    suspend fun clearAll() = withContext(Dispatchers.IO) {
+        cacheDir.listFiles().orEmpty().forEach { it.delete() }
+        _apks.value = emptyList()
+    }
+
     suspend fun deleteById(id: String) = withContext(Dispatchers.IO) {
         val entry = getById(id) ?: return@withContext
         File(entry.cachedFilePath).delete()

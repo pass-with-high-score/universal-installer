@@ -25,7 +25,22 @@
     <string name="manage_show_system">Εμφάνιση εφαρμογών συστήματος</string>
     <string name="manage_hide_system">Απόκρυψη εφαρμογών συστήματος</string>
     <string name="manage_empty">Δεν έχετε εγκαταστήσει ακόμη καμία εφαρμογή.</string>
-    <string name="manage_open">Διαχείριση εφαρμογών</string>
     <string name="uninstall">Απεγκατάσταση</string>
     <string name="unknown_sources_hidden">Αυτό το ρολόι κρύβει τη ρύθμιση. Δώστε την μέσω ασύρματου εντοπισμού σφαλμάτων:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Περισσότερα</string>
+    <string name="settings_title">Ρυθμίσεις</string>
+    <string name="settings_storage">Αποθηκευτικός χώρος</string>
+    <string name="settings_storage_summary">Ουρά %1$s · %2$s ελεύθερα</string>
+    <string name="settings_clear_queue">Εκκαθάριση ουράς</string>
+    <string name="settings_clear_queue_confirm">Διαγραφή όλων των πακέτων στην ουρά;</string>
+    <string name="settings_keep_after_install">Διατήρηση APK μετά την εγκατάσταση</string>
+    <string name="settings_keep_after_install_on">Διατηρείται για επανεγκατάσταση</string>
+    <string name="settings_keep_after_install_off">Διαγράφεται μετά την εγκατάσταση</string>
+    <string name="settings_install_permission">Δικαίωμα εγκατάστασης</string>
+    <string name="settings_install_permission_summary">Να επιτρέπεται η εγκατάσταση άγνωστων εφαρμογών</string>
+    <string name="settings_about">Σχετικά</string>
+    <string name="settings_about_summary">Έκδοση και όνομα πακέτου</string>
+    <string name="about_version">Έκδοση</string>
+    <string name="about_package">Πακέτο</string>
+    <string name="cancel">Άκυρο</string>
 </resources>

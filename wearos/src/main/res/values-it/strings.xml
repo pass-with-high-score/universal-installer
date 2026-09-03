@@ -25,7 +25,22 @@
     <string name="manage_show_system">Mostra app di sistema</string>
     <string name="manage_hide_system">Nascondi app di sistema</string>
     <string name="manage_empty">Non hai ancora installato alcuna app.</string>
-    <string name="manage_open">Gestisci app</string>
     <string name="uninstall">Disinstalla</string>
     <string name="unknown_sources_hidden">Questo orologio nasconde l\'impostazione. Concedila tramite debug wireless:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Altro</string>
+    <string name="settings_title">Impostazioni</string>
+    <string name="settings_storage">Spazio</string>
+    <string name="settings_storage_summary">Coda %1$s · %2$s liberi</string>
+    <string name="settings_clear_queue">Svuota la coda</string>
+    <string name="settings_clear_queue_confirm">Eliminare tutti i pacchetti in attesa?</string>
+    <string name="settings_keep_after_install">Conserva l\'APK dopo l\'installazione</string>
+    <string name="settings_keep_after_install_on">Conservato, reinstallabile</string>
+    <string name="settings_keep_after_install_off">Eliminato una volta installato</string>
+    <string name="settings_install_permission">Autorizzazione di installazione</string>
+    <string name="settings_install_permission_summary">Consenti l\'installazione di app sconosciute</string>
+    <string name="settings_about">Informazioni</string>
+    <string name="settings_about_summary">Versione e nome del pacchetto</string>
+    <string name="about_version">Versione</string>
+    <string name="about_package">Pacchetto</string>
+    <string name="cancel">Annulla</string>
 </resources>

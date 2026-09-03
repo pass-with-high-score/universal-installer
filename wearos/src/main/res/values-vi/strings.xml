@@ -25,7 +25,22 @@
     <string name="manage_show_system">Hiện ứng dụng hệ thống</string>
     <string name="manage_hide_system">Ẩn ứng dụng hệ thống</string>
     <string name="manage_empty">Bạn chưa cài ứng dụng nào.</string>
-    <string name="manage_open">Quản lý ứng dụng</string>
     <string name="uninstall">Gỡ cài đặt</string>
     <string name="unknown_sources_hidden">Đồng hồ này ẩn tuỳ chọn đó. Hãy cấp quyền qua gỡ lỗi không dây:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Thêm</string>
+    <string name="settings_title">Cài đặt</string>
+    <string name="settings_storage">Dung lượng</string>
+    <string name="settings_storage_summary">Hàng đợi %1$s · còn trống %2$s</string>
+    <string name="settings_clear_queue">Xoá hàng đợi</string>
+    <string name="settings_clear_queue_confirm">Xoá mọi gói đang chờ trong hàng đợi?</string>
+    <string name="settings_keep_after_install">Giữ APK sau khi cài</string>
+    <string name="settings_keep_after_install_on">Được giữ lại để cài lại</string>
+    <string name="settings_keep_after_install_off">Xoá sau khi cài xong</string>
+    <string name="settings_install_permission">Quyền cài đặt</string>
+    <string name="settings_install_permission_summary">Cho phép cài ứng dụng không rõ nguồn</string>
+    <string name="settings_about">Giới thiệu</string>
+    <string name="settings_about_summary">Phiên bản và tên gói</string>
+    <string name="about_version">Phiên bản</string>
+    <string name="about_package">Gói</string>
+    <string name="cancel">Huỷ</string>
 </resources>

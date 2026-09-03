@@ -25,7 +25,22 @@
     <string name="manage_show_system">Tampilkan aplikasi sistem</string>
     <string name="manage_hide_system">Sembunyikan aplikasi sistem</string>
     <string name="manage_empty">Anda belum memasang aplikasi apa pun.</string>
-    <string name="manage_open">Kelola aplikasi</string>
     <string name="uninstall">Copot pemasangan</string>
     <string name="unknown_sources_hidden">Jam tangan ini menyembunyikan setelan itu. Berikan lewat proses debug nirkabel:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Lainnya</string>
+    <string name="settings_title">Setelan</string>
+    <string name="settings_storage">Penyimpanan</string>
+    <string name="settings_storage_summary">Antrean %1$s · %2$s tersisa</string>
+    <string name="settings_clear_queue">Kosongkan antrean</string>
+    <string name="settings_clear_queue_confirm">Hapus semua paket yang menunggu di antrean?</string>
+    <string name="settings_keep_after_install">Simpan APK setelah dipasang</string>
+    <string name="settings_keep_after_install_on">Disimpan agar bisa dipasang lagi</string>
+    <string name="settings_keep_after_install_off">Dihapus setelah dipasang</string>
+    <string name="settings_install_permission">Izin pemasangan</string>
+    <string name="settings_install_permission_summary">Izinkan memasang aplikasi tidak dikenal</string>
+    <string name="settings_about">Tentang</string>
+    <string name="settings_about_summary">Versi dan nama paket</string>
+    <string name="about_version">Versi</string>
+    <string name="about_package">Paket</string>
+    <string name="cancel">Batal</string>
 </resources>

@@ -25,7 +25,22 @@
     <string name="manage_show_system">Mostrar apps del sistema</string>
     <string name="manage_hide_system">Ocultar apps del sistema</string>
     <string name="manage_empty">Aún no has instalado ninguna aplicación.</string>
-    <string name="manage_open">Gestionar aplicaciones</string>
     <string name="uninstall">Desinstalar</string>
     <string name="unknown_sources_hidden">Este reloj oculta ese ajuste. Concédelo mediante depuración inalámbrica:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Más</string>
+    <string name="settings_title">Ajustes</string>
+    <string name="settings_storage">Almacenamiento</string>
+    <string name="settings_storage_summary">Cola %1$s · %2$s libres</string>
+    <string name="settings_clear_queue">Vaciar la cola</string>
+    <string name="settings_clear_queue_confirm">¿Eliminar todos los paquetes en espera?</string>
+    <string name="settings_keep_after_install">Conservar el APK tras instalar</string>
+    <string name="settings_keep_after_install_on">Se conserva para reinstalarlo</string>
+    <string name="settings_keep_after_install_off">Se elimina al instalarlo</string>
+    <string name="settings_install_permission">Permiso de instalación</string>
+    <string name="settings_install_permission_summary">Permitir instalar aplicaciones desconocidas</string>
+    <string name="settings_about">Acerca de</string>
+    <string name="settings_about_summary">Versión y nombre del paquete</string>
+    <string name="about_version">Versión</string>
+    <string name="about_package">Paquete</string>
+    <string name="cancel">Cancelar</string>
 </resources>

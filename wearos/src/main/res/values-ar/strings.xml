@@ -25,7 +25,22 @@
     <string name="manage_show_system">إظهار تطبيقات النظام</string>
     <string name="manage_hide_system">إخفاء تطبيقات النظام</string>
     <string name="manage_empty">لم تثبّت أي تطبيق بعد.</string>
-    <string name="manage_open">إدارة التطبيقات</string>
     <string name="uninstall">إلغاء التثبيت</string>
     <string name="unknown_sources_hidden">تخفي هذه الساعة هذا الإعداد. امنح الإذن عبر تصحيح الأخطاء اللاسلكي:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">المزيد</string>
+    <string name="settings_title">الإعدادات</string>
+    <string name="settings_storage">التخزين</string>
+    <string name="settings_storage_summary">قائمة الانتظار %1$s · متاح %2$s</string>
+    <string name="settings_clear_queue">مسح قائمة الانتظار</string>
+    <string name="settings_clear_queue_confirm">هل تريد حذف كل الحزم في قائمة الانتظار؟</string>
+    <string name="settings_keep_after_install">الاحتفاظ بملف APK بعد التثبيت</string>
+    <string name="settings_keep_after_install_on">يُحتفظ به لإعادة التثبيت</string>
+    <string name="settings_keep_after_install_off">يُحذف بعد التثبيت</string>
+    <string name="settings_install_permission">إذن التثبيت</string>
+    <string name="settings_install_permission_summary">السماح بتثبيت التطبيقات غير المعروفة</string>
+    <string name="settings_about">حول</string>
+    <string name="settings_about_summary">الإصدار واسم الحزمة</string>
+    <string name="about_version">الإصدار</string>
+    <string name="about_package">الحزمة</string>
+    <string name="cancel">إلغاء</string>
 </resources>

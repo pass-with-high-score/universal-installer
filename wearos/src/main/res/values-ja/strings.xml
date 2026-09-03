@@ -25,7 +25,22 @@
     <string name="manage_show_system">システムアプリを表示</string>
     <string name="manage_hide_system">システムアプリを非表示</string>
     <string name="manage_empty">まだ自分でインストールしたアプリはありません。</string>
-    <string name="manage_open">アプリの管理</string>
     <string name="uninstall">アンインストール</string>
     <string name="unknown_sources_hidden">このウォッチではこの設定が非表示です。ワイヤレスデバッグで許可してください:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">その他</string>
+    <string name="settings_title">設定</string>
+    <string name="settings_storage">ストレージ</string>
+    <string name="settings_storage_summary">キュー %1$s・空き %2$s</string>
+    <string name="settings_clear_queue">キューを消去</string>
+    <string name="settings_clear_queue_confirm">キューで待機中のパッケージをすべて削除しますか？</string>
+    <string name="settings_keep_after_install">インストール後も APK を保持</string>
+    <string name="settings_keep_after_install_on">保持され、再インストールできます</string>
+    <string name="settings_keep_after_install_off">インストール後に削除</string>
+    <string name="settings_install_permission">インストール権限</string>
+    <string name="settings_install_permission_summary">提供元不明のアプリのインストールを許可</string>
+    <string name="settings_about">このアプリについて</string>
+    <string name="settings_about_summary">バージョンとパッケージ名</string>
+    <string name="about_version">バージョン</string>
+    <string name="about_package">パッケージ</string>
+    <string name="cancel">キャンセル</string>
 </resources>

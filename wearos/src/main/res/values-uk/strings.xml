@@ -25,7 +25,22 @@
     <string name="manage_show_system">Показати системні</string>
     <string name="manage_hide_system">Приховати системні</string>
     <string name="manage_empty">Ви ще не встановили жодного застосунку.</string>
-    <string name="manage_open">Керування застосунками</string>
     <string name="uninstall">Видалити</string>
     <string name="unknown_sources_hidden">Цей годинник приховує це налаштування. Надайте дозвіл через бездротове налагодження:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="more_title">Ще</string>
+    <string name="settings_title">Налаштування</string>
+    <string name="settings_storage">Пам\'ять</string>
+    <string name="settings_storage_summary">Черга %1$s · вільно %2$s</string>
+    <string name="settings_clear_queue">Очистити чергу</string>
+    <string name="settings_clear_queue_confirm">Видалити всі пакети з черги?</string>
+    <string name="settings_keep_after_install">Зберігати APK після встановлення</string>
+    <string name="settings_keep_after_install_on">Зберігається для повторного встановлення</string>
+    <string name="settings_keep_after_install_off">Видаляється після встановлення</string>
+    <string name="settings_install_permission">Дозвіл на встановлення</string>
+    <string name="settings_install_permission_summary">Дозволити встановлення невідомих застосунків</string>
+    <string name="settings_about">Про застосунок</string>
+    <string name="settings_about_summary">Версія та назва пакета</string>
+    <string name="about_version">Версія</string>
+    <string name="about_package">Пакет</string>
+    <string name="cancel">Скасувати</string>
 </resources>

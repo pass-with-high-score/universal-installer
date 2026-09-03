@@ -34,6 +34,23 @@
     <string name="manage_show_system">Show system apps</string>
     <string name="manage_hide_system">Hide system apps</string>
     <string name="manage_empty">No apps installed by you yet.</string>
-    <string name="manage_open">Manage apps</string>
     <string name="uninstall">Uninstall</string>
+
+    <!-- More / Settings -->
+    <string name="more_title">More</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_storage">Storage</string>
+    <string name="settings_storage_summary">Queue %1$s · %2$s free</string>
+    <string name="settings_clear_queue">Clear queue</string>
+    <string name="settings_clear_queue_confirm">Delete every package waiting in the queue?</string>
+    <string name="settings_keep_after_install">Keep APK after install</string>
+    <string name="settings_keep_after_install_on">Kept, so it can be installed again</string>
+    <string name="settings_keep_after_install_off">Deleted once installed</string>
+    <string name="settings_install_permission">Install permission</string>
+    <string name="settings_install_permission_summary">Allow installing unknown apps</string>
+    <string name="settings_about">About</string>
+    <string name="settings_about_summary">Version and package name</string>
+    <string name="about_version">Version</string>
+    <string name="about_package">Package</string>
+    <string name="cancel">Cancel</string>
 </resources>
