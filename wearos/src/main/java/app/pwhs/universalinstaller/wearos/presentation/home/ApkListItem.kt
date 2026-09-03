@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller.wearos.presentation.home
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -56,20 +57,32 @@ fun ApkListItem(
             modifier = Modifier.fillMaxWidth(),
             transformation = transformation,
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ApkIcon(apkPath = info.cachedFilePath, size = 24.dp)
-                Text(
-                    text = "v${info.versionName} · ${formatSize(info.sizeBytes)}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
+                Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+                    // Real version names run long ("1.43.1.585786902-wear"); on one line with the
+                    // size they push it off the end, so the size gets a line of its own.
+                    Text(
+                        text = "v${info.versionName}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
+                        Text(
+                            text = formatSize(info.sizeBytes),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                        )
+                        ApkBadge(info = info)
+                    }
+                }
             }
-            ApkBadge(info = info, modifier = Modifier.padding(top = 4.dp))
         }
     }
 }

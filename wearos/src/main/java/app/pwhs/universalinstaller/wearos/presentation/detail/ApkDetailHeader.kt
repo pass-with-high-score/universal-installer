@@ -38,7 +38,15 @@ fun ApkDetailHeader(info: WearApkInfo, modifier: Modifier = Modifier) {
             overflow = TextOverflow.Ellipsis,
         )
         Text(
-            text = "v${info.versionName} · ${formatSize(info.sizeBytes)}",
+            text = "v${info.versionName}",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
+        Text(
+            text = formatSize(info.sizeBytes),
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
