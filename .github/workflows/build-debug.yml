@@ -29,7 +29,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Run Gradle Build
-        run: ./gradlew :app:assembleOpensourceDebug :tv:assembleDebug
+        run: ./gradlew :app:assembleOpensourceDebug :tv:assembleDebug :wearos:assembleDebug
 
       - name: Upload debug APKs
         uses: actions/upload-artifact@v4
@@ -38,4 +38,5 @@ jobs:
           path: |
             app/build/outputs/apk/opensource/debug/*.apk
             tv/build/outputs/apk/debug/*.apk
+            wearos/build/outputs/apk/debug/*.apk
           retention-days: 14

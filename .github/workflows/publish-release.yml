@@ -74,6 +74,8 @@ jobs:
       - name: Grant execute permission
         run: chmod +x gradlew
 
+      # Ships the phone AAB and the watch AAB in one release — they share a package name, so
+      # Play treats them as two form factors of the same listing.
       - name: Deploy to production track
         id: play_store_production
         continue-on-error: true
@@ -100,7 +102,7 @@ jobs:
       # gets the `opensource` flavor instead: same app, minus Firebase Analytics and
       # Crashlytics, which is the build we distribute as open source.
       - name: Build release APK & AAB
-        run: ./gradlew :app:assembleOpensourceRelease :app:bundleOpensourceRelease :tv:assembleRelease :tv:bundleRelease
+        run: ./gradlew :app:assembleOpensourceRelease :app:bundleOpensourceRelease :tv:assembleRelease :tv:bundleRelease :wearos:assembleRelease :wearos:bundleRelease
 
       # The flavor dimension renamed these to app-opensource-release.*, but two downstream
       # consumers key off the old names: F-Droid's recipe pins `binary:` to app-release.apk for
@@ -123,6 +125,8 @@ jobs:
             app/build/outputs/apk/opensource/release/app-release.apk
             tv/build/outputs/bundle/release/tv-release.aab
             tv/build/outputs/apk/release/tv-release.apk
+            wearos/build/outputs/bundle/release/wearos-release.aab
+            wearos/build/outputs/apk/release/wearos-release.apk
           retention-days: 30
 
       - name: Create GitHub Release
@@ -137,4 +141,6 @@ jobs:
             app/build/outputs/bundle/opensourceRelease/app-release.aab
             tv/build/outputs/apk/release/tv-release.apk
             tv/build/outputs/bundle/release/tv-release.aab
+            wearos/build/outputs/apk/release/wearos-release.apk
+            wearos/build/outputs/bundle/release/wearos-release.aab
           token: ${{ secrets.GITHUB_TOKEN }}

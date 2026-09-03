@@ -1,0 +1,5 @@
+# Same package as the phone app on purpose: the Wearable Data Layer only routes a channel between
+# nodes running the same package name, so Play treats the watch build as another form factor of the
+# phone listing rather than an app of its own.
+package_name("app.pwhs.universalinstaller")
+json_key_file("fastlane/play-store-key.json")

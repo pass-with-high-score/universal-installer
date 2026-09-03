@@ -8,3 +8,6 @@ eval_gemfile(plugins_path) if File.exist?(plugins_path)
 
 tv_plugins_path = File.join(File.dirname(__FILE__), 'fastlane_tv', 'Pluginfile')
 eval_gemfile(tv_plugins_path) if File.exist?(tv_plugins_path)
+
+wearos_plugins_path = File.join(File.dirname(__FILE__), 'fastlane_wearos', 'Pluginfile')
+eval_gemfile(wearos_plugins_path) if File.exist?(wearos_plugins_path)
