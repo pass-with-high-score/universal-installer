@@ -50,4 +50,5 @@
     <string name="accent_blue">Mavi</string>
     <string name="accent_green">Yeşil</string>
     <string name="accent_purple">Mor</string>
+    <string name="about_rate">Uygulamayı değerlendir</string>
 </resources>

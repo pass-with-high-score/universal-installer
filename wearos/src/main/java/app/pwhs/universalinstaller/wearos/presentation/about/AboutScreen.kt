@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.wearos.presentation.about
 
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
@@ -14,11 +15,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
@@ -45,7 +49,22 @@ fun AboutScreen() {
         packageName = context.packageName,
         // The installed APK doubles as the icon source, the same way Manage renders its rows.
         sourceDir = info?.applicationInfo?.sourceDir,
+        onRate = { openStoreListing(context) },
     )
+}
+
+/**
+ * Wear ships its own Play client, so the market: URI lands on this app's listing. The https form
+ * is the fallback for a watch without Play; if neither resolves there is nowhere to send anyone.
+ */
+private fun openStoreListing(context: android.content.Context) {
+    val id = context.packageName
+    val targets = listOf("market://details?id=$id", "https://play.google.com/store/apps/details?id=$id")
+    for (url in targets) {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        if (runCatching { context.startActivity(intent) }.isSuccess) return
+    }
 }
 
 @Composable
@@ -54,6 +73,7 @@ fun AboutScreenContent(
     version: String,
     packageName: String,
     sourceDir: String?,
+    onRate: () -> Unit,
 ) {
     AppScaffold {
         val listState = rememberTransformingLazyColumnState()
@@ -78,6 +98,19 @@ fun AboutScreenContent(
                         )
                         Label(stringResource(R.string.about_version), version)
                         Label(stringResource(R.string.about_package), packageName)
+                    }
+                }
+
+                item {
+                    Button(
+                        onClick = onRate,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp)
+                            .transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                    ) {
+                        Text(stringResource(R.string.about_rate))
                     }
                 }
             }
@@ -112,6 +145,7 @@ private fun AboutScreenPreview() {
             version = "1.12.0 (1035)",
             packageName = "app.pwhs.universalinstaller",
             sourceDir = null,
+            onRate = {},
         )
     }
 }

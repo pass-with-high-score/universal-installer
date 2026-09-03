@@ -50,4 +50,5 @@
     <string name="accent_blue">Niebieski</string>
     <string name="accent_green">Zielony</string>
     <string name="accent_purple">Fioletowy</string>
+    <string name="about_rate">Oceń aplikację</string>
 </resources>

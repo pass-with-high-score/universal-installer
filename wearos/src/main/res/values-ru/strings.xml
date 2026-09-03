@@ -50,4 +50,5 @@
     <string name="accent_blue">Синий</string>
     <string name="accent_green">Зелёный</string>
     <string name="accent_purple">Фиолетовый</string>
+    <string name="about_rate">Оценить приложение</string>
 </resources>

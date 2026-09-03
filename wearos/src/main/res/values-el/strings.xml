@@ -50,4 +50,5 @@
     <string name="accent_blue">Μπλε</string>
     <string name="accent_green">Πράσινο</string>
     <string name="accent_purple">Μοβ</string>
+    <string name="about_rate">Αξιολόγηση εφαρμογής</string>
 </resources>

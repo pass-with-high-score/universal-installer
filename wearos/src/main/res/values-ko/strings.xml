@@ -50,4 +50,5 @@
     <string name="accent_blue">파랑</string>
     <string name="accent_green">초록</string>
     <string name="accent_purple">보라</string>
+    <string name="about_rate">앱 평가하기</string>
 </resources>

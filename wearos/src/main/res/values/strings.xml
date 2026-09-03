@@ -59,5 +59,6 @@
     <string name="settings_about_summary">Version and package name</string>
     <string name="about_version">Version</string>
     <string name="about_package">Package</string>
+    <string name="about_rate">Rate this app</string>
     <string name="cancel">Cancel</string>
 </resources>

@@ -50,4 +50,5 @@
     <string name="accent_blue">Biru</string>
     <string name="accent_green">Hijau</string>
     <string name="accent_purple">Ungu</string>
+    <string name="about_rate">Beri rating aplikasi</string>
 </resources>
