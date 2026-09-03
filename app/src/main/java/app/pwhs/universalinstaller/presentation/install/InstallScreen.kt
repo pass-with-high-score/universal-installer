@@ -155,6 +155,9 @@ fun InstallScreen(
         )
     }
 
+    val watchAvailable by viewModel.watchAvailable.collectAsState()
+    LaunchedEffect(Unit) { viewModel.refreshWatchAvailability() }
+
     InstallUi(
         modifier = modifier,
         uiState = uiState,
@@ -240,6 +243,7 @@ fun InstallScreen(
         onToggleAllUsers = viewModel::setAllUsers,
         onSelectUserId = viewModel::setUserId,
         onSendToWatch = { uri, name -> viewModel.sendToWatch(uri, name) },
+        watchAvailable = watchAvailable,
     )
 
     val storageWarning by viewModel.storageWarningInfo.collectAsState()
@@ -306,6 +310,7 @@ private fun InstallUi(
     onCloseBatchDetail: () -> Unit = {},
     onSaveBatchDetail: (Uri, List<Uri>) -> Unit = { _, _ -> },
     onSendToWatch: (Uri?, String?) -> Unit = { _, _ -> },
+    watchAvailable: Boolean = true,
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -634,8 +639,8 @@ private fun InstallUi(
                 actions = {
                     val isSyncRunning = uiState.syncState == app.pwhs.universalinstaller.presentation.sync.SyncState.RUNNING
 
-                    // Watch send button — always visible
                     IconButton(
+                        enabled = watchAvailable,
                         onClick = {
                             if (uiState.pendingApkInfo != null) {
                                 onSendToWatch(null, null)

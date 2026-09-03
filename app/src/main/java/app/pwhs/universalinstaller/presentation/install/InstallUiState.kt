@@ -138,6 +138,7 @@ sealed interface WatchSendState {
     data class Sending(val progress: Float) : WatchSendState  // 0.0–1.0
     data object Success : WatchSendState
     data object NoWatch : WatchSendState
+    data class Unsupported(val reason: String) : WatchSendState
     data class Error(val message: String) : WatchSendState
 }
 

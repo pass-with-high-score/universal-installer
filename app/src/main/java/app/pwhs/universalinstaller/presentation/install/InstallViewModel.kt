@@ -484,16 +484,34 @@ class InstallViewModel(
 
     // ── Watch (Wear OS) ──────────────────────────────────────────────────────
 
+    val watchAvailable: StateFlow<Boolean> = wearDelegate.watchAvailable
+
+    fun refreshWatchAvailability() = wearDelegate.refreshWatchAvailability()
+
     fun sendToWatch(apkUri: Uri? = null, fileName: String? = null) {
-        val uri = apkUri
-            ?: parseDelegate.pendingOriginalUri
-            ?: parseDelegate.pendingApkUris?.firstOrNull()
-            ?: return
-        val name = fileName
-            ?: parseDelegate.pendingFileName
-            ?: "${parseDelegate.pendingApkInfo.value?.appName ?: "app"}.apk"
+        if (apkUri != null) {
+            wearDelegate.sendToWatch(apkUri, fileName ?: fallbackFileName())
+            return
+        }
+
+        val originalUri = parseDelegate.pendingOriginalUri
+        val splitUris = parseDelegate.pendingApkUris.orEmpty()
+        val name = fileName ?: parseDelegate.pendingFileName ?: fallbackFileName()
+
+        // Loose splits have no single file to hand over; only a bundle archive or one APK works.
+        if (originalUri == null && splitUris.size > 1) {
+            wearDelegate.reportUnsupported(
+                application.getString(R.string.watch_send_unsupported_splits)
+            )
+            return
+        }
+
+        val uri = originalUri ?: splitUris.firstOrNull() ?: return
         wearDelegate.sendToWatch(uri, name)
     }
+
+    private fun fallbackFileName(): String =
+        "${parseDelegate.pendingApkInfo.value?.appName ?: "app"}.apk"
 
     fun dismissWatchSend() = wearDelegate.dismissWatchSend()
 }

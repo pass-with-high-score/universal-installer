@@ -850,12 +850,14 @@
     <string name="insufficient_storage_dialog_clean_up">Free Up Space</string>
 
     <!-- Wear OS Send Strings -->
+    <string name="watch_send_unsupported_title">Can\'t send this package</string>
+    <string name="watch_send_unsupported_splits">This is a set of separate split APKs. Send a single APK, or the original .apks/.xapk bundle instead.</string>
     <string name="watch_send_title">Send to Watch</string>
     <string name="watch_send_connecting">Connecting to watch…</string>
     <string name="watch_send_sending">Sending APK to watch (%1$d%%)…</string>
     <string name="watch_send_success_title">APK Sent</string>
     <string name="watch_send_success_msg">The APK has been transferred to your watch. Open Universal Installer on your watch to install it.</string>
     <string name="watch_send_no_watch_title">No Watch Connected</string>
-    <string name="watch_send_no_watch_msg">No Wear OS watch was found. Make sure your watch is paired and connected via Bluetooth.</string>
+    <string name="watch_send_no_watch_msg">No Wear OS watch with Universal Installer was found. Make sure your watch is paired, connected via Bluetooth, and has the watch app installed.</string>
     <string name="watch_send_error_title">Transfer Failed</string>
 </resources>
