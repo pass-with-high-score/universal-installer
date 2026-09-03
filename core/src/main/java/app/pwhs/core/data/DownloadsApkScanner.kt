@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
 import app.pwhs.core.domain.ApkFile
+import app.pwhs.core.install.BUNDLE_EXTS
 import java.io.File
 
 /**
@@ -14,7 +15,6 @@ import java.io.File
  */
 object DownloadsApkScanner {
 
-    private val BUNDLE_EXTS = setOf("apks", "xapk", "apkm", "apk+", "zip")
     private val APK_EXTS = setOf("apk", "apks", "xapk", "apkm", "apk+", "zip")
 
     fun scan(context: Context): List<ApkFile> {

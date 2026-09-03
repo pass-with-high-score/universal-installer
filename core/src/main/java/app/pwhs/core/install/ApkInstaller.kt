@@ -41,7 +41,6 @@ class ApkInstaller(private val context: Context) {
 
     private companion object {
         const val ACTION = "app.pwhs.core.install.STATUS"
-        val BUNDLE_EXTS = setOf("apks", "xapk", "apkm", "apk+", "zip")
     }
 
     /** Convenience for installing a staged file (e.g. an upload received over LAN). */
