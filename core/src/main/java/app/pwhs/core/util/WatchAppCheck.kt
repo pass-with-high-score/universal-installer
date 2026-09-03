@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
+import app.pwhs.core.install.BaseApkExtractor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -18,18 +19,28 @@ object WatchAppCheck {
 
     const val WATCH_FEATURE = "android.hardware.type.watch"
 
-    fun declaresWatchFeature(context: Context, apkPath: String): Boolean = runCatching {
-        val flags = PackageManager.GET_CONFIGURATIONS
-        val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getPackageArchiveInfo(
-                apkPath, PackageManager.PackageInfoFlags.of(flags.toLong())
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            context.packageManager.getPackageArchiveInfo(apkPath, flags)
+    fun declaresWatchFeature(context: Context, apkPath: String): Boolean {
+        // A .xapk/.apks is a zip, not an APK — parsing it directly returns null, which used to
+        // brand every split bundle a phone app.
+        val extracted = BaseApkExtractor.pathForParsing(context, apkPath, "watch_feature_check")
+            ?: return false
+        try {
+            return runCatching {
+                val flags = PackageManager.GET_CONFIGURATIONS
+                val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    context.packageManager.getPackageArchiveInfo(
+                        extracted.path, PackageManager.PackageInfoFlags.of(flags.toLong())
+                    )
+                } else {
+                    @Suppress("DEPRECATION")
+                    context.packageManager.getPackageArchiveInfo(extracted.path, flags)
+                }
+                info?.reqFeatures?.any { it.name == WATCH_FEATURE } == true
+            }.getOrDefault(false)
+        } finally {
+            extracted.temp?.delete()
         }
-        info?.reqFeatures?.any { it.name == WATCH_FEATURE } == true
-    }.getOrDefault(false)
+    }
 
     /** Unreadable or unparsable content resolves to `true` so an uncertain read never blocks a send. */
     suspend fun declaresWatchFeature(context: Context, uri: Uri): Boolean =

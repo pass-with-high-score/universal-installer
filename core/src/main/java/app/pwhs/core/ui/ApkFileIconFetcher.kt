@@ -2,6 +2,7 @@ package app.pwhs.core.ui
 
 import android.content.Context
 import androidx.core.graphics.drawable.toBitmap
+import app.pwhs.core.install.BaseApkExtractor
 import coil3.ImageLoader
 import coil3.asImage
 import coil3.decode.DataSource
@@ -11,9 +12,6 @@ import coil3.fetch.ImageFetchResult
 import coil3.request.Options
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import ru.solrudev.ackpine.splits.Apk
-import ru.solrudev.ackpine.splits.CloseableSequence
-import ru.solrudev.ackpine.splits.ZippedApkSplits
 
 @JvmInline
 value class ApkFileIconData(val path: String)
@@ -23,40 +21,10 @@ class ApkFileIconFetcher(
     private val context: Context,
 ) : Fetcher {
     override suspend fun fetch(): FetchResult? = withContext(Dispatchers.IO) {
-        val file = java.io.File(data.path)
-        val ext = file.extension.lowercase()
-        val isSplit = ext in listOf("apks", "xapk", "apkm", "zip")
-        var tempFile: java.io.File? = null
-
-        val pathForParsing = if (isSplit) {
-            try {
-                val uri = android.net.Uri.fromFile(file)
-                var baseApk: Apk.Base? = null
-                val apks = ZippedApkSplits.getApksForUri(uri, context)
-                try {
-                    for (apk in apks) {
-                        if (apk is Apk.Base) {
-                            baseApk = apk
-                            break
-                        }
-                    }
-                } finally {
-                    apks.close()
-                }
-                if (baseApk == null) return@withContext null
-
-                // Copy base apk sequence to a temp file
-                tempFile = java.io.File(context.cacheDir, "temp_icon_${System.currentTimeMillis()}.apk")
-                context.contentResolver.openInputStream(baseApk.uri)?.use { input ->
-                    tempFile.outputStream().use { output -> input.copyTo(output) }
-                }
-                tempFile.absolutePath
-            } catch (e: Exception) {
-                return@withContext null
-            }
-        } else {
-            data.path
-        }
+        val extracted = BaseApkExtractor.pathForParsing(context, data.path, "temp_icon")
+            ?: return@withContext null
+        val pathForParsing = extracted.path
+        val tempFile = extracted.temp
 
         try {
             val pm = context.packageManager
