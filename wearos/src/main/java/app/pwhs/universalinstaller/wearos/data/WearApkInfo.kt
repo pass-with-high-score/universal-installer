@@ -16,5 +16,9 @@ data class WearApkInfo(
     val sizeBytes: Long,
     /** Absolute path to the cached package file in internal storage. */
     val cachedFilePath: String,
+    /** Read once when the package lands, so the list never parses an archive while scrolling. */
+    val declaresWatchFeature: Boolean = false,
+    /** Version of this package already on the watch, null when it is not installed. */
+    val installedVersionCode: Long? = null,
     val receivedAt: Long = System.currentTimeMillis(),
 )

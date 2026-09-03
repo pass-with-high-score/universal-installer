@@ -13,6 +13,7 @@ import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import app.pwhs.universalinstaller.wearos.presentation.detail.ApkDetailScreen
 import app.pwhs.universalinstaller.wearos.presentation.home.HomeScreen
+import app.pwhs.universalinstaller.wearos.presentation.theme.UniversalInstallerTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class MainActivity : ComponentActivity() {
@@ -23,9 +24,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         pendingApkId.value = intent?.getStringExtra(EXTRA_APK_ID)
         setContent {
-            val apkId by pendingApkId.collectAsState()
-            NotificationPermissionRequest()
-            WearNavGraph(apkId) { pendingApkId.value = null }
+            UniversalInstallerTheme {
+                val apkId by pendingApkId.collectAsState()
+                NotificationPermissionRequest()
+                WearNavGraph(apkId) { pendingApkId.value = null }
+            }
         }
     }
 

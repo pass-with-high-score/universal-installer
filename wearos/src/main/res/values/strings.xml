@@ -6,7 +6,6 @@
 
     <!-- Home screen -->
     <string name="home_title">APK Queue</string>
-    <string name="home_empty">No APKs yet.\nSend one from your phone.</string>
 
     <!-- Detail screen -->
     <string name="install">Install</string>
@@ -25,4 +24,13 @@
 
     <!-- Notification -->
     <string name="apk_received_title">APK received</string>
+
+    <string name="home_empty_title">Nothing here yet</string>
+    <string name="home_empty_hint">Open Universal Installer on your phone and send a package to this watch.</string>
+    <string name="receiving">Receiving %1$s…</string>
+    <string name="receive_failed">Transfer failed</string>
+    <string name="badge_phone_app">Phone app</string>
+    <string name="badge_installed">Installed</string>
+    <string name="badge_update">Update</string>
+    <string name="badge_older">Older</string>
 </resources>

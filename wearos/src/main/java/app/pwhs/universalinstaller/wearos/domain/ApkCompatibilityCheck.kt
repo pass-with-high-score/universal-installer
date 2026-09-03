@@ -2,7 +2,6 @@ package app.pwhs.universalinstaller.wearos.domain
 
 import android.content.Context
 import android.os.Build
-import app.pwhs.core.util.WatchAppCheck
 import app.pwhs.universalinstaller.wearos.R
 import app.pwhs.universalinstaller.wearos.data.WearApkInfo
 
@@ -18,7 +17,7 @@ class ApkCompatibilityCheck(private val context: Context) {
                 R.string.incompatible_min_sdk, info.minSdk, Build.VERSION.SDK_INT
             )
         }
-        if (!WatchAppCheck.declaresWatchFeature(context, info.cachedFilePath)) {
+        if (!info.declaresWatchFeature) {
             return context.getString(R.string.incompatible_not_a_watch_app)
         }
         return null

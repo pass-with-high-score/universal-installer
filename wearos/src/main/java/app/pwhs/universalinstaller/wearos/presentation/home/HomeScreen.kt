@@ -1,30 +1,24 @@
 package app.pwhs.universalinstaller.wearos.presentation.home
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
-import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
-import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
-import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import app.pwhs.universalinstaller.wearos.R
 import app.pwhs.universalinstaller.wearos.data.WearApkInfo
+import app.pwhs.universalinstaller.wearos.data.WearReceiveState
 import app.pwhs.universalinstaller.wearos.presentation.theme.UniversalInstallerTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -35,72 +29,72 @@ fun HomeScreen(
 ) {
     val apks by viewModel.apks.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
-    HomeScreenContent(apks = apks, isLoading = isLoading, onApkClick = onApkClick)
+    val receiveState by viewModel.receiveState.collectAsState()
+    HomeScreenContent(
+        apks = apks,
+        isLoading = isLoading,
+        receiveState = receiveState,
+        onApkClick = onApkClick,
+        onDelete = viewModel::delete,
+    )
 }
 
 @Composable
 fun HomeScreenContent(
     apks: List<WearApkInfo>,
     isLoading: Boolean,
+    receiveState: WearReceiveState,
     onApkClick: (String) -> Unit,
+    onDelete: (String) -> Unit,
 ) {
-    UniversalInstallerTheme {
-        AppScaffold {
-            val listState = rememberTransformingLazyColumnState()
-            val transformationSpec = rememberTransformationSpec()
+    AppScaffold {
+        val listState = rememberTransformingLazyColumnState()
+        val spec = rememberTransformationSpec()
 
-            ScreenScaffold(scrollState = listState) { contentPadding ->
-                TransformingLazyColumn(
-                    contentPadding = contentPadding,
-                    state = listState,
-                ) {
-                    item {
-                        ListHeader(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .transformedHeight(this, transformationSpec),
-                            transformation = SurfaceTransformation(transformationSpec),
-                        ) {
-                            Text(text = stringResource(R.string.home_title))
-                        }
+        ScreenScaffold(scrollState = listState) { contentPadding ->
+            TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
+                item {
+                    ListHeader(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                    ) {
+                        Text(text = stringResource(R.string.home_title))
                     }
+                }
 
-                    if (apks.isEmpty()) {
-                        item {
+                if (receiveState !is WearReceiveState.Idle) {
+                    item {
+                        ReceivingCard(
+                            state = receiveState,
+                            modifier = Modifier.transformedHeight(this, spec),
+                        )
+                    }
+                }
+
+                items(apks.size, key = { apks[it].id }) { index ->
+                    val apk = apks[index]
+                    ApkListItem(
+                        info = apk,
+                        onClick = { onApkClick(apk.id) },
+                        onDelete = { onDelete(apk.id) },
+                        modifier = Modifier.transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                    )
+                }
+
+                if (apks.isEmpty() && receiveState is WearReceiveState.Idle) {
+                    item {
+                        if (isLoading) {
                             Text(
-                                text = stringResource(
-                                    if (isLoading) R.string.loading else R.string.home_empty
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                textAlign = TextAlign.Center,
+                                text = stringResource(R.string.loading),
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 16.dp)
-                                    .transformedHeight(this, transformationSpec),
+                                    .transformedHeight(this, spec),
                             )
-                        }
-                    } else {
-                        items(apks.size) { index ->
-                            val apk = apks[index]
-                            TitleCard(
-                                onClick = { onApkClick(apk.id) },
-                                title = {
-                                    Text(
-                                        text = apk.appName,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .transformedHeight(this, transformationSpec),
-                                transformation = SurfaceTransformation(transformationSpec),
-                            ) {
-                                Text(
-                                    text = "${apk.versionName} · ${formatSize(apk.sizeBytes)}",
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
+                        } else {
+                            HomeEmpty(modifier = Modifier.transformedHeight(this, spec))
                         }
                     }
                 }
@@ -109,38 +103,62 @@ fun HomeScreenContent(
     }
 }
 
-private fun formatSize(bytes: Long): String {
-    val mb = bytes / 1_048_576.0
-    return if (mb >= 1.0) "%.1f MB".format(mb) else "${bytes / 1024} KB"
-}
-
-private fun previewApk() = WearApkInfo(
-    id = "sample.apk",
-    fileName = "sample.apk",
-    appName = "Sample App",
-    packageName = "com.sample.app",
-    versionName = "2.1.0",
-    versionCode = 210,
-    minSdk = 30,
-    isBundle = false,
-    sizeBytes = 15_000_000L,
-    cachedFilePath = "/data/app/sample.apk",
+private fun previewApk(
+    id: String = "sample.apk",
+    appName: String = "Watch Face Studio",
+    declaresWatchFeature: Boolean = true,
+    installedVersionCode: Long? = null,
+) = WearApkInfo(
+    id = id, fileName = id, appName = appName, packageName = "com.sample.app",
+    versionName = "2.1.0", versionCode = 210, minSdk = 30, isBundle = false,
+    sizeBytes = 15_000_000L, cachedFilePath = "/nowhere/$id",
+    declaresWatchFeature = declaresWatchFeature, installedVersionCode = installedVersionCode,
 )
 
 @WearPreviewDevices
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreenContent(apks = listOf(previewApk()), isLoading = false, onApkClick = {})
+    UniversalInstallerTheme {
+        HomeScreenContent(
+            apks = listOf(
+                previewApk(),
+                previewApk(id = "b.apk", appName = "Instagram", declaresWatchFeature = false),
+                previewApk(id = "c.apk", appName = "Tiles Demo", installedVersionCode = 210),
+            ),
+            isLoading = false,
+            receiveState = WearReceiveState.Idle,
+            onApkClick = {},
+            onDelete = {},
+        )
+    }
 }
 
 @WearPreviewDevices
 @Composable
-private fun HomeScreenLoadingPreview() {
-    HomeScreenContent(apks = emptyList(), isLoading = true, onApkClick = {})
+private fun HomeScreenReceivingPreview() {
+    UniversalInstallerTheme {
+        HomeScreenContent(
+            apks = listOf(previewApk()),
+            isLoading = false,
+            receiveState = WearReceiveState.Receiving("watchface.apk", 4_000_000, 12_000_000),
+            onApkClick = {},
+            onDelete = {},
+        )
+    }
 }
 
 @WearPreviewDevices
 @Composable
 private fun HomeScreenEmptyPreview() {
-    HomeScreenContent(apks = emptyList(), isLoading = false, onApkClick = {})
+    UniversalInstallerTheme {
+        HomeScreenContent(emptyList(), false, WearReceiveState.Idle, {}, {})
+    }
+}
+
+@WearPreviewDevices
+@Composable
+private fun HomeScreenLoadingPreview() {
+    UniversalInstallerTheme {
+        HomeScreenContent(emptyList(), true, WearReceiveState.Idle, {}, {})
+    }
 }

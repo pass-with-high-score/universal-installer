@@ -1,9 +1,12 @@
 package app.pwhs.universalinstaller.wearos.data
 
 import android.content.Context
+import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import app.pwhs.core.data.ApkMetadataReader
 import app.pwhs.core.install.isBundleFileName
+import app.pwhs.core.util.WatchAppCheck
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -65,7 +68,22 @@ class WearApkRepository(
         return File(cacheDir, "${UUID.randomUUID()}_$safe")
     }
 
-    private suspend fun readInfo(file: File): WearApkInfo? =
-        metadataReader.readMetadata(Uri.fromFile(file), file.name.isBundleFileName())
-            ?.toWearApkInfo(file)
+    private suspend fun readInfo(file: File): WearApkInfo? {
+        val metadata = metadataReader.readMetadata(Uri.fromFile(file), file.name.isBundleFileName())
+            ?: return null
+        return metadata.toWearApkInfo(
+            file = file,
+            declaresWatchFeature = WatchAppCheck.declaresWatchFeature(context, file.absolutePath),
+            installedVersionCode = installedVersionCode(metadata.packageName),
+        )
+    }
+
+    private fun installedVersionCode(packageName: String): Long? = runCatching {
+        val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.packageManager.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0L))
+        } else {
+            @Suppress("DEPRECATION") context.packageManager.getPackageInfo(packageName, 0)
+        }
+        info.longVersionCode
+    }.getOrNull()
 }
