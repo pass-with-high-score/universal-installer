@@ -64,6 +64,9 @@ class WearTransferService : Service() {
 
     private suspend fun runTransfer(uri: Uri, fileName: String) {
         WearTransferState.update(WatchSendState.CheckingWatch)
+        // Parsing the icon reads the whole archive, so it runs beside the transfer rather than
+        // delaying it; the watch shows a placeholder until the icon lands.
+        scope.launch { WearApkSender.sendIcon(applicationContext, uri, fileName) }
         val result = WearApkSender.send(
             context = applicationContext,
             apkUri = uri,

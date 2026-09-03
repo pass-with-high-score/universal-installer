@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.wearos.data
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.graphics.BitmapFactory
 import android.content.Context
 import android.content.Intent
 import android.os.PowerManager
@@ -13,6 +14,7 @@ import app.pwhs.universalinstaller.wearos.R
 import app.pwhs.universalinstaller.wearos.presentation.MainActivity
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.ChannelClient
+import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import kotlinx.coroutines.Dispatchers
@@ -30,6 +32,17 @@ import org.koin.android.ext.android.inject
 class WearReceiverService : WearableListenerService() {
 
     private val repository: WearApkRepository by inject()
+
+    /** The phone sends the launcher icon ahead of the payload; the payload itself is unparsable
+     *  until it is complete, so this is the only way the transfer can show what is arriving. */
+    override fun onMessageReceived(event: MessageEvent) {
+        val fileName = event.path.removePrefix(META_PATH_PREFIX)
+        if (fileName == event.path || fileName.isEmpty()) return
+        val icon = runCatching {
+            BitmapFactory.decodeByteArray(event.data, 0, event.data.size)
+        }.getOrNull() ?: return
+        WearReceiveProgress.setIcon(fileName, icon)
+    }
 
     override fun onChannelOpened(channel: ChannelClient.Channel) {
         val payload = channel.path.removePrefix(CHANNEL_PATH_PREFIX)
@@ -161,5 +174,6 @@ class WearReceiverService : WearableListenerService() {
         private const val WAKE_LOCK_TAG = "UniversalInstaller:WearReceiver"
         private const val WAKE_LOCK_TIMEOUT_MS = 10 * 60 * 1000L
         const val CHANNEL_PATH_PREFIX = "/apk-transfer/"
+        const val META_PATH_PREFIX = "/apk-meta/"
     }
 }

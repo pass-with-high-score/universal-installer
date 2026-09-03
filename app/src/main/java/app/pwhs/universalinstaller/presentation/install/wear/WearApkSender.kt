@@ -1,8 +1,12 @@
 package app.pwhs.universalinstaller.presentation.install.wear
 
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import androidx.core.graphics.scale
+import app.pwhs.core.data.ApkMetadataReader
+import app.pwhs.core.install.isBundleFileName
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Node
@@ -11,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 
 /**
  * Streams an APK to the paired Wear OS watch over a Wearable [com.google.android.gms.wearable.ChannelClient]
@@ -29,7 +34,11 @@ object WearApkSender {
      */
     const val CHANNEL_PATH_PREFIX = "/apk-transfer/"
 
+    /** Icon channel, paired with [CHANNEL_PATH_PREFIX] by file name. */
+    const val META_PATH_PREFIX = "/apk-meta/"
+
     private const val BUFFER_SIZE = 8192
+    private const val ICON_PX = 96
 
     sealed interface SendResult {
         data object Success : SendResult
@@ -87,6 +96,30 @@ object WearApkSender {
             runCatching { Tasks.await(channelClient.close(channel)) }
         }
     }
+
+    /**
+     * Sends the package's launcher icon ahead of the payload, so the watch can show what is
+     * arriving — it cannot read the icon itself until the archive is complete. Best effort: a
+     * transfer with no icon is still a fine transfer, so every failure here is swallowed.
+     */
+    suspend fun sendIcon(context: Context, apkUri: Uri, fileName: String) =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                val node = findReceiverNode(context) ?: return@withContext
+                val metadata = ApkMetadataReader(context)
+                    .readMetadata(apkUri, fileName.isBundleFileName()) ?: return@withContext
+                val icon = metadata.icon ?: return@withContext
+                val bytes = ByteArrayOutputStream().use { out ->
+                    icon.scale(ICON_PX, ICON_PX).compress(Bitmap.CompressFormat.PNG, 100, out)
+                    out.toByteArray()
+                }
+                Tasks.await(
+                    Wearable.getMessageClient(context)
+                        .sendMessage(node.id, META_PATH_PREFIX + sanitize(fileName), bytes)
+                )
+            }.onFailure { Log.d(TAG, "Icon not sent: ${it.message}") }
+            Unit
+        }
 
     private fun findReceiverNode(context: Context): Node? = runCatching {
         val info = Tasks.await(
