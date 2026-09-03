@@ -43,4 +43,11 @@
     <string name="about_version">버전</string>
     <string name="about_package">패키지</string>
     <string name="cancel">취소</string>
+    <string name="settings_language">언어</string>
+    <string name="settings_language_system">워치 언어</string>
+    <string name="settings_accent">강조 색상</string>
+    <string name="accent_orange">주황</string>
+    <string name="accent_blue">파랑</string>
+    <string name="accent_green">초록</string>
+    <string name="accent_purple">보라</string>
 </resources>

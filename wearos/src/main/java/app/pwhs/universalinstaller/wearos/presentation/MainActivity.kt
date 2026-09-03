@@ -1,6 +1,8 @@
 package app.pwhs.universalinstaller.wearos.presentation
 
+import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,22 +18,45 @@ import app.pwhs.universalinstaller.wearos.presentation.home.HomeScreen
 import app.pwhs.universalinstaller.wearos.presentation.about.AboutScreen
 import app.pwhs.universalinstaller.wearos.presentation.manage.ManageScreen
 import app.pwhs.universalinstaller.wearos.presentation.more.MoreScreen
+import app.pwhs.universalinstaller.wearos.data.WearSettings
+import app.pwhs.universalinstaller.wearos.presentation.settings.AccentScreen
+import app.pwhs.universalinstaller.wearos.presentation.settings.AppLocale
+import app.pwhs.universalinstaller.wearos.presentation.settings.LanguageScreen
 import app.pwhs.universalinstaller.wearos.presentation.settings.SettingsScreen
+import app.pwhs.universalinstaller.wearos.presentation.settings.SettingsViewModel
+import app.pwhs.universalinstaller.wearos.presentation.theme.WearAccent
 import app.pwhs.universalinstaller.wearos.presentation.theme.UniversalInstallerTheme
 import kotlinx.coroutines.flow.MutableStateFlow
+import org.koin.android.ext.android.inject
+import org.koin.androidx.compose.koinViewModel
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
 
     private val pendingApkId = MutableStateFlow<String?>(null)
+    private val settings: WearSettings by inject()
+
+    /** The locale has to be in place before the first resource is resolved, which is here. */
+    override fun attachBaseContext(newBase: Context) {
+        val locale = AppLocale.toLocale(WearSettings.readLanguageBlocking(newBase))
+        if (locale == null) {
+            super.attachBaseContext(newBase)
+            return
+        }
+        Locale.setDefault(locale)
+        val config = Configuration(newBase.resources.configuration).apply { setLocale(locale) }
+        super.attachBaseContext(newBase.createConfigurationContext(config))
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         pendingApkId.value = intent?.getStringExtra(EXTRA_APK_ID)
         setContent {
-            UniversalInstallerTheme {
+            val accentId by settings.accentId.collectAsState(initial = null)
+            UniversalInstallerTheme(accent = WearAccent.fromId(accentId)) {
                 val apkId by pendingApkId.collectAsState()
                 NotificationPermissionRequest()
-                WearNavGraph(apkId) { pendingApkId.value = null }
+                WearNavGraph(apkId, onRecreate = { recreate() }) { pendingApkId.value = null }
             }
         }
     }
@@ -53,12 +78,15 @@ private object Routes {
     const val MANAGE = "manage"
     const val SETTINGS = "settings"
     const val ABOUT = "about"
+    const val LANGUAGE = "language"
+    const val ACCENT = "accent"
     fun detail(apkId: String) = "detail/$apkId"
 }
 
 @Composable
 fun WearNavGraph(
     deepLinkApkId: String? = null,
+    onRecreate: () -> Unit = {},
     onDeepLinkConsumed: () -> Unit = {},
 ) {
     val navController = rememberSwipeDismissableNavController()
@@ -87,7 +115,24 @@ fun WearNavGraph(
         }
         composable(Routes.MANAGE) { ManageScreen() }
         composable(Routes.SETTINGS) {
-            SettingsScreen(onAboutClick = { navController.navigate(Routes.ABOUT) })
+            SettingsScreen(
+                onAboutClick = { navController.navigate(Routes.ABOUT) },
+                onLanguageClick = { navController.navigate(Routes.LANGUAGE) },
+                onAccentClick = { navController.navigate(Routes.ACCENT) },
+            )
+        }
+        composable(Routes.LANGUAGE) {
+            val viewModel: SettingsViewModel = koinViewModel()
+            val tag by viewModel.languageTag.collectAsState()
+            LanguageScreen(
+                selectedTag = tag,
+                onSelect = { viewModel.setLanguage(it, onRecreate) },
+            )
+        }
+        composable(Routes.ACCENT) {
+            val viewModel: SettingsViewModel = koinViewModel()
+            val accent by viewModel.accent.collectAsState()
+            AccentScreen(selected = accent, onSelect = viewModel::setAccent)
         }
         composable(Routes.ABOUT) { AboutScreen() }
         composable(Routes.DETAIL) { backStackEntry ->

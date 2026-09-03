@@ -48,6 +48,13 @@
     <string name="settings_keep_after_install_off">Deleted once installed</string>
     <string name="settings_install_permission">Install permission</string>
     <string name="settings_install_permission_summary">Allow installing unknown apps</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">Watch language</string>
+    <string name="settings_accent">Accent colour</string>
+    <string name="accent_orange">Orange</string>
+    <string name="accent_blue">Blue</string>
+    <string name="accent_green">Green</string>
+    <string name="accent_purple">Purple</string>
     <string name="settings_about">About</string>
     <string name="settings_about_summary">Version and package name</string>
     <string name="about_version">Version</string>

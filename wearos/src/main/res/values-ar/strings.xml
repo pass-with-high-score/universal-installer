@@ -43,4 +43,11 @@
     <string name="about_version">الإصدار</string>
     <string name="about_package">الحزمة</string>
     <string name="cancel">إلغاء</string>
+    <string name="settings_language">اللغة</string>
+    <string name="settings_language_system">لغة الساعة</string>
+    <string name="settings_accent">لون التمييز</string>
+    <string name="accent_orange">برتقالي</string>
+    <string name="accent_blue">أزرق</string>
+    <string name="accent_green">أخضر</string>
+    <string name="accent_purple">بنفسجي</string>
 </resources>

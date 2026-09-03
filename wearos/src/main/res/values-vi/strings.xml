@@ -43,4 +43,11 @@
     <string name="about_version">Phiên bản</string>
     <string name="about_package">Gói</string>
     <string name="cancel">Huỷ</string>
+    <string name="settings_language">Ngôn ngữ</string>
+    <string name="settings_language_system">Ngôn ngữ đồng hồ</string>
+    <string name="settings_accent">Màu nhấn</string>
+    <string name="accent_orange">Cam</string>
+    <string name="accent_blue">Xanh dương</string>
+    <string name="accent_green">Xanh lá</string>
+    <string name="accent_purple">Tím</string>
 </resources>

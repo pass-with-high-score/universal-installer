@@ -43,4 +43,11 @@
     <string name="about_version">Versione</string>
     <string name="about_package">Pacchetto</string>
     <string name="cancel">Annulla</string>
+    <string name="settings_language">Lingua</string>
+    <string name="settings_language_system">Lingua dell\'orologio</string>
+    <string name="settings_accent">Colore d\'accento</string>
+    <string name="accent_orange">Arancione</string>
+    <string name="accent_blue">Blu</string>
+    <string name="accent_green">Verde</string>
+    <string name="accent_purple">Viola</string>
 </resources>

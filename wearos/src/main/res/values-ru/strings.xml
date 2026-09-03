@@ -43,4 +43,11 @@
     <string name="about_version">Версия</string>
     <string name="about_package">Пакет</string>
     <string name="cancel">Отмена</string>
+    <string name="settings_language">Язык</string>
+    <string name="settings_language_system">Язык часов</string>
+    <string name="settings_accent">Акцентный цвет</string>
+    <string name="accent_orange">Оранжевый</string>
+    <string name="accent_blue">Синий</string>
+    <string name="accent_green">Зелёный</string>
+    <string name="accent_purple">Фиолетовый</string>
 </resources>

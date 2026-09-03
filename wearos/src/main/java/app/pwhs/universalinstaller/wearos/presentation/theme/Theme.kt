@@ -1,15 +1,16 @@
 package app.pwhs.universalinstaller.wearos.presentation.theme
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.wear.compose.material3.ColorScheme
 import androidx.wear.compose.material3.MaterialTheme
 
-private val WearColorScheme = ColorScheme(
-    primary = WearPrimary,
-    primaryDim = WearPrimaryDim,
-    primaryContainer = WearPrimaryContainer,
-    onPrimary = WearOnPrimary,
-    onPrimaryContainer = WearOnPrimaryContainer,
+private fun colorScheme(accent: WearAccent) = ColorScheme(
+    primary = accent.primary,
+    primaryDim = accent.primaryDim,
+    primaryContainer = accent.primaryContainer,
+    onPrimary = accent.onPrimary,
+    onPrimaryContainer = accent.onPrimaryContainer,
     secondary = WearSecondary,
     secondaryDim = WearSecondaryDim,
     secondaryContainer = WearSecondaryContainer,
@@ -37,6 +38,9 @@ private val WearColorScheme = ColorScheme(
 )
 
 @Composable
-fun UniversalInstallerTheme(content: @Composable () -> Unit) {
-    MaterialTheme(colorScheme = WearColorScheme, content = content)
+fun UniversalInstallerTheme(
+    accent: WearAccent = WearAccent.Default,
+    content: @Composable () -> Unit,
+) {
+    MaterialTheme(colorScheme = remember(accent) { colorScheme(accent) }, content = content)
 }

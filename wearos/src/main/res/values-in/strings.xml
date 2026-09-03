@@ -43,4 +43,11 @@
     <string name="about_version">Versi</string>
     <string name="about_package">Paket</string>
     <string name="cancel">Batal</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_language_system">Bahasa jam tangan</string>
+    <string name="settings_accent">Warna aksen</string>
+    <string name="accent_orange">Oranye</string>
+    <string name="accent_blue">Biru</string>
+    <string name="accent_green">Hijau</string>
+    <string name="accent_purple">Ungu</string>
 </resources>

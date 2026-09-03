@@ -54,6 +54,15 @@ android {
             }
         }
     }
+    // The in-app language picker only works if every language ships in the install. Play splits
+    // an AAB by language by default and downloads just the device's own, so a picked locale would
+    // silently fall back to English.
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

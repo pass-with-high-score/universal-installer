@@ -43,4 +43,11 @@
     <string name="about_version">Version</string>
     <string name="about_package">Paket</string>
     <string name="cancel">Abbrechen</string>
+    <string name="settings_language">Sprache</string>
+    <string name="settings_language_system">Sprache der Uhr</string>
+    <string name="settings_accent">Akzentfarbe</string>
+    <string name="accent_orange">Orange</string>
+    <string name="accent_blue">Blau</string>
+    <string name="accent_green">Grün</string>
+    <string name="accent_purple">Lila</string>
 </resources>

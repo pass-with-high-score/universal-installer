@@ -43,4 +43,11 @@
     <string name="about_version">Έκδοση</string>
     <string name="about_package">Πακέτο</string>
     <string name="cancel">Άκυρο</string>
+    <string name="settings_language">Γλώσσα</string>
+    <string name="settings_language_system">Γλώσσα ρολογιού</string>
+    <string name="settings_accent">Χρώμα τονισμού</string>
+    <string name="accent_orange">Πορτοκαλί</string>
+    <string name="accent_blue">Μπλε</string>
+    <string name="accent_green">Πράσινο</string>
+    <string name="accent_purple">Μοβ</string>
 </resources>

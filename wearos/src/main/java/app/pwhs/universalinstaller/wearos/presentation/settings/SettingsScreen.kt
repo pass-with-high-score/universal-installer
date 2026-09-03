@@ -33,9 +33,18 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun SettingsScreen(
     onAboutClick: () -> Unit,
+    onLanguageClick: () -> Unit,
+    onAccentClick: () -> Unit,
     viewModel: SettingsViewModel = koinViewModel(),
 ) {
     val keep by viewModel.keepAfterInstall.collectAsState()
+    val accent by viewModel.accent.collectAsState()
+    val languageTag by viewModel.languageTag.collectAsState()
+    val languageLabel = if (languageTag == AppLocale.SYSTEM) {
+        stringResource(R.string.settings_language_system)
+    } else {
+        AppLocale.displayName(languageTag)
+    }
     val queueBytes by viewModel.queueBytes.collectAsState()
     val freeBytes by viewModel.freeBytes.collectAsState()
     SettingsScreenContent(
@@ -46,6 +55,10 @@ fun SettingsScreen(
         onClearQueue = viewModel::clearQueue,
         onOpenInstallPermission = viewModel::openInstallPermission,
         onAboutClick = onAboutClick,
+        onLanguageClick = onLanguageClick,
+        onAccentClick = onAccentClick,
+        languageLabel = languageLabel,
+        accentLabel = stringResource(accent.labelRes()),
     )
 }
 
@@ -58,6 +71,10 @@ fun SettingsScreenContent(
     onClearQueue: () -> Unit,
     onOpenInstallPermission: () -> Unit,
     onAboutClick: () -> Unit,
+    onLanguageClick: () -> Unit,
+    onAccentClick: () -> Unit,
+    languageLabel: String,
+    accentLabel: String,
 ) {
     val context = LocalContext.current
     var confirmClear by remember { mutableStateOf(false) }
@@ -115,6 +132,26 @@ fun SettingsScreenContent(
 
                 item {
                     SettingRow(
+                        title = stringResource(R.string.settings_language),
+                        summary = languageLabel,
+                        onClick = onLanguageClick,
+                        modifier = Modifier.transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                    )
+                }
+
+                item {
+                    SettingRow(
+                        title = stringResource(R.string.settings_accent),
+                        summary = accentLabel,
+                        onClick = onAccentClick,
+                        modifier = Modifier.transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                    )
+                }
+
+                item {
+                    SettingRow(
                         title = stringResource(R.string.settings_install_permission),
                         summary = stringResource(R.string.settings_install_permission_summary),
                         onClick = onOpenInstallPermission,
@@ -164,7 +201,7 @@ fun SettingsScreenContent(
 @Composable
 private fun SettingsScreenPreview() {
     UniversalInstallerTheme {
-        SettingsScreenContent(false, 125_179_933L, 2_400_000_000L, {}, {}, {}, {})
+        SettingsScreenContent(false, 125_179_933L, 2_400_000_000L, {}, {}, {}, {}, {}, {}, "Tiếng Việt", "Orange")
     }
 }
 
@@ -172,6 +209,6 @@ private fun SettingsScreenPreview() {
 @Composable
 private fun SettingsScreenKeepOnPreview() {
     UniversalInstallerTheme {
-        SettingsScreenContent(true, 0L, 2_400_000_000L, {}, {}, {}, {})
+        SettingsScreenContent(true, 0L, 2_400_000_000L, {}, {}, {}, {}, {}, {}, "Watch language", "Blue")
     }
 }

@@ -43,4 +43,11 @@
     <string name="about_version">Sürüm</string>
     <string name="about_package">Paket</string>
     <string name="cancel">İptal</string>
+    <string name="settings_language">Dil</string>
+    <string name="settings_language_system">Saatin dili</string>
+    <string name="settings_accent">Vurgu rengi</string>
+    <string name="accent_orange">Turuncu</string>
+    <string name="accent_blue">Mavi</string>
+    <string name="accent_green">Yeşil</string>
+    <string name="accent_purple">Mor</string>
 </resources>

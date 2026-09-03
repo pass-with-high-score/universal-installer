@@ -43,4 +43,11 @@
     <string name="about_version">Versão</string>
     <string name="about_package">Pacote</string>
     <string name="cancel">Cancelar</string>
+    <string name="settings_language">Idioma</string>
+    <string name="settings_language_system">Idioma do relógio</string>
+    <string name="settings_accent">Cor de destaque</string>
+    <string name="accent_orange">Laranja</string>
+    <string name="accent_blue">Azul</string>
+    <string name="accent_green">Verde</string>
+    <string name="accent_purple">Roxo</string>
 </resources>

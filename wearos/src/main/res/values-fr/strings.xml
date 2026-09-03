@@ -43,4 +43,11 @@
     <string name="about_version">Version</string>
     <string name="about_package">Paquet</string>
     <string name="cancel">Annuler</string>
+    <string name="settings_language">Langue</string>
+    <string name="settings_language_system">Langue de la montre</string>
+    <string name="settings_accent">Couleur d\'accentuation</string>
+    <string name="accent_orange">Orange</string>
+    <string name="accent_blue">Bleu</string>
+    <string name="accent_green">Vert</string>
+    <string name="accent_purple">Violet</string>
 </resources>

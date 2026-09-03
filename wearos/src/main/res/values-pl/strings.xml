@@ -43,4 +43,11 @@
     <string name="about_version">Wersja</string>
     <string name="about_package">Pakiet</string>
     <string name="cancel">Anuluj</string>
+    <string name="settings_language">Język</string>
+    <string name="settings_language_system">Język zegarka</string>
+    <string name="settings_accent">Kolor akcentu</string>
+    <string name="accent_orange">Pomarańczowy</string>
+    <string name="accent_blue">Niebieski</string>
+    <string name="accent_green">Zielony</string>
+    <string name="accent_purple">Fioletowy</string>
 </resources>

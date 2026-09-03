@@ -43,4 +43,11 @@
     <string name="about_version">वर्शन</string>
     <string name="about_package">पैकेज</string>
     <string name="cancel">रद्द करें</string>
+    <string name="settings_language">भाषा</string>
+    <string name="settings_language_system">घड़ी की भाषा</string>
+    <string name="settings_accent">एक्सेंट रंग</string>
+    <string name="accent_orange">नारंगी</string>
+    <string name="accent_blue">नीला</string>
+    <string name="accent_green">हरा</string>
+    <string name="accent_purple">बैंगनी</string>
 </resources>

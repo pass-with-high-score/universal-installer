@@ -43,4 +43,11 @@
     <string name="about_version">Версія</string>
     <string name="about_package">Пакет</string>
     <string name="cancel">Скасувати</string>
+    <string name="settings_language">Мова</string>
+    <string name="settings_language_system">Мова годинника</string>
+    <string name="settings_accent">Акцентний колір</string>
+    <string name="accent_orange">Помаранчевий</string>
+    <string name="accent_blue">Синій</string>
+    <string name="accent_green">Зелений</string>
+    <string name="accent_purple">Фіолетовий</string>
 </resources>

@@ -43,4 +43,11 @@
     <string name="about_version">バージョン</string>
     <string name="about_package">パッケージ</string>
     <string name="cancel">キャンセル</string>
+    <string name="settings_language">言語</string>
+    <string name="settings_language_system">ウォッチの言語</string>
+    <string name="settings_accent">アクセントカラー</string>
+    <string name="accent_orange">オレンジ</string>
+    <string name="accent_blue">ブルー</string>
+    <string name="accent_green">グリーン</string>
+    <string name="accent_purple">パープル</string>
 </resources>

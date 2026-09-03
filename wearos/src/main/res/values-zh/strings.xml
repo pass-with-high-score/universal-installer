@@ -43,4 +43,11 @@
     <string name="about_version">版本</string>
     <string name="about_package">软件包</string>
     <string name="cancel">取消</string>
+    <string name="settings_language">语言</string>
+    <string name="settings_language_system">手表语言</string>
+    <string name="settings_accent">强调色</string>
+    <string name="accent_orange">橙色</string>
+    <string name="accent_blue">蓝色</string>
+    <string name="accent_green">绿色</string>
+    <string name="accent_purple">紫色</string>
 </resources>

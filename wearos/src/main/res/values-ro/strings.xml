@@ -43,4 +43,11 @@
     <string name="about_version">Versiune</string>
     <string name="about_package">Pachet</string>
     <string name="cancel">Anulează</string>
+    <string name="settings_language">Limbă</string>
+    <string name="settings_language_system">Limba ceasului</string>
+    <string name="settings_accent">Culoare de accent</string>
+    <string name="accent_orange">Portocaliu</string>
+    <string name="accent_blue">Albastru</string>
+    <string name="accent_green">Verde</string>
+    <string name="accent_purple">Mov</string>
 </resources>
