@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.install.FoundPackageFile
 import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
-import app.pwhs.universalinstaller.util.ApkFileIconData
+import app.pwhs.core.ui.ApkFileIconData
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 

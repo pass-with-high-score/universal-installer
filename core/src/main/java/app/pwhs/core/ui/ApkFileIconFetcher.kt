@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.util
+package app.pwhs.core.ui
 
 import android.content.Context
 import androidx.core.graphics.drawable.toBitmap

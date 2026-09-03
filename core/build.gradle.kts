@@ -50,6 +50,9 @@ dependencies {
     api(libs.androidx.datastore.preferences)
     api(libs.androidx.documentfile)
 
+    // Coil — api so :app and :wearos can register ApkFileIconFetcher on their image loaders.
+    api(libs.coil.compose)
+
     // Compose requirements for shared UI
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)

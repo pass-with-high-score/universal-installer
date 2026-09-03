@@ -16,7 +16,7 @@ import app.pwhs.universalinstaller.review.ReviewGate
 import app.pwhs.universalinstaller.review.createReviewPrompter
 import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.universalinstaller.telemetry.createTelemetrySink
-import app.pwhs.universalinstaller.util.ApkFileIconFetcher
+import app.pwhs.core.ui.ApkFileIconFetcher
 import app.pwhs.universalinstaller.util.AppIconFetcher
 import app.pwhs.universalinstaller.util.CrashHandler
 import com.topjohnwu.superuser.Shell

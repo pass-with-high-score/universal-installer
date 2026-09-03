@@ -73,7 +73,7 @@ import androidx.core.content.FileProvider
 import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.composable.SettingsSection
-import app.pwhs.universalinstaller.util.ApkFileIconData
+import app.pwhs.core.ui.ApkFileIconData
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.ImageRequest

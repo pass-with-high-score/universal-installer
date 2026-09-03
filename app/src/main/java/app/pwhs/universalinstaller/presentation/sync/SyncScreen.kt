@@ -704,7 +704,7 @@ private fun SharedFileItem(
             ) {
                 coil3.compose.SubcomposeAsyncImage(
                     model = coil3.request.ImageRequest.Builder(context)
-                        .data(app.pwhs.universalinstaller.util.ApkFileIconData(file.absolutePath))
+                        .data(app.pwhs.core.ui.ApkFileIconData(file.absolutePath))
                         .build(),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize(),
