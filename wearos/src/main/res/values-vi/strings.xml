@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Xin chào, %1$s!</string>
+    <string name="tile_label">Thẻ Installer</string>
+    <string name="complication_label">Tiện ích Installer</string>
+    <string name="home_title">Hàng đợi APK</string>
+    <string name="install">Cài đặt</string>
+    <string name="delete">Xoá</string>
+    <string name="retry">Thử lại</string>
+    <string name="installing">Đang cài đặt…</string>
+    <string name="install_failed">Cài đặt thất bại</string>
+    <string name="loading">Đang tải…</string>
+    <string name="install_anyway">Vẫn cài đặt</string>
+    <string name="unknown_sources_msg">Hãy bật Cài ứng dụng không rõ nguồn cho Universal Installer trong cài đặt đồng hồ.</string>
+    <string name="unknown_sources_open_settings">Mở cài đặt</string>
+    <string name="incompatible_min_sdk">Cần Android API %1$d, đồng hồ này là API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Đây là ứng dụng điện thoại, không phải ứng dụng Wear OS.</string>
+    <string name="apk_received_title">Đã nhận APK</string>
+    <string name="home_empty_title">Chưa có gì ở đây</string>
+    <string name="home_empty_hint">Mở Universal Installer trên điện thoại và gửi một gói sang đồng hồ này.</string>
+    <string name="receiving">Đang nhận %1$s…</string>
+    <string name="receive_failed">Chuyển thất bại</string>
+    <string name="badge_phone_app">Ứng dụng điện thoại</string>
+    <string name="badge_installed">Đã cài</string>
+    <string name="badge_update">Cập nhật</string>
+    <string name="badge_older">Cũ hơn</string>
+    <string name="manage_title">Quản lý ứng dụng</string>
+    <string name="manage_show_system">Hiện ứng dụng hệ thống</string>
+    <string name="manage_hide_system">Ẩn ứng dụng hệ thống</string>
+    <string name="manage_empty">Bạn chưa cài ứng dụng nào.</string>
+    <string name="manage_open">Quản lý ứng dụng</string>
+    <string name="uninstall">Gỡ cài đặt</string>
+    <string name="unknown_sources_hidden">Đồng hồ này ẩn tuỳ chọn đó. Hãy cấp quyền qua gỡ lỗi không dây:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

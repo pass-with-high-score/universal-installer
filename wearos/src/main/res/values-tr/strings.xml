@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Merhaba, %1$s!</string>
+    <string name="tile_label">Installer kartı</string>
+    <string name="complication_label">Installer bileşeni</string>
+    <string name="home_title">APK kuyruğu</string>
+    <string name="install">Kur</string>
+    <string name="delete">Sil</string>
+    <string name="retry">Yeniden dene</string>
+    <string name="installing">Kuruluyor…</string>
+    <string name="install_failed">Kurulum başarısız</string>
+    <string name="loading">Yükleniyor…</string>
+    <string name="install_anyway">Yine de kur</string>
+    <string name="unknown_sources_msg">Saat ayarlarında Universal Installer için Bilinmeyen uygulamaları kur seçeneğini açın.</string>
+    <string name="unknown_sources_open_settings">Ayarları aç</string>
+    <string name="incompatible_min_sdk">Android API %1$d gerekiyor, bu saat API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Bu bir telefon uygulaması, Wear OS uygulaması değil.</string>
+    <string name="apk_received_title">APK alındı</string>
+    <string name="home_empty_title">Burada henüz bir şey yok</string>
+    <string name="home_empty_hint">Telefonunuzda Universal Installer\'ı açın ve bu saate bir paket gönderin.</string>
+    <string name="receiving">%1$s alınıyor…</string>
+    <string name="receive_failed">Aktarım başarısız</string>
+    <string name="badge_phone_app">Telefon uygulaması</string>
+    <string name="badge_installed">Kurulu</string>
+    <string name="badge_update">Güncelleme</string>
+    <string name="badge_older">Daha eski</string>
+    <string name="manage_title">Uygulamaları yönet</string>
+    <string name="manage_show_system">Sistem uygulamalarını göster</string>
+    <string name="manage_hide_system">Sistem uygulamalarını gizle</string>
+    <string name="manage_empty">Henüz kendi kurduğunuz bir uygulama yok.</string>
+    <string name="manage_open">Uygulamaları yönet</string>
+    <string name="uninstall">Kaldır</string>
+    <string name="unknown_sources_hidden">Bu saat bu ayarı gizliyor. Kablosuz hata ayıklama ile izin verin:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

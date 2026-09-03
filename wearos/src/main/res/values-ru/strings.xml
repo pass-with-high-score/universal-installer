@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Привет, %1$s!</string>
+    <string name="tile_label">Плитка Installer</string>
+    <string name="complication_label">Расширение Installer</string>
+    <string name="home_title">Очередь APK</string>
+    <string name="install">Установить</string>
+    <string name="delete">Удалить</string>
+    <string name="retry">Повторить</string>
+    <string name="installing">Установка…</string>
+    <string name="install_failed">Не удалось установить</string>
+    <string name="loading">Загрузка…</string>
+    <string name="install_anyway">Всё равно установить</string>
+    <string name="unknown_sources_msg">Включите Установка неизвестных приложений для Universal Installer в настройках часов.</string>
+    <string name="unknown_sources_open_settings">Открыть настройки</string>
+    <string name="incompatible_min_sdk">Требуется Android API %1$d, на этих часах API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Это приложение для телефона, а не для Wear OS.</string>
+    <string name="apk_received_title">APK получен</string>
+    <string name="home_empty_title">Здесь пока пусто</string>
+    <string name="home_empty_hint">Откройте Universal Installer на телефоне и отправьте пакет на эти часы.</string>
+    <string name="receiving">Получение %1$s…</string>
+    <string name="receive_failed">Передача не удалась</string>
+    <string name="badge_phone_app">Приложение для телефона</string>
+    <string name="badge_installed">Установлено</string>
+    <string name="badge_update">Обновление</string>
+    <string name="badge_older">Старее</string>
+    <string name="manage_title">Управление приложениями</string>
+    <string name="manage_show_system">Показать системные</string>
+    <string name="manage_hide_system">Скрыть системные</string>
+    <string name="manage_empty">Вы ещё не установили ни одного приложения.</string>
+    <string name="manage_open">Управление приложениями</string>
+    <string name="uninstall">Удалить</string>
+    <string name="unknown_sources_hidden">Эти часы скрывают эту настройку. Выдайте разрешение через беспроводную отладку:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

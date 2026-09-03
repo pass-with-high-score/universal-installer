@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">नमस्ते, %1$s!</string>
+    <string name="tile_label">Installer टाइल</string>
+    <string name="complication_label">Installer कॉम्प्लिकेशन</string>
+    <string name="home_title">APK कतार</string>
+    <string name="install">इंस्टॉल करें</string>
+    <string name="delete">मिटाएँ</string>
+    <string name="retry">फिर से कोशिश करें</string>
+    <string name="installing">इंस्टॉल हो रहा है…</string>
+    <string name="install_failed">इंस्टॉल विफल</string>
+    <string name="loading">लोड हो रहा है…</string>
+    <string name="install_anyway">फिर भी इंस्टॉल करें</string>
+    <string name="unknown_sources_msg">घड़ी की सेटिंग में Universal Installer के लिए अनजान ऐप्स इंस्टॉल करें चालू करें।</string>
+    <string name="unknown_sources_open_settings">सेटिंग खोलें</string>
+    <string name="incompatible_min_sdk">Android API %1$d चाहिए, यह घड़ी API %2$d है।</string>
+    <string name="incompatible_not_a_watch_app">यह फ़ोन का ऐप है, Wear OS का नहीं।</string>
+    <string name="apk_received_title">APK मिला</string>
+    <string name="home_empty_title">यहाँ अभी कुछ नहीं है</string>
+    <string name="home_empty_hint">अपने फ़ोन पर Universal Installer खोलें और इस घड़ी पर कोई पैकेज भेजें।</string>
+    <string name="receiving">%1$s मिल रहा है…</string>
+    <string name="receive_failed">ट्रांसफ़र विफल</string>
+    <string name="badge_phone_app">फ़ोन ऐप</string>
+    <string name="badge_installed">इंस्टॉल है</string>
+    <string name="badge_update">अपडेट</string>
+    <string name="badge_older">पुराना</string>
+    <string name="manage_title">ऐप्स प्रबंधित करें</string>
+    <string name="manage_show_system">सिस्टम ऐप्स दिखाएँ</string>
+    <string name="manage_hide_system">सिस्टम ऐप्स छिपाएँ</string>
+    <string name="manage_empty">आपने अभी तक कोई ऐप इंस्टॉल नहीं किया।</string>
+    <string name="manage_open">ऐप्स प्रबंधित करें</string>
+    <string name="uninstall">अनइंस्टॉल करें</string>
+    <string name="unknown_sources_hidden">यह घड़ी यह सेटिंग छिपाती है। वायरलेस डीबगिंग से अनुमति दें:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

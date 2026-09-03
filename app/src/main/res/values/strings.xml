@@ -217,10 +217,6 @@
     <string name="permission_notifications_desc">Shows download, OBB copy and VirusTotal scan progress so you can leave the app during long jobs.</string>
     <string name="permission_usage_title">Usage access</string>
     <string name="permission_usage_desc">Optional — lets the Uninstall screen sort apps by last used and show individual app usage times.</string>
-    <string name="permission_return_channel_name">Return to app</string>
-    <string name="permission_return_channel_desc">Notification to return to the app after granting a permission in system settings.</string>
-    <string name="permission_return_title">Permission granted</string>
-    <string name="permission_return_body">Tap to return to Universal Installer.</string>
     <string name="remote_download_clipboard_empty">Clipboard is empty</string>
     <string name="remote_download_invalid_url">Invalid URL. Must start with http:// or https://</string>
     <string name="remote_download_cancel">Cancel</string>
@@ -565,17 +561,6 @@
     <string name="install_delete_source_failed">Installed, but the APK file could not be deleted. Apps that share a file with Universal Installer often do not allow deleting it — remove it from the file manager you opened it with.</string>
     <string name="install_error_miui_hint">On Xiaomi, Redmi and POCO devices, MIUI/HyperOS optimization often blocks installs silently. Open Settings &gt; Additional settings &gt; Developer options, turn off \&quot;MIUI optimization\&quot;, install the app, then turn it back on. While it is off the system theme may look distorted — restarting the phone fixes that.</string>
     <string name="splash_tagline">Install anything, anywhere</string>
-    <string name="onboarding_skip">Skip</string>
-    <string name="onboarding_next">Next</string>
-    <string name="onboarding_get_started">Get Started</string>
-    <string name="onboarding_permission_granted">Permission granted</string>
-    <string name="onboarding_grant_permission">Grant Permission</string>
-    <string name="onboarding_page1_title">Install Any Package</string>
-    <string name="onboarding_page1_desc">Support APK, APK+, APKS, XAPK, and APKM formats. Install split APKs with ease.</string>
-    <string name="onboarding_page2_title">Manage Your Apps</string>
-    <string name="onboarding_page2_desc">Browse installed apps, uninstall unwanted ones, and manage your device effortlessly.</string>
-    <string name="onboarding_page3_title">Allow Installation</string>
-    <string name="onboarding_page3_desc">To install packages, the app needs permission to install from unknown sources. Tap the button below to grant it.</string>
     <string name="setting_section_sync">Sync &amp; Share</string>
     <string name="qs_tile_sync_label">Sync &amp; Share</string>
     <string name="theme_screen_title">App Theme</string>
@@ -830,7 +815,6 @@
     <string name="dialog_menu_install_source_aa_hint">Use Google Play Store (%1$s) to ensure apps work on Android Auto.</string>
 
     <!-- History Detail Strings -->
-    <string name="history_detail_title">Installation Details</string>
     <string name="history_detail_status_success">Installed Successfully</string>
     <string name="history_detail_status_failed">Installation Failed</string>
     <string name="history_detail_op_new">New Install</string>
@@ -843,7 +827,6 @@
     <string name="history_detail_copied">Copied to clipboard</string>
     <string name="history_detail_error_title">Error Diagnostics</string>
     <string name="error_cannot_open_app">Unable to open app</string>
-    <string name="error_insufficient_storage">Insufficient storage space to install. Please free up space and try again.</string>
     <string name="error_no_file_picker">No file manager app found to select files</string>
     <string name="insufficient_storage_dialog_title">Insufficient Storage Space</string>
     <string name="insufficient_storage_dialog_message">Your device does not have enough free internal storage to install this package. Required space: %1$s, Available: %2$s. Please free up space and try again.</string>

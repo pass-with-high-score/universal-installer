@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Cześć, %1$s!</string>
+    <string name="tile_label">Kafelek Installer</string>
+    <string name="complication_label">Komplikacja Installer</string>
+    <string name="home_title">Kolejka APK</string>
+    <string name="install">Zainstaluj</string>
+    <string name="delete">Usuń</string>
+    <string name="retry">Ponów</string>
+    <string name="installing">Instalowanie…</string>
+    <string name="install_failed">Instalacja nie powiodła się</string>
+    <string name="loading">Wczytywanie…</string>
+    <string name="install_anyway">Zainstaluj mimo to</string>
+    <string name="unknown_sources_msg">Włącz Instalowanie nieznanych aplikacji dla Universal Installer w ustawieniach zegarka.</string>
+    <string name="unknown_sources_open_settings">Otwórz ustawienia</string>
+    <string name="incompatible_min_sdk">Wymaga interfejsu Android API %1$d, a ten zegarek ma API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">To aplikacja na telefon, a nie na Wear OS.</string>
+    <string name="apk_received_title">Odebrano APK</string>
+    <string name="home_empty_title">Jeszcze nic tu nie ma</string>
+    <string name="home_empty_hint">Otwórz Universal Installer na telefonie i wyślij pakiet na ten zegarek.</string>
+    <string name="receiving">Odbieranie %1$s…</string>
+    <string name="receive_failed">Przesyłanie nie powiodło się</string>
+    <string name="badge_phone_app">Aplikacja na telefon</string>
+    <string name="badge_installed">Zainstalowano</string>
+    <string name="badge_update">Aktualizacja</string>
+    <string name="badge_older">Starsza</string>
+    <string name="manage_title">Zarządzaj aplikacjami</string>
+    <string name="manage_show_system">Pokaż aplikacje systemowe</string>
+    <string name="manage_hide_system">Ukryj aplikacje systemowe</string>
+    <string name="manage_empty">Nie masz jeszcze własnych aplikacji.</string>
+    <string name="manage_open">Zarządzaj aplikacjami</string>
+    <string name="uninstall">Odinstaluj</string>
+    <string name="unknown_sources_hidden">Ten zegarek ukrywa to ustawienie. Przyznaj je przez debugowanie bezprzewodowe:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

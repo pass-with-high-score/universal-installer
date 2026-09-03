@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Привіт, %1$s!</string>
+    <string name="tile_label">Плитка Installer</string>
+    <string name="complication_label">Ускладнення Installer</string>
+    <string name="home_title">Черга APK</string>
+    <string name="install">Установити</string>
+    <string name="delete">Видалити</string>
+    <string name="retry">Повторити</string>
+    <string name="installing">Установлення…</string>
+    <string name="install_failed">Не вдалося встановити</string>
+    <string name="loading">Завантаження…</string>
+    <string name="install_anyway">Усе одно встановити</string>
+    <string name="unknown_sources_msg">Увімкніть Установлення невідомих застосунків для Universal Installer у налаштуваннях годинника.</string>
+    <string name="unknown_sources_open_settings">Відкрити налаштування</string>
+    <string name="incompatible_min_sdk">Потрібен Android API %1$d, на цьому годиннику API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Це застосунок для телефона, а не для Wear OS.</string>
+    <string name="apk_received_title">APK отримано</string>
+    <string name="home_empty_title">Тут поки що порожньо</string>
+    <string name="home_empty_hint">Відкрийте Universal Installer на телефоні й надішліть пакет на цей годинник.</string>
+    <string name="receiving">Отримання %1$s…</string>
+    <string name="receive_failed">Не вдалося передати</string>
+    <string name="badge_phone_app">Застосунок для телефона</string>
+    <string name="badge_installed">Установлено</string>
+    <string name="badge_update">Оновлення</string>
+    <string name="badge_older">Старіше</string>
+    <string name="manage_title">Керування застосунками</string>
+    <string name="manage_show_system">Показати системні</string>
+    <string name="manage_hide_system">Приховати системні</string>
+    <string name="manage_empty">Ви ще не встановили жодного застосунку.</string>
+    <string name="manage_open">Керування застосунками</string>
+    <string name="uninstall">Видалити</string>
+    <string name="unknown_sources_hidden">Цей годинник приховує це налаштування. Надайте дозвіл через бездротове налагодження:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

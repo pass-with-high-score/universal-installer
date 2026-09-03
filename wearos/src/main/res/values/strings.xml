@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Universal Installer</string>
+    <string name="app_name" translatable="false">Universal Installer</string>
     <string name="hello_world">Hello, %1$s!</string>
     <string name="tile_label">Installer tile</string>
     <string name="complication_label">Installer complication</string>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Hallo, %1$s!</string>
+    <string name="tile_label">Installer-Kachel</string>
+    <string name="complication_label">Installer-Komplikation</string>
+    <string name="home_title">APK-Warteschlange</string>
+    <string name="install">Installieren</string>
+    <string name="delete">Löschen</string>
+    <string name="retry">Wiederholen</string>
+    <string name="installing">Wird installiert…</string>
+    <string name="install_failed">Installation fehlgeschlagen</string>
+    <string name="loading">Wird geladen…</string>
+    <string name="install_anyway">Trotzdem installieren</string>
+    <string name="unknown_sources_msg">Aktiviere in den Uhreneinstellungen Unbekannte Apps installieren für Universal Installer.</string>
+    <string name="unknown_sources_open_settings">Einstellungen öffnen</string>
+    <string name="incompatible_min_sdk">Erfordert Android-API %1$d, diese Uhr hat API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Das ist eine Smartphone-App, keine Wear OS-App.</string>
+    <string name="apk_received_title">APK empfangen</string>
+    <string name="home_empty_title">Noch nichts vorhanden</string>
+    <string name="home_empty_hint">Öffne Universal Installer auf deinem Smartphone und sende ein Paket an diese Uhr.</string>
+    <string name="receiving">%1$s wird empfangen…</string>
+    <string name="receive_failed">Übertragung fehlgeschlagen</string>
+    <string name="badge_phone_app">Smartphone-App</string>
+    <string name="badge_installed">Installiert</string>
+    <string name="badge_update">Update</string>
+    <string name="badge_older">Älter</string>
+    <string name="manage_title">Apps verwalten</string>
+    <string name="manage_show_system">Systemapps anzeigen</string>
+    <string name="manage_hide_system">Systemapps ausblenden</string>
+    <string name="manage_empty">Du hast noch keine Apps installiert.</string>
+    <string name="manage_open">Apps verwalten</string>
+    <string name="uninstall">Deinstallieren</string>
+    <string name="unknown_sources_hidden">Diese Uhr blendet die Einstellung aus. Erteile die Berechtigung per Wireless-Debugging:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

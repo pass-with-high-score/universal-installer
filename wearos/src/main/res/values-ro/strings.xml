@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Salut, %1$s!</string>
+    <string name="tile_label">Card Installer</string>
+    <string name="complication_label">Complicație Installer</string>
+    <string name="home_title">Coadă APK</string>
+    <string name="install">Instalează</string>
+    <string name="delete">Șterge</string>
+    <string name="retry">Reîncearcă</string>
+    <string name="installing">Se instalează…</string>
+    <string name="install_failed">Instalare eșuată</string>
+    <string name="loading">Se încarcă…</string>
+    <string name="install_anyway">Instalează oricum</string>
+    <string name="unknown_sources_msg">Activează Instalarea aplicațiilor necunoscute pentru Universal Installer în setările ceasului.</string>
+    <string name="unknown_sources_open_settings">Deschide setările</string>
+    <string name="incompatible_min_sdk">Necesită Android API %1$d, acest ceas are API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Aceasta este o aplicație pentru telefon, nu una Wear OS.</string>
+    <string name="apk_received_title">APK primit</string>
+    <string name="home_empty_title">Încă nu e nimic aici</string>
+    <string name="home_empty_hint">Deschide Universal Installer pe telefon și trimite un pachet către acest ceas.</string>
+    <string name="receiving">Se primește %1$s…</string>
+    <string name="receive_failed">Transfer eșuat</string>
+    <string name="badge_phone_app">Aplicație de telefon</string>
+    <string name="badge_installed">Instalat</string>
+    <string name="badge_update">Actualizare</string>
+    <string name="badge_older">Mai vechi</string>
+    <string name="manage_title">Gestionează aplicațiile</string>
+    <string name="manage_show_system">Arată aplicațiile de sistem</string>
+    <string name="manage_hide_system">Ascunde aplicațiile de sistem</string>
+    <string name="manage_empty">Încă nu ai instalat nicio aplicație.</string>
+    <string name="manage_open">Gestionează aplicațiile</string>
+    <string name="uninstall">Dezinstalează</string>
+    <string name="unknown_sources_hidden">Acest ceas ascunde setarea. Acord-o prin depanare wireless:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

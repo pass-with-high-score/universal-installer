@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">你好，%1$s！</string>
+    <string name="tile_label">Installer 卡片</string>
+    <string name="complication_label">Installer 复杂功能</string>
+    <string name="home_title">APK 队列</string>
+    <string name="install">安装</string>
+    <string name="delete">删除</string>
+    <string name="retry">重试</string>
+    <string name="installing">正在安装…</string>
+    <string name="install_failed">安装失败</string>
+    <string name="loading">加载中…</string>
+    <string name="install_anyway">仍要安装</string>
+    <string name="unknown_sources_msg">请在手表设置中为 Universal Installer 打开“安装未知应用”。</string>
+    <string name="unknown_sources_open_settings">打开设置</string>
+    <string name="incompatible_min_sdk">需要 Android API %1$d，此手表为 API %2$d。</string>
+    <string name="incompatible_not_a_watch_app">这是手机应用，不是 Wear OS 应用。</string>
+    <string name="apk_received_title">已接收 APK</string>
+    <string name="home_empty_title">这里还没有内容</string>
+    <string name="home_empty_hint">在手机上打开 Universal Installer，然后向此手表发送软件包。</string>
+    <string name="receiving">正在接收 %1$s…</string>
+    <string name="receive_failed">传输失败</string>
+    <string name="badge_phone_app">手机应用</string>
+    <string name="badge_installed">已安装</string>
+    <string name="badge_update">更新</string>
+    <string name="badge_older">更旧</string>
+    <string name="manage_title">管理应用</string>
+    <string name="manage_show_system">显示系统应用</string>
+    <string name="manage_hide_system">隐藏系统应用</string>
+    <string name="manage_empty">你还没有安装任何应用。</string>
+    <string name="manage_open">管理应用</string>
+    <string name="uninstall">卸载</string>
+    <string name="unknown_sources_hidden">此手表隐藏了该设置。请通过无线调试授予权限：\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Γεια σου, %1$s!</string>
+    <string name="tile_label">Πλακίδιο Installer</string>
+    <string name="complication_label">Επιπλοκή Installer</string>
+    <string name="home_title">Ουρά APK</string>
+    <string name="install">Εγκατάσταση</string>
+    <string name="delete">Διαγραφή</string>
+    <string name="retry">Επανάληψη</string>
+    <string name="installing">Γίνεται εγκατάσταση…</string>
+    <string name="install_failed">Η εγκατάσταση απέτυχε</string>
+    <string name="loading">Φόρτωση…</string>
+    <string name="install_anyway">Εγκατάσταση ούτως ή άλλως</string>
+    <string name="unknown_sources_msg">Ενεργοποιήστε την Εγκατάσταση άγνωστων εφαρμογών για το Universal Installer στις ρυθμίσεις του ρολογιού.</string>
+    <string name="unknown_sources_open_settings">Άνοιγμα ρυθμίσεων</string>
+    <string name="incompatible_min_sdk">Απαιτεί Android API %1$d, αυτό το ρολόι έχει API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Αυτή είναι εφαρμογή για κινητό, όχι εφαρμογή Wear OS.</string>
+    <string name="apk_received_title">Ελήφθη APK</string>
+    <string name="home_empty_title">Δεν υπάρχει τίποτα ακόμη</string>
+    <string name="home_empty_hint">Ανοίξτε το Universal Installer στο κινητό σας και στείλτε ένα πακέτο σε αυτό το ρολόι.</string>
+    <string name="receiving">Λήψη %1$s…</string>
+    <string name="receive_failed">Η μεταφορά απέτυχε</string>
+    <string name="badge_phone_app">Εφαρμογή κινητού</string>
+    <string name="badge_installed">Εγκατεστημένο</string>
+    <string name="badge_update">Ενημέρωση</string>
+    <string name="badge_older">Παλαιότερο</string>
+    <string name="manage_title">Διαχείριση εφαρμογών</string>
+    <string name="manage_show_system">Εμφάνιση εφαρμογών συστήματος</string>
+    <string name="manage_hide_system">Απόκρυψη εφαρμογών συστήματος</string>
+    <string name="manage_empty">Δεν έχετε εγκαταστήσει ακόμη καμία εφαρμογή.</string>
+    <string name="manage_open">Διαχείριση εφαρμογών</string>
+    <string name="uninstall">Απεγκατάσταση</string>
+    <string name="unknown_sources_hidden">Αυτό το ρολόι κρύβει τη ρύθμιση. Δώστε την μέσω ασύρματου εντοπισμού σφαλμάτων:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

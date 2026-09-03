@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Bonjour, %1$s !</string>
+    <string name="tile_label">Tuile Installer</string>
+    <string name="complication_label">Complication Installer</string>
+    <string name="home_title">File d\'attente APK</string>
+    <string name="install">Installer</string>
+    <string name="delete">Supprimer</string>
+    <string name="retry">Réessayer</string>
+    <string name="installing">Installation…</string>
+    <string name="install_failed">Échec de l\'installation</string>
+    <string name="loading">Chargement…</string>
+    <string name="install_anyway">Installer quand même</string>
+    <string name="unknown_sources_msg">Activez « Installer des applications inconnues » pour Universal Installer dans les paramètres de la montre.</string>
+    <string name="unknown_sources_open_settings">Ouvrir les paramètres</string>
+    <string name="incompatible_min_sdk">Nécessite l\'API Android %1$d, cette montre est en API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Il s\'agit d\'une application pour téléphone, pas d\'une application Wear OS.</string>
+    <string name="apk_received_title">APK reçu</string>
+    <string name="home_empty_title">Rien ici pour l\'instant</string>
+    <string name="home_empty_hint">Ouvrez Universal Installer sur votre téléphone et envoyez un paquet à cette montre.</string>
+    <string name="receiving">Réception de %1$s…</string>
+    <string name="receive_failed">Échec du transfert</string>
+    <string name="badge_phone_app">Application téléphone</string>
+    <string name="badge_installed">Installé</string>
+    <string name="badge_update">Mise à jour</string>
+    <string name="badge_older">Plus ancien</string>
+    <string name="manage_title">Gérer les applications</string>
+    <string name="manage_show_system">Afficher les applications système</string>
+    <string name="manage_hide_system">Masquer les applications système</string>
+    <string name="manage_empty">Vous n\'avez encore installé aucune application.</string>
+    <string name="manage_open">Gérer les applications</string>
+    <string name="uninstall">Désinstaller</string>
+    <string name="unknown_sources_hidden">Cette montre masque ce paramètre. Accordez-le via le débogage sans fil :\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>

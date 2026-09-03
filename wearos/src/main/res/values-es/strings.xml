@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello_world">Hola, %1$s</string>
+    <string name="tile_label">Mosaico de Installer</string>
+    <string name="complication_label">Complicación de Installer</string>
+    <string name="home_title">Cola de APK</string>
+    <string name="install">Instalar</string>
+    <string name="delete">Eliminar</string>
+    <string name="retry">Reintentar</string>
+    <string name="installing">Instalando…</string>
+    <string name="install_failed">Error de instalación</string>
+    <string name="loading">Cargando…</string>
+    <string name="install_anyway">Instalar de todos modos</string>
+    <string name="unknown_sources_msg">Activa Instalar aplicaciones desconocidas para Universal Installer en los ajustes del reloj.</string>
+    <string name="unknown_sources_open_settings">Abrir ajustes</string>
+    <string name="incompatible_min_sdk">Requiere la API %1$d de Android; este reloj tiene la API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">Es una aplicación para teléfono, no una aplicación de Wear OS.</string>
+    <string name="apk_received_title">APK recibido</string>
+    <string name="home_empty_title">Aquí no hay nada todavía</string>
+    <string name="home_empty_hint">Abre Universal Installer en tu teléfono y envía un paquete a este reloj.</string>
+    <string name="receiving">Recibiendo %1$s…</string>
+    <string name="receive_failed">Error de transferencia</string>
+    <string name="badge_phone_app">App de teléfono</string>
+    <string name="badge_installed">Instalado</string>
+    <string name="badge_update">Actualizar</string>
+    <string name="badge_older">Más antiguo</string>
+    <string name="manage_title">Gestionar aplicaciones</string>
+    <string name="manage_show_system">Mostrar apps del sistema</string>
+    <string name="manage_hide_system">Ocultar apps del sistema</string>
+    <string name="manage_empty">Aún no has instalado ninguna aplicación.</string>
+    <string name="manage_open">Gestionar aplicaciones</string>
+    <string name="uninstall">Desinstalar</string>
+    <string name="unknown_sources_hidden">Este reloj oculta ese ajuste. Concédelo mediante depuración inalámbrica:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+</resources>
