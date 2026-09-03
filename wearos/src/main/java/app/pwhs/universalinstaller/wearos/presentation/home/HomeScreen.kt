@@ -5,11 +5,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.EdgeButton
+import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -69,7 +71,10 @@ fun HomeScreenContent(
             // must not sit behind it.
             edgeButton = {
                 EdgeButton(onClick = onMoreClick) {
-                    Text(stringResource(R.string.more_title))
+                    Icon(
+                        painter = painterResource(R.drawable.ic_more_horiz),
+                        contentDescription = stringResource(R.string.more_title),
+                    )
                 }
             },
         ) { contentPadding ->
