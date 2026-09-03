@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.wearos.presentation.manage
 
 import android.app.Application
 import android.content.Intent
+import android.provider.Settings
 import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,6 +38,19 @@ class ManageViewModel(
     }
 
     fun sourceDirOf(packageName: String): String? = repository.sourceDirOf(packageName)
+
+    /**
+     * Tapping a row must not destroy anything — that is what the swipe is for. Wear's Settings
+     * does honour the per-app details intent, contrary to what resolve-activity suggests: it
+     * answers with its main activity but routes on the package URI.
+     */
+    fun openAppInfo(packageName: String) {
+        val intent = Intent(
+            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+            "package:$packageName".toUri(),
+        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        runCatching { getApplication<Application>().startActivity(intent) }
+    }
 
     /** Wear ships the standard uninstaller, so the system dialog does the asking and the work. */
     fun uninstall(packageName: String) {

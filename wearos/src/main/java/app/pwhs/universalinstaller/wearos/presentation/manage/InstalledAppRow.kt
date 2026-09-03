@@ -23,11 +23,12 @@ import app.pwhs.universalinstaller.wearos.presentation.component.ApkIcon
 import app.pwhs.universalinstaller.wearos.presentation.home.formatSize
 import app.pwhs.universalinstaller.wearos.presentation.theme.UniversalInstallerTheme
 
-/** One installed package. Swipe left to hand it to the system uninstaller. */
+/** One installed package: tap for its system App info page, swipe left to uninstall. */
 @Composable
 fun InstalledAppRow(
     app: InstalledApp,
     sourceDir: String?,
+    onOpen: () -> Unit,
     onUninstall: () -> Unit,
     modifier: Modifier = Modifier,
     transformation: SurfaceTransformation? = null,
@@ -44,7 +45,7 @@ fun InstalledAppRow(
         modifier = modifier,
     ) {
         TitleCard(
-            onClick = onUninstall,
+            onClick = onOpen,
             title = {
                 Text(text = app.appName, maxLines = 1, overflow = TextOverflow.Ellipsis)
             },
@@ -84,5 +85,5 @@ private fun previewApp() = InstalledApp(
 @WearPreviewDevices
 @Composable
 private fun InstalledAppRowPreview() {
-    UniversalInstallerTheme { InstalledAppRow(previewApp(), null, {}) }
+    UniversalInstallerTheme { InstalledAppRow(previewApp(), null, {}, {}) }
 }

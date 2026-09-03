@@ -33,6 +33,7 @@ fun ManageScreen(viewModel: ManageViewModel = koinViewModel()) {
         includeSystem = includeSystem,
         sourceDirOf = viewModel::sourceDirOf,
         onToggleSystem = viewModel::toggleSystemApps,
+        onOpen = viewModel::openAppInfo,
         onUninstall = viewModel::uninstall,
     )
 }
@@ -44,6 +45,7 @@ fun ManageScreenContent(
     includeSystem: Boolean,
     sourceDirOf: (String) -> String?,
     onToggleSystem: () -> Unit,
+    onOpen: (String) -> Unit,
     onUninstall: (String) -> Unit,
 ) {
     AppScaffold {
@@ -85,6 +87,7 @@ fun ManageScreenContent(
                     InstalledAppRow(
                         app = app,
                         sourceDir = sourceDirOf(app.packageName),
+                        onOpen = { onOpen(app.packageName) },
                         onUninstall = { onUninstall(app.packageName) },
                         modifier = Modifier.transformedHeight(this, spec),
                         transformation = SurfaceTransformation(spec),
@@ -123,7 +126,7 @@ private fun ManageScreenPreview() {
                 previewApp("Sleep Tracker", "com.example.sleep", 8_400_000L),
             ),
             isLoading = false, includeSystem = false,
-            sourceDirOf = { null }, onToggleSystem = {}, onUninstall = {},
+            sourceDirOf = { null }, onToggleSystem = {}, onOpen = {}, onUninstall = {},
         )
     }
 }
@@ -132,6 +135,6 @@ private fun ManageScreenPreview() {
 @Composable
 private fun ManageScreenEmptyPreview() {
     UniversalInstallerTheme {
-        ManageScreenContent(emptyList(), false, false, { null }, {}, {})
+        ManageScreenContent(emptyList(), false, false, { null }, {}, {}, {})
     }
 }
