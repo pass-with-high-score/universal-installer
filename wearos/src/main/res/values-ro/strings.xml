@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Salut, %1$s!</string>
-    <string name="tile_label">Card Installer</string>
-    <string name="complication_label">Complicație Installer</string>
     <string name="home_title">Coadă APK</string>
     <string name="install">Instalează</string>
     <string name="delete">Șterge</string>

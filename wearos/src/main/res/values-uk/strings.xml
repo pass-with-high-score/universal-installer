@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Привіт, %1$s!</string>
-    <string name="tile_label">Плитка Installer</string>
-    <string name="complication_label">Ускладнення Installer</string>
     <string name="home_title">Черга APK</string>
     <string name="install">Установити</string>
     <string name="delete">Видалити</string>

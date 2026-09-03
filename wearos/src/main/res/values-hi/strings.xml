@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">नमस्ते, %1$s!</string>
-    <string name="tile_label">Installer टाइल</string>
-    <string name="complication_label">Installer कॉम्प्लिकेशन</string>
     <string name="home_title">APK कतार</string>
     <string name="install">इंस्टॉल करें</string>
     <string name="delete">मिटाएँ</string>

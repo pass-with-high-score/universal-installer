@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Hola, %1$s</string>
-    <string name="tile_label">Mosaico de Installer</string>
-    <string name="complication_label">Complicación de Installer</string>
     <string name="home_title">Cola de APK</string>
     <string name="install">Instalar</string>
     <string name="delete">Eliminar</string>

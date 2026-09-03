@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Hallo, %1$s!</string>
-    <string name="tile_label">Installer-Kachel</string>
-    <string name="complication_label">Installer-Komplikation</string>
     <string name="home_title">APK-Warteschlange</string>
     <string name="install">Installieren</string>
     <string name="delete">Löschen</string>

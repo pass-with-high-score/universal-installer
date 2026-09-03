@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Bonjour, %1$s !</string>
-    <string name="tile_label">Tuile Installer</string>
-    <string name="complication_label">Complication Installer</string>
     <string name="home_title">File d\'attente APK</string>
     <string name="install">Installer</string>
     <string name="delete">Supprimer</string>

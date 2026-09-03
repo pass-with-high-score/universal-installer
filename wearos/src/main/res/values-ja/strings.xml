@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">こんにちは、%1$s!</string>
-    <string name="tile_label">Installer タイル</string>
-    <string name="complication_label">Installer コンプリケーション</string>
     <string name="home_title">APK キュー</string>
     <string name="install">インストール</string>
     <string name="delete">削除</string>

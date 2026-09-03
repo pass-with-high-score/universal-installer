@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Xin chào, %1$s!</string>
-    <string name="tile_label">Thẻ Installer</string>
-    <string name="complication_label">Tiện ích Installer</string>
     <string name="home_title">Hàng đợi APK</string>
     <string name="install">Cài đặt</string>
     <string name="delete">Xoá</string>

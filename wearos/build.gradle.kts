@@ -83,15 +83,6 @@ dependencies {
     implementation(libs.androidx.wear.compose.ui.tooling)
     implementation(libs.androidx.wear.tooling.preview)
 
-    // Wear ProtoLayout & Tiles
-    implementation(libs.androidx.protolayout)
-    implementation(libs.androidx.protolayout.material3)
-    implementation(libs.androidx.tiles)
-    implementation(libs.androidx.tiles.tooling.preview)
-
-    // Complications & Wearable Services
-    implementation(libs.androidx.watchface.complications.data.source.ktx)
-    implementation(libs.guava)
     implementation(libs.play.services.wearable)
 
     // Koin DI
@@ -104,8 +95,6 @@ dependencies {
 
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.tiles.renderer)
-    debugImplementation(libs.androidx.tiles.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
     debugImplementation(libs.androidx.ui.tooling)
 }

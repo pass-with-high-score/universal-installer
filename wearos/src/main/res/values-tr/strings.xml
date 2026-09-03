@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Merhaba, %1$s!</string>
-    <string name="tile_label">Installer kartı</string>
-    <string name="complication_label">Installer bileşeni</string>
     <string name="home_title">APK kuyruğu</string>
     <string name="install">Kur</string>
     <string name="delete">Sil</string>

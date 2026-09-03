@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Cześć, %1$s!</string>
-    <string name="tile_label">Kafelek Installer</string>
-    <string name="complication_label">Komplikacja Installer</string>
     <string name="home_title">Kolejka APK</string>
     <string name="install">Zainstaluj</string>
     <string name="delete">Usuń</string>

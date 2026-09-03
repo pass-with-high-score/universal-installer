@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello_world">Γεια σου, %1$s!</string>
-    <string name="tile_label">Πλακίδιο Installer</string>
-    <string name="complication_label">Επιπλοκή Installer</string>
     <string name="home_title">Ουρά APK</string>
     <string name="install">Εγκατάσταση</string>
     <string name="delete">Διαγραφή</string>
