@@ -33,4 +33,10 @@
     <string name="badge_installed">Installed</string>
     <string name="badge_update">Update</string>
     <string name="badge_older">Older</string>
+    <string name="manage_title">Manage apps</string>
+    <string name="manage_show_system">Show system apps</string>
+    <string name="manage_hide_system">Hide system apps</string>
+    <string name="manage_empty">No apps installed by you yet.</string>
+    <string name="manage_open">Manage apps</string>
+    <string name="uninstall">Uninstall</string>
 </resources>

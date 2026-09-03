@@ -9,6 +9,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -25,6 +26,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun HomeScreen(
     onApkClick: (String) -> Unit,
+    onManageClick: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val apks by viewModel.apks.collectAsState()
@@ -35,6 +37,7 @@ fun HomeScreen(
         isLoading = isLoading,
         receiveState = receiveState,
         onApkClick = onApkClick,
+        onManageClick = onManageClick,
         onDelete = viewModel::delete,
     )
 }
@@ -45,13 +48,23 @@ fun HomeScreenContent(
     isLoading: Boolean,
     receiveState: WearReceiveState,
     onApkClick: (String) -> Unit,
+    onManageClick: () -> Unit,
     onDelete: (String) -> Unit,
 ) {
     AppScaffold {
         val listState = rememberTransformingLazyColumnState()
         val spec = rememberTransformationSpec()
 
-        ScreenScaffold(scrollState = listState) { contentPadding ->
+        ScreenScaffold(
+            scrollState = listState,
+            // A persistent destination rather than a list item: the queue can be long and Manage
+            // must not sit behind it.
+            edgeButton = {
+                EdgeButton(onClick = onManageClick) {
+                    Text(stringResource(R.string.manage_open))
+                }
+            },
+        ) { contentPadding ->
             TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
                 item {
                     ListHeader(
@@ -128,6 +141,7 @@ private fun HomeScreenPreview() {
             isLoading = false,
             receiveState = WearReceiveState.Idle,
             onApkClick = {},
+            onManageClick = {},
             onDelete = {},
         )
     }
@@ -142,6 +156,7 @@ private fun HomeScreenReceivingPreview() {
             isLoading = false,
             receiveState = WearReceiveState.Receiving("watchface.apk", 4_000_000, 12_000_000),
             onApkClick = {},
+            onManageClick = {},
             onDelete = {},
         )
     }
@@ -151,7 +166,7 @@ private fun HomeScreenReceivingPreview() {
 @Composable
 private fun HomeScreenEmptyPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(emptyList(), false, WearReceiveState.Idle, {}, {})
+        HomeScreenContent(emptyList(), false, WearReceiveState.Idle, {}, {}, {})
     }
 }
 
@@ -159,6 +174,6 @@ private fun HomeScreenEmptyPreview() {
 @Composable
 private fun HomeScreenLoadingPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(emptyList(), true, WearReceiveState.Idle, {}, {})
+        HomeScreenContent(emptyList(), true, WearReceiveState.Idle, {}, {}, {})
     }
 }

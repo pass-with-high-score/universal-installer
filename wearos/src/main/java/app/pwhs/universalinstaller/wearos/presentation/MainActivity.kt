@@ -13,6 +13,7 @@ import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import app.pwhs.universalinstaller.wearos.presentation.detail.ApkDetailScreen
 import app.pwhs.universalinstaller.wearos.presentation.home.HomeScreen
+import app.pwhs.universalinstaller.wearos.presentation.manage.ManageScreen
 import app.pwhs.universalinstaller.wearos.presentation.theme.UniversalInstallerTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -45,6 +46,7 @@ class MainActivity : ComponentActivity() {
 private object Routes {
     const val HOME = "home"
     const val DETAIL = "detail/{apkId}"
+    const val MANAGE = "manage"
     fun detail(apkId: String) = "detail/$apkId"
 }
 
@@ -68,8 +70,10 @@ fun WearNavGraph(
         composable(Routes.HOME) {
             HomeScreen(
                 onApkClick = { apkId -> navController.navigate(Routes.detail(apkId)) },
+                onManageClick = { navController.navigate(Routes.MANAGE) },
             )
         }
+        composable(Routes.MANAGE) { ManageScreen() }
         composable(Routes.DETAIL) { backStackEntry ->
             val apkId = backStackEntry.arguments?.getString("apkId") ?: return@composable
             ApkDetailScreen(

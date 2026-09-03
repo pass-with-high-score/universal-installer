@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -7,8 +8,14 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <!-- targetSdk 30+ filters getPackageInfo, so without this the watch cannot tell whether a
-         received package is already installed and every install-state badge stays hidden. -->
-    <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
+         received package is already installed and every install-state badge stays hidden. The
+         Manage screen needs the same visibility to list what is on the device at all. A <queries>
+         element cannot express either — both work off packages only known at runtime — and Play's
+         allowed uses cover an app whose purpose is installing and managing packages. :app has
+         carried this permission for the same reason since before the watch existed. -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
 
     <application
         android:name=".WearApp"

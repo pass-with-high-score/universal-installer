@@ -4,8 +4,10 @@ import app.pwhs.core.data.ApkMetadataReader
 import app.pwhs.core.install.ApkInstaller
 import app.pwhs.universalinstaller.wearos.domain.ApkCompatibilityCheck
 import app.pwhs.universalinstaller.wearos.data.WearApkRepository
+import app.pwhs.universalinstaller.wearos.data.WearInstalledAppsRepository
 import app.pwhs.universalinstaller.wearos.presentation.detail.DetailViewModel
 import app.pwhs.universalinstaller.wearos.presentation.home.HomeViewModel
+import app.pwhs.universalinstaller.wearos.presentation.manage.ManageViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
@@ -16,7 +18,9 @@ val wearModule = module {
     singleOf(::ApkInstaller)
     singleOf(::ApkCompatibilityCheck)
     singleOf(::WearApkRepository)
+    singleOf(::WearInstalledAppsRepository)
     viewModelOf(::HomeViewModel)
+    viewModelOf(::ManageViewModel)
     viewModel { params ->
         DetailViewModel(
             apkId = params.get(),
