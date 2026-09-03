@@ -44,6 +44,8 @@ data class ApkInfo(
     val isBlocked: Boolean = false,
     /** Whether the APK declares Android Auto compatibility (services or metadata). */
     val isAndroidAutoSupported: Boolean = false,
+    /** Whether the APK declares `uses-feature android.hardware.type.watch`. */
+    val isWearOsSupported: Boolean = false,
 ) {
     val isRootRequested: Boolean
         get() = permissions.contains("android.permission.ACCESS_SUPERUSER")

@@ -1,11 +1,13 @@
 package app.pwhs.universalinstaller.presentation.install
 
+import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.Watch
@@ -32,6 +34,8 @@ import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
 fun WatchSendDialog(
     state: WatchSendState,
     onDismiss: () -> Unit,
+    onCancel: () -> Unit = onDismiss,
+    onConfirmSend: () -> Unit = {},
 ) {
     if (state is WatchSendState.Idle) return
 
@@ -54,13 +58,19 @@ fun WatchSendDialog(
         },
         text = { WatchSendBody(state) },
         confirmButton = {
-            if (state.isTerminal()) {
-                Button(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
+            when {
+                state is WatchSendState.ConfirmNotWatchApp ->
+                    Button(onClick = onConfirmSend) {
+                        Text(stringResource(R.string.watch_send_anyway))
+                    }
+
+                state.isTerminal() ->
+                    Button(onClick = onDismiss) { Text(stringResource(android.R.string.ok)) }
             }
         },
         dismissButton = {
-            if (state is WatchSendState.CheckingWatch) {
-                TextButton(onClick = onDismiss) { Text(stringResource(R.string.cancel)) }
+            if (!state.isTerminal()) {
+                TextButton(onClick = onCancel) { Text(stringResource(R.string.cancel)) }
             }
         },
     )
@@ -105,6 +115,8 @@ private fun WatchSendBody(state: WatchSendState) {
 @Composable
 private fun WatchSendState.message(): String = when (this) {
     is WatchSendState.Success -> stringResource(R.string.watch_send_success_msg)
+    is WatchSendState.ConfirmNotWatchApp ->
+        stringResource(R.string.watch_send_not_watch_app_msg, fileName)
     is WatchSendState.NoWatch -> stringResource(R.string.watch_send_no_watch_msg)
     is WatchSendState.Unsupported -> reason
     is WatchSendState.Error -> message
@@ -113,6 +125,7 @@ private fun WatchSendState.message(): String = when (this) {
 
 private fun WatchSendState.titleRes(): Int = when (this) {
     is WatchSendState.Success -> R.string.watch_send_success_title
+    is WatchSendState.ConfirmNotWatchApp -> R.string.watch_send_not_watch_app_title
     is WatchSendState.NoWatch -> R.string.watch_send_no_watch_title
     is WatchSendState.Unsupported -> R.string.watch_send_unsupported_title
     is WatchSendState.Error -> R.string.watch_send_error_title
@@ -121,6 +134,7 @@ private fun WatchSendState.titleRes(): Int = when (this) {
 
 private fun WatchSendState.icon(): ImageVector = when (this) {
     is WatchSendState.Success -> Icons.Rounded.CheckCircle
+    is WatchSendState.ConfirmNotWatchApp -> Icons.AutoMirrored.Rounded.HelpOutline
     is WatchSendState.Unsupported, is WatchSendState.Error -> Icons.Rounded.ErrorOutline
     else -> Icons.Rounded.Watch
 }
@@ -133,43 +147,59 @@ private fun WatchSendState.iconTint(): Color = when (this) {
     else -> MaterialTheme.colorScheme.primary
 }
 
-private fun WatchSendState.isTerminal(): Boolean =
-    this !is WatchSendState.CheckingWatch && this !is WatchSendState.Sending
+private fun WatchSendState.isTerminal(): Boolean = when (this) {
+    is WatchSendState.CheckingWatch,
+    is WatchSendState.Sending,
+    is WatchSendState.ConfirmNotWatchApp -> false
+
+    else -> true
+}
 
 @Preview
 @Composable
 private fun WatchSendDialogCheckingPreview() {
-    UniversalInstallerTheme { WatchSendDialog(WatchSendState.CheckingWatch) {} }
+    UniversalInstallerTheme { WatchSendDialog(WatchSendState.CheckingWatch, onDismiss = {}) }
 }
 
 @Preview
 @Composable
 private fun WatchSendDialogSendingPreview() {
-    UniversalInstallerTheme { WatchSendDialog(WatchSendState.Sending(0.42f)) {} }
+    UniversalInstallerTheme { WatchSendDialog(WatchSendState.Sending(0.42f), onDismiss = {}) }
 }
 
 @Preview
 @Composable
 private fun WatchSendDialogSuccessPreview() {
-    UniversalInstallerTheme { WatchSendDialog(WatchSendState.Success) {} }
+    UniversalInstallerTheme { WatchSendDialog(WatchSendState.Success, onDismiss = {}) }
 }
 
 @Preview
 @Composable
 private fun WatchSendDialogNoWatchPreview() {
-    UniversalInstallerTheme { WatchSendDialog(WatchSendState.NoWatch) {} }
+    UniversalInstallerTheme { WatchSendDialog(WatchSendState.NoWatch, onDismiss = {}) }
 }
 
 @Preview
 @Composable
 private fun WatchSendDialogUnsupportedPreview() {
     UniversalInstallerTheme {
-        WatchSendDialog(WatchSendState.Unsupported("This is a set of separate split APKs.")) {}
+        WatchSendDialog(WatchSendState.Unsupported("This is a set of separate split APKs."), onDismiss = {})
+    }
+}
+
+@Preview
+@Composable
+private fun WatchSendDialogConfirmNotWatchAppPreview() {
+    UniversalInstallerTheme {
+        WatchSendDialog(
+            state = WatchSendState.ConfirmNotWatchApp(Uri.EMPTY, "Instagram.apk"),
+            onDismiss = {},
+        )
     }
 }
 
 @Preview
 @Composable
 private fun WatchSendDialogErrorPreview() {
-    UniversalInstallerTheme { WatchSendDialog(WatchSendState.Error("Transfer failed")) {} }
+    UniversalInstallerTheme { WatchSendDialog(WatchSendState.Error("Transfer failed"), onDismiss = {}) }
 }

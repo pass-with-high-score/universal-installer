@@ -8,6 +8,8 @@ import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 
 /**
@@ -36,9 +38,9 @@ object WearApkSender {
         data class Error(val message: String) : SendResult
     }
 
-    /** True when a watch that actually has this app installed is reachable. */
-    suspend fun isWatchAvailable(context: Context): Boolean = withContext(Dispatchers.IO) {
-        findReceiverNode(context) != null
+    /** Display name of a reachable watch that has this app installed, or null when there is none. */
+    suspend fun connectedWatchName(context: Context): String? = withContext(Dispatchers.IO) {
+        findReceiverNode(context)?.displayName
     }
 
     /**
@@ -101,7 +103,7 @@ object WearApkSender {
         context.contentResolver.openFileDescriptor(uri, "r")?.use { it.statSize } ?: 0L
     }.getOrDefault(0L).coerceAtLeast(0L)
 
-    private fun copyWithProgress(
+    private suspend fun copyWithProgress(
         input: java.io.InputStream,
         output: java.io.OutputStream,
         totalBytes: Long,
@@ -112,6 +114,8 @@ object WearApkSender {
         var lastPercent = -1
         var read = input.read(buffer)
         while (read != -1) {
+            // Lets a cancel take effect within one chunk instead of at the end of the file.
+            currentCoroutineContext().ensureActive()
             output.write(buffer, 0, read)
             sent += read
             if (onProgress != null && totalBytes > 0) {

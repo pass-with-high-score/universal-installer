@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.install
 
 import android.app.Application
 import android.content.Context
+import app.pwhs.universalinstaller.presentation.install.util.InstallScanHelper
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -153,7 +154,7 @@ class InstallViewModel(
             parseDelegate.isApk,
             batchDelegate.batchDetailUri,
             dialogDelegate.downloadProgress,
-            wearDelegate.watchSendState,
+            wearDelegate.sendState,
         )
     ) { flows ->
         InstallUiStateBuilder.build(flows)
@@ -484,13 +485,17 @@ class InstallViewModel(
 
     // ── Watch (Wear OS) ──────────────────────────────────────────────────────
 
-    val watchAvailable: StateFlow<Boolean> = wearDelegate.watchAvailable
+    val watchName: StateFlow<String?> = wearDelegate.watchName
+    val isLookingUpWatch: StateFlow<Boolean> = wearDelegate.isLookingUpWatch
+    val watchApkScanState: StateFlow<ScanState> = wearDelegate.apkScanState
 
-    fun refreshWatchAvailability() = wearDelegate.refreshWatchAvailability()
+    fun refreshWatch() = wearDelegate.refreshWatch()
+
+    fun scanApksForWatch(force: Boolean = false) = wearDelegate.scanForApks(force)
 
     fun sendToWatch(apkUri: Uri? = null, fileName: String? = null) {
         if (apkUri != null) {
-            wearDelegate.sendToWatch(apkUri, fileName ?: fallbackFileName())
+            wearDelegate.sendToWatch(apkUri, fileName ?: fallbackFileName(), null)
             return
         }
 
@@ -507,11 +512,22 @@ class InstallViewModel(
         }
 
         val uri = originalUri ?: splitUris.firstOrNull() ?: return
-        wearDelegate.sendToWatch(uri, name)
+        wearDelegate.sendToWatch(uri, name, parseDelegate.pendingApkInfo.value?.isWearOsSupported)
+    }
+
+    fun confirmSendToWatch() = wearDelegate.confirmSendToWatch()
+
+    fun sendFoundFileToWatch(context: Context, found: FoundPackageFile) {
+        val file = java.io.File(found.path)
+        if (!file.exists()) return
+        val uri = InstallScanHelper.resolveUriForFile(context, file)
+        wearDelegate.sendToWatch(uri, found.name, found.isWearOsSupported)
     }
 
     private fun fallbackFileName(): String =
         "${parseDelegate.pendingApkInfo.value?.appName ?: "app"}.apk"
+
+    fun cancelWatchSend() = wearDelegate.cancelWatchSend()
 
     fun dismissWatchSend() = wearDelegate.dismissWatchSend()
 }

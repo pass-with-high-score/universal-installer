@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.OpenableColumns
+import app.pwhs.core.util.WatchAppCheck
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.SplitEntry
 import app.pwhs.universalinstaller.domain.model.SplitType
@@ -216,6 +217,7 @@ object InstallApkSplitsHelper {
         var targetSdk = 0
         var signatureMismatch: Boolean? = null
         var isAndroidAutoSupported = false
+        var isWearOsSupported = false
 
         try {
             val tempFile = File(context.cacheDir, "temp_parse_${System.currentTimeMillis()}.apk")
@@ -226,6 +228,7 @@ object InstallApkSplitsHelper {
             val parseFlags = (PackageManager.GET_PERMISSIONS or
                     PackageManager.GET_SERVICES or
                     PackageManager.GET_META_DATA or
+                    PackageManager.GET_CONFIGURATIONS or
                     SignatureCheck.archiveFlag).toLong()
 
             val packageInfo = try {
@@ -267,6 +270,7 @@ object InstallApkSplitsHelper {
                             service.name.contains("CarService", ignoreCase = true)
                 } ?: false
                 isAndroidAutoSupported = hasCarMeta || hasCarService
+                isWearOsSupported = packageInfo.reqFeatures?.any { it.name == WatchAppCheck.WATCH_FEATURE } == true
 
                 if (ackpinePackageName.isEmpty()) ackpinePackageName = packageInfo.packageName
                 if (ackpineVersionName.isEmpty()) ackpineVersionName = packageInfo.versionName ?: ""
@@ -338,6 +342,7 @@ object InstallApkSplitsHelper {
             signatureMismatch = signatureMismatch,
             isBlocked = isBlocked,
             isAndroidAutoSupported = isAndroidAutoSupported,
+            isWearOsSupported = isWearOsSupported,
         )
     }
 

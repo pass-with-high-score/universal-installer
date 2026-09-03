@@ -852,6 +852,7 @@
     <!-- Wear OS Send Strings -->
     <string name="watch_send_unsupported_title">Can\'t send this package</string>
     <string name="watch_send_unsupported_splits">This is a set of separate split APKs. Send a single APK, or the original .apks/.xapk bundle instead.</string>
+    <string name="watch_send_channel_name">Sending to watch</string>
     <string name="watch_send_title">Send to Watch</string>
     <string name="watch_send_connecting">Connecting to watch…</string>
     <string name="watch_send_sending">Sending APK to watch (%1$d%%)…</string>
@@ -860,4 +861,16 @@
     <string name="watch_send_no_watch_title">No Watch Connected</string>
     <string name="watch_send_no_watch_msg">No Wear OS watch with Universal Installer was found. Make sure your watch is paired, connected via Bluetooth, and has the watch app installed.</string>
     <string name="watch_send_error_title">Transfer Failed</string>
+    <string name="watch_send_not_watch_app_title">Not a watch app</string>
+    <string name="watch_send_not_watch_app_msg">%1$s does not declare Wear OS support. It may still install and run on your watch, but it was probably built for phones. Send it anyway?</string>
+    <string name="watch_send_anyway">Send anyway</string>
+    <string name="watch_status_ready">Ready to receive</string>
+    <string name="watch_status_none">No watch found</string>
+    <string name="watch_status_none_hint">Pair a watch and install Universal Installer on it.</string>
+    <string name="watch_status_retry">Retry</string>
+    <string name="watch_sheet_current">Currently open</string>
+    <string name="watch_sheet_on_device">Packages on this device</string>
+    <string name="watch_sheet_pick_file">Choose another file…</string>
+    <string name="watch_sheet_send">Send</string>
+    <string name="watch_chip_wear_os">Wear OS</string>
 </resources>

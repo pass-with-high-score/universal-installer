@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.presentation.install
 
+import android.net.Uri
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.InstallerProfile
 import app.pwhs.universalinstaller.domain.model.SessionData
@@ -138,6 +139,8 @@ sealed interface WatchSendState {
     data class Sending(val progress: Float) : WatchSendState  // 0.0–1.0
     data object Success : WatchSendState
     data object NoWatch : WatchSendState
+    /** APK does not declare the watch feature; the user decides whether to send it anyway. */
+    data class ConfirmNotWatchApp(val apkUri: Uri, val fileName: String) : WatchSendState
     data class Unsupported(val reason: String) : WatchSendState
     data class Error(val message: String) : WatchSendState
 }

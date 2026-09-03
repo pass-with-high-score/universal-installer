@@ -9,6 +9,7 @@ import android.os.storage.StorageManager
 import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import app.pwhs.core.util.WatchAppCheck
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
@@ -44,6 +45,7 @@ data class FoundPackageFile(
     val versionName: String? = null,
     val installState: InstallState = InstallState.Unknown,
     val isAndroidAutoSupported: Boolean = false,
+    val isWearOsSupported: Boolean = false,
 )
 
 object ApkScanner {
@@ -149,10 +151,11 @@ object ApkScanner {
         file: FoundPackageFile,
     ): FoundPackageFile {
         val archive = runCatching {
+            val flags = PackageManager.GET_CONFIGURATIONS
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.getPackageArchiveInfo(file.path, PackageManager.PackageInfoFlags.of(0L))
+                pm.getPackageArchiveInfo(file.path, PackageManager.PackageInfoFlags.of(flags.toLong()))
             } else {
-                @Suppress("DEPRECATION") pm.getPackageArchiveInfo(file.path, 0)
+                @Suppress("DEPRECATION") pm.getPackageArchiveInfo(file.path, flags)
             }
         }.getOrNull() ?: return file
 
@@ -202,6 +205,7 @@ object ApkScanner {
             versionName = archive.versionName,
             installState = state,
             isAndroidAutoSupported = isAa,
+            isWearOsSupported = archive.reqFeatures?.any { it.name == WatchAppCheck.WATCH_FEATURE } == true,
         )
     }
 

@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Transfer lifecycle trên phone"
-status: pending
+status: in-progress
 priority: P2
 effort: "5h"
 dependencies: [2]
@@ -125,3 +125,31 @@ mỗi file kèm `@Preview` bọc theme.
 | Android 14+ hạn chế start foreground service từ background | Transfer luôn khởi phát từ tương tác UI (foreground) → hợp lệ; không thêm đường start nào khác |
 | Đổi tên `WearSenderService` → `WearApkSender` chạm nhiều import | Đổi trong một commit riêng, chạy build ngay sau |
 | Singleton `WearTransferState` giữ state cũ sau khi process bị kill và dựng lại | `reset()` trong `Application.onCreate` của `:app`, giống cách `TvReceiverState` được dùng |
+
+## Kết quả (2026-09-03)
+
+Làm full theo plan, **chưa có số đo throughput** — user quyết định làm trước. Nếu đo ra transfer nhanh
+thì `WearTransferService` + `WearTransferState` gỡ được, phần cancel và dialog vẫn giữ.
+
+| Thay đổi | Chi tiết |
+|---|---|
+| `WearTransferState` | Object process-wide giữ `StateFlow<WatchSendState>`, mirror `SyncManager` |
+| `WearTransferService` | Foreground service `dataSync`, `ACTION_SEND` / `ACTION_CANCEL`, notification progress + nút Cancel; `startForeground()` là việc đầu tiên trong `onStartCommand` |
+| Cancel thật | `WearApkSender.copyWithProgress` gọi `ensureActive()` mỗi chunk → cancel ăn trong ≤ 8 KB; `finally` của `send()` đóng channel |
+| `InstallWearDelegate` | Thành lớp mỏng: đọc từ `WearTransferState`, gửi intent tới service. Không còn `MutableStateFlow` riêng |
+| Dialog | Nút Cancel cho **mọi** trạng thái chưa terminal (trước đó `Sending` không có đường thoát) |
+| Manifest | Khai service; `FOREGROUND_SERVICE` + `FOREGROUND_SERVICE_DATA_SYNC` đã có sẵn từ trước |
+
+### Lệch so với plan
+
+- **Không tách `WatchSendDialog` thành nhiều file** — đã gộp data-driven ở Phase 2, không còn gì để tách.
+- **Không đổi tên file `WearSenderService` ở phase này** — đã làm ở Phase 2.
+- **Không gọi `WearTransferState.reset()` trong `Application.onCreate`.** Plan lo state cũ sót lại sau
+  khi process bị kill. Nhưng `object` của Kotlin khởi tạo lại từ đầu mỗi lần process start, nên
+  `state` đã là `Idle` sẵn — thêm `reset()` là code thừa.
+
+### Nợ lại
+
+- `watch_send_channel_name` chưa dịch → tổng `:app` lint **39 (baseline) → 42**, cả 3 lỗi thêm đều là
+  `MissingTranslation` của string mới. Không có lỗi lint loại khác.
+- Toàn bộ tiêu chí của phase này cần thiết bị, chưa tick được cái nào.

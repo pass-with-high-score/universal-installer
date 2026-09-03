@@ -155,8 +155,14 @@ fun InstallScreen(
         )
     }
 
-    val watchAvailable by viewModel.watchAvailable.collectAsState()
-    LaunchedEffect(Unit) { viewModel.refreshWatchAvailability() }
+    val watchName by viewModel.watchName.collectAsState()
+    val isLookingUpWatch by viewModel.isLookingUpWatch.collectAsState()
+    val watchApkScanState by viewModel.watchApkScanState.collectAsState()
+    // Re-checked on every resume so putting the watch on after opening the app still registers.
+    LifecycleResumeEffect(Unit) {
+        viewModel.refreshWatch()
+        onPauseOrDispose {}
+    }
 
     InstallUi(
         modifier = modifier,
@@ -243,7 +249,12 @@ fun InstallScreen(
         onToggleAllUsers = viewModel::setAllUsers,
         onSelectUserId = viewModel::setUserId,
         onSendToWatch = { uri, name -> viewModel.sendToWatch(uri, name) },
-        watchAvailable = watchAvailable,
+        onSendFoundToWatch = { found -> viewModel.sendFoundFileToWatch(context, found) },
+        onRefreshWatch = viewModel::refreshWatch,
+        onScanApksForWatch = viewModel::scanApksForWatch,
+        watchName = watchName,
+        isLookingUpWatch = isLookingUpWatch,
+        watchApkScanState = watchApkScanState,
     )
 
     val storageWarning by viewModel.storageWarningInfo.collectAsState()
@@ -258,6 +269,8 @@ fun InstallScreen(
     WatchSendDialog(
         state = uiState.watchSendState,
         onDismiss = viewModel::dismissWatchSend,
+        onCancel = viewModel::cancelWatchSend,
+        onConfirmSend = viewModel::confirmSendToWatch,
     )
 }
 
@@ -310,7 +323,12 @@ private fun InstallUi(
     onCloseBatchDetail: () -> Unit = {},
     onSaveBatchDetail: (Uri, List<Uri>) -> Unit = { _, _ -> },
     onSendToWatch: (Uri?, String?) -> Unit = { _, _ -> },
-    watchAvailable: Boolean = true,
+    onSendFoundToWatch: (FoundPackageFile) -> Unit = {},
+    onRefreshWatch: () -> Unit = {},
+    onScanApksForWatch: (Boolean) -> Unit = {},
+    watchName: String? = null,
+    isLookingUpWatch: Boolean = false,
+    watchApkScanState: ScanState = ScanState.Idle,
 ) {
     val context = LocalContext.current
     val resource = LocalResources.current
@@ -439,10 +457,15 @@ private fun InstallUi(
         ActivityResultContracts.OpenDocumentTree()
     ) { uri -> onGrantObbFolder(uri) }
 
+    var showWatchSheet by rememberSaveable { mutableStateOf(false) }
+
+    // No mime filter — "application/vnd.android.package-archive" hides .apks/.xapk/.apkm, which
+    // the watch receiver does accept.
     val watchApkPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
         if (uri != null) {
+            showWatchSheet = false
             val displayName = context.contentResolver.getDisplayName(uri)
             onSendToWatch(uri, displayName)
         }
@@ -528,6 +551,38 @@ private fun InstallUi(
             onStartDeviceScan()
         }
         onPauseOrDispose {}
+    }
+
+    if (showWatchSheet) {
+        WatchSendSheet(
+            watchName = watchName,
+            isLookingUpWatch = isLookingUpWatch,
+            pendingApk = uiState.pendingApkInfo,
+            scanState = watchApkScanState,
+            onRefreshWatch = onRefreshWatch,
+            onRescan = { onScanApksForWatch(true) },
+            onGrantPermission = {
+                runCatching {
+                    grantPermissionLauncher.launch(ApkScanner.buildGrantIntent(context))
+                }.onFailure {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.error_cannot_open_app),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            },
+            onSendPending = {
+                showWatchSheet = false
+                onSendToWatch(null, null)
+            },
+            onSendFound = { found ->
+                showWatchSheet = false
+                onSendFoundToWatch(found)
+            },
+            onPickFile = { watchApkPickerLauncher.launch("*/*") },
+            onDismiss = { showWatchSheet = false },
+        )
     }
 
     FoundApksSheet(
@@ -640,13 +695,10 @@ private fun InstallUi(
                     val isSyncRunning = uiState.syncState == app.pwhs.universalinstaller.presentation.sync.SyncState.RUNNING
 
                     IconButton(
-                        enabled = watchAvailable,
                         onClick = {
-                            if (uiState.pendingApkInfo != null) {
-                                onSendToWatch(null, null)
-                            } else {
-                                watchApkPickerLauncher.launch("application/vnd.android.package-archive")
-                            }
+                            showWatchSheet = true
+                            onRefreshWatch()
+                            onScanApksForWatch(false)
                         }
                     ) {
                         Icon(
