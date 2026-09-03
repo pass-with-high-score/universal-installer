@@ -51,4 +51,5 @@
     <string name="accent_green">초록</string>
     <string name="accent_purple">보라</string>
     <string name="about_rate">앱 평가하기</string>
+    <string name="receive_channel_name">패키지 수신 중</string>
 </resources>

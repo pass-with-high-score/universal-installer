@@ -51,4 +51,5 @@
     <string name="accent_green">Verde</string>
     <string name="accent_purple">Mov</string>
     <string name="about_rate">Evaluează aplicația</string>
+    <string name="receive_channel_name">Se primește un pachet</string>
 </resources>

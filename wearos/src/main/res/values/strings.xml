@@ -21,6 +21,7 @@
 
     <!-- Notification -->
     <string name="apk_received_title">APK received</string>
+    <string name="receive_channel_name">Receiving a package</string>
 
     <string name="home_empty_title">Nothing here yet</string>
     <string name="home_empty_hint">Open Universal Installer on your phone and send a package to this watch.</string>

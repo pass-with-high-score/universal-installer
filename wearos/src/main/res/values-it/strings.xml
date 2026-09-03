@@ -51,4 +51,5 @@
     <string name="accent_green">Verde</string>
     <string name="accent_purple">Viola</string>
     <string name="about_rate">Valuta l\'app</string>
+    <string name="receive_channel_name">Ricezione di un pacchetto</string>
 </resources>

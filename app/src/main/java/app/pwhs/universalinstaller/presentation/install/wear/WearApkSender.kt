@@ -9,13 +9,20 @@ import app.pwhs.core.data.ApkMetadataReader
 import app.pwhs.core.install.isBundleFileName
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Streams an APK to the paired Wear OS watch over a Wearable [com.google.android.gms.wearable.ChannelClient]
@@ -38,6 +45,12 @@ object WearApkSender {
     const val META_PATH_PREFIX = "/apk-meta/"
 
     private const val BUFFER_SIZE = 8192
+
+    /** Opening a channel talks to a watch over Bluetooth; slow is normal, forever is not. */
+    private const val OPEN_TIMEOUT_SECONDS = 30L
+    private const val CLOSE_TIMEOUT_SECONDS = 10L
+    private const val STALL_TIMEOUT_MS = 60_000L
+    private const val STALL_CHECK_MS = 5_000L
     private const val ICON_PX = 96
 
     sealed interface SendResult {
@@ -72,7 +85,10 @@ object WearApkSender {
 
         val channelClient = Wearable.getChannelClient(context)
         val channel = runCatching {
-            Tasks.await(channelClient.openChannel(targetNode.id, channelPath))
+            Tasks.await(
+                channelClient.openChannel(targetNode.id, channelPath),
+                OPEN_TIMEOUT_SECONDS, TimeUnit.SECONDS,
+            )
         }.getOrElse { e ->
             Log.e(TAG, "Failed to open channel: ${e.message}", e)
             return@withContext SendResult.Error("Failed to open channel: ${e.message}")
@@ -82,8 +98,12 @@ object WearApkSender {
             runCatching {
                 val input = context.contentResolver.openInputStream(apkUri)
                     ?: error("Cannot read APK file")
-                Tasks.await(channelClient.getOutputStream(channel)).use { out ->
-                    input.use { copyWithProgress(it, out, totalBytes, onProgress) }
+                val out = Tasks.await(
+                    channelClient.getOutputStream(channel),
+                    OPEN_TIMEOUT_SECONDS, TimeUnit.SECONDS,
+                )
+                out.use { stream ->
+                    input.use { copyWatched(channelClient, channel, it, stream, totalBytes, onProgress) }
                 }
             }.fold(
                 onSuccess = { SendResult.Success },
@@ -93,7 +113,42 @@ object WearApkSender {
                 },
             )
         } finally {
-            runCatching { Tasks.await(channelClient.close(channel)) }
+            runCatching { Tasks.await(channelClient.close(channel), CLOSE_TIMEOUT_SECONDS, TimeUnit.SECONDS) }
+        }
+    }
+
+    /**
+     * Runs the copy with a watchdog. A blocked `write` cannot be interrupted by cancelling the
+     * coroutine — the only thing that frees it is closing the channel underneath, which is what the
+     * watchdog does once the byte count has not moved for [STALL_TIMEOUT_MS]. Without this a watch
+     * that stops reading leaves the sender parked on write() for good.
+     */
+    private suspend fun copyWatched(
+        channelClient: ChannelClient,
+        channel: ChannelClient.Channel,
+        input: java.io.InputStream,
+        output: java.io.OutputStream,
+        totalBytes: Long,
+        onProgress: ((Float) -> Unit)?,
+    ) = coroutineScope {
+        val lastMovement = AtomicLong(System.currentTimeMillis())
+        val watchdog = launch {
+            while (isActive) {
+                delay(STALL_CHECK_MS)
+                if (System.currentTimeMillis() - lastMovement.get() > STALL_TIMEOUT_MS) {
+                    Log.e(TAG, "No bytes moved for ${STALL_TIMEOUT_MS}ms — closing the channel")
+                    runCatching { Tasks.await(channelClient.close(channel), CLOSE_TIMEOUT_SECONDS, TimeUnit.SECONDS) }
+                    return@launch
+                }
+            }
+        }
+        try {
+            copyWithProgress(input, output, totalBytes) { progress ->
+                lastMovement.set(System.currentTimeMillis())
+                onProgress?.invoke(progress)
+            }
+        } finally {
+            watchdog.cancel()
         }
     }
 
