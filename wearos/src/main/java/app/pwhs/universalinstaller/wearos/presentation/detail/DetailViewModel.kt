@@ -1,108 +1,92 @@
 package app.pwhs.universalinstaller.wearos.presentation.detail
 
 import android.app.Application
-import android.app.PendingIntent
-import android.content.Intent
-import android.content.pm.PackageInstaller
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import app.pwhs.core.install.ApkInstaller
 import app.pwhs.universalinstaller.wearos.data.WearApkInfo
 import app.pwhs.universalinstaller.wearos.data.WearApkRepository
-import kotlinx.coroutines.Dispatchers
+import app.pwhs.universalinstaller.wearos.domain.ApkCompatibilityCheck
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
-
-sealed interface InstallState {
-    data object Idle : InstallState
-    data object Installing : InstallState
-    data object Success : InstallState
-    data class Failed(val message: String) : InstallState
-}
 
 class DetailViewModel(
     private val apkId: String,
     private val repository: WearApkRepository,
+    private val installer: ApkInstaller,
+    private val compatibility: ApkCompatibilityCheck,
     application: Application,
 ) : AndroidViewModel(application) {
 
-    private val _apkInfo = MutableStateFlow<WearApkInfo?>(null)
-    val apkInfo: StateFlow<WearApkInfo?> = _apkInfo.asStateFlow()
+    // Observed rather than read once: opening this screen from a notification can beat the
+    // repository's disk scan.
+    val apkInfo: StateFlow<WearApkInfo?> = repository.apks
+        .map { list -> list.find { it.id == apkId } }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, repository.getById(apkId))
 
     private val _installState = MutableStateFlow<InstallState>(InstallState.Idle)
     val installState: StateFlow<InstallState> = _installState.asStateFlow()
 
-    init {
-        _apkInfo.value = repository.getById(apkId)
+    fun install() {
+        val info = apkInfo.value ?: return
+
+        if (!getApplication<Application>().packageManager.canRequestPackageInstalls()) {
+            _installState.value = InstallState.NeedsUnknownSources
+            return
+        }
+
+        val incompatibility = compatibility.check(info)
+        if (incompatibility != null) {
+            _installState.value = InstallState.Incompatible(incompatibility)
+            return
+        }
+
+        installAnyway()
     }
 
-    fun install() {
-        val info = _apkInfo.value ?: return
+    fun installAnyway() {
+        val info = apkInfo.value ?: return
         val apkFile = File(info.cachedFilePath)
         if (!apkFile.exists()) {
-            _installState.value = InstallState.Failed("APK file not found")
+            _installState.value = InstallState.Failed("Package file not found")
             return
         }
 
         viewModelScope.launch {
-            _installState.value = InstallState.Installing
-            runCatching {
-                withContext(Dispatchers.IO) {
-                    commitInstallSession(apkFile)
+            _installState.value = InstallState.Installing(null)
+            val result = installer.install(
+                uri = android.net.Uri.fromFile(apkFile),
+                isBundle = info.isBundle,
+                totalBytes = info.sizeBytes,
+                onProgress = { written, total ->
+                    if (total > 0) {
+                        _installState.value = InstallState.Installing(written.toFloat() / total)
+                    }
+                },
+            )
+            when (result) {
+                is ApkInstaller.Result.Success -> {
+                    _installState.value = InstallState.Success
+                    repository.deleteById(apkId)
                 }
-            }.onSuccess {
-                _installState.value = InstallState.Success
-                repository.deleteById(apkId)
-            }.onFailure { e ->
-                _installState.value = InstallState.Failed(e.message ?: "Installation failed")
+                // The cached file stays put so the user can retry.
+                is ApkInstaller.Result.Failure ->
+                    _installState.value = InstallState.Failed(result.message)
             }
         }
     }
 
     fun delete() {
-        viewModelScope.launch {
-            repository.deleteById(apkId)
-        }
+        viewModelScope.launch { repository.deleteById(apkId) }
     }
 
     fun resetInstallState() {
         _installState.value = InstallState.Idle
-    }
-
-    /**
-     * Writes APK bytes into a PackageInstaller session and commits it.
-     * Android handles showing any necessary confirmation UI on the watch.
-     * Must be called on a background thread.
-     */
-    private fun commitInstallSession(apkFile: File) {
-        val context = getApplication<Application>()
-        val installer = context.packageManager.packageInstaller
-
-        val params = PackageInstaller.SessionParams(
-            PackageInstaller.SessionParams.MODE_FULL_INSTALL
-        ).also {
-            it.setAppPackageName(_apkInfo.value?.packageName)
-        }
-
-        val sessionId = installer.createSession(params)
-        installer.openSession(sessionId).use { session ->
-            session.openWrite("base.apk", 0, apkFile.length()).use { output ->
-                apkFile.inputStream().use { it.copyTo(output) }
-                session.fsync(output)
-            }
-
-            // Self-targeting intent so system can report result back
-            val intent = Intent(Intent.ACTION_MAIN).apply {
-                setPackage(context.packageName)
-            }
-            val pi = PendingIntent.getActivity(
-                context, sessionId, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-            )
-            session.commit(pi.intentSender)
-        }
     }
 }

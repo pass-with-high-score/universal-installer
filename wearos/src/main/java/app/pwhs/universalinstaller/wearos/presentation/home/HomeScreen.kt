@@ -34,12 +34,14 @@ fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val apks by viewModel.apks.collectAsState()
-    HomeScreenContent(apks = apks, onApkClick = onApkClick)
+    val isLoading by viewModel.isLoading.collectAsState()
+    HomeScreenContent(apks = apks, isLoading = isLoading, onApkClick = onApkClick)
 }
 
 @Composable
 fun HomeScreenContent(
     apks: List<WearApkInfo>,
+    isLoading: Boolean,
     onApkClick: (String) -> Unit,
 ) {
     UniversalInstallerTheme {
@@ -66,7 +68,9 @@ fun HomeScreenContent(
                     if (apks.isEmpty()) {
                         item {
                             Text(
-                                text = stringResource(R.string.home_empty),
+                                text = stringResource(
+                                    if (isLoading) R.string.loading else R.string.home_empty
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier
@@ -110,22 +114,33 @@ private fun formatSize(bytes: Long): String {
     return if (mb >= 1.0) "%.1f MB".format(mb) else "${bytes / 1024} KB"
 }
 
+private fun previewApk() = WearApkInfo(
+    id = "sample.apk",
+    fileName = "sample.apk",
+    appName = "Sample App",
+    packageName = "com.sample.app",
+    versionName = "2.1.0",
+    versionCode = 210,
+    minSdk = 30,
+    isBundle = false,
+    sizeBytes = 15_000_000L,
+    cachedFilePath = "/data/app/sample.apk",
+)
+
 @WearPreviewDevices
 @Composable
 private fun HomeScreenPreview() {
-    HomeScreenContent(
-        apks = listOf(
-            WearApkInfo(
-                id = "1",
-                fileName = "sample.apk",
-                appName = "Sample App",
-                packageName = "com.sample.app",
-                versionName = "2.1.0",
-                versionCode = 210,
-                sizeBytes = 15_000_000L,
-                cachedFilePath = "/data/app/sample.apk",
-            )
-        ),
-        onApkClick = {},
-    )
+    HomeScreenContent(apks = listOf(previewApk()), isLoading = false, onApkClick = {})
+}
+
+@WearPreviewDevices
+@Composable
+private fun HomeScreenLoadingPreview() {
+    HomeScreenContent(apks = emptyList(), isLoading = true, onApkClick = {})
+}
+
+@WearPreviewDevices
+@Composable
+private fun HomeScreenEmptyPreview() {
+    HomeScreenContent(apks = emptyList(), isLoading = false, onApkClick = {})
 }

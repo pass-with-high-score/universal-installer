@@ -1,9 +1,9 @@
 package app.pwhs.universalinstaller.wearos.data
 
 import android.content.Context
-import android.content.pm.PackageInfo
-import android.content.pm.PackageManager
-import android.os.Build
+import android.net.Uri
+import app.pwhs.core.data.ApkMetadataReader
+import app.pwhs.core.install.isBundleFileName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,13 +13,15 @@ import java.io.File
 import java.util.UUID
 
 /**
- * In-memory + disk repository for APK files received from the paired phone.
+ * Packages received from the paired phone.
  *
- * In a production version this would be backed by DataStore/Room, but for the
- * initial release an in-memory list kept alive by the Application scope is
- * sufficient — the watch session is typically short.
+ * The cache directory is the source of truth — the in-memory list is rebuilt from it on start, so
+ * an APK survives the watch killing this process between the transfer and the user opening the app.
  */
-class WearApkRepository(private val context: Context) {
+class WearApkRepository(
+    private val context: Context,
+    private val metadataReader: ApkMetadataReader,
+) {
 
     private val cacheDir: File
         get() = File(context.filesDir, "wear_apk_cache").also { it.mkdirs() }
@@ -27,10 +29,25 @@ class WearApkRepository(private val context: Context) {
     private val _apks = MutableStateFlow<List<WearApkInfo>>(emptyList())
     val apks: StateFlow<List<WearApkInfo>> = _apks.asStateFlow()
 
-    /** Called by WearReceiverService once a full APK has been written to disk. */
+    private val _isLoading = MutableStateFlow(true)
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
+
+    /** Rebuilds the list from whatever is on disk. Files that no longer parse are deleted. */
+    suspend fun refresh() = withContext(Dispatchers.IO) {
+        _isLoading.value = true
+        val entries = cacheDir.listFiles().orEmpty()
+            .filter { it.isFile }
+            .mapNotNull { file -> readInfo(file) ?: run { file.delete(); null } }
+            .sortedByDescending { it.receivedAt }
+        _apks.value = entries
+        _isLoading.value = false
+    }
+
+    /** Called by WearReceiverService once a full package has been written to disk. */
     suspend fun addApk(apkFile: File): WearApkInfo? = withContext(Dispatchers.IO) {
-        val info = extractApkInfo(apkFile) ?: return@withContext null
-        _apks.value = _apks.value + info
+        val info = readInfo(apkFile) ?: return@withContext null
+        _apks.value = (_apks.value.filterNot { it.id == info.id } + info)
+            .sortedByDescending { it.receivedAt }
         info
     }
 
@@ -42,40 +59,13 @@ class WearApkRepository(private val context: Context) {
         _apks.value = _apks.value.filter { it.id != id }
     }
 
-    /** Create a temp file in the cache dir to write incoming bytes into. */
+    /** Create a file in the cache dir to write incoming bytes into. */
     fun createTempApkFile(fileName: String): File {
         val safe = fileName.replace(Regex("[^a-zA-Z0-9._-]"), "_")
         return File(cacheDir, "${UUID.randomUUID()}_$safe")
     }
 
-    // ── private helpers ───────────────────────────────────────────────────
-
-    @Suppress("DEPRECATION")
-    private fun extractApkInfo(apkFile: File): WearApkInfo? = runCatching {
-        val pm = context.packageManager
-        val pkgInfo: PackageInfo? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            pm.getPackageArchiveInfo(apkFile.absolutePath, PackageManager.PackageInfoFlags.of(0))
-        } else {
-            pm.getPackageArchiveInfo(apkFile.absolutePath, 0)
-        }
-        pkgInfo ?: return@runCatching null
-        pkgInfo.applicationInfo?.sourceDir = apkFile.absolutePath
-        pkgInfo.applicationInfo?.publicSourceDir = apkFile.absolutePath
-
-        val appName = pkgInfo.applicationInfo?.let {
-            pm.getApplicationLabel(it).toString()
-        } ?: apkFile.nameWithoutExtension
-
-        WearApkInfo(
-            id = UUID.randomUUID().toString(),
-            fileName = apkFile.name,
-            appName = appName,
-            packageName = pkgInfo.packageName,
-            versionName = pkgInfo.versionName ?: "?",
-            versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
-                pkgInfo.longVersionCode else pkgInfo.versionCode.toLong(),
-            sizeBytes = apkFile.length(),
-            cachedFilePath = apkFile.absolutePath,
-        )
-    }.getOrNull()
+    private suspend fun readInfo(file: File): WearApkInfo? =
+        metadataReader.readMetadata(Uri.fromFile(file), file.name.isBundleFileName())
+            ?.toWearApkInfo(file)
 }

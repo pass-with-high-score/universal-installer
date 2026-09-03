@@ -16,6 +16,13 @@
     <string name="install_failed">Install failed</string>
     <string name="loading">Loading…</string>
 
+    <string name="install_anyway">Install anyway</string>
+    <string name="unknown_sources_msg">Turn on \"Install unknown apps\" for Universal Installer in watch settings.</string>
+    <string name="unknown_sources_open_settings">Open settings</string>
+    <string name="unknown_sources_hidden">This watch hides the setting. Grant it over wireless debugging:\nadb shell appops set app.pwhs.universalinstaller REQUEST_INSTALL_PACKAGES allow</string>
+    <string name="incompatible_min_sdk">Needs Android API %1$d, this watch is API %2$d.</string>
+    <string name="incompatible_not_a_watch_app">This is a phone app, not a Wear OS app.</string>
+
     <!-- Notification -->
     <string name="apk_received_title">APK received</string>
 </resources>

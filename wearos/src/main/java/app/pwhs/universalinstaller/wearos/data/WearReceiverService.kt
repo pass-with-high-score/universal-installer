@@ -4,14 +4,16 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import app.pwhs.core.util.StorageUtil
+import app.pwhs.universalinstaller.wearos.R
+import app.pwhs.universalinstaller.wearos.presentation.MainActivity
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.ChannelClient
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
-import app.pwhs.universalinstaller.wearos.R
-import app.pwhs.universalinstaller.wearos.presentation.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,13 +21,13 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import java.io.File
 
 /**
- * Listens for incoming APK channels opened by the paired phone.
+ * Receives packages the phone streams over a Wearable channel.
  *
- * The phone calls ChannelClient.openChannel(nodeId, "/apk-transfer/<filename>") and then
- * sends the raw APK bytes. This service reads them, writes to disk, and posts a notification.
+ * Path contract shared with the phone's `WearApkSender`:
+ * `/apk-transfer/<expectedBytes>/<fileName>`. The size arrives up front so the free-space check
+ * can run before a single byte is written.
  */
 class WearReceiverService : WearableListenerService() {
 
@@ -38,46 +40,69 @@ class WearReceiverService : WearableListenerService() {
     }
 
     override fun onChannelOpened(channel: ChannelClient.Channel) {
-        val path = channel.path
-        if (!path.startsWith(CHANNEL_PATH_PREFIX)) return
+        val payload = channel.path.removePrefix(CHANNEL_PATH_PREFIX)
+        if (payload == channel.path) return
 
-        val fileName = path.removePrefix(CHANNEL_PATH_PREFIX)
-        Log.d(TAG, "Receiving APK channel: $fileName")
-
-        scope.launch {
-            receiveApk(channel, fileName)
+        val expectedBytes = payload.substringBefore('/').toLongOrNull() ?: 0L
+        val fileName = payload.substringAfter('/', "")
+        if (fileName.isEmpty()) {
+            Log.e(TAG, "Malformed channel path: ${channel.path}")
+            return
         }
+
+        Log.d(TAG, "Receiving $fileName ($expectedBytes bytes)")
+        scope.launch { receive(channel, fileName, expectedBytes) }
     }
 
-    private suspend fun receiveApk(channel: ChannelClient.Channel, fileName: String) =
-        withContext(Dispatchers.IO) {
-            val channelClient = Wearable.getChannelClient(this@WearReceiverService)
-            val tempFile: File = repository.createTempApkFile(fileName)
+    private suspend fun receive(
+        channel: ChannelClient.Channel,
+        fileName: String,
+        expectedBytes: Long,
+    ) = withContext(Dispatchers.IO) {
+        val channelClient = Wearable.getChannelClient(this@WearReceiverService)
+        val wakeLock = getSystemService(PowerManager::class.java)
+            .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKE_LOCK_TAG)
 
-            runCatching {
-                // Tasks.await() is safe on IO dispatcher (blocking)
-                val inputStream = Tasks.await(channelClient.getInputStream(channel))
-                inputStream.use { input ->
-                    tempFile.outputStream().use { output ->
-                        input.copyTo(output)
-                    }
-                }
-                Tasks.await(channelClient.close(channel))
-            }.onFailure { e ->
-                Log.e(TAG, "Failed to receive APK: ${e.message}", e)
-                tempFile.delete()
+        // The watch sleeps long before a Bluetooth transfer of an APK finishes.
+        wakeLock.acquire(WAKE_LOCK_TIMEOUT_MS)
+        try {
+            if (expectedBytes > 0 && !StorageUtil.hasSufficientStorage(expectedBytes)) {
+                Log.e(TAG, "Not enough free space for $fileName ($expectedBytes bytes)")
                 return@withContext
             }
 
-            Log.d(TAG, "APK written to ${tempFile.absolutePath} (${tempFile.length()} bytes)")
-            val apkInfo = repository.addApk(tempFile)
-            if (apkInfo != null) {
-                postNotification(apkInfo)
-            } else {
-                Log.e(TAG, "Could not parse APK info from ${tempFile.name}")
-                tempFile.delete()
+            val target = repository.createTempApkFile(fileName)
+            val written = runCatching {
+                Tasks.await(channelClient.getInputStream(channel)).use { input ->
+                    target.outputStream().use { output -> input.copyTo(output) }
+                }
+                target.length()
+            }.getOrElse { e ->
+                Log.e(TAG, "Transfer failed: ${e.message}", e)
+                target.delete()
+                return@withContext
             }
+
+            if (expectedBytes > 0 && written != expectedBytes) {
+                Log.e(TAG, "Truncated transfer: got $written of $expectedBytes bytes")
+                target.delete()
+                return@withContext
+            }
+
+            val apkInfo = repository.addApk(target)
+            if (apkInfo == null) {
+                Log.e(TAG, "Could not parse package info from ${target.name}")
+                target.delete()
+                return@withContext
+            }
+
+            Log.d(TAG, "Received ${apkInfo.appName} ($written bytes)")
+            postNotification(apkInfo)
+        } finally {
+            runCatching { Tasks.await(channelClient.close(channel)) }
+            if (wakeLock.isHeld) wakeLock.release()
         }
+    }
 
     private fun postNotification(apkInfo: WearApkInfo) {
         val nm = getSystemService(NotificationManager::class.java)
@@ -85,9 +110,12 @@ class WearReceiverService : WearableListenerService() {
             NotificationChannel(CHANNEL_ID, "APK Received", NotificationManager.IMPORTANCE_DEFAULT)
         )
 
+        val requestCode = apkInfo.id.hashCode()
         val intent = Intent(this, MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            .putExtra(MainActivity.EXTRA_APK_ID, apkInfo.id)
         val pi = PendingIntent.getActivity(
-            this, 0, intent,
+            this, requestCode, intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
@@ -99,12 +127,14 @@ class WearReceiverService : WearableListenerService() {
             .setAutoCancel(true)
             .build()
 
-        nm.notify(apkInfo.id.hashCode(), notification)
+        nm.notify(requestCode, notification)
     }
 
     companion object {
         private const val TAG = "WearReceiverService"
-        const val CHANNEL_PATH_PREFIX = "/apk-transfer/"
         private const val CHANNEL_ID = "wear_apk_received"
+        private const val WAKE_LOCK_TAG = "UniversalInstaller:WearReceiver"
+        private const val WAKE_LOCK_TIMEOUT_MS = 10 * 60 * 1000L
+        const val CHANNEL_PATH_PREFIX = "/apk-transfer/"
     }
 }
