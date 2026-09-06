@@ -41,6 +41,8 @@ app/src/play/google-services.json
 app/google-services.json
 tv/google-services.json
 tv/**/google-services.json
+.firebaserc
+firebase.json
 
 # CI staging dir for the store bundle attached to a GitHub Release
 /dist/
