@@ -48,6 +48,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import app.pwhs.core.domain.InstalledApp
 import app.pwhs.tv.R
+import app.pwhs.tv.presentation.components.TvInstallerModeBadge
 import app.pwhs.tv.presentation.manage.components.AppDetailsPane
 import app.pwhs.tv.presentation.manage.components.AppListRow
 import app.pwhs.tv.presentation.manage.components.ConfirmAction
@@ -118,14 +119,18 @@ fun ManageScreen(
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(horizontal = 32.dp, vertical = 40.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.tv_manage_title),
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold
-                )
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = stringResource(R.string.tv_manage_title),
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    TvInstallerModeBadge()
+                }
                 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(20.dp))
 
                 // Search Bar
                 Row(

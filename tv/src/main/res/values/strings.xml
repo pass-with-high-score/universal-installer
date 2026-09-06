@@ -126,4 +126,27 @@
     <string name="tv_details_size">Size</string>
     <string name="tv_details_min_sdk">Min SDK</string>
     <string name="tv_details_target_sdk">Target SDK</string>
+    <string name="tv_details_action_details">Details</string>
+    <string name="tv_details_action_back">Back</string>
+    <string name="tv_details_full_title">APK Details</string>
+    <string name="tv_details_label_package">Package ID</string>
+    <string name="tv_details_label_version_code">Build code</string>
+    <string name="tv_details_label_tv_status">Status on TV</string>
+    <string name="tv_details_status_not_installed">Not installed</string>
+    <string name="tv_details_status_update">Update available (Installed: v%s)</string>
+    <string name="tv_details_status_same">Already installed (v%s)</string>
+    <string name="tv_details_status_downgrade">Installed version is newer (v%s)</string>
+    <string name="tv_details_label_file_name">File name</string>
+    <string name="tv_details_label_file_path">Location</string>
+    <string name="tv_details_label_format">Format</string>
+    <string name="tv_details_format_bundle">Split APK Bundle</string>
+    <string name="tv_details_format_single">Standalone APK</string>
+    <string name="tv_details_section_permissions">Permissions</string>
+    <string name="tv_details_permissions_empty">No special permissions requested</string>
+    <string name="tv_details_action_permissions">Permissions</string>
+    <string name="tv_details_permissions_empty_desc">This APK does not declare any special permissions.</string>
+    <string name="installer_mode_shizuku" translatable="false">Shizuku</string>
+    <string name="installer_mode_root" translatable="false">Root</string>
+    <string name="installer_mode_package_installer">Package Installer</string>
+    <string name="installer_mode_using">Using %s</string>
 </resources>

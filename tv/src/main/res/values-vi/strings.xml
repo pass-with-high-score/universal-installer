@@ -112,4 +112,27 @@
     <string name="tv_details_size">Kích thước</string>
     <string name="tv_details_min_sdk">SDK tối thiểu</string>
     <string name="tv_details_target_sdk">SDK mục tiêu</string>
+    <string name="tv_details_action_details">Chi tiết</string>
+    <string name="tv_details_action_back">Quay lại</string>
+    <string name="tv_details_full_title">Chi tiết tệp APK</string>
+    <string name="tv_details_label_package">Mã gói (Package ID)</string>
+    <string name="tv_details_label_version_code">Mã build</string>
+    <string name="tv_details_label_tv_status">Trạng thái trên TV</string>
+    <string name="tv_details_status_not_installed">Chưa cài đặt</string>
+    <string name="tv_details_status_update">Có bản cập nhật (Đang cài: v%s)</string>
+    <string name="tv_details_status_same">Đã cài đặt bản này (v%s)</string>
+    <string name="tv_details_status_downgrade">Bản trên TV mới hơn (v%s)</string>
+    <string name="tv_details_label_file_name">Tên tệp</string>
+    <string name="tv_details_label_file_path">Đường dẫn tệp</string>
+    <string name="tv_details_label_format">Định dạng</string>
+    <string name="tv_details_format_bundle">Gói APK phân tách (Split Bundle)</string>
+    <string name="tv_details_format_single">Tệp APK đơn</string>
+    <string name="tv_details_section_permissions">Quyền truy cập</string>
+    <string name="tv_details_permissions_empty">Không yêu cầu quyền đặc biệt</string>
+    <string name="tv_details_action_permissions">Quyền</string>
+    <string name="tv_details_permissions_empty_desc">Tệp APK này không yêu cầu quyền đặc biệt nào.</string>
+    <string name="installer_mode_shizuku" translatable="false">Shizuku</string>
+    <string name="installer_mode_root" translatable="false">Root</string>
+    <string name="installer_mode_package_installer">Trình cài đặt gói</string>
+    <string name="installer_mode_using">Đang dùng %s</string>
 </resources>

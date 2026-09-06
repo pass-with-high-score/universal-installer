@@ -46,6 +46,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import app.pwhs.core.util.StorageUtil
 import app.pwhs.tv.R
+import app.pwhs.tv.presentation.components.TvInstallerModeBadge
 import app.pwhs.tv.presentation.receive.components.InstallStatusOverlay
 import app.pwhs.tv.presentation.receive.components.LocalFilesContent
 import app.pwhs.tv.presentation.receive.components.ReceiveContent
@@ -142,13 +143,18 @@ fun ReceiveScreen(
                     .padding(vertical = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Text(
-                    stringResource(R.string.tv_app_tab_install),
-                    style = MaterialTheme.typography.displaySmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 16.dp)
-                )
+                Column(
+                    modifier = Modifier.padding(bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        stringResource(R.string.tv_app_tab_install),
+                        style = MaterialTheme.typography.displaySmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    TvInstallerModeBadge()
+                }
                 
                 SidebarTab(
                     selected = currentTab == InstallTab.Receive,

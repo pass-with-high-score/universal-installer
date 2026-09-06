@@ -84,12 +84,20 @@ class ApkMetadataReader(private val context: Context) {
             } ?: return null
 
             val pm = context.packageManager
-            val pi = pm.getPackageArchiveInfo(tempFile.absolutePath, 0) ?: return null
+            val flags = PackageManager.GET_PERMISSIONS
+            val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                pm.getPackageArchiveInfo(tempFile.absolutePath, PackageManager.PackageInfoFlags.of(flags.toLong()))
+            } else {
+                @Suppress("DEPRECATION")
+                pm.getPackageArchiveInfo(tempFile.absolutePath, flags)
+            } ?: return null
             val appInfo = pi.applicationInfo ?: return null
             
             // Important: set source paths so loadIcon/loadLabel work correctly
             appInfo.sourceDir = tempFile.absolutePath
             appInfo.publicSourceDir = tempFile.absolutePath
+
+            val requestedPerms = pi.requestedPermissions?.toList().orEmpty()
 
             return PackageMetadata(
                 packageName = pi.packageName,
@@ -99,7 +107,8 @@ class ApkMetadataReader(private val context: Context) {
                 icon = appInfo.loadIcon(pm).toBitmap(512, 512),
                 isBundle = isBundle,
                 minSdk = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) appInfo.minSdkVersion else 0,
-                targetSdk = appInfo.targetSdkVersion
+                targetSdk = appInfo.targetSdkVersion,
+                permissions = requestedPerms,
             )
         } catch (e: Exception) {
             return null
