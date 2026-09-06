@@ -198,6 +198,8 @@ fun DialogInstallContent(
             )
         }
 
+        if (uiState.dialogStage == DialogStage.None) return@UniversalInstallerTheme
+
         val isSheet = uiStyle == InstallUiStyle.Sheet
         Box(
             modifier = Modifier

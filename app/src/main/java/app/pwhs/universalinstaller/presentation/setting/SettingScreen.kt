@@ -90,7 +90,6 @@ fun SettingScreen(
     val uiState by viewModel.uiState.collectAsState()
     val dhizukuState by viewModel.dhizukuState.collectAsState()
     val useDhizuku by viewModel.useDhizuku.collectAsState()
-    val blacklist by viewModel.blacklist.collectAsState()
     val securityLevel by viewModel.securityLevel.collectAsState()
     val externalOpenMode by viewModel.externalOpenMode.collectAsState()
     val installUiStyle by viewModel.installUiStyle.collectAsState()
@@ -128,7 +127,6 @@ fun SettingScreen(
         onInstallerPackageChanged = viewModel::setInstallerPackageName,
         onCustomAuthorizerCommandChange = viewModel::setCustomAuthorizerCommand,
         onTestCustomAuthorizerCommand = viewModel::testCustomAuthorizerCommand,
-        blacklist = blacklist,
         onReplayTutorial = {
             // Reuse MainActivity's onboarding route rather than clearing ONBOARDING_COMPLETED:
             // clearing it would also re-show the tour on the next cold start, which nobody asked
@@ -153,8 +151,6 @@ fun SettingScreen(
         onSyncRequirePinChanged = viewModel::setSyncRequirePin,
         onSyncPinCodeChanged = viewModel::setSyncPinCode,
         onSyncServerPortChanged = viewModel::setSyncServerPort,
-        onBiometricLockInstallChanged = viewModel::setBiometricLockInstall,
-        onBiometricLockUninstallChanged = viewModel::setBiometricLockUninstall,
         onAutoConfirmExternalInstallChanged = viewModel::setAutoConfirmExternalInstall,
         onShowDownloadTabChanged = viewModel::setShowDownloadTab,
         onDefaultInstallerChanged = viewModel::toggleDefaultInstaller,
@@ -188,7 +184,6 @@ private fun SettingUi(
     onUseDhizukuChanged: (Boolean) -> Unit = {},
     onPrivilegedOptionChanged: (SettingViewModel.PrivilegedOption, Boolean) -> Unit = { _, _ -> },
     onInstallerPackageChanged: (String) -> Unit = {},
-    blacklist: List<String> = emptyList(),
     onShizukuInstallerChanged: (String) -> Unit = {},
     onDeleteApkChanged: (Boolean) -> Unit = {},
     onAutoOpenAfterInstallChanged: (Boolean) -> Unit = {},
@@ -201,8 +196,6 @@ private fun SettingUi(
     onSyncRequirePinChanged: (Boolean) -> Unit = {},
     onSyncPinCodeChanged: (String) -> Unit = {},
     onSyncServerPortChanged: (String) -> Unit = {},
-    onBiometricLockInstallChanged: (Boolean) -> Unit = {},
-    onBiometricLockUninstallChanged: (Boolean) -> Unit = {},
     onAutoConfirmExternalInstallChanged: (Boolean) -> Unit = {},
     onShowDownloadTabChanged: (Boolean) -> Unit = {},
     onDefaultInstallerChanged: (Boolean) -> Unit = {},
@@ -410,12 +403,6 @@ private fun SettingUi(
                     q = q,
                     securityLabels = securityLabels,
                     context = context,
-                    blacklist = blacklist,
-                    biometricLockInstall = uiState.biometricLockInstall,
-                    biometricLockUninstall = uiState.biometricLockUninstall,
-                    biometricEnrolmentAvailable = uiState.biometricEnrolmentAvailable,
-                    onBiometricLockInstallChanged = onBiometricLockInstallChanged,
-                    onBiometricLockUninstallChanged = onBiometricLockUninstallChanged
                 )
 
                 // ── Privacy Section ──────────────────────────

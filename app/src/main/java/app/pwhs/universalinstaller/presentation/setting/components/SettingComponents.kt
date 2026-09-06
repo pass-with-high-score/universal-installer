@@ -4,9 +4,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.selection.selectable
+import android.widget.Toast
 import app.pwhs.universalinstaller.presentation.setting.InstallMode
 import app.pwhs.universalinstaller.presentation.setting.SecurityLevel
 import app.pwhs.universalinstaller.presentation.setting.ShizukuState
+import app.pwhs.universalinstaller.presentation.setting.security.util.SystemInstallerManager
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -261,146 +263,7 @@ internal fun InstallSourceItem(
     }
 }
 
-/**
- * Picker for the global install backend.
- *
- * Root option disappears when the build has no libsu (store flavor).
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-internal fun InstallModeSelector(
-    currentMode: InstallMode,
-    shizukuState: ShizukuState,
-    rootSupported: Boolean,
-    rootState: RootState,
-    dhizukuSupported: Boolean = true,
-    dhizukuState: DhizukuState = DhizukuState.NOT_INSTALLED,
-    microGSupported: Boolean = true,
-    onModeChange: (InstallMode) -> Unit,
-) {
-    val options: List<InstallMode> = remember(rootSupported, dhizukuSupported, microGSupported, currentMode) {
-        buildList {
-            add(InstallMode.DEFAULT)
-            add(InstallMode.SHIZUKU)
-            if (dhizukuSupported) add(InstallMode.DHIZUKU)
-            if (rootSupported) add(InstallMode.ROOT)
-            add(InstallMode.CUSTOM)
-            if (microGSupported || currentMode == InstallMode.MICROG) add(InstallMode.MICROG)
-        }
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-    ) {
-        // bodyLarge, not titleSmall: this sits among SwitchPreference rows whose headline is
-        // bodyLarge. Styling it as a caption made the section's most consequential control read
-        // as a footnote while the minor toggles shouted.
-        Text(
-            text = stringResource(R.string.setting_install_mode_title),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(bottom = 8.dp),
-        )
-        // Root stays tappable whenever libsu shipped (it's only in the row then) — tapping it
-        // when su isn't ready fires the root request. We only DIM it (greyed label) to show
-        // it isn't the ready engine, rather than disabling the click.
-        // Only dim Root when positively unusable (NOT_ROOTED / UNAVAILABLE). UNKNOWN must not
-        // dim — a fresh probe reads su as UNKNOWN (libsu confirms READY only after a shell
-        // attempt), so a granted device shows UNKNOWN and was wrongly greyed.
-        val rootDimmed = currentMode != InstallMode.ROOT &&
-            (rootState == RootState.NOT_ROOTED || rootState == RootState.UNAVAILABLE)
-        val dhizukuDimmed = currentMode != InstallMode.DHIZUKU &&
-            (dhizukuState == DhizukuState.NOT_INSTALLED || dhizukuState == DhizukuState.UNSUPPORTED || dhizukuState == DhizukuState.PROFILE_OWNER_UNSUPPORTED)
 
-        FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            options.forEach { mode ->
-                val dim = (mode == InstallMode.ROOT && rootDimmed) || (mode == InstallMode.DHIZUKU && dhizukuDimmed)
-                val selected = mode == currentMode
-                FilterChip(
-                    selected = selected,
-                    onClick = {
-                        if (mode != currentMode || (mode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED)) {
-                            onModeChange(mode)
-                        }
-                    },
-                    label = {
-                        Text(
-                            text = when (mode) {
-                                InstallMode.DEFAULT -> stringResource(R.string.setting_install_mode_default)
-                                InstallMode.SHIZUKU -> stringResource(R.string.setting_install_mode_shizuku)
-                                InstallMode.DHIZUKU -> stringResource(R.string.setting_install_mode_dhizuku)
-                                InstallMode.ROOT -> stringResource(R.string.setting_install_mode_root)
-                                InstallMode.CUSTOM -> stringResource(R.string.setting_install_mode_custom)
-                                InstallMode.MICROG -> stringResource(R.string.installer_mode_microg)
-                            },
-                        )
-                    },
-                    leadingIcon = {
-                        Icon(
-                            imageVector = when (mode) {
-                                InstallMode.DEFAULT -> Icons.Rounded.Android
-                                InstallMode.SHIZUKU -> Icons.Rounded.Key
-                                InstallMode.DHIZUKU -> Icons.Rounded.AdminPanelSettings
-                                InstallMode.ROOT -> Icons.Rounded.Shield
-                                InstallMode.CUSTOM -> Icons.Rounded.Terminal
-                                InstallMode.MICROG -> Icons.Rounded.CloudDownload
-                            },
-                            contentDescription = null,
-                            modifier = Modifier.size(FilterChipDefaults.IconSize),
-                        )
-                    },
-                    shape = RoundedCornerShape(12.dp),
-                    colors = FilterChipDefaults.filterChipColors(
-                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                        selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    ),
-                    modifier = if (dim) Modifier.alpha(0.38f) else Modifier,
-                )
-            }
-        }
-        val statusText = when (currentMode) {
-            InstallMode.DEFAULT -> stringResource(R.string.setting_install_mode_default_sub)
-            InstallMode.SHIZUKU -> when (shizukuState) {
-                ShizukuState.NOT_INSTALLED -> stringResource(R.string.setting_shizuku_not_installed)
-                ShizukuState.NOT_RUNNING -> stringResource(R.string.setting_shizuku_not_running)
-                ShizukuState.UNSUPPORTED -> stringResource(R.string.setting_shizuku_unsupported)
-                ShizukuState.NO_PERMISSION -> stringResource(R.string.setting_shizuku_no_permission)
-                ShizukuState.READY -> stringResource(R.string.setting_shizuku_ready)
-            }
-            InstallMode.DHIZUKU -> when (dhizukuState) {
-                DhizukuState.UNSUPPORTED -> stringResource(R.string.setting_dhizuku_unsupported)
-                DhizukuState.NOT_INSTALLED -> stringResource(R.string.setting_dhizuku_not_installed)
-                DhizukuState.NOT_RUNNING -> stringResource(R.string.setting_dhizuku_not_running)
-                DhizukuState.PROFILE_OWNER_UNSUPPORTED -> stringResource(R.string.setting_dhizuku_profile_owner_unsupported)
-                DhizukuState.NOT_AUTHORIZED -> stringResource(R.string.setting_dhizuku_no_permission)
-                DhizukuState.READY -> stringResource(R.string.setting_dhizuku_ready)
-            }
-            InstallMode.ROOT -> when (rootState) {
-                RootState.UNAVAILABLE -> "Unavailable"
-                RootState.UNKNOWN -> "Checking..."
-                RootState.DENIED -> "Denied"
-                RootState.READY -> "Ready"
-                else -> "Not Rooted"
-            }
-            InstallMode.CUSTOM -> stringResource(R.string.setting_install_mode_custom_sub)
-            InstallMode.MICROG -> stringResource(R.string.installer_mode_microg_desc)
-        }
-        val canRequestPermission = currentMode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED
-        Text(
-            text = statusText,
-            style = MaterialTheme.typography.bodySmall,
-            color = if (canRequestPermission) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .then(if (canRequestPermission) Modifier.clickable { onModeChange(InstallMode.DHIZUKU) } else Modifier),
-        )
-    }
-}
 
 
 /**

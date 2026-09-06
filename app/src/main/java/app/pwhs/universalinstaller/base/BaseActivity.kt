@@ -118,6 +118,9 @@ abstract class BaseActivity : FragmentActivity() {
                 amoledMode = themeState.amoledMode,
                 themePreset = themeState.themePreset
             ) {
+                if (this@BaseActivity !is app.pwhs.universalinstaller.presentation.splash.SplashActivity) {
+                    app.pwhs.universalinstaller.presentation.setting.security.components.AppLockGate()
+                }
                 content()
             }
         }

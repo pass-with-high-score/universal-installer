@@ -19,6 +19,7 @@ import app.pwhs.universalinstaller.presentation.sync.SyncViewModel
 import app.pwhs.universalinstaller.presentation.manage.ManageViewModel
 import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsViewModel
 import app.pwhs.universalinstaller.presentation.setting.backup.BackupViewModel
+import app.pwhs.universalinstaller.presentation.setting.security.SecurityViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.HttpTimeout
@@ -114,6 +115,7 @@ val appModule = module {
     viewModelOf(::DownloadHistoryViewModel)
     viewModelOf(::SyncViewModel)
     viewModelOf(::BackupViewModel)
+    viewModelOf(::SecurityViewModel)
 }
 
 

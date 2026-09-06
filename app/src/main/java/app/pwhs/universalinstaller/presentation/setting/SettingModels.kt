@@ -102,6 +102,31 @@ enum class InstallMode {
             useMicroG -> MICROG
             else -> DEFAULT
         }
+
+        fun resolveEffective(
+            configuredMode: InstallMode,
+            shizukuState: ShizukuState,
+            rootState: RootState,
+            dhizukuState: app.pwhs.universalinstaller.util.DhizukuState,
+            isMicroGAvailable: Boolean,
+            isSystemInstallerFrozen: Boolean,
+        ): InstallMode {
+            return when {
+                configuredMode == MICROG && isMicroGAvailable -> MICROG
+                configuredMode == CUSTOM -> CUSTOM
+                configuredMode == ROOT && rootState == RootState.READY -> ROOT
+                configuredMode == SHIZUKU && shizukuState == ShizukuState.READY -> SHIZUKU
+                configuredMode == DHIZUKU && dhizukuState == app.pwhs.universalinstaller.util.DhizukuState.READY -> DHIZUKU
+                configuredMode == DEFAULT && !isSystemInstallerFrozen -> DEFAULT
+                isSystemInstallerFrozen -> when {
+                    shizukuState == ShizukuState.READY -> SHIZUKU
+                    rootState == RootState.READY -> ROOT
+                    dhizukuState == app.pwhs.universalinstaller.util.DhizukuState.READY -> DHIZUKU
+                    else -> DEFAULT
+                }
+                else -> DEFAULT
+            }
+        }
     }
 }
 

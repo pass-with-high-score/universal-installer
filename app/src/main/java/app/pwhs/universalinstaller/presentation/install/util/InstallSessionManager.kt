@@ -19,6 +19,7 @@ import app.pwhs.universalinstaller.presentation.install.controller.ManualInstall
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import app.pwhs.universalinstaller.presentation.install.controller.ShizukuInstallController
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.presentation.setting.security.util.SystemInstallerManager
 import app.pwhs.universalinstaller.util.CustomShellExecutor
 import app.pwhs.universalinstaller.util.DhizukuCompat
 import kotlinx.coroutines.Dispatchers
@@ -116,6 +117,29 @@ object InstallSessionManager {
             val controller = dhizukuController
             if (controller != null && DhizukuCompat.isReady(context)) return controller
             Timber.w("Dhizuku selected but not ready — falling back to default installer")
+        }
+
+        // Fallback when system package installer is frozen:
+        // DefaultInstallController relies on the system package installer UI to show the
+        // confirmation dialog. If it is disabled, DefaultInstallController will fail or hang.
+        // Therefore, if any elevated backend (Shizuku / Root / Dhizuku) is ready, auto-promote to it.
+        if (SystemInstallerManager.isSystemPackageInstallerDisabled(context)) {
+            if (isShizukuReadyForInstall()) {
+                Timber.i("System package installer is frozen: auto-promoting to Shizuku")
+                return shizukuController
+            }
+            if (rootController != null) {
+                val state = backendFactory.probeRootState()
+                if (state == RootState.READY) {
+                    Timber.i("System package installer is frozen: auto-promoting to Root")
+                    return rootController
+                }
+            }
+            if (dhizukuController != null && DhizukuCompat.isReady(context)) {
+                Timber.i("System package installer is frozen: auto-promoting to Dhizuku")
+                return dhizukuController
+            }
+            Timber.w("System package installer is frozen and no elevated backend is available!")
         }
 
         return defaultController

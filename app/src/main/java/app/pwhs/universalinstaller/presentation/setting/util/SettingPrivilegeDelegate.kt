@@ -11,6 +11,7 @@ import app.pwhs.universalinstaller.presentation.install.controller.InstallerBack
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import app.pwhs.universalinstaller.presentation.setting.InstallMode
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.presentation.setting.security.util.SystemInstallerManager
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.universalinstaller.presentation.setting.ShizukuState
 import app.pwhs.universalinstaller.telemetry.Telemetry
@@ -134,6 +135,10 @@ class SettingPrivilegeDelegate(
     fun setInstallMode(mode: InstallMode) {
         when (mode) {
             InstallMode.DEFAULT -> scope.launch {
+                if (SystemInstallerManager.isSystemPackageInstallerDisabled(application)) {
+                    emitEvent(R.string.setting_system_installer_frozen_cannot_select)
+                    return@launch
+                }
                 dataStore.edit { p ->
                     p[PreferencesKeys.USE_SHIZUKU] = false
                     p[PreferencesKeys.USE_ROOT] = false
@@ -143,25 +148,9 @@ class SettingPrivilegeDelegate(
                 }
             }
             InstallMode.SHIZUKU -> {
-                scope.launch {
-                    dataStore.edit { p ->
-                        p[PreferencesKeys.USE_ROOT] = false
-                        p[PreferencesKeys.USE_DHIZUKU] = false
-                        p[PreferencesKeys.USE_CUSTOM_AUTHORIZER] = false
-                        p[PreferencesKeys.USE_MICROG] = false
-                    }
-                }
                 setUseShizuku(true)
             }
             InstallMode.DHIZUKU -> {
-                scope.launch {
-                    dataStore.edit { p ->
-                        p[PreferencesKeys.USE_SHIZUKU] = false
-                        p[PreferencesKeys.USE_ROOT] = false
-                        p[PreferencesKeys.USE_CUSTOM_AUTHORIZER] = false
-                        p[PreferencesKeys.USE_MICROG] = false
-                    }
-                }
                 setUseDhizuku(true)
             }
             InstallMode.ROOT -> scope.launch {

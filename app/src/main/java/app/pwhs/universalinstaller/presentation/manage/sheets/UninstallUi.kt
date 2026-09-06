@@ -207,26 +207,10 @@ internal fun UninstallUi(
     val extractInProgress = uiState.extractState is ExtractState.Running
     // Biometric gate state — flag tracked per-attempt rather than per-target so toggling
     // the Settings switch applies on the next uninstall without re-composing.
-    val uninstallGateEnabled by remember(context) {
-        context.dataStore.data.map {
-            it[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
-                .BIOMETRIC_LOCK_UNINSTALL] ?: false
-        }
-    }.collectAsState(initial = false)
+    val uninstallGate = app.pwhs.universalinstaller.presentation.install.util.rememberUninstallSecurityGate(context)
     val gatedUninstall: (String) -> Unit = { pkg ->
-        val activity = context as? androidx.fragment.app.FragmentActivity
-        if (activity != null) {
-            val name = uiState.apps.firstOrNull { it.packageName == pkg }?.appName ?: pkg
-            BiometricGate.authenticate(
-                activity = activity,
-                enabled = uninstallGateEnabled,
-                title = resource.getString(R.string.biometric_uninstall_title),
-                subtitle = resource.getString(R.string.biometric_uninstall_sub, name),
-                onSuccess = { onUninstall(pkg) },
-            )
-        } else {
-            onUninstall(pkg)
-        }
+        val name = uiState.apps.firstOrNull { it.packageName == pkg }?.appName ?: pkg
+        uninstallGate(pkg, name, onUninstall)
     }
 
     // Action sheet — opens on card tap (when not in selection mode). Adding new actions

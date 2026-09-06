@@ -1,10 +1,15 @@
 package app.pwhs.universalinstaller.presentation.composable
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectable
@@ -35,16 +40,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import app.pwhs.universalinstaller.presentation.setting.InstallMode
-import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.universalinstaller.presentation.setting.ShizukuState
+import app.pwhs.universalinstaller.presentation.setting.security.util.SystemInstallerManager
 import app.pwhs.universalinstaller.util.DhizukuCompat
 import app.pwhs.universalinstaller.util.DhizukuState
-import app.pwhs.core.data.local.dataStore
-import kotlinx.coroutines.flow.map
+import app.pwhs.universalinstaller.util.MicroGCompat
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -58,20 +63,64 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
     val context = LocalContext.current
     val settingViewModel: SettingViewModel = koinViewModel()
     val settingState by settingViewModel.uiState.collectAsState()
+    val useDhizuku by settingViewModel.useDhizuku.collectAsState()
+    val dhizukuState by settingViewModel.dhizukuState.collectAsState()
 
-    val modeFlow = remember(context) {
-        context.dataStore.data.map { prefs ->
-            when {
-                prefs[PreferencesKeys.USE_MICROG] == true -> Mode.MicroG
-                prefs[PreferencesKeys.USE_CUSTOM_AUTHORIZER] == true -> Mode.Custom
-                prefs[PreferencesKeys.USE_ROOT] == true -> Mode.Root
-                prefs[PreferencesKeys.USE_SHIZUKU] == true -> Mode.Shizuku
-                prefs[PreferencesKeys.USE_DHIZUKU] == true -> Mode.Dhizuku
-                else -> Mode.Default
-            }
-        }
+    var isSystemInstallerFrozen by remember {
+        mutableStateOf(SystemInstallerManager.isSystemPackageInstallerDisabled(context))
     }
-    val mode by modeFlow.collectAsState(initial = Mode.Default)
+    var canInstallPackages by remember {
+        mutableStateOf(
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                context.packageManager.canRequestPackageInstalls()
+            } else true
+        )
+    }
+
+    LifecycleResumeEffect(Unit) {
+        isSystemInstallerFrozen = SystemInstallerManager.isSystemPackageInstallerDisabled(context)
+        canInstallPackages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.packageManager.canRequestPackageInstalls()
+        } else true
+        onPauseOrDispose {}
+    }
+
+    val microGAvailable = remember(context) { MicroGCompat.isAvailable(context) }
+
+    val configuredMode = remember(
+        settingState.useShizuku,
+        settingState.useRoot,
+        useDhizuku,
+        settingState.useCustomAuthorizer,
+        settingState.useMicroG,
+    ) {
+        InstallMode.from(
+            useShizuku = settingState.useShizuku,
+            useRoot = settingState.useRoot,
+            useDhizuku = useDhizuku,
+            useCustomAuthorizer = settingState.useCustomAuthorizer,
+            useMicroG = settingState.useMicroG,
+        )
+    }
+
+    val effectiveMode = remember(
+        configuredMode,
+        settingState.shizukuState,
+        settingState.rootState,
+        dhizukuState,
+        microGAvailable,
+        isSystemInstallerFrozen,
+    ) {
+        InstallMode.resolveEffective(
+            configuredMode = configuredMode,
+            shizukuState = settingState.shizukuState,
+            rootState = settingState.rootState,
+            dhizukuState = dhizukuState,
+            isMicroGAvailable = microGAvailable,
+            isSystemInstallerFrozen = isSystemInstallerFrozen,
+        )
+    }
+
     var showPicker by remember { mutableStateOf(false) }
 
     // Surface the hint events the switcher emits (e.g. "install Shizuku", "permission denied")
@@ -82,23 +131,23 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
         }
     }
 
-    val label = when (mode) {
-        Mode.MicroG -> stringResource(R.string.installer_mode_microg)
-        Mode.Custom -> stringResource(R.string.installer_mode_custom)
-        Mode.Root -> stringResource(R.string.installer_mode_root)
-        Mode.Shizuku -> stringResource(R.string.installer_mode_shizuku)
-        Mode.Dhizuku -> stringResource(R.string.installer_mode_dhizuku)
-        Mode.Default -> stringResource(R.string.installer_mode_package_installer)
+    val label = when (effectiveMode) {
+        InstallMode.MICROG -> stringResource(R.string.installer_mode_microg)
+        InstallMode.CUSTOM -> stringResource(R.string.installer_mode_custom)
+        InstallMode.ROOT -> stringResource(R.string.installer_mode_root)
+        InstallMode.SHIZUKU -> stringResource(R.string.installer_mode_shizuku)
+        InstallMode.DHIZUKU -> stringResource(R.string.installer_mode_dhizuku)
+        InstallMode.DEFAULT -> stringResource(R.string.installer_mode_package_installer)
     }
-    val icon = when (mode) {
-        Mode.MicroG -> Icons.Rounded.CloudDownload
-        Mode.Custom -> Icons.Rounded.Terminal
-        Mode.Root -> Icons.Rounded.Key
-        Mode.Shizuku -> Icons.Rounded.AdminPanelSettings
-        Mode.Dhizuku -> Icons.Rounded.Shield
-        Mode.Default -> Icons.Rounded.Android
+    val icon = when (effectiveMode) {
+        InstallMode.MICROG -> Icons.Rounded.CloudDownload
+        InstallMode.CUSTOM -> Icons.Rounded.Terminal
+        InstallMode.ROOT -> Icons.Rounded.Key
+        InstallMode.SHIZUKU -> Icons.Rounded.AdminPanelSettings
+        InstallMode.DHIZUKU -> Icons.Rounded.Shield
+        InstallMode.DEFAULT -> Icons.Rounded.Android
     }
-    val privileged = mode == Mode.Root || mode == Mode.Shizuku || mode == Mode.Dhizuku || mode == Mode.Custom || mode == Mode.MicroG
+    val privileged = effectiveMode != InstallMode.DEFAULT
     val container = if (privileged)
         MaterialTheme.colorScheme.primaryContainer
     else
@@ -131,26 +180,8 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
     }
 
     if (showPicker) {
-        val dhizukuState by settingViewModel.dhizukuState.collectAsState()
-        val current = InstallMode.from(
-            useShizuku = mode == Mode.Shizuku,
-            useRoot = mode == Mode.Root,
-            useDhizuku = mode == Mode.Dhizuku,
-            useCustomAuthorizer = mode == Mode.Custom,
-            useMicroG = mode == Mode.MicroG,
-        )
-        // Root stays tappable whenever this build ships su support — tapping it when not yet
-        // ready fires the root request (su prompt). It's only greyed (dimmed) to signal it
-        // isn't the active/ready engine. On builds with no root support it's fully disabled.
-        // Shizuku is disabled only when it genuinely can't run here (not installed /
-        // unsupported); NOT_RUNNING / NO_PERMISSION stay tappable since picking them kicks
-        // off the start/permission flow, same as Settings.
-        // Only DIM Root when we positively know it's unusable (NOT_ROOTED / UNAVAILABLE).
-        // UNKNOWN must NOT dim: a fresh SettingViewModel probes su as UNKNOWN (libsu confirms
-        // READY only after a shell attempt), so a granted device shows UNKNOWN here and was
-        // being greyed even though root works.
-        val rootReady = settingState.rootState == RootState.READY || current == InstallMode.ROOT
-        val rootDimmed = current != InstallMode.ROOT && (
+        val rootReady = settingState.rootState == RootState.READY || effectiveMode == InstallMode.ROOT
+        val rootDimmed = effectiveMode != InstallMode.ROOT && (
             settingState.rootState == RootState.NOT_ROOTED ||
             settingState.rootState == RootState.UNAVAILABLE
         )
@@ -158,12 +189,12 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
             settingState.shizukuState != ShizukuState.NOT_INSTALLED
 
         val dhizukuSupported = DhizukuCompat.isSupported
-        val dhizukuReady = dhizukuState == DhizukuState.READY || current == InstallMode.DHIZUKU
+        val dhizukuReady = dhizukuState == DhizukuState.READY || effectiveMode == InstallMode.DHIZUKU
         val dhizukuSelectable = dhizukuSupported &&
             dhizukuState != DhizukuState.UNSUPPORTED &&
             dhizukuState != DhizukuState.NOT_INSTALLED &&
             dhizukuState != DhizukuState.PROFILE_OWNER_UNSUPPORTED
-        val dhizukuDimmed = current != InstallMode.DHIZUKU && !dhizukuReady
+        val dhizukuDimmed = effectiveMode != InstallMode.DHIZUKU && !dhizukuReady
 
         AlertDialog(
             onDismissRequest = { showPicker = false },
@@ -172,12 +203,44 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                 Column {
                     EngineOption(
                         title = stringResource(R.string.installer_mode_package_installer),
-                        subtitle = stringResource(R.string.installer_engine_default_desc),
-                        selected = current == InstallMode.DEFAULT,
-                        enabled = true,
+                        subtitle = if (isSystemInstallerFrozen) {
+                            stringResource(R.string.setting_system_installer_frozen_badge_desc)
+                        } else if (!canInstallPackages) {
+                            stringResource(R.string.permission_install_prompt_required)
+                        } else {
+                            stringResource(R.string.installer_engine_default_desc)
+                        },
+                        selected = effectiveMode == InstallMode.DEFAULT,
+                        enabled = !isSystemInstallerFrozen,
+                        dimmed = isSystemInstallerFrozen,
                         onClick = {
-                            settingViewModel.setInstallMode(InstallMode.DEFAULT)
-                            showPicker = false
+                            if (isSystemInstallerFrozen) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.setting_system_installer_frozen_cannot_select),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            } else if (!canInstallPackages) {
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.permission_install_prompt_required),
+                                    Toast.LENGTH_LONG
+                                ).show()
+                                runCatching {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
+                                            data = Uri.parse("package:${context.packageName}")
+                                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                                        }
+                                        context.startActivity(intent)
+                                    }
+                                }
+                                settingViewModel.setInstallMode(InstallMode.DEFAULT)
+                                showPicker = false
+                            } else {
+                                settingViewModel.setInstallMode(InstallMode.DEFAULT)
+                                showPicker = false
+                            }
                         },
                     )
                     EngineOption(
@@ -187,7 +250,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                             ShizukuState.UNSUPPORTED -> stringResource(R.string.setting_shizuku_unsupported)
                             else -> stringResource(R.string.installer_engine_shizuku_desc)
                         },
-                        selected = current == InstallMode.SHIZUKU,
+                        selected = effectiveMode == InstallMode.SHIZUKU,
                         enabled = shizukuSelectable,
                         onClick = {
                             settingViewModel.setInstallMode(InstallMode.SHIZUKU)
@@ -205,7 +268,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                                 DhizukuState.NOT_AUTHORIZED -> stringResource(R.string.setting_dhizuku_no_permission)
                                 else -> stringResource(R.string.installer_engine_dhizuku_desc)
                             },
-                            selected = current == InstallMode.DHIZUKU,
+                            selected = effectiveMode == InstallMode.DHIZUKU,
                             enabled = dhizukuSelectable,
                             dimmed = dhizukuDimmed,
                             onClick = {
@@ -222,9 +285,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                             rootReady -> stringResource(R.string.installer_engine_root_desc)
                             else -> stringResource(R.string.installer_engine_root_request)
                         },
-                        selected = current == InstallMode.ROOT,
-                        // Clickable as long as the build supports root, even when su isn't
-                        // ready — the tap triggers the root request.
+                        selected = effectiveMode == InstallMode.ROOT,
                         enabled = settingState.rootSupported,
                         dimmed = rootDimmed,
                         onClick = {
@@ -235,19 +296,18 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                     EngineOption(
                         title = stringResource(R.string.installer_mode_custom),
                         subtitle = stringResource(R.string.installer_engine_custom_desc),
-                        selected = current == InstallMode.CUSTOM,
+                        selected = effectiveMode == InstallMode.CUSTOM,
                         enabled = true,
                         onClick = {
                             settingViewModel.setInstallMode(InstallMode.CUSTOM)
                             showPicker = false
                         },
                     )
-                    val microGAvailable = remember(context) { app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context) }
                     EngineOption(
                         title = stringResource(R.string.installer_mode_microg),
                         subtitle = if (microGAvailable) stringResource(R.string.installer_mode_microg_desc)
                             else stringResource(R.string.microg_not_installed),
-                        selected = current == InstallMode.MICROG,
+                        selected = effectiveMode == InstallMode.MICROG,
                         enabled = microGAvailable,
                         onClick = {
                             settingViewModel.setInstallMode(InstallMode.MICROG)
@@ -278,6 +338,7 @@ private fun EngineOption(
 ) {
     Row(
         modifier = Modifier
+            .fillMaxWidth()
             .selectable(selected = selected, enabled = enabled, onClick = onClick)
             .padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -295,5 +356,3 @@ private fun EngineOption(
         }
     }
 }
-
-private enum class Mode { Default, Shizuku, Dhizuku, Root, Custom, MicroG }

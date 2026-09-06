@@ -95,6 +95,15 @@ data class AppSettingsBackupDto(
     val appProfileMapping: String? = null,
     val blockedPackages: Set<String>? = null,
 
+    // PIN Lock
+    val pinLockEnabled: Boolean? = null,
+    val pinLockHash: String? = null,
+    val pinLockSalt: String? = null,
+    val pinLockInstall: Boolean? = null,
+    val pinLockUninstall: Boolean? = null,
+    val pinLockAppOpen: Boolean? = null,
+    val pinLockProtectSettings: Boolean? = null,
+
     // Biometrics
     val biometricLockInstall: Boolean? = null,
     val biometricLockUninstall: Boolean? = null,

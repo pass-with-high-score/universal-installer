@@ -120,6 +120,13 @@ class BackupRestoreManager(
                 installerProfiles = prefs[PreferencesKeys.INSTALLER_PROFILES],
                 appProfileMapping = prefs[PreferencesKeys.APP_PROFILE_MAPPING],
                 blockedPackages = prefs[InstallBlacklist.KEY],
+                pinLockEnabled = prefs[PreferencesKeys.PIN_LOCK_ENABLED],
+                pinLockHash = prefs[PreferencesKeys.PIN_LOCK_HASH],
+                pinLockSalt = prefs[PreferencesKeys.PIN_LOCK_SALT],
+                pinLockInstall = prefs[PreferencesKeys.PIN_LOCK_INSTALL],
+                pinLockUninstall = prefs[PreferencesKeys.PIN_LOCK_UNINSTALL],
+                pinLockAppOpen = prefs[PreferencesKeys.PIN_LOCK_APP_OPEN],
+                pinLockProtectSettings = prefs[PreferencesKeys.PIN_LOCK_PROTECT_SETTINGS],
                 biometricLockInstall = prefs[PreferencesKeys.BIOMETRIC_LOCK_INSTALL],
                 biometricLockUninstall = prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL],
                 syncRequirePin = prefs[PreferencesKeys.SYNC_REQUIRE_PIN],
@@ -302,7 +309,14 @@ class BackupRestoreManager(
                 s.appProfileMapping?.let { prefs[PreferencesKeys.APP_PROFILE_MAPPING] = it }
                 s.blockedPackages?.let { prefs[InstallBlacklist.KEY] = it }
 
-                // Biometrics & Sync
+                // Security: PIN & Biometrics & Sync
+                s.pinLockEnabled?.let { prefs[PreferencesKeys.PIN_LOCK_ENABLED] = it }
+                s.pinLockHash?.let { prefs[PreferencesKeys.PIN_LOCK_HASH] = it }
+                s.pinLockSalt?.let { prefs[PreferencesKeys.PIN_LOCK_SALT] = it }
+                s.pinLockInstall?.let { prefs[PreferencesKeys.PIN_LOCK_INSTALL] = it }
+                s.pinLockUninstall?.let { prefs[PreferencesKeys.PIN_LOCK_UNINSTALL] = it }
+                s.pinLockAppOpen?.let { prefs[PreferencesKeys.PIN_LOCK_APP_OPEN] = it }
+                s.pinLockProtectSettings?.let { prefs[PreferencesKeys.PIN_LOCK_PROTECT_SETTINGS] = it }
                 s.biometricLockInstall?.let { prefs[PreferencesKeys.BIOMETRIC_LOCK_INSTALL] = it }
                 s.biometricLockUninstall?.let { prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] = it }
                 s.syncRequirePin?.let { prefs[PreferencesKeys.SYNC_REQUIRE_PIN] = it }

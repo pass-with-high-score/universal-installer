@@ -114,6 +114,10 @@ object ShizukuShellExecutor {
     suspend fun launchApp(packageName: String): Result<String> =
         runShell(packageName, "monkey -p $packageName -c android.intent.category.LAUNCHER 1", successToken = null)
 
+    /** Sets appops mode (e.g. REQUEST_INSTALL_PACKAGES ignore) for a package via Shizuku shell. */
+    suspend fun setAppOp(packageName: String, op: String, mode: String): Result<String> =
+        runShell(packageName, "appops set $packageName $op $mode", successToken = null)
+
     /**
      * Single-shot shell. [successToken] gates "did the command actually do the thing" beyond
      * the exit code — `pm` is notorious for printing soft failures ("Failure [...]") with

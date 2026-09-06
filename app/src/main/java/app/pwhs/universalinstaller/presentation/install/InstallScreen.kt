@@ -119,21 +119,10 @@ fun InstallScreen(
     var pendingRisks by remember { mutableStateOf<List<app.pwhs.universalinstaller.presentation.install.dialog.InstallRisk>>(emptyList()) }
     var pendingAction by remember { mutableStateOf<(() -> Unit)?>(null) }
 
-    val startBiometricFlow: (onSuccess: () -> Unit) -> Unit = { onSuccess ->
-        val activity = context as? androidx.fragment.app.FragmentActivity
-        if (activity != null) {
-            BiometricGate.authenticate(
-                activity = activity,
-                enabled = installGateEnabled,
-                title = resource.getString(R.string.biometric_install_title),
-                subtitle = resource.getString(R.string.biometric_install_sub),
-                onSuccess = onSuccess,
-                onCancel = viewModel::dismissPendingInstall,
-            )
-        } else {
-            onSuccess()
-        }
-    }
+    val securityGate = app.pwhs.universalinstaller.presentation.install.util.rememberInstallSecurityGate(
+        context = context,
+        onCancel = viewModel::dismissPendingInstall,
+    )
 
     if (pendingRisks.isNotEmpty()) {
         app.pwhs.universalinstaller.presentation.install.dialog.RiskConfirmDialog(
@@ -143,7 +132,7 @@ fun InstallScreen(
                 val action = pendingAction
                 pendingAction = null
                 if (action != null) {
-                    startBiometricFlow(action)
+                    securityGate.authenticate(action)
                 }
             },
             onCancel = {
@@ -202,7 +191,7 @@ fun InstallScreen(
                     viewModel.confirmInstall(keepApk = keep)
                 }
             } else {
-                startBiometricFlow {
+                securityGate.authenticate {
                     val keep = keepApk
                     keepApk = false
                     viewModel.confirmInstall(keepApk = keep)

@@ -52,11 +52,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import androidx.fragment.app.FragmentActivity
 import timber.log.Timber
 import java.io.FileNotFoundException
 import java.io.IOException
 
-class DialogInstallActivity : ComponentActivity() {
+class DialogInstallActivity : FragmentActivity() {
 
     private val viewModel: InstallViewModel by viewModel()
     private val installNotifier: InstallProgressNotifier by inject()
@@ -207,7 +208,19 @@ class DialogInstallActivity : ComponentActivity() {
             val resolvedMode = mode
             if (resolvedMode == null && !forcedToDialog) return@setContent
 
-            if (!forcedToDialog && restoredEntry == null && resolvedMode != ExternalOpenMode.Dialog) {
+            val context = this@DialogInstallActivity
+            val cancelAndFinish = {
+                viewModel.dismissPendingInstall()
+                viewModel.dialogClose()
+                viewModel.clearDialogTarget()
+                finish()
+            }
+            val securityGate = app.pwhs.universalinstaller.presentation.install.util.rememberInstallSecurityGate(
+                context = context,
+                onCancel = cancelAndFinish,
+            )
+
+            if (!forcedToDialog && restoredEntry == null && resolvedMode != ExternalOpenMode.Dialog && !securityGate.isPinRequired) {
                 HeadlessNotificationInstall(
                     mode = resolvedMode!!,
                     uri = incomingUri,
@@ -225,7 +238,6 @@ class DialogInstallActivity : ComponentActivity() {
             }
 
             val uiState by viewModel.uiState.collectAsState()
-            val context = this@DialogInstallActivity
             val isApk = remember(incomingUri) {
                 val displayName = context.contentResolver.getDisplayName(incomingUri)
                 val ext = displayName.substringAfterLast('.', "").lowercase()
@@ -284,8 +296,10 @@ class DialogInstallActivity : ComponentActivity() {
                 if (!StorageUtil.hasSufficientStorage(apkSize)) {
                     viewModel.showStorageWarning(apkSize)
                 } else {
-                    viewModel.dialogStartInstalling()
-                    viewModel.confirmInstall(trackDialogTarget = true, keepApk = keepApk)
+                    securityGate.authenticate {
+                        viewModel.dialogStartInstalling()
+                        viewModel.confirmInstall(trackDialogTarget = true, keepApk = keepApk)
+                    }
                 }
             }
 
@@ -308,7 +322,7 @@ class DialogInstallActivity : ComponentActivity() {
             }
 
             LaunchedEffect(uiState.dialogStage, autoConfirmExternalInstall, isCallerAutoApproved, autoOpenAfterInstall) {
-                val shouldAutoInstall = autoConfirmExternalInstall || isCallerAutoApproved
+                val shouldAutoInstall = (autoConfirmExternalInstall || isCallerAutoApproved) && !securityGate.isPinRequired
                 if (uiState.dialogStage == DialogStage.Prepare && shouldAutoInstall) {
                     Timber.i("Auto-approving install: autoConfirm=$autoConfirmExternalInstall, callerApproved=$isCallerAutoApproved (caller=$callerPackage)")
                     proceedInstall()

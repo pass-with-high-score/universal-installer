@@ -91,6 +91,16 @@ object PreferencesKeys {
     val SYNC_PIN_CODE = stringPreferencesKey("sync_pin_code")
     val SYNC_SERVER_PORT = stringPreferencesKey("sync_server_port")
 
+    // Built-in PIN lock (Parental Control / App Security)
+    val PIN_LOCK_ENABLED = booleanPreferencesKey("pin_lock_enabled")
+    val PIN_LOCK_HASH = stringPreferencesKey("pin_lock_hash")
+    val PIN_LOCK_SALT = stringPreferencesKey("pin_lock_salt")
+    val PIN_LOCK_INSTALL = booleanPreferencesKey("pin_lock_install")
+    val PIN_LOCK_UNINSTALL = booleanPreferencesKey("pin_lock_uninstall")
+    val PIN_LOCK_APP_OPEN = booleanPreferencesKey("pin_lock_app_open")
+    val PIN_LOCK_PROTECT_SETTINGS = booleanPreferencesKey("pin_lock_protect_settings")
+    val PIN_LOCK_DISABLE_SYSTEM_INSTALLER = booleanPreferencesKey("pin_lock_disable_system_installer")
+
     // Biometric gate — independent toggles so users can guard install but not uninstall (or
     // vice versa) without one switch implying the other.
     val BIOMETRIC_LOCK_INSTALL = booleanPreferencesKey("biometric_lock_install")

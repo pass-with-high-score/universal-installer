@@ -106,6 +106,7 @@ class App : Application(), SingletonImageLoader.Factory {
         Telemetry.install(createTelemetrySink(this))
         AppReview.install(createReviewPrompter(this))
         CrashHandler.install(this)
+        registerActivityLifecycleCallbacks(app.pwhs.universalinstaller.presentation.setting.security.util.AppLockManager)
         // Release builds used to plant nothing, so Settings -> Diagnostics collected a logcat
         // dump containing not one line from this app. Issues #92 and #100 both arrived with a
         // full report attached and no clue in it. Release now keeps warnings and errors — the
