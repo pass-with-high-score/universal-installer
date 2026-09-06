@@ -250,6 +250,22 @@ fun SettingsScreen(modifier: Modifier = Modifier) {
                 )
             }
         }
+        item {
+            val deleteApkEnabled by context.dataStore.data
+                .map { it[SharedPrefsKeys.DELETE_APK_AFTER_INSTALL] ?: false }
+                .collectAsState(initial = false)
+            SettingsCard(onClick = {
+                scope.launch {
+                    context.dataStore.edit { it[SharedPrefsKeys.DELETE_APK_AFTER_INSTALL] = !deleteApkEnabled }
+                }
+            }) {
+                TitleValue(
+                    stringResource(R.string.tv_settings_delete_apk_title),
+                    if (deleteApkEnabled) stringResource(R.string.tv_settings_delete_apk_on)
+                    else stringResource(R.string.tv_settings_delete_apk_off)
+                )
+            }
+        }
 
         item { ShizukuSetting() }
         item {

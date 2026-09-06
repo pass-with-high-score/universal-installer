@@ -14,6 +14,7 @@ object SharedPrefsKeys {
 
     /** TV: when true (default) and root is available, install silently via the root shell. */
     val ROOT_SILENT_INSTALL = booleanPreferencesKey("tv_root_silent_install")
+    val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
     val TV_SHIZUKU_REPLACE = booleanPreferencesKey("tv_shizuku_replace")
     val TV_ROOT_REPLACE = booleanPreferencesKey("tv_root_replace")
     val TV_SHIZUKU_DOWNGRADE = booleanPreferencesKey("tv_shizuku_downgrade")

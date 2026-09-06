@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
@@ -121,10 +122,16 @@ fun ApkDetailsDialog(
         )
     }
 
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        val installFocus = remember { FocusRequester() }
+        LaunchedEffect(Unit) { runCatching { installFocus.requestFocus() } }
+
         Surface(
-            modifier = Modifier.width(480.dp),
-            shape = RoundedCornerShape(28.dp),
+            modifier = Modifier.width(680.dp),
+            shape = RoundedCornerShape(24.dp),
             colors = SurfaceDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surface,
                 contentColor = MaterialTheme.colorScheme.onSurface
@@ -132,98 +139,205 @@ fun ApkDetailsDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(32.dp)
-                    .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .padding(28.dp)
             ) {
-                if (icon != null) {
-                    Image(
-                        bitmap = icon,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                    )
-                } else {
-                    Box(
-                        Modifier
-                            .size(100.dp)
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
+                // Header: App Icon (72dp) + Name & Package + Split tag
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    if (icon != null) {
+                        Image(
+                            bitmap = icon,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .size(72.dp)
+                                .clip(RoundedCornerShape(18.dp))
+                        )
+                    } else {
+                        Box(
+                            Modifier
+                                .size(72.dp)
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "APK",
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.width(20.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                        ) {
+                            Text(
+                                text = name,
+                                style = MaterialTheme.typography.headlineSmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f, fill = false)
+                            )
+                            if (isBundle) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                ) {
+                                    Text(
+                                        "SPLIT BUNDLE",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                            }
+                        }
+
+                        if (pkg.isNotBlank()) {
+                            Spacer(Modifier.height(4.dp))
+                            Text(
+                                text = pkg,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(20.dp))
+
+                // Metadata cards: 2x2 balanced grid with API chip badges
+                val minVer = getAndroidVersion(minSdk)
+                val targetVer = getAndroidVersion(targetSdk)
+
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Text("APK", style = MaterialTheme.typography.displaySmall)
+                        DetailMetaItem(
+                            label = stringResource(R.string.tv_details_version),
+                            value = version,
+                            modifier = Modifier.weight(1f)
+                        )
+                        DetailMetaItem(
+                            label = stringResource(R.string.tv_details_size),
+                            value = formatSize(context, size),
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        DetailMetaItem(
+                            label = stringResource(R.string.tv_details_min_sdk),
+                            value = if (minSdk > 0) (if (minVer != null) "Android $minVer+" else "API $minSdk") else "—",
+                            subValue = if (minSdk > 0 && minVer != null) "API $minSdk" else null,
+                            modifier = Modifier.weight(1f)
+                        )
+                        DetailMetaItem(
+                            label = stringResource(R.string.tv_details_target_sdk),
+                            value = if (targetSdk > 0) (if (targetVer != null) "Android $targetVer" else "API $targetSdk") else "—",
+                            subValue = if (targetSdk > 0 && targetVer != null) "API $targetSdk" else null,
+                            modifier = Modifier.weight(1f)
+                        )
                     }
                 }
 
                 Spacer(Modifier.height(24.dp))
 
-                Text(
-                    name,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-                if (pkg.isNotBlank()) {
-                    Text(
-                        pkg,
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = TextAlign.Center
-                    )
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    DetailMetaItem(label = "Version", value = version, modifier = Modifier.weight(1f))
-                    DetailMetaItem(label = "Size", value = formatSize(context, size), modifier = Modifier.weight(1f))
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    DetailMetaItem(label = "Min SDK", value = "Android $minSdk", modifier = Modifier.weight(1f))
-                    DetailMetaItem(label = "Target SDK", value = "Android $targetSdk", modifier = Modifier.weight(1f))
-                }
-
-                Spacer(Modifier.height(32.dp))
-
+                // Action Buttons: Install & Close on main row, Delete APK below
                 val btnShape = RoundedCornerShape(14.dp)
-                Button(
-                    onClick = { onInstall(uri, isBundle, name, size) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(btnShape),
-                    shape = ButtonDefaults.shape(btnShape)
+                val hasDelete = apkItem is TvApkItem.Local && onDelete != null
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        if (isInstalling) stringResource(R.string.tv_receive_installing_plain)
-                        else stringResource(R.string.tv_receive_install),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.labelLarge
-                    )
+                    Button(
+                        onClick = { onInstall(uri, isBundle, name, size) },
+                        modifier = Modifier
+                            .weight(1.3f)
+                            .height(48.dp)
+                            .clip(btnShape)
+                            .focusRequester(installFocus),
+                        shape = ButtonDefaults.shape(btnShape),
+                        colors = ButtonDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            focusedContainerColor = MaterialTheme.colorScheme.onSurface,
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
+                            focusedContentColor = MaterialTheme.colorScheme.inverseOnSurface
+                        )
+                    ) {
+                        Text(
+                            text = if (isInstalling) stringResource(R.string.tv_receive_installing_plain)
+                            else stringResource(R.string.tv_receive_install),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Bold,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(48.dp)
+                            .clip(btnShape),
+                        shape = ButtonDefaults.shape(btnShape),
+                        colors = ButtonDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                            focusedContainerColor = MaterialTheme.colorScheme.onSurface,
+                            contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            focusedContentColor = MaterialTheme.colorScheme.inverseOnSurface
+                        )
+                    ) {
+                        Text(
+                            stringResource(R.string.tv_manage_action_close),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.labelLarge,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
                 }
 
-                if (apkItem is TvApkItem.Local && onDelete != null) {
-                    Spacer(Modifier.height(12.dp))
+                if (hasDelete) {
+                    Spacer(Modifier.height(10.dp))
                     Button(
                         onClick = { showDeleteConfirm = true },
                         modifier = Modifier
                             .fillMaxWidth()
+                            .height(44.dp)
                             .clip(btnShape),
                         shape = ButtonDefaults.shape(btnShape),
                         colors = ButtonDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f),
                             focusedContainerColor = MaterialTheme.colorScheme.error,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                            contentColor = MaterialTheme.colorScheme.error,
                             focusedContentColor = MaterialTheme.colorScheme.onError
                         )
                     ) {
@@ -240,32 +354,37 @@ fun ApkDetailsDialog(
                             Spacer(Modifier.width(8.dp))
                             Text(
                                 stringResource(R.string.tv_receive_delete_apk),
-                                style = MaterialTheme.typography.labelLarge
+                                style = MaterialTheme.typography.labelLarge,
+                                fontWeight = FontWeight.SemiBold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
                             )
                         }
                     }
                 }
-
-                Spacer(Modifier.height(12.dp))
-
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(btnShape),
-                    shape = ButtonDefaults.shape(btnShape),
-                    colors = ButtonDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    Text(
-                        stringResource(R.string.tv_manage_action_close),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
             }
         }
     }
+}
+
+private fun getAndroidVersion(sdk: Int): String? = when (sdk) {
+    21 -> "5.0"
+    22 -> "5.1"
+    23 -> "6.0"
+    24 -> "7.0"
+    25 -> "7.1"
+    26 -> "8.0"
+    27 -> "8.1"
+    28 -> "9"
+    29 -> "10"
+    30 -> "11"
+    31 -> "12"
+    32 -> "12L"
+    33 -> "13"
+    34 -> "14"
+    35 -> "15"
+    36 -> "16"
+    else -> null
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)

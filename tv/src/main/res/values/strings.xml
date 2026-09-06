@@ -119,4 +119,11 @@
     <string name="tv_receive_confirm_delete_msg">This APK file will be permanently removed from your TV storage.</string>
     <string name="tv_receive_deleted_success">Deleted %s ✓</string>
     <string name="tv_receive_delete_failed">Could not delete %s</string>
+    <string name="tv_settings_delete_apk_title">Delete APK after install</string>
+    <string name="tv_settings_delete_apk_on">On — automatically delete APK after successful install</string>
+    <string name="tv_settings_delete_apk_off">Off — keep APK file after install</string>
+    <string name="tv_details_version">Version</string>
+    <string name="tv_details_size">Size</string>
+    <string name="tv_details_min_sdk">Min SDK</string>
+    <string name="tv_details_target_sdk">Target SDK</string>
 </resources>

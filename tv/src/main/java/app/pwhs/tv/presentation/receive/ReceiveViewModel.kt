@@ -23,6 +23,7 @@ import app.pwhs.core.receiver.TvReceiver
 import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.core.telemetry.TelemetryEvents
 import app.pwhs.core.util.RootShell
+import app.pwhs.core.util.SourceFileDeleter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -213,6 +214,13 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
             _installResult.value = when (result) {
                 is ApkInstaller.Result.Success -> {
                     _pendingApk.value = null // received APK is installed — clear the hero so the QR returns
+                    val deleteAfterInstall = prefs[SharedPrefsKeys.DELETE_APK_AFTER_INSTALL] ?: false
+                    if (deleteAfterInstall) {
+                        withContext(Dispatchers.IO) {
+                            SourceFileDeleter.deleteSourceFile(context, uri)
+                        }
+                        _downloads.value = _downloads.value.filterNot { it.uri == uri.toString() }
+                    }
                     InstallOutcome.Success(label, silent = useRoot || useShizuku)
                 }
                 is ApkInstaller.Result.Failure -> InstallOutcome.Failure(label, result.message)

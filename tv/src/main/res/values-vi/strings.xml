@@ -105,4 +105,11 @@
     <string name="tv_receive_confirm_delete_msg">Tệp APK này sẽ bị xóa vĩnh viễn khỏi bộ nhớ TV của bạn.</string>
     <string name="tv_receive_deleted_success">Đã xóa %s ✓</string>
     <string name="tv_receive_delete_failed">Không thể xóa %s</string>
+    <string name="tv_settings_delete_apk_title">Xóa APK sau khi cài đặt</string>
+    <string name="tv_settings_delete_apk_on">Bật — tự động xóa tệp APK sau khi cài đặt thành công</string>
+    <string name="tv_settings_delete_apk_off">Tắt — giữ lại tệp APK sau khi cài đặt</string>
+    <string name="tv_details_version">Phiên bản</string>
+    <string name="tv_details_size">Kích thước</string>
+    <string name="tv_details_min_sdk">SDK tối thiểu</string>
+    <string name="tv_details_target_sdk">SDK mục tiêu</string>
 </resources>
