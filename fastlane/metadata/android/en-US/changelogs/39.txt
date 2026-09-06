@@ -1,0 +1,5 @@
+• PIN Lock protection: secure app access and installation actions with a custom PIN
+• Parental Controls: enforce safety confirmations before installing high-risk packages
+• System Installer Manager: freeze or bypass the default package installer seamlessly
+• Enhanced security settings with encrypted PIN storage and biometric support
+• Performance improvements and bug fixes

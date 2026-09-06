@@ -133,68 +133,89 @@ platform :android do
     end
   end
 
-  # Smart deploy: build only modules whose versionCode changed since the previous tag.
-  # Unchanged modules are represented via version_codes_to_retain so Play Store keeps
-  # their existing binaries on the target track without us needing to re-upload them.
+  # Smart deploy: build and upload only modules whose versionCode changed since the previous tag.
+  # Uploads each changed form factor independently to avoid combining them into a single release payload.
   private_lane :smart_deploy do |options|
-    aab_paths    = []
-    retain_codes = []
+    uploaded_any = false
 
     # --- Phone ---
     phone_now     = read_version_code(module: "app")
     phone_last    = tagged_version_code(module: "app")
     phone_changed = phone_now != phone_last
-    UI.message("📱 Phone versionCode: last=#{phone_last} now=#{phone_now} → #{phone_changed ? 'BUILDING' : 'SKIPPING (no change)'}")
+    UI.message("📱 Phone versionCode: last=#{phone_last} now=#{phone_now} → #{phone_changed ? 'BUILDING & UPLOADING' : 'SKIPPING (no change)'}")
     if phone_changed
       gradle(task: ":app:bundlePlayRelease")
-      aab_paths << PHONE_AAB
-    else
-      retain_codes << phone_now
+      upload_to_play_store(
+        track:                   options[:track],
+        package_name:            "app.pwhs.universalinstaller",
+        aab:                     PHONE_AAB,
+        json_key:                "fastlane/play-store-key.json",
+        skip_upload_metadata:    true,
+        skip_upload_images:      true,
+        skip_upload_screenshots: true,
+        skip_upload_changelogs:  false,
+        release_status:          options[:release_status],
+      )
+      uploaded_any = true
     end
 
     # --- WearOS ---
     wear_now     = read_version_code(module: "wearos")
     wear_last    = tagged_version_code(module: "wearos")
     wear_changed = wear_now != wear_last
-    UI.message("⌚ WearOS versionCode: last=#{wear_last} now=#{wear_now} → #{wear_changed ? 'BUILDING' : 'SKIPPING (no change)'}")
+    UI.message("⌚ WearOS versionCode: last=#{wear_last} now=#{wear_now} → #{wear_changed ? 'BUILDING & UPLOADING' : 'SKIPPING (no change)'}")
     if wear_changed
       gradle(task: ":wearos:bundleRelease")
-      aab_paths << WEAR_AAB
-    else
-      retain_codes << wear_now
+      upload_to_play_store(
+        track:                   options[:track],
+        package_name:            "app.pwhs.universalinstaller",
+        aab:                     WEAR_AAB,
+        json_key:                "fastlane/play-store-key.json",
+        skip_upload_metadata:    true,
+        skip_upload_images:      true,
+        skip_upload_screenshots: true,
+        skip_upload_changelogs:  false,
+        release_status:          options[:release_status],
+      )
+      uploaded_any = true
     end
 
     # --- TV ---
     tv_now     = read_version_code(module: "tv")
     tv_last    = tagged_version_code(module: "tv")
     tv_changed = tv_now != tv_last
-    UI.message("📺 TV versionCode: last=#{tv_last} now=#{tv_now} → #{tv_changed ? 'BUILDING' : 'SKIPPING (no change)'}")
+    UI.message("📺 TV versionCode: last=#{tv_last} now=#{tv_now} → #{tv_changed ? 'BUILDING & UPLOADING' : 'SKIPPING (no change)'}")
     if tv_changed
       gradle(task: ":tv:bundleRelease")
-      aab_paths << TV_AAB
-    else
-      retain_codes << tv_now
+      upload_to_play_store(
+        track:                   options[:track],
+        package_name:            "app.pwhs.universalinstaller",
+        aab:                     TV_AAB,
+        json_key:                "fastlane/play-store-key.json",
+        skip_upload_metadata:    true,
+        skip_upload_images:      true,
+        skip_upload_screenshots: true,
+        skip_upload_changelogs:  false,
+        release_status:          options[:release_status],
+      )
+      uploaded_any = true
     end
 
-    if aab_paths.empty?
-      UI.important("⚠️ No AABs had version code bumps! Fallback: building phone AAB.")
+    if !uploaded_any
+      UI.important("⚠️ No AABs had version code bumps! Fallback: building and uploading phone AAB.")
       gradle(task: ":app:bundlePlayRelease")
-      aab_paths << PHONE_AAB
-      retain_codes.delete(phone_now)
+      upload_to_play_store(
+        track:                   options[:track],
+        package_name:            "app.pwhs.universalinstaller",
+        aab:                     PHONE_AAB,
+        json_key:                "fastlane/play-store-key.json",
+        skip_upload_metadata:    true,
+        skip_upload_images:      true,
+        skip_upload_screenshots: true,
+        skip_upload_changelogs:  false,
+        release_status:          options[:release_status],
+      )
     end
-
-    upload_to_play_store(
-      track:                   options[:track],
-      package_name:            "app.pwhs.universalinstaller",
-      aab_paths:               aab_paths,
-      version_codes_to_retain: retain_codes.empty? ? nil : retain_codes,
-      json_key:                "fastlane/play-store-key.json",
-      skip_upload_metadata:    false,
-      skip_upload_images:      false,
-      skip_upload_screenshots: options[:skip_screenshots],
-      skip_upload_changelogs:  false,
-      release_status:          options[:release_status],
-    )
   end
 
 end

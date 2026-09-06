@@ -1,0 +1,3 @@
+• Refreshed app launcher icons: modern adaptive and high-resolution TV icons
+• Enhanced visual consistency and rendering across Android TV home screens
+• Performance optimizations and stability improvements
