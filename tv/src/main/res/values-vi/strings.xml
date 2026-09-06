@@ -100,4 +100,9 @@
     <string name="tv_shizuku_ready">Sẵn sàng cài APK và gói APK phân tách im lặng.</string>
     <string name="tv_shizuku_denied">Quyền bị từ chối. Cho phép ứng dụng này trong Shizuku rồi thử lại.</string>
     <string name="tv_shizuku_error">Không thể yêu cầu quyền. Mở Shizuku rồi thử lại.</string>
+    <string name="tv_receive_delete_apk">Xóa tệp APK</string>
+    <string name="tv_receive_confirm_delete_title">Xóa %s?</string>
+    <string name="tv_receive_confirm_delete_msg">Tệp APK này sẽ bị xóa vĩnh viễn khỏi bộ nhớ TV của bạn.</string>
+    <string name="tv_receive_deleted_success">Đã xóa %s ✓</string>
+    <string name="tv_receive_delete_failed">Không thể xóa %s</string>
 </resources>

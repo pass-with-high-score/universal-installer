@@ -66,12 +66,20 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     private val _installResult = MutableStateFlow<InstallOutcome?>(null)
     val installResult: StateFlow<InstallOutcome?> = _installResult.asStateFlow()
 
+    private val _deleteOutcome = MutableStateFlow<DeleteOutcome?>(null)
+    val deleteOutcome: StateFlow<DeleteOutcome?> = _deleteOutcome.asStateFlow()
+
     /** Kept so the result overlay can offer a one-tap Retry without re-picking the APK. */
     private var lastInstall: InstallRequest? = null
 
     sealed interface InstallOutcome {
         data class Success(val label: String, val silent: Boolean = false) : InstallOutcome
         data class Failure(val label: String, val message: String) : InstallOutcome
+    }
+
+    sealed interface DeleteOutcome {
+        data class Success(val label: String) : DeleteOutcome
+        data class Failure(val label: String) : DeleteOutcome
     }
 
     private data class InstallRequest(val uri: Uri, val isBundle: Boolean, val label: String, val sizeBytes: Long)
@@ -223,6 +231,25 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     fun dismissPending() {
         _pendingApk.value = null
         _installResult.value = null
+    }
+
+    fun deleteLocalApk(apk: ApkFile) {
+        viewModelScope.launch {
+            val label = apk.metadata?.appName ?: apk.displayName
+            val success = withContext(Dispatchers.IO) {
+                app.pwhs.core.util.SourceFileDeleter.deleteSourceFile(context, Uri.parse(apk.uri))
+            }
+            if (success) {
+                _downloads.value = _downloads.value.filterNot { it.uri == apk.uri }
+                _deleteOutcome.value = DeleteOutcome.Success(label)
+            } else {
+                _deleteOutcome.value = DeleteOutcome.Failure(label)
+            }
+        }
+    }
+
+    fun clearDeleteOutcome() {
+        _deleteOutcome.value = null
     }
 
     private fun String.isBundleName(): Boolean =

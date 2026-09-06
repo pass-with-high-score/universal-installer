@@ -114,4 +114,9 @@
     <string name="tv_shizuku_ready">Ready for silent APK and split-bundle installation.</string>
     <string name="tv_shizuku_denied">Permission denied. Allow this app in Shizuku, then try again.</string>
     <string name="tv_shizuku_error">Could not request permission. Open Shizuku and try again.</string>
+    <string name="tv_receive_delete_apk">Delete APK</string>
+    <string name="tv_receive_confirm_delete_title">Delete %s?</string>
+    <string name="tv_receive_confirm_delete_msg">This APK file will be permanently removed from your TV storage.</string>
+    <string name="tv_receive_deleted_success">Deleted %s ✓</string>
+    <string name="tv_receive_delete_failed">Could not delete %s</string>
 </resources>

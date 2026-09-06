@@ -1,5 +1,7 @@
 package app.pwhs.tv.presentation.settings
 
+import app.pwhs.tv.presentation.settings.components.SettingsCard
+import app.pwhs.tv.presentation.settings.components.TitleValue
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable

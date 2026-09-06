@@ -11,43 +11,21 @@ import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.focusGroup
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Folder
-import androidx.compose.material.icons.rounded.LinkOff
 import androidx.compose.material.icons.rounded.PhoneAndroid
-import androidx.compose.material.icons.rounded.Refresh
-import androidx.compose.material.icons.rounded.Storage
-import androidx.compose.material.icons.rounded.WifiOff
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -57,49 +35,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRestorer
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.tv.material3.Button
-import androidx.tv.material3.ButtonDefaults
-import androidx.tv.material3.ClickableSurfaceDefaults
-import androidx.tv.material3.ExperimentalTvMaterial3Api
-import androidx.tv.material3.Icon
-import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
-import androidx.tv.material3.Surface
-import androidx.tv.material3.SurfaceDefaults
 import androidx.tv.material3.Text
-import app.pwhs.core.domain.ApkFile
-import app.pwhs.core.receiver.ConnectedClient
-import app.pwhs.core.receiver.ReceivedApk
-import app.pwhs.core.receiver.ReceivingProgress
-import app.pwhs.core.receiver.ReceiverStatus
-import app.pwhs.core.util.StorageStats
 import app.pwhs.core.util.StorageUtil
 import app.pwhs.tv.R
-import app.pwhs.tv.formatSize
-import app.pwhs.tv.ui.components.QrCode
-import java.io.File
+import app.pwhs.tv.presentation.receive.components.InstallStatusOverlay
+import app.pwhs.tv.presentation.receive.components.LocalFilesContent
+import app.pwhs.tv.presentation.receive.components.ReceiveContent
+import app.pwhs.tv.presentation.receive.components.SidebarTab
+import app.pwhs.tv.presentation.receive.components.TvStorageCard
 
 private enum class InstallTab { Receive, LocalFiles }
 
-@OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun ReceiveScreen(
     modifier: Modifier = Modifier,
@@ -113,10 +67,12 @@ fun ReceiveScreen(
     val downloads by viewModel.downloads.collectAsState()
     val isScanning by viewModel.isScanning.collectAsState()
     val installResult by viewModel.installResult.collectAsState()
+    val deleteOutcome by viewModel.deleteOutcome.collectAsState()
     val installingLabel by viewModel.installingLabel.collectAsState()
     val installProgress by viewModel.installProgress.collectAsState()
-    
-    val storageStats = remember { StorageUtil.getStorageStats() }
+
+    var storageRefreshKey by remember { mutableStateOf(0) }
+    val storageStats = remember(storageRefreshKey) { StorageUtil.getStorageStats() }
     var selectedApk by remember { mutableStateOf<TvApkItem?>(null) } 
     var currentTab by remember { mutableStateOf(InstallTab.Receive) }
 
@@ -141,16 +97,17 @@ fun ReceiveScreen(
     ) { hasStorage = checkStoragePermission() }
 
     LaunchedEffect(pending) {
-        // Just switch to the Receive tab; the Install button requests focus itself once it's
-        // actually composed (after the AnimatedContent crossfade) — see HeroPendingCard.
         if (pending != null) currentTab = InstallTab.Receive
     }
     
     LaunchedEffect(hasStorage) {
-        // Scan once per granted-permission session. The results live in the ViewModel (retained in
-        // this tab's back-stack entry), so switching away and back doesn't trigger a redundant
-        // re-scan; the Rescan button still forces a fresh scan on demand.
         if (hasStorage) viewModel.scanLocalApksIfNeeded()
+    }
+
+    LaunchedEffect(installResult) {
+        if (installResult is ReceiveViewModel.InstallOutcome.Success) {
+            storageRefreshKey++
+        }
     }
 
     // Details Dialog
@@ -166,1137 +123,115 @@ fun ReceiveScreen(
                     viewModel.install(uri, isBundle, label, sizeBytes)
                     selectedApk = null
                 }
+            },
+            onDelete = { apkFile ->
+                viewModel.deleteLocalApk(apkFile)
+                storageRefreshKey++
+                selectedApk = null
             }
         )
     }
 
     Box(modifier = modifier.fillMaxSize()) {
-    Row(modifier = Modifier.fillMaxSize().padding(horizontal = 48.dp)) {
-        // ── Left Pane: Sidebar Navigation ────────────────────────────────────
-        Column(
-            modifier = Modifier
-                .weight(0.35f)
-                .fillMaxHeight()
-                .padding(vertical = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Text(
-                stringResource(R.string.tv_app_tab_install),
-                style = MaterialTheme.typography.displaySmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            
-            SidebarTab(
-                selected = currentTab == InstallTab.Receive,
-                label = stringResource(R.string.tv_receive_from_phone),
-                icon = Icons.Rounded.PhoneAndroid,
-                onClick = { currentTab = InstallTab.Receive }
-            )
+        Row(modifier = Modifier.fillMaxSize().padding(horizontal = 48.dp)) {
+            // ── Left Pane: Sidebar Navigation ────────────────────────────────────
+            Column(
+                modifier = Modifier
+                    .weight(0.35f)
+                    .fillMaxHeight()
+                    .padding(vertical = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    stringResource(R.string.tv_app_tab_install),
+                    style = MaterialTheme.typography.displaySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 16.dp)
+                )
+                
+                SidebarTab(
+                    selected = currentTab == InstallTab.Receive,
+                    label = stringResource(R.string.tv_receive_from_phone),
+                    icon = Icons.Rounded.PhoneAndroid,
+                    onClick = { currentTab = InstallTab.Receive }
+                )
 
-            SidebarTab(
-                selected = currentTab == InstallTab.LocalFiles,
-                label = stringResource(R.string.tv_receive_local_files),
-                icon = Icons.Rounded.Folder,
-                onClick = { currentTab = InstallTab.LocalFiles }
-            )
+                SidebarTab(
+                    selected = currentTab == InstallTab.LocalFiles,
+                    label = stringResource(R.string.tv_receive_local_files),
+                    icon = Icons.Rounded.Folder,
+                    onClick = { currentTab = InstallTab.LocalFiles }
+                )
 
-            Spacer(Modifier.weight(1f))
+                Spacer(Modifier.weight(1f))
 
-            TvStorageCard(stats = storageStats)
-        }
+                TvStorageCard(stats = storageStats)
+            }
 
-        Spacer(Modifier.width(28.dp))
+            Spacer(Modifier.width(28.dp))
 
-        // ── Right Pane: Dynamic Content Area ─────────────────────────────────
-        Box(
-            modifier = Modifier
-                .weight(0.70f)
-                .fillMaxHeight()
-                .padding(vertical = 24.dp)
-        ) {
-            AnimatedContent(
-                targetState = currentTab,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "installTabTransition"
-            ) { tab ->
-                when (tab) {
-                    InstallTab.Receive -> ReceiveContent(
-                        status = status,
-                        connectedClient = connectedClient,
-                        pending = pending,
-                        receivingProgress = receivingProgress,
-                        installingLabel = installingLabel,
-                        installFocus = installFocus,
-                        onInstall = { selectedApk = TvApkItem.Received(it) },
-                        onDismissPending = { viewModel.dismissPending() },
-                        onDisconnectClient = { viewModel.disconnect() }
-                    )
-                    InstallTab.LocalFiles -> LocalFilesContent(
-                        hasStorage = hasStorage,
-                        isScanning = isScanning,
-                        downloads = downloads,
-                        onApkClick = { selectedApk = TvApkItem.Local(it) },
-                        onRescan = { viewModel.scanLocalApks() },
-                        onReceiveFromPhone = { currentTab = InstallTab.Receive },
-                        onGrantPermission = {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, Uri.parse("package:${context.packageName}"))
-                                settingsLauncher.launch(intent)
-                            } else {
-                                readPerm?.let { permLauncher.launch(it) }
+            // ── Right Pane: Dynamic Content Area ─────────────────────────────────
+            Box(
+                modifier = Modifier
+                    .weight(0.70f)
+                    .fillMaxHeight()
+                    .padding(vertical = 24.dp)
+            ) {
+                AnimatedContent(
+                    targetState = currentTab,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "installTabTransition"
+                ) { tab ->
+                    when (tab) {
+                        InstallTab.Receive -> ReceiveContent(
+                            status = status,
+                            connectedClient = connectedClient,
+                            pending = pending,
+                            receivingProgress = receivingProgress,
+                            installingLabel = installingLabel,
+                            installFocus = installFocus,
+                            onInstall = { selectedApk = TvApkItem.Received(it) },
+                            onDismissPending = { viewModel.dismissPending() },
+                            onDisconnectClient = { viewModel.disconnect() }
+                        )
+                        InstallTab.LocalFiles -> LocalFilesContent(
+                            hasStorage = hasStorage,
+                            isScanning = isScanning,
+                            downloads = downloads,
+                            onApkClick = { selectedApk = TvApkItem.Local(it) },
+                            onRescan = { viewModel.scanLocalApks() },
+                            onReceiveFromPhone = { currentTab = InstallTab.Receive },
+                            onGrantPermission = {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                    val intent = Intent(
+                                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                                        Uri.parse("package:${context.packageName}")
+                                    )
+                                    settingsLauncher.launch(intent)
+                                } else {
+                                    readPerm?.let { permLauncher.launch(it) }
+                                }
                             }
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
-    }
 
-        // ── Install status overlay (progress while writing · result pill) ────
+        // ── Install / Operation status overlay (progress · result pill) ────
         InstallStatusOverlay(
             installingLabel = installingLabel,
             progress = installProgress,
             result = installResult,
+            deleteOutcome = deleteOutcome,
             onRetry = { viewModel.retryInstall() },
             onDismiss = { viewModel.clearInstallResult() },
+            onDismissDelete = { viewModel.clearDeleteOutcome() },
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp)
         )
     }
 }
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun InstallStatusOverlay(
-    installingLabel: String?,
-    progress: Float?,
-    result: ReceiveViewModel.InstallOutcome?,
-    onRetry: () -> Unit,
-    onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    // Success auto-dismisses; a failure lingers so the Retry action stays reachable.
-    LaunchedEffect(result) {
-        if (result is ReceiveViewModel.InstallOutcome.Success) {
-            kotlinx.coroutines.delay(3000)
-            onDismiss()
-        }
-    }
-
-    val visible = installingLabel != null || result != null
-    androidx.compose.animation.AnimatedVisibility(
-        visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut(),
-        modifier = modifier
-    ) {
-        val shape = RoundedCornerShape(20.dp)
-        val (container, content) = when {
-            installingLabel != null -> MaterialTheme.colorScheme.surfaceVariant to MaterialTheme.colorScheme.onSurface
-            result is ReceiveViewModel.InstallOutcome.Failure -> MaterialTheme.colorScheme.errorContainer to MaterialTheme.colorScheme.onErrorContainer
-            else -> MaterialTheme.colorScheme.primaryContainer to MaterialTheme.colorScheme.onPrimaryContainer
-        }
-        Surface(
-            modifier = Modifier.widthIn(min = 360.dp, max = 720.dp),
-            shape = shape,
-            colors = SurfaceDefaults.colors(containerColor = container, contentColor = content)
-        ) {
-            Column(modifier = Modifier.padding(horizontal = 28.dp, vertical = 20.dp)) {
-                when {
-                    installingLabel != null -> {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                stringResource(R.string.tv_receive_installing, installingLabel),
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f, fill = false)
-                            )
-                            if (progress != null) {
-                                Spacer(Modifier.width(12.dp))
-                                Text(
-                                    "${(progress * 100).toInt()}%",
-                                    style = MaterialTheme.typography.titleMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                        }
-                        Spacer(Modifier.height(12.dp))
-                        if (progress != null) {
-                            androidx.compose.material3.LinearProgressIndicator(
-                                progress = { progress },
-                                modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape),
-                                color = MaterialTheme.colorScheme.primary,
-                                trackColor = content.copy(alpha = 0.2f)
-                            )
-                        } else {
-                            androidx.compose.material3.LinearProgressIndicator(
-                                modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape),
-                                color = MaterialTheme.colorScheme.primary,
-                                trackColor = content.copy(alpha = 0.2f)
-                            )
-                        }
-                    }
-                    result is ReceiveViewModel.InstallOutcome.Success -> {
-                        Text(
-                            stringResource(
-                                if (result.silent) R.string.tv_receive_installed_silent
-                                else R.string.tv_receive_installed_success,
-                                result.label
-                            ),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                    }
-                    result is ReceiveViewModel.InstallOutcome.Failure -> {
-                        Text(
-                            stringResource(R.string.tv_receive_failed, result.message),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.SemiBold,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        val retryFocus = remember { FocusRequester() }
-                        LaunchedEffect(Unit) { runCatching { retryFocus.requestFocus() } }
-                        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            val btnShape = CircleShape
-                            Button(
-                                onClick = onRetry,
-                                shape = ButtonDefaults.shape(btnShape),
-                                modifier = Modifier.clip(btnShape).focusRequester(retryFocus)
-                            ) { Text(stringResource(R.string.tv_receive_retry)) }
-                            Button(
-                                onClick = onDismiss,
-                                shape = ButtonDefaults.shape(btnShape),
-                                modifier = Modifier.clip(btnShape),
-                                colors = ButtonDefaults.colors(containerColor = content.copy(alpha = 0.15f), contentColor = content)
-                            ) { Text(stringResource(R.string.tv_receive_dismiss)) }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun SidebarTab(
-    selected: Boolean,
-    label: String,
-    icon: ImageVector,
-    onClick: () -> Unit
-) {
-    val shape = RoundedCornerShape(12.dp)
-    Surface(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape),
-        shape = ClickableSurfaceDefaults.shape(shape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
-            focusedContainerColor = MaterialTheme.colorScheme.primary,
-            contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.width(16.dp))
-            Text(label, style = MaterialTheme.typography.titleMedium, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun ReceiveContent(
-    status: ReceiverStatus,
-    connectedClient: ConnectedClient?,
-    pending: ReceivedApk?,
-    receivingProgress: ReceivingProgress?,
-    installingLabel: String?,
-    installFocus: FocusRequester,
-    onInstall: (ReceivedApk) -> Unit,
-    onDismissPending: () -> Unit,
-    onDisconnectClient: () -> Unit
-) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        if (pending != null) {
-            // Hero Pending Card
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    stringResource(R.string.tv_receive_step3),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                )
-                
-                HeroPendingCard(
-                    apk = pending,
-                    isInstalling = installingLabel != null,
-                    installFocus = installFocus,
-                    onInstall = { onInstall(pending) },
-                    onDismiss = onDismissPending
-                )
-            }
-        } else if (receivingProgress != null) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                ReceivingProgressCard(receivingProgress)
-            }
-        } else if (connectedClient != null) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                ConnectedDeviceCard(connectedClient, onDisconnect = onDisconnectClient)
-            }
-        } else {
-            // QR Connection Hub - Improved layout for better text flow
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                when (val s = status) {
-                    is ReceiverStatus.Running -> {
-                        // No LAN address → the QR would encode 0.0.0.0 (unscannable). Guide the
-                        // user to Wi-Fi instead of showing a dead code.
-                        if (s.ip == "0.0.0.0") {
-                            NoNetworkState()
-                        } else {
-                            CenteredHeroCard(url = s.url, ip = s.ip, port = s.port)
-                        }
-                    }
-                    ReceiverStatus.Stopped -> {
-                        val ctx = LocalContext.current
-                        LaunchedEffect(Unit) {
-                            app.pwhs.core.receiver.TvReceiver.start(ctx)
-                        }
-                        Text(
-                            stringResource(R.string.tv_receive_starting),
-                            style = MaterialTheme.typography.headlineSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun ReceivingProgressCard(progress: ReceivingProgress) {
-    val context = LocalContext.current
-    val animatedProgress by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = progress.progress,
-        animationSpec = androidx.compose.animation.core.tween(durationMillis = 150),
-        label = "uploadProgress"
-    )
-    Surface(
-        shape = RoundedCornerShape(24.dp),
-        colors = SurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
-        ),
-        modifier = Modifier
-            .widthIn(max = 500.dp)
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    Icons.Rounded.PhoneAndroid,
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-            Spacer(Modifier.height(16.dp))
-            Text(
-                stringResource(R.string.tv_receive_receiving_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(Modifier.height(16.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Bottom
-            ) {
-                Text(
-                    "${progress.percent}%",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                    "${android.text.format.Formatter.formatShortFileSize(context, progress.bytesReceived)} / ${android.text.format.Formatter.formatShortFileSize(context, progress.totalBytes)}",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(12.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(animatedProgress.coerceIn(0.02f, 1f))
-                        .fillMaxHeight()
-                        .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.primary)
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun ConnectedDeviceCard(
-    client: ConnectedClient,
-    onDisconnect: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(24.dp),
-        colors = SurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
-        ),
-        modifier = Modifier
-            .widthIn(max = 520.dp)
-            .fillMaxWidth()
-            .padding(16.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(28.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    Icons.Rounded.PhoneAndroid,
-                    contentDescription = null,
-                    modifier = Modifier.size(36.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-            Spacer(Modifier.height(16.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .clip(CircleShape)
-                        .background(androidx.compose.ui.graphics.Color(0xFF10B981))
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    stringResource(R.string.tv_receive_device_connected_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            Spacer(Modifier.height(8.dp))
-            Text(
-                "${client.deviceName} (${client.ip})",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colorScheme.primary
-            )
-            Spacer(Modifier.height(12.dp))
-            Text(
-                stringResource(R.string.tv_receive_device_connected_subtitle),
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Spacer(Modifier.height(24.dp))
-            Button(
-                onClick = onDisconnect,
-                colors = ButtonDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.7f),
-                    focusedContainerColor = MaterialTheme.colorScheme.error
-                ),
-                shape = ButtonDefaults.shape(shape = RoundedCornerShape(12.dp))
-            ) {
-                Icon(
-                    Icons.Rounded.LinkOff,
-                    contentDescription = null,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    stringResource(R.string.tv_receive_btn_disconnect),
-                    style = MaterialTheme.typography.labelLarge
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun GuideStep(num: Int, text: String, modifier: Modifier = Modifier) {
-    val cleanText = text.replaceFirst(Regex("^\\d+\\.\\s*"), "")
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.Top,
-        horizontalArrangement = Arrangement.Start,
-    ) {
-        Text(
-            "$num.",
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary,
-        )
-        Spacer(Modifier.width(6.dp))
-        Text(
-            cleanText,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Start,
-        )
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun CenteredHeroCard(
-    url: String,
-    ip: String,
-    port: Int,
-    modifier: Modifier = Modifier,
-) {
-    val ipCode = remember(ip) { app.pwhs.core.receiver.IpEncoder.encode(ip) }
-
-    Surface(
-        shape = RoundedCornerShape(24.dp),
-        colors = SurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-        ),
-        modifier = modifier
-            .widthIn(max = 440.dp)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                shape = RoundedCornerShape(24.dp)
-            )
-    ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 28.dp, vertical = 20.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            // TV Code Pill Badge on top
-            if (!ipCode.isNullOrBlank()) {
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    colors = SurfaceDefaults.colors(
-                        containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.55f)
-                    ),
-                    modifier = Modifier.padding(bottom = 14.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 14.dp, vertical = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            stringResource(R.string.tv_receive_code_label),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer,
-                            fontWeight = FontWeight.Medium
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            ipCode,
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.tertiary,
-                            fontWeight = FontWeight.ExtraBold,
-                            letterSpacing = 2.sp
-                        )
-                    }
-                }
-            }
-
-            // QR Code in soft white rounded box
-            Box(
-                modifier = Modifier
-                    .size(135.dp)
-                    .clip(RoundedCornerShape(18.dp))
-                    .background(Color.White)
-                    .padding(10.dp)
-            ) {
-                QrCode(data = url, modifier = Modifier.fillMaxSize())
-            }
-
-            Spacer(Modifier.height(10.dp))
-
-            // Web URL
-            Text(
-                "http://$ip:$port",
-                style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-
-            Spacer(Modifier.height(10.dp))
-
-            // 2 Clean Hint Rows
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    stringResource(R.string.tv_receive_step_app),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    stringResource(R.string.tv_receive_step_web),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                    textAlign = TextAlign.Center
-                )
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun NoNetworkState() {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(520.dp)) {
-        Icon(Icons.Rounded.WifiOff, contentDescription = null, modifier = Modifier.size(72.dp), tint = MaterialTheme.colorScheme.error)
-        Spacer(Modifier.height(20.dp))
-        Text(
-            stringResource(R.string.tv_receive_no_network),
-            style = MaterialTheme.typography.headlineSmall,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-        )
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun LocalFilesContent(
-    hasStorage: Boolean,
-    isScanning: Boolean,
-    downloads: List<ApkFile>,
-    onApkClick: (ApkFile) -> Unit,
-    onGrantPermission: () -> Unit,
-    onRescan: () -> Unit,
-    onReceiveFromPhone: () -> Unit,
-) {
-    when {
-        !hasStorage -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(480.dp)) {
-                Icon(Icons.Rounded.Folder, contentDescription = null, modifier = Modifier.size(64.dp), tint = MaterialTheme.colorScheme.error)
-                Spacer(Modifier.height(24.dp))
-                Text(stringResource(R.string.tv_receive_allow_storage_title), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.tv_receive_allow_storage_subtitle), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(32.dp))
-                val shape = CircleShape
-                Button(
-                    onClick = onGrantPermission,
-                    shape = ButtonDefaults.shape(shape),
-                    modifier = Modifier.clip(shape)
-                ) {
-                    Text(stringResource(R.string.tv_receive_grant_all_files))
-                }
-            }
-        }
-
-        isScanning && downloads.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                androidx.compose.material3.LinearProgressIndicator(
-                    modifier = Modifier.width(220.dp).height(6.dp).clip(CircleShape),
-                    color = MaterialTheme.colorScheme.primary,
-                    trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                )
-                Spacer(Modifier.height(20.dp))
-                Text(stringResource(R.string.tv_receive_scanning), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
-
-        downloads.isEmpty() -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.width(520.dp)) {
-                Icon(Icons.Rounded.Folder, contentDescription = null, modifier = Modifier.size(72.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(20.dp))
-                Text(stringResource(R.string.tv_receive_no_apks), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                Spacer(Modifier.height(28.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    val shape = CircleShape
-                    Button(
-                        onClick = onRescan,
-                        shape = ButtonDefaults.shape(shape),
-                        modifier = Modifier.clip(shape),
-                        colors = ButtonDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                            contentColor = MaterialTheme.colorScheme.onSurface,
-                        ),
-                    ) {
-                        Icon(Icons.Rounded.Refresh, contentDescription = null, modifier = Modifier.size(22.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.tv_receive_rescan))
-                    }
-                    Button(
-                        onClick = onReceiveFromPhone,
-                        shape = ButtonDefaults.shape(shape),
-                        modifier = Modifier.clip(shape),
-                    ) {
-                        Icon(Icons.Rounded.PhoneAndroid, contentDescription = null, modifier = Modifier.size(22.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.tv_receive_from_phone))
-                    }
-                }
-            }
-        }
-
-        else -> LazyVerticalGrid(
-            columns = GridCells.Fixed(1), // Wide cards look better in a single column list
-            // Restores the previously focused card when the user comes back to this tab,
-            // instead of re-running a focus search across the grid.
-            modifier = Modifier
-                .fillMaxSize()
-                .focusRestorer()
-                .focusGroup(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(downloads, key = { it.uri }) { apk ->
-                ApkWideItem(apk) { onApkClick(apk) }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun ApkWideItem(apk: ApkFile, onClick: () -> Unit) {
-    val context = LocalContext.current
-    val meta = apk.metadata
-    val shape = RoundedCornerShape(16.dp)
-    Surface(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
-        shape = ClickableSurfaceDefaults.shape(shape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-            focusedContainerColor = MaterialTheme.colorScheme.primary,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            focusedContentColor = MaterialTheme.colorScheme.onPrimary
-        )
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            val icon = meta?.icon
-            if (icon != null) {
-                Image(
-                    bitmap = icon.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp).clip(RoundedCornerShape(12.dp))
-                )
-            } else {
-                Box(
-                    Modifier.size(64.dp).clip(RoundedCornerShape(12.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("APK", style = MaterialTheme.typography.titleMedium)
-                }
-            }
-            
-            Spacer(Modifier.width(20.dp))
-            
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    meta?.appName ?: apk.displayName,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = if (meta != null) "${meta.packageName} · v${meta.versionName}" else apk.displayName,
-                    style = MaterialTheme.typography.bodyLarge,
-                    // Track the Surface's content color (onSurface at rest, onPrimary when focused)
-                    // so the subtitle stays legible on the focused orange row.
-                    color = LocalContentColor.current.copy(alpha = 0.8f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-            }
-
-            Text(
-                text = formatSize(context, apk.sizeBytes),
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(start = 16.dp)
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun HeroPendingCard(
-    apk: ReceivedApk,
-    isInstalling: Boolean,
-    installFocus: FocusRequester,
-    onInstall: () -> Unit,
-    onDismiss: () -> Unit
-) {
-    val context = LocalContext.current
-    val meta = apk.metadata
-    val shape = RoundedCornerShape(28.dp)
-    // Land focus on Install now that the button is composed (the crossfade is done).
-    LaunchedEffect(Unit) { runCatching { installFocus.requestFocus() } }
-    Surface(
-        onClick = onInstall,
-        modifier = Modifier
-            .width(600.dp)
-            .clip(shape),
-        shape = ClickableSurfaceDefaults.shape(shape),
-        colors = ClickableSurfaceDefaults.colors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            focusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
-            contentColor = MaterialTheme.colorScheme.onSurface,
-            focusedContentColor = MaterialTheme.colorScheme.onSurface
-        )
-    ) {
-        Row(Modifier.padding(32.dp), verticalAlignment = Alignment.CenterVertically) {
-            val icon = meta?.icon
-            if (icon != null) {
-                Image(
-                    bitmap = icon.asImageBitmap(),
-                    contentDescription = null,
-                    modifier = Modifier.size(120.dp).clip(RoundedCornerShape(20.dp))
-                )
-            } else {
-                Box(
-                    Modifier.size(120.dp).clip(RoundedCornerShape(20.dp)).background(MaterialTheme.colorScheme.secondaryContainer),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("APK", style = MaterialTheme.typography.displayMedium)
-                }
-            }
-            Spacer(Modifier.width(32.dp))
-            Column(Modifier.weight(1f)) {
-                Text(meta?.appName ?: apk.fileName, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-                if (meta != null) {
-                    Text("${meta.packageName} · v${meta.versionName}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                }
-                Text(formatSize(context, apk.sizeBytes), style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(32.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                    val btnShape = CircleShape
-                    Button(
-                        onClick = onInstall,
-                        modifier = Modifier
-                            .focusRequester(installFocus)
-                            .weight(1f)
-                            .clip(btnShape),
-                        shape = ButtonDefaults.shape(btnShape)
-                    ) {
-                        Text(if (isInstalling) stringResource(R.string.tv_receive_installing_plain) else stringResource(R.string.tv_receive_install), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-                    }
-                    Button(
-                        onClick = onDismiss,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(btnShape),
-                        shape = ButtonDefaults.shape(btnShape),
-                        // Distinct from the card fill so the secondary action reads as a button
-                        // at rest (surfaceVariant.copy(0.5f) composited onto the surfaceVariant card).
-                        colors = ButtonDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                        )
-                    ) {
-                        Text(stringResource(R.string.tv_receive_dismiss), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
-                    }
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun TvStorageCard(stats: StorageStats) {
-    val context = LocalContext.current
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
-            .padding(16.dp)
-    ) {
-        Column {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                Text(
-                    text = stringResource(R.string.install_storage_title),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = stringResource(
-                        R.string.install_storage_value,
-                        android.text.format.Formatter.formatShortFileSize(context, stats.freeBytes),
-                        android.text.format.Formatter.formatShortFileSize(context, stats.totalBytes)
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-            Spacer(Modifier.height(12.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth(stats.progress)
-                        .fillMaxHeight()
-                        .clip(CircleShape)
-                        .background(
-                            when {
-                                stats.progress >= 0.9f -> MaterialTheme.colorScheme.error
-                                stats.progress >= 0.75f -> MaterialTheme.colorScheme.tertiary
-                                else -> MaterialTheme.colorScheme.primary
-                            }
-                        )
-                )
-            }
-        }
-    }
-}
-
-sealed interface TvApkItem {
-    data class Received(val apk: ReceivedApk) : TvApkItem
-    data class Local(val apk: ApkFile) : TvApkItem
-}
-
-@OptIn(ExperimentalTvMaterial3Api::class)
-@Composable
-private fun ApkDetailsDialog(
-    apkItem: TvApkItem,
-    isInstalling: Boolean,
-    onDismiss: () -> Unit,
-    onInstall: (Uri, Boolean, String, Long) -> Unit
-) {
-    val context = LocalContext.current
-    
-    val name: String
-    val pkg: String
-    val version: String
-    val size: Long
-    val icon: androidx.compose.ui.graphics.ImageBitmap?
-    val uri: Uri
-    val isBundle: Boolean
-    val minSdk: Int
-    val targetSdk: Int
-
-    when (apkItem) {
-        is TvApkItem.Received -> {
-            val meta = apkItem.apk.metadata
-            name = meta?.appName ?: apkItem.apk.fileName
-            pkg = meta?.packageName ?: ""
-            version = meta?.versionName ?: ""
-            size = apkItem.apk.sizeBytes
-            icon = meta?.icon?.asImageBitmap()
-            uri = Uri.fromFile(File(apkItem.apk.path))
-            isBundle = apkItem.apk.fileName.isBundleName()
-            minSdk = meta?.minSdk ?: 0
-            targetSdk = meta?.targetSdk ?: 0
-        }
-        is TvApkItem.Local -> {
-            val meta = apkItem.apk.metadata
-            name = meta?.appName ?: apkItem.apk.displayName
-            pkg = meta?.packageName ?: ""
-            version = meta?.versionName ?: ""
-            size = apkItem.apk.sizeBytes
-            icon = meta?.icon?.asImageBitmap()
-            uri = Uri.parse(apkItem.apk.uri)
-            isBundle = apkItem.apk.isBundle
-            minSdk = meta?.minSdk ?: 0
-            targetSdk = meta?.targetSdk ?: 0
-        }
-        // else branch is redundant and removed
-    }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Surface(
-            modifier = Modifier.width(480.dp),
-            shape = RoundedCornerShape(28.dp),
-            colors = SurfaceDefaults.colors(
-                containerColor = MaterialTheme.colorScheme.surface,
-                contentColor = MaterialTheme.colorScheme.onSurface
-            )
-        ) {
-            Column(
-                modifier = Modifier.padding(32.dp).verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (icon != null) {
-                    Image(
-                        bitmap = icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(100.dp).clip(RoundedCornerShape(16.dp))
-                    )
-                } else {
-                    Box(
-                        Modifier.size(100.dp).clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surfaceVariant),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("APK", style = MaterialTheme.typography.displaySmall)
-                    }
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                Text(name, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                if (pkg.isNotBlank()) {
-                    Text(pkg, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant, textAlign = TextAlign.Center)
-                }
-                
-                Spacer(Modifier.height(24.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    DetailMetaItem(label = "Version", value = version, modifier = Modifier.weight(1f))
-                    DetailMetaItem(label = "Size", value = formatSize(context, size), modifier = Modifier.weight(1f))
-                }
-                
-                Spacer(Modifier.height(12.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    DetailMetaItem(label = "Min SDK", value = "Android $minSdk", modifier = Modifier.weight(1f))
-                    DetailMetaItem(label = "Target SDK", value = "Android $targetSdk", modifier = Modifier.weight(1f))
-                }
-
-                Spacer(Modifier.height(32.dp))
-
-                val btnShape = RoundedCornerShape(14.dp)
-                Button(
-                    onClick = { onInstall(uri, isBundle, name, size) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(btnShape),
-                    shape = ButtonDefaults.shape(btnShape)
-                ) {
-                    Text(
-                        if (isInstalling) stringResource(R.string.tv_receive_installing_plain) else stringResource(R.string.tv_receive_install),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(btnShape),
-                    shape = ButtonDefaults.shape(btnShape),
-                    colors = ButtonDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
-                ) {
-                    Text(
-                        stringResource(R.string.tv_manage_action_close),
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun DetailMetaItem(label: String, value: String, modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            .padding(16.dp)
-    ) {
-        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(text = value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
-    }
-}
-
-private fun String.isBundleName(): Boolean =
-    substringAfterLast('.', "").lowercase() in setOf("apks", "xapk", "apkm", "apk+", "zip")
 
 private fun openUnknownSources(context: Context) {
     runCatching {
