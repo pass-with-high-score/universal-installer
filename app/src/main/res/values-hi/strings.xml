@@ -987,4 +987,12 @@
   <string name="find_auto_found_so_far">%d पैकेज मिले</string>
   <string name="source_folder_root">रूट स्टोरेज</string>
   <string name="source_folder_sdcard">एसडी कार्ड</string>
+  <string name="apk_info_vt_network_error">नेटवर्क कनेक्शन विफल रहा — कनेक्शन जांचें और पुनः प्रयास करें</string>
+  <string name="install_error_incompatible_sdk_title">असंगत Android संस्करण</string>
+  <string name="install_error_incompatible_sdk_guidance">इस ऐप के लिए आपके डिवाइस पर चल रहे Android संस्करण से नए संस्करण की आवश्यकता है।</string>
+  <string name="install_error_incompatible_sdk_detailed_guidance">इस ऐप के लिए Android %1$s (API %2$d) या नए की आवश्यकता है, लेकिन आपका डिवाइस Android %3$s (API %4$d) चला रहा है।</string>
+  <string name="install_error_incompatible_abi_title">असंगत CPU आर्किटेक्चर</string>
+  <string name="install_error_incompatible_abi_guidance">यह APK आपके डिवाइस के CPU आर्किटेक्चर (उदा. 32-बिट बनाम 64-बिट) के अनुकूल नहीं है।</string>
+  <string name="install_error_incompatible_feature_title">डिवाइस सुविधा अनुपलब्ध है</string>
+  <string name="install_error_incompatible_feature_guidance">इस ऐप के लिए ऐसी हार्डवेयर या सिस्टम सुविधा आवश्यक है जो आपके डिवाइस पर समर्थित नहीं है।</string>
 </resources>

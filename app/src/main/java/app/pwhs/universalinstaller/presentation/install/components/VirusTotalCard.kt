@@ -82,7 +82,12 @@ fun VirusTotalCard(
         VtStatus.RATE_LIMITED -> vt.errorMessage.takeIf { it.isNotBlank() }
             ?.let { stringResource(R.string.apk_info_vt_rate_limited_retry, it) }
             ?: stringResource(R.string.apk_info_vt_rate_limited)
-        VtStatus.ERROR -> vt.errorMessage.takeIf { it.isNotBlank() } ?: stringResource(R.string.apk_info_vt_error)
+        VtStatus.ERROR -> when {
+            vt.errorMessage == app.pwhs.universalinstaller.data.remote.VirusTotalService.NETWORK_ERROR_TAG ->
+                stringResource(R.string.apk_info_vt_network_error)
+            vt.errorMessage.isNotBlank() && vt.errorMessage != "Unknown error" -> vt.errorMessage
+            else -> stringResource(R.string.apk_info_vt_error)
+        }
         VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt.errorMessage.orEmpty())
         VtStatus.SCANNING -> stringResource(R.string.apk_info_vt_scanning)
         VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_uploading, vt.uploadProgress)

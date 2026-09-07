@@ -47,7 +47,12 @@ object InstallVirusTotalHelper {
             }
         }.getOrElse { e ->
             Timber.e(e, "VirusTotal hash lookup error")
-            "" to VtResult(status = VtStatus.ERROR, errorMessage = e.message ?: "Unknown error")
+            val message = when {
+                VirusTotalService.isNetworkError(e) -> VirusTotalService.NETWORK_ERROR_TAG
+                !e.message.isNullOrBlank() -> e.message.orEmpty()
+                else -> ""
+            }
+            "" to VtResult(status = VtStatus.ERROR, errorMessage = message)
         }
     }
 

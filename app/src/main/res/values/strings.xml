@@ -295,6 +295,7 @@
     <string name="install_targeted_no_backend">To install into a specific profile, enable Shizuku or Root in Settings</string>
     <string name="apk_info_permissions_empty">This app requests no permissions</string>
     <string name="apk_info_vt_error">Scan failed — tap to retry</string>
+    <string name="apk_info_vt_network_error">Network connection failed — check connection and retry</string>
     <string name="setting_biometric_install_enabled">Install will now require biometric auth</string>
     <string name="setting_biometric_install_disabled">Install no longer requires biometric auth</string>
     <string name="setting_biometric_uninstall_enabled">Uninstall will now require biometric auth</string>
@@ -595,6 +596,13 @@
     <string name="install_error_conflict_signature_guidance">The installed app is signed with a different key, so Android will not treat this file as an update. Uninstall the existing app first — its data will be lost. No installer option can bypass this.</string>
     <string name="install_error_incompatible_title">Incompatible package</string>
     <string name="install_error_incompatible_guidance">This APK is not compatible with your device. It may require a different CPU architecture, Android version, or missing hardware feature.</string>
+    <string name="install_error_incompatible_sdk_title">Incompatible Android version</string>
+    <string name="install_error_incompatible_sdk_guidance">This app requires a newer version of Android than the one running on your device.</string>
+    <string name="install_error_incompatible_sdk_detailed_guidance">This app requires Android %1$s (API %2$d) or newer, but your device is running Android %3$s (API %4$d).</string>
+    <string name="install_error_incompatible_abi_title">Incompatible CPU architecture</string>
+    <string name="install_error_incompatible_abi_guidance">This APK is not compatible with your device\'s CPU architecture (e.g. 32-bit vs 64-bit).</string>
+    <string name="install_error_incompatible_feature_title">Missing device feature</string>
+    <string name="install_error_incompatible_feature_guidance">This app requires a hardware or system feature that is not supported by your device.</string>
     <string name="install_error_invalid_title">Invalid package</string>
     <string name="install_error_invalid_guidance">The APK file is corrupted or not a valid Android package. Try downloading it again from a trusted source.</string>
     <string name="install_error_storage_title">Not enough storage</string>

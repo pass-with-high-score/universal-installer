@@ -1,11 +1,17 @@
 package app.pwhs.universalinstaller.presentation.install
 
 import android.content.Context
+import android.os.Build
 import app.pwhs.core.util.DeviceCompat
 import app.pwhs.universalinstaller.R
 import ru.solrudev.ackpine.installer.InstallFailure
 
 object InstallErrorHelper {
+
+    private val REQUIRED_SDK_REGEX = Regex(
+        """(?:newer sdk version|sdk version)\s*#?(\d+)""",
+        RegexOption.IGNORE_CASE
+    )
 
     data class ErrorInfo(
         val title: String,
@@ -47,6 +53,68 @@ object InstallErrorHelper {
         }
     }
 
+    fun sdkToAndroidVersion(sdk: Int): String = when (sdk) {
+        21 -> "5.0"
+        22 -> "5.1"
+        23 -> "6.0"
+        24 -> "7.0"
+        25 -> "7.1"
+        26 -> "8.0"
+        27 -> "8.1"
+        28 -> "9"
+        29 -> "10"
+        30 -> "11"
+        31 -> "12"
+        32 -> "12L"
+        33 -> "13"
+        34 -> "14"
+        35 -> "15"
+        36 -> "16"
+        37 -> "17"
+        else -> sdk.toString()
+    }
+
+    private fun incompatibleErrorInfo(context: Context, message: String?): ErrorInfo {
+        val raw = message.orEmpty().uppercase()
+        return when {
+            "OLDER_SDK" in raw || "NEWER SDK" in raw -> {
+                val match = REQUIRED_SDK_REGEX.find(message.orEmpty())
+                val reqSdk = match?.groupValues?.getOrNull(1)?.toIntOrNull()
+                val guidance = if (reqSdk != null) {
+                    val reqVer = sdkToAndroidVersion(reqSdk)
+                    val currentSdk = Build.VERSION.SDK_INT
+                    val currentVer = Build.VERSION.RELEASE.takeIf { !it.isNullOrBlank() }
+                        ?: sdkToAndroidVersion(currentSdk)
+                    context.getString(
+                        R.string.install_error_incompatible_sdk_detailed_guidance,
+                        reqVer,
+                        reqSdk,
+                        currentVer,
+                        currentSdk
+                    )
+                } else {
+                    context.getString(R.string.install_error_incompatible_sdk_guidance)
+                }
+                ErrorInfo(
+                    title = context.getString(R.string.install_error_incompatible_sdk_title),
+                    guidance = guidance,
+                )
+            }
+            "CPU_ABI" in raw || "NO_MATCHING_ABIS" in raw || "NATIVE_LIBRARIES" in raw -> ErrorInfo(
+                title = context.getString(R.string.install_error_incompatible_abi_title),
+                guidance = context.getString(R.string.install_error_incompatible_abi_guidance),
+            )
+            "MISSING_FEATURE" in raw || "FEATURE" in raw -> ErrorInfo(
+                title = context.getString(R.string.install_error_incompatible_feature_title),
+                guidance = context.getString(R.string.install_error_incompatible_feature_guidance),
+            )
+            else -> ErrorInfo(
+                title = context.getString(R.string.install_error_incompatible_title),
+                guidance = context.getString(R.string.install_error_incompatible_guidance),
+            )
+        }
+    }
+
     /**
      * Failure kinds MIUI/HyperOS "optimization" is known to produce when it silently vetoes a
      * third-party install. Which one surfaces depends on the ROM version, so we cover the whole
@@ -85,10 +153,7 @@ object InstallErrorHelper {
             title = context.getString(R.string.install_error_conflict_title),
             guidance = context.getString(conflictGuidance(failure.message)),
         )
-        is InstallFailure.Incompatible -> ErrorInfo(
-            title = context.getString(R.string.install_error_incompatible_title),
-            guidance = context.getString(R.string.install_error_incompatible_guidance),
-        )
+        is InstallFailure.Incompatible -> incompatibleErrorInfo(context, failure.message)
         is InstallFailure.Invalid -> ErrorInfo(
             title = context.getString(R.string.install_error_invalid_title),
             guidance = context.getString(R.string.install_error_invalid_guidance),

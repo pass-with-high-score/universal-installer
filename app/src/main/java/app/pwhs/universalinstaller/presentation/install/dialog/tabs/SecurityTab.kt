@@ -61,7 +61,12 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
                 ?.let { stringResource(R.string.apk_info_vt_rate_limited_retry, it) }
                 ?: stringResource(R.string.apk_info_vt_rate_limited)
             VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vtErrorMsg.orEmpty())
-            VtStatus.ERROR -> vtErrorMsg ?: stringResource(R.string.apk_info_vt_error)
+            VtStatus.ERROR -> when {
+                vtResult.errorMessage == app.pwhs.universalinstaller.data.remote.VirusTotalService.NETWORK_ERROR_TAG ->
+                    stringResource(R.string.apk_info_vt_network_error)
+                !vtErrorMsg.isNullOrBlank() && vtErrorMsg != "Unknown error" -> vtErrorMsg
+                else -> stringResource(R.string.apk_info_vt_error)
+            }
             else -> stringResource(R.string.dialog_menu_virustotal_desc)
         }
         val vtColor = when (vtResult?.status) {

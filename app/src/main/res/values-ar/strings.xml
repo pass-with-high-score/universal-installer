@@ -987,4 +987,12 @@
     <string name="find_auto_found_so_far">تم العثور على %d حزمة</string>
     <string name="source_folder_root">وحدة التخزين الجذرية</string>
     <string name="source_folder_sdcard">بطاقة SD</string>
+    <string name="apk_info_vt_network_error">فشل الاتصال بالشبكة — تحقق من الاتصال وأعد المحاولة</string>
+    <string name="install_error_incompatible_sdk_title">إصدار Android غير متوافق</string>
+    <string name="install_error_incompatible_sdk_guidance">يتطلب هذا التطبيق إصدارًا أحدث من Android مقارنة بالإصدار المشغل على جهازك.</string>
+    <string name="install_error_incompatible_sdk_detailed_guidance">يتطلب هذا التطبيق نظام Android %1$s (API %2$d) أو أحدث، لكن جهازك يعمل بنظام Android %3$s (API %4$d).</string>
+    <string name="install_error_incompatible_abi_title">معمارية المعالج غير متوافقة</string>
+    <string name="install_error_incompatible_abi_guidance">ملف APK هذا غير متوافق مع معمارية المعالج بجهازك (مثل 32 بت مقابل 64 بت).</string>
+    <string name="install_error_incompatible_feature_title">ميزة الجهاز مفقودة</string>
+    <string name="install_error_incompatible_feature_guidance">يتطلب هذا التطبيق ميزة جهاز أو ميزة نظام لا يدعمها جهازك.</string>
 </resources>

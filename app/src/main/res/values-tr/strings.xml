@@ -987,4 +987,12 @@
     <string name="find_auto_found_so_far">%d paket bulundu</string>
     <string name="source_folder_root">Kök depolama</string>
     <string name="source_folder_sdcard">SD Kart</string>
+    <string name="apk_info_vt_network_error">Ağ bağlantısı başarısız — bağlantıyı kontrol edip tekrar deneyin</string>
+    <string name="install_error_incompatible_sdk_title">Uyumsuz Android sürümü</string>
+    <string name="install_error_incompatible_sdk_guidance">Bu uygulama, cihazınızda çalışan sürümden daha yeni bir Android sürümü gerektirir.</string>
+    <string name="install_error_incompatible_sdk_detailed_guidance">Bu uygulama Android %1$s (API %2$d) veya daha yenisini gerektirir, ancak cihazınız Android %3$s (API %4$d) çalıştırıyor.</string>
+    <string name="install_error_incompatible_abi_title">Uyumsuz CPU mimarisi</string>
+    <string name="install_error_incompatible_abi_guidance">Bu APK cihazınızın CPU mimarisiyle uyumlu değil (ör. 32-bit ve 64-bit).</string>
+    <string name="install_error_incompatible_feature_title">Eksik cihaz özelliği</string>
+    <string name="install_error_incompatible_feature_guidance">Bu uygulama, cihazınız tarafından desteklenmeyen bir donanım hoặc sistem özelliği gerektirir.</string>
 </resources>

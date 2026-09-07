@@ -987,4 +987,12 @@
     <string name="find_auto_found_so_far">%d paket ditemukan</string>
     <string name="source_folder_root">Penyimpanan root</string>
     <string name="source_folder_sdcard">Kartu SD</string>
+    <string name="apk_info_vt_network_error">Koneksi jaringan gagal — periksa koneksi dan coba lagi</string>
+    <string name="install_error_incompatible_sdk_title">Versi Android tidak kompatibel</string>
+    <string name="install_error_incompatible_sdk_guidance">Aplikasi ini memerlukan versi Android yang lebih baru daripada yang berjalan di perangkat Anda.</string>
+    <string name="install_error_incompatible_sdk_detailed_guidance">Aplikasi ini memerlukan Android %1$s (API %2$d) atau yang lebih baru, tetapi perangkat Anda menjalankan Android %3$s (API %4$d).</string>
+    <string name="install_error_incompatible_abi_title">Arsitektur CPU tidak kompatibel</string>
+    <string name="install_error_incompatible_abi_guidance">APK ini tidak kompatibel dengan arsitektur CPU perangkat Anda (misalnya 32-bit vs 64-bit).</string>
+    <string name="install_error_incompatible_feature_title">Fitur perangkat tidak ditemukan</string>
+    <string name="install_error_incompatible_feature_guidance">Aplikasi ini memerlukan fitur perangkat keras atau sistem yang tidak didukung oleh perangkat Anda.</string>
 </resources>

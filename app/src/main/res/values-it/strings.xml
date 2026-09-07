@@ -987,4 +987,12 @@
     <string name="find_auto_found_so_far">%d pacchetti trovati</string>
     <string name="source_folder_root">Memoria root</string>
     <string name="source_folder_sdcard">Scheda SD</string>
+    <string name="apk_info_vt_network_error">Connessione di rete non riuscita — controlla la connessione e riprova</string>
+    <string name="install_error_incompatible_sdk_title">Versione di Android incompatibile</string>
+    <string name="install_error_incompatible_sdk_guidance">Questa app richiede una versione di Android più recente di quella in uso sul dispositivo.</string>
+    <string name="install_error_incompatible_sdk_detailed_guidance">Questa app richiede Android %1$s (API %2$d) o successivo, ma il dispositivo esegue Android %3$s (API %4$d).</string>
+    <string name="install_error_incompatible_abi_title">Architettura CPU incompatibile</string>
+    <string name="install_error_incompatible_abi_guidance">Questo APK non è compatibile con l\'architettura della CPU del dispositivo (es. 32 bit vs 64 bit).</string>
+    <string name="install_error_incompatible_feature_title">Funzionalità del dispositivo mancante</string>
+    <string name="install_error_incompatible_feature_guidance">Questa app richiede una funzionalità hardware o di sistema non supportata dal tuo dispositivo.</string>
 </resources>

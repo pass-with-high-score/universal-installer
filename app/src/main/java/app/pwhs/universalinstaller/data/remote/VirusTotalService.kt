@@ -66,7 +66,12 @@ class VirusTotalService(
             }
         }.getOrElse { e ->
             Timber.e(e, "VirusTotal hash lookup failed")
-            VtResult(status = VtStatus.ERROR, errorMessage = e.message ?: "Unknown error")
+            val message = when {
+                isNetworkError(e) -> NETWORK_ERROR_TAG
+                !e.message.isNullOrBlank() -> e.message.orEmpty()
+                else -> ""
+            }
+            VtResult(status = VtStatus.ERROR, errorMessage = message)
         }
     }
 
@@ -363,6 +368,17 @@ class VirusTotalService(
     }
 
     companion object {
+        const val NETWORK_ERROR_TAG = "NETWORK_ERROR"
+
+        fun isNetworkError(t: Throwable): Boolean =
+            t is java.nio.channels.UnresolvedAddressException ||
+            t is java.net.UnknownHostException ||
+            t is java.net.ConnectException ||
+            t is java.net.SocketException ||
+            t is java.net.SocketTimeoutException ||
+            t is io.ktor.client.network.sockets.SocketTimeoutException ||
+            t is io.ktor.client.network.sockets.ConnectTimeoutException
+
         const val BASE_URL = "https://www.virustotal.com/api/v3"
         private const val HEADER_KEY = "x-apikey"
 

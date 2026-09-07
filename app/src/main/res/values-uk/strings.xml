@@ -987,4 +987,12 @@
     <string name="find_auto_found_so_far">Знайдено %d пакетів</string>
     <string name="source_folder_root">Кореневе сховище</string>
     <string name="source_folder_sdcard">SD-карта</string>
+    <string name="apk_info_vt_network_error">Помилка підключення до мережі — перевірте з\'єднання та повторіть спробу</string>
+    <string name="install_error_incompatible_sdk_title">Несумісна версія Android</string>
+    <string name="install_error_incompatible_sdk_guidance">Ця програма потребує новішої версії Android, ніж установлена на вашому пристрої.</string>
+    <string name="install_error_incompatible_sdk_detailed_guidance">Ця програма потребує Android %1$s (API %2$d) або новішої версії, але на вашому пристрої встановлено Android %3$s (API %4$d).</string>
+    <string name="install_error_incompatible_abi_title">Несумісна архітектура процесора</string>
+    <string name="install_error_incompatible_abi_guidance">Цей APK не сумісний з архітектурою процесора вашого пристрою (наприклад, 32-біт проти 64-біт).</string>
+    <string name="install_error_incompatible_feature_title">Відсутня функція пристрою</string>
+    <string name="install_error_incompatible_feature_guidance">Ця програма потребує апаратної або системної функції, яка не підтримується вашим пристроєм.</string>
 </resources>
