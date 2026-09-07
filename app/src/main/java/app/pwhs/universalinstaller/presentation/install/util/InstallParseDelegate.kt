@@ -175,8 +175,12 @@ class InstallParseDelegate(
                 current = current,
                 virusTotalService = virusTotalService,
                 virusTotalNotifier = virusTotalNotifier,
-                onUpdateApkInfo = { _pendingApkInfo.value = it },
-                onProgress = { _pendingApkInfo.value = _pendingApkInfo.value?.copy(vtResult = it) },
+                onUpdateSha256 = { sha256 ->
+                    _pendingApkInfo.value = _pendingApkInfo.value?.copy(sha256 = sha256)
+                },
+                onProgress = { vtResult ->
+                    _pendingApkInfo.value = _pendingApkInfo.value?.copy(vtResult = vtResult)
+                },
             )
         }
     }

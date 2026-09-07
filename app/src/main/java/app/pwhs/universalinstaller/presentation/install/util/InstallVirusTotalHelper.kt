@@ -58,7 +58,7 @@ object InstallVirusTotalHelper {
         current: ApkInfo,
         virusTotalService: VirusTotalService,
         virusTotalNotifier: VirusTotalNotifier,
-        onUpdateApkInfo: (ApkInfo) -> Unit,
+        onUpdateSha256: (String) -> Unit,
         onProgress: (VtResult) -> Unit,
     ) {
         val apiKey = readVirusTotalApiKey(context)
@@ -74,8 +74,24 @@ object InstallVirusTotalHelper {
             return
         }
 
-        var scanNotifId = virusTotalNotifier.notifyHashing(fileName)
-        onProgress(VtResult(status = VtStatus.SCANNING))
+        if (apiKey.isBlank()) {
+            onProgress(VtResult(status = VtStatus.NO_API_KEY))
+            return
+        }
+
+        val isDirectUpload = current.vtResult?.status == VtStatus.NOT_FOUND && current.sha256.isNotBlank()
+
+        val scanNotifId = if (isDirectUpload) {
+            virusTotalNotifier.notifyUploadingStart(fileName)
+        } else {
+            virusTotalNotifier.notifyHashing(fileName)
+        }
+
+        if (isDirectUpload) {
+            onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
+        } else {
+            onProgress(VtResult(status = VtStatus.SCANNING))
+        }
 
         val sha256 = current.sha256.ifBlank {
             runCatching {
@@ -92,18 +108,16 @@ object InstallVirusTotalHelper {
             return
         }
 
-        onUpdateApkInfo(current.copy(sha256 = sha256))
+        onUpdateSha256(sha256)
 
-        if (apiKey.isBlank()) {
-            onProgress(VtResult(status = VtStatus.NO_API_KEY))
-            virusTotalNotifier.cancel(scanNotifId)
-            return
-        }
-
-        val hashResult = virusTotalService.checkFile(apiKey, sha256)
-        if (hashResult.status != VtStatus.NOT_FOUND) {
-            finishScan(context, virusTotalNotifier, scanNotifId, fileName, hashResult, sha256, onProgress)
-            return
+        if (!isDirectUpload) {
+            val hashResult = virusTotalService.checkFile(apiKey, sha256)
+            if (hashResult.status != VtStatus.NOT_FOUND) {
+                finishScan(context, virusTotalNotifier, scanNotifId, fileName, hashResult, sha256, onProgress)
+                return
+            }
+            onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
+            virusTotalNotifier.notifyUploading(scanNotifId, fileName, 0)
         }
 
         val tempFile = runCatching {

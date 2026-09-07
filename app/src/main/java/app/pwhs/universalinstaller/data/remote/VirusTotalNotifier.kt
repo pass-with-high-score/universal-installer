@@ -36,6 +36,20 @@ class VirusTotalNotifier(private val context: Context) {
         return id
     }
 
+    fun notifyUploadingStart(fileName: String): Int {
+        if (!canPost()) return -1
+        val id = nextId()
+        val n = baseBuilder()
+            .setContentTitle(context.getString(R.string.vt_notif_uploading, 0))
+            .setContentText(fileName)
+            .setProgress(100, 0, false)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .build()
+        post(id, n)
+        return id
+    }
+
     fun notifyUploading(id: Int, fileName: String, percent: Int) {
         if (!canPost() || id < 0) return
         val n = baseBuilder()
