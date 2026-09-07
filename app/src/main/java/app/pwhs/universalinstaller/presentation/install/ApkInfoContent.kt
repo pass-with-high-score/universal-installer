@@ -20,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Android
-import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Storage
@@ -60,8 +59,9 @@ import app.pwhs.universalinstaller.presentation.install.components.AbisCard
 import app.pwhs.universalinstaller.presentation.install.components.ApkInfoFooter
 import app.pwhs.universalinstaller.presentation.install.components.DetailsCard
 import app.pwhs.universalinstaller.presentation.install.components.InfoChip
-import app.pwhs.universalinstaller.presentation.install.dialog.TrackersDetailDialog
+import app.pwhs.universalinstaller.presentation.install.components.InstallBlockedBanner
 import app.pwhs.universalinstaller.presentation.install.components.InstallTargetCard
+import app.pwhs.universalinstaller.presentation.install.dialog.TrackersDetailDialog
 import app.pwhs.universalinstaller.presentation.install.components.ObbAttachCard
 import app.pwhs.universalinstaller.presentation.install.components.PermissionsCard
 import app.pwhs.universalinstaller.presentation.install.components.ProfilePickerCard
@@ -104,6 +104,7 @@ internal fun ApkInfoContent(
     onKeepApkChanged: (Boolean) -> Unit = {},
 ) {
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     val currentMappingProfileId = appProfileMapping[apkInfo.packageName]
     var isExpanded by rememberSaveable { mutableStateOf(!startCompact) }
     var showTrackersDialog by rememberSaveable { mutableStateOf(false) }
@@ -278,7 +279,20 @@ internal fun ApkInfoContent(
                     )
                 }
                 apkInfo.vtResult?.let { vt ->
-                    VtStatusChip(vt = vt)
+                    VtStatusChip(
+                        vt = vt,
+                        onClick = onCheckVirusTotal,
+                        onOpenWeb = {
+                            if (apkInfo.sha256.isNotBlank()) {
+                                uriHandler.openUri("https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
+                            }
+                        },
+                        onOpenSettings = {
+                            context.startActivity(
+                                Intent(context, SettingActivity::class.java),
+                            )
+                        },
+                    )
                 }
                 if (apkInfo.isScanningTrackers) {
                     InfoChip(
@@ -389,7 +403,6 @@ internal fun ApkInfoContent(
                     AbisCard(abis = apkInfo.supportedAbis)
                 }
                 Spacer(Modifier.height(16.dp))
-                val uriHandler = LocalUriHandler.current
                 VirusTotalCard(
                     vt = apkInfo.vtResult,
                     fileSizeBytes = apkInfo.fileSizeBytes,
@@ -421,35 +434,10 @@ internal fun ApkInfoContent(
         }
 
         if (apkInfo.isBlocked) {
-            Surface(
-                color = MaterialTheme.colorScheme.errorContainer,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Block,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(Modifier.width(10.dp))
-                    Text(
-                        text = stringResource(R.string.install_blocked_banner),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onErrorContainer,
-                        modifier = Modifier.weight(1f),
-                    )
-                    TextButton(onClick = { onUnblock(apkInfo.packageName) }) {
-                        Text(
-                            text = stringResource(R.string.install_blocked_unblock),
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                        )
-                    }
-                }
-            }
+            InstallBlockedBanner(
+                packageName = apkInfo.packageName,
+                onUnblock = onUnblock,
+            )
         }
 
         if (showKeepApkOption) {

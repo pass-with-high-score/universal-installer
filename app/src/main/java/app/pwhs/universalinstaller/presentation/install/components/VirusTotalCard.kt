@@ -338,21 +338,31 @@ fun VtEngineList(engines: List<VtEngineResult>, warningColor: Color) {
 }
 
 @Composable
-fun VtStatusChip(vt: VtResult) {
+fun VtStatusChip(
+    vt: VtResult,
+    onClick: (() -> Unit)? = null,
+    onOpenWeb: (() -> Unit)? = null,
+    onOpenSettings: (() -> Unit)? = null,
+) {
     val extendedColors = LocalExtendedColors.current
     when (vt.status) {
-        VtStatus.CLEAN -> InfoChip(
-            label = stringResource(R.string.apk_info_vt_chip_clean),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.GppGood,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = extendedColors.success,
-                )
-            },
-            contentColor = extendedColors.success,
-        )
+        VtStatus.CLEAN -> {
+            val totalEngines = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
+            val tallySuffix = if (totalEngines > 0) " (0/$totalEngines)" else ""
+            InfoChip(
+                label = stringResource(R.string.apk_info_vt_chip_clean) + tallySuffix,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.GppGood,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = extendedColors.success,
+                    )
+                },
+                contentColor = extendedColors.success,
+                onClick = onOpenWeb,
+            )
+        }
         VtStatus.MALICIOUS, VtStatus.SUSPICIOUS -> {
             val alarming = vt.status == VtStatus.MALICIOUS
             InfoChip(
@@ -367,20 +377,56 @@ fun VtStatusChip(vt: VtResult) {
                 },
                 containerColor = if (alarming) MaterialTheme.colorScheme.errorContainer else extendedColors.warningContainer,
                 contentColor = if (alarming) MaterialTheme.colorScheme.onErrorContainer else extendedColors.warning,
+                onClick = onOpenWeb,
             )
         }
-        VtStatus.SCANNING, VtStatus.UPLOADING, VtStatus.QUEUED, VtStatus.ANALYZING -> InfoChip(
-            label = stringResource(R.string.apk_info_vt_chip_scanning),
+        VtStatus.SCANNING, VtStatus.UPLOADING, VtStatus.QUEUED, VtStatus.ANALYZING -> {
+            val progressText = when (vt.status) {
+                VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_uploading, vt.uploadProgress)
+                VtStatus.QUEUED -> stringResource(R.string.apk_info_vt_queued)
+                VtStatus.ANALYZING -> stringResource(R.string.apk_info_vt_analyzing)
+                else -> stringResource(R.string.apk_info_vt_chip_scanning)
+            }
+            InfoChip(
+                label = progressText,
+                leadingIcon = {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(12.dp),
+                        strokeWidth = 1.5.dp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                },
+            )
+        }
+        VtStatus.NOT_FOUND -> InfoChip(
+            label = stringResource(R.string.apk_info_vt_upload_action),
             leadingIcon = {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(12.dp),
-                    strokeWidth = 1.5.dp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                Icon(
+                    imageVector = Icons.Rounded.CloudUpload,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             },
+            contentColor = MaterialTheme.colorScheme.primary,
+            onClick = onClick,
         )
-        else -> InfoChip(
-            label = stringResource(R.string.apk_info_vt_chip_no_result),
+        VtStatus.ERROR -> InfoChip(
+            label = stringResource(R.string.dialog_failed_retry),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Refresh,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.error,
+                )
+            },
+            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+            contentColor = MaterialTheme.colorScheme.error,
+            onClick = onClick,
+        )
+        VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY -> InfoChip(
+            label = stringResource(R.string.apk_info_vt_add_key),
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Rounded.Security,
@@ -390,6 +436,20 @@ fun VtStatusChip(vt: VtResult) {
                 )
             },
             contentColor = extendedColors.warning,
+            onClick = onOpenSettings,
+        )
+        else -> InfoChip(
+            label = stringResource(R.string.scan_virustotal_btn),
+            leadingIcon = {
+                Icon(
+                    imageVector = Icons.Rounded.Security,
+                    contentDescription = null,
+                    modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+            },
+            contentColor = MaterialTheme.colorScheme.primary,
+            onClick = onClick,
         )
     }
 }
