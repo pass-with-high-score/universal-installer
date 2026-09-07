@@ -167,6 +167,7 @@
     <string name="find_auto_delete_confirm">Usuń</string>
     <string name="find_auto_search_hint">Szukaj pakietów…</string>
     <string name="find_auto_no_match">Żadne pakiety nie pasują do %s</string>
+    <string name="found_filter_all">Wszystkie</string>
     <string name="found_chip_split">Podzielony</string>
     <string name="found_chip_new">Nowy</string>
     <string name="found_chip_update">Aktualizacja</string>

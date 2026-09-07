@@ -346,6 +346,7 @@
     <string name="backup_delete_one_title">حذف هذه النسخة الاحتياطية؟</string>
     <string name="backup_delete_all_title">حذف جميع النسخ الاحتياطية؟</string>
     <string name="backup_delete_all_msg">إزالة %1$d ملفات نهائيًا من القرص.</string>
+    <string name="found_filter_all">الكل</string>
     <string name="found_chip_split">تقسيم</string>
     <string name="found_chip_new">جديد</string>
     <string name="found_chip_update">تحديث</string>

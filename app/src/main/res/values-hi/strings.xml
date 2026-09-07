@@ -346,7 +346,8 @@
   <string name="backup_delete_one_title">क्या यह बैकअप हटाना है?</string>
   <string name="backup_delete_all_title">क्या सभी बैकअप हटाने हैं?</string>
   <string name="backup_delete_all_msg">डिस्क से %1$d फ़ाइलों को स्थायी रूप से हटा दें।</string>
-  <string name="found_chip_split">स्प्लिट</string>
+  <string name="found_filter_all">सभी</string>
+    <string name="found_chip_split">स्प्लिट</string>
   <string name="found_chip_new">नया</string>
   <string name="found_chip_update">अपडेट</string>
   <string name="found_chip_installed">इंस्टॉल किया गया</string>

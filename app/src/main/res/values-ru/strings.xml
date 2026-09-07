@@ -346,6 +346,7 @@
     <string name="backup_delete_one_title">Удалить эту резервную копию?</string>
     <string name="backup_delete_all_title">Удалить все резервные копии?</string>
     <string name="backup_delete_all_msg">Навсегда удалить %1$d файлов с диска.</string>
+    <string name="found_filter_all">Все</string>
     <string name="found_chip_split">Сплит</string>
     <string name="found_chip_new">Новое</string>
     <string name="found_chip_update">Обновление</string>

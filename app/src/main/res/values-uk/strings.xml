@@ -151,6 +151,7 @@
     <string name="find_auto_delete_confirm">Видалити</string>
     <string name="find_auto_search_hint">Пошук пакетів…</string>
     <string name="find_auto_no_match">Немає пакетів, що відповідають \&quot;%s\&quot;</string>
+    <string name="found_filter_all">Всі</string>
     <string name="found_chip_split">Розділений</string>
     <string name="found_chip_new">Нове</string>
     <string name="found_chip_update">Оновлення</string>

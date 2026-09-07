@@ -346,6 +346,7 @@
     <string name="backup_delete_one_title">Hapus cadangan ini?</string>
     <string name="backup_delete_all_title">Hapus semua cadangan?</string>
     <string name="backup_delete_all_msg">Hapus %1$d file secara permanen dari disk.</string>
+    <string name="found_filter_all">Semua</string>
     <string name="found_chip_split">Split</string>
     <string name="found_chip_new">Baru</string>
     <string name="found_chip_update">Perbarui</string>

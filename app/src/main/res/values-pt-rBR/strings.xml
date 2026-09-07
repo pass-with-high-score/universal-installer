@@ -162,6 +162,7 @@
     <string name="find_auto_delete_confirm">Excluir</string>
     <string name="find_auto_search_hint">Pesquisar pacotes…</string>
     <string name="find_auto_no_match">Nenhum pacote corresponde a \&quot;%s\&quot;</string>
+    <string name="found_filter_all">Todos</string>
     <string name="found_chip_split">Dividido</string>
     <string name="found_chip_new">Novo</string>
     <string name="found_chip_update">Atualizar</string>

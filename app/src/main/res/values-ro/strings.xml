@@ -154,6 +154,7 @@
     <string name="find_auto_delete_confirm">Șterge</string>
     <string name="find_auto_search_hint">Caută pachete…</string>
     <string name="find_auto_no_match">Niciun pachet nu corespunde cu &quot;%s&quot;</string>
+    <string name="found_filter_all">Toate</string>
     <string name="found_chip_split">Split</string>
     <string name="found_chip_new">Nou</string>
     <string name="found_chip_update">Actualizare</string>

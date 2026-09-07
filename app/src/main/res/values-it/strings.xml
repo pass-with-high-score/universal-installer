@@ -151,6 +151,7 @@
     <string name="find_auto_delete_confirm">Elimina</string>
     <string name="find_auto_search_hint">Cerca pacchetti…</string>
     <string name="find_auto_no_match">Nessun pacchetto corrisponde a \&quot;%s\&quot;</string>
+    <string name="found_filter_all">Tutti</string>
     <string name="found_chip_split">Diviso</string>
     <string name="found_chip_new">Nuovo</string>
     <string name="found_chip_update">Aggiorna</string>

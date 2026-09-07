@@ -346,6 +346,7 @@
     <string name="backup_delete_one_title">Dieses Backup löschen?</string>
     <string name="backup_delete_all_title">Alle Backups löschen?</string>
     <string name="backup_delete_all_msg">%1$d Dateien dauerhaft vom Datenträger entfernen.</string>
+    <string name="found_filter_all">Alle</string>
     <string name="found_chip_split">Split</string>
     <string name="found_chip_new">Neu</string>
     <string name="found_chip_update">Update</string>

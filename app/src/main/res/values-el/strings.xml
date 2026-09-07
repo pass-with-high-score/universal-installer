@@ -150,6 +150,7 @@
     <string name="find_auto_delete_confirm">Διαγραφή</string>
     <string name="find_auto_search_hint">Αναζήτηση πακέτων…</string>
     <string name="find_auto_no_match">Κανένα πακέτο δεν ταιριάζει με &quot;%s&quot;</string>
+    <string name="found_filter_all">Όλα</string>
     <string name="found_chip_split">Διαχωρισμένο</string>
     <string name="found_chip_new">Νέο</string>
     <string name="found_chip_update">Ενημέρωση</string>

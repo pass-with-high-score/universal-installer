@@ -394,6 +394,7 @@
     <string name="backup_delete_one_title">删除此备份？</string>
     <string name="backup_delete_all_title">删除所有备份？</string>
     <string name="backup_delete_all_msg">从磁盘永久删除 %1$d 个文件。</string>
+    <string name="found_filter_all">全部</string>
     <string name="found_chip_split">拆分包</string>
     <string name="found_chip_new">新应用</string>
     <string name="found_chip_update">更新</string>

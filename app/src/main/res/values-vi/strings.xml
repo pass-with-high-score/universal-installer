@@ -438,7 +438,8 @@
   <string name="backup_delete_one_title">Xóa bản sao lưu này?</string>
   <string name="backup_delete_all_title">Xóa tất cả bản sao lưu?</string>
   <string name="backup_delete_all_msg">Xóa vĩnh viễn %1$d tệp khỏi bộ nhớ.</string>
-  <string name="found_chip_split">Chia nhỏ</string>
+  <string name="found_filter_all">Tất cả</string>
+    <string name="found_chip_split">Chia nhỏ</string>
   <string name="found_chip_new">Mới</string>
   <string name="found_chip_update">Cập nhật</string>
   <string name="found_chip_installed">Đã cài</string>

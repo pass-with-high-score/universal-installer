@@ -346,6 +346,7 @@
     <string name="backup_delete_one_title">이 백업을 삭제하시겠습니까?</string>
     <string name="backup_delete_all_title">모든 백업을 삭제하시겠습니까?</string>
     <string name="backup_delete_all_msg">디스크에서 %1$d개의 파일을 영구적으로 제거합니다.</string>
+    <string name="found_filter_all">전체</string>
     <string name="found_chip_split">분할</string>
     <string name="found_chip_new">신규</string>
     <string name="found_chip_update">업데이트</string>

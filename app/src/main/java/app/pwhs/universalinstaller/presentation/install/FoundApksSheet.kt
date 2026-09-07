@@ -74,10 +74,13 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.components.FoundApkFilter
+import app.pwhs.universalinstaller.presentation.install.components.FoundApksFilterRow
 import app.pwhs.universalinstaller.presentation.install.components.FoundRow
 import app.pwhs.universalinstaller.presentation.install.components.PermissionBody
 import app.pwhs.universalinstaller.presentation.install.components.ScanningBody
 import app.pwhs.universalinstaller.presentation.install.components.SheetHeader
+import app.pwhs.universalinstaller.presentation.install.components.filterFoundFiles
 import app.pwhs.core.ui.ApkFileIconData
 import app.pwhs.core.util.PermissionMonitor
 import coil3.compose.SubcomposeAsyncImage
@@ -177,6 +180,7 @@ private fun ResultsBody(
     var selected by remember(files) { mutableStateOf(setOf<String>()) }
     var showDeleteDialog by remember { mutableStateOf(false) }
     var searchQuery by rememberSaveable { mutableStateOf("") }
+    var activeFilter by rememberSaveable { mutableStateOf(FoundApkFilter.All) }
     val keyboardController = LocalSoftwareKeyboardController.current
 
     // Debounce the active filter so each keystroke doesn't re-filter a list that can
@@ -192,15 +196,9 @@ private fun ResultsBody(
         }
     }
 
-    // Filter files based on the debounced query (case-insensitive, matches name or path).
-    val filteredFiles = remember(files, debouncedQuery) {
-        if (debouncedQuery.isBlank()) files
-        else {
-            val q = debouncedQuery.trim().lowercase()
-            files.filter { f ->
-                f.name.lowercase().contains(q) || f.path.lowercase().contains(q)
-            }
-        }
+    // Filter files based on the debounced query and active filter chip.
+    val filteredFiles = remember(files, debouncedQuery, activeFilter) {
+        filterFoundFiles(files, debouncedQuery, activeFilter)
     }
 
     val selectedFiles = files.filter { it.path in selected }
@@ -270,6 +268,14 @@ private fun ResultsBody(
         )
         Spacer(Modifier.height(8.dp))
 
+        // ── Filter chips ────────────────────────────────────
+        FoundApksFilterRow(
+            allFiles = files,
+            activeFilter = activeFilter,
+            onFilterSelected = { activeFilter = it },
+        )
+        Spacer(Modifier.height(4.dp))
+
         // Select-all row: toggles only the currently visible (filtered) items.
         Row(
             modifier = Modifier
@@ -290,7 +296,7 @@ private fun ResultsBody(
             )
             Spacer(Modifier.width(4.dp))
             Text(
-                text = if (searchQuery.isBlank()) "${selected.size} / ${files.size}"
+                text = if (searchQuery.isBlank() && activeFilter == FoundApkFilter.All) "${selected.size} / ${files.size}"
                        else "${filteredSelected} / ${filteredFiles.size}",
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -298,10 +304,11 @@ private fun ResultsBody(
         }
         Spacer(Modifier.height(4.dp))
 
-        if (filteredFiles.isEmpty() && searchQuery.isNotBlank()) {
+        if (filteredFiles.isEmpty() && (searchQuery.isNotBlank() || activeFilter != FoundApkFilter.All)) {
             // No matches — show empty state.
             Text(
-                text = stringResource(R.string.find_auto_no_match, searchQuery),
+                text = if (searchQuery.isNotBlank()) stringResource(R.string.find_auto_no_match, searchQuery)
+                       else stringResource(R.string.find_auto_empty),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier

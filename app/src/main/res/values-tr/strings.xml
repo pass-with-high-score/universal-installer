@@ -346,6 +346,7 @@
     <string name="backup_delete_one_title">Bu yedek silinsin mi?</string>
     <string name="backup_delete_all_title">Tüm yedekler silinsin mi?</string>
     <string name="backup_delete_all_msg">%1$d dosya diskten kalıcı olarak silinecek.</string>
+    <string name="found_filter_all">Tümü</string>
     <string name="found_chip_split">Split</string>
     <string name="found_chip_new">Yeni</string>
     <string name="found_chip_update">Güncelle</string>

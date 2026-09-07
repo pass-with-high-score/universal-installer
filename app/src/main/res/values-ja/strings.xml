@@ -346,6 +346,7 @@
     <string name="backup_delete_one_title">このバックアップを削除しますか？</string>
     <string name="backup_delete_all_title">すべてのバックアップを削除しますか？</string>
     <string name="backup_delete_all_msg">%1$d 個のファイルをディスクから完全に削除します。</string>
+    <string name="found_filter_all">すべて</string>
     <string name="found_chip_split">分割</string>
     <string name="found_chip_new">新規</string>
     <string name="found_chip_update">更新</string>

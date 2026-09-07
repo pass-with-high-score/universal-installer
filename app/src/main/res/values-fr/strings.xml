@@ -346,7 +346,8 @@
   <string name="backup_delete_one_title">Supprimer cette sauvegarde ?</string>
   <string name="backup_delete_all_title">Supprimer toutes les sauvegardes ?</string>
   <string name="backup_delete_all_msg">Supprimer définitivement %1$d fichiers du disque.</string>
-  <string name="found_chip_split">Split</string>
+  <string name="found_filter_all">Tout</string>
+    <string name="found_chip_split">Split</string>
   <string name="found_chip_new">Nouveau</string>
   <string name="found_chip_update">Mettre à jour</string>
   <string name="found_chip_installed">Installé</string>
