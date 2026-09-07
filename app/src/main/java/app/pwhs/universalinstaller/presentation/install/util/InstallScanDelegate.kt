@@ -89,9 +89,18 @@ class InstallScanDelegate(
         deviceScanJob?.cancel()
         _scanState.value = ScanState.Scanning()
         deviceScanJob = scope.launch {
-            _scanState.value = InstallScanHelper.performDeviceScan(application) { status, count, progress ->
+            val readyState = InstallScanHelper.performDeviceScan(application) { status, count, progress ->
                 _scanState.value = ScanState.Scanning(status = status, foundCount = count, progress = progress)
             }
+            if (readyState is ScanState.Ready) {
+                _scanState.value = ScanState.Scanning(
+                    status = application.getString(R.string.find_auto_count, readyState.files.size),
+                    foundCount = readyState.files.size,
+                    progress = 1.0f,
+                )
+                kotlinx.coroutines.delay(300)
+            }
+            _scanState.value = readyState
         }
     }
 

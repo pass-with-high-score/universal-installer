@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.install.util
 import android.app.Application
 import android.net.Uri
 import app.pwhs.core.util.WatchAppCheck
+import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.install.ScanState
 import app.pwhs.universalinstaller.presentation.install.WatchSendState
 import app.pwhs.universalinstaller.presentation.install.wear.WearApkSender
@@ -51,9 +52,18 @@ class InstallWearDelegate(
         scanJob?.cancel()
         _apkScanState.value = ScanState.Scanning()
         scanJob = scope.launch {
-            _apkScanState.value = InstallScanHelper.performDeviceScan(application) { status, count, progress ->
+            val readyState = InstallScanHelper.performDeviceScan(application) { status, count, progress ->
                 _apkScanState.value = ScanState.Scanning(status = status, foundCount = count, progress = progress)
             }
+            if (readyState is ScanState.Ready) {
+                _apkScanState.value = ScanState.Scanning(
+                    status = application.getString(R.string.find_auto_count, readyState.files.size),
+                    foundCount = readyState.files.size,
+                    progress = 1.0f,
+                )
+                kotlinx.coroutines.delay(300)
+            }
+            _apkScanState.value = readyState
         }
     }
 

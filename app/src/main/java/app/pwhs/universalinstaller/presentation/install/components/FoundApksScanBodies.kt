@@ -21,7 +21,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -110,9 +116,36 @@ internal fun PermissionBody(onGrant: () -> Unit) {
 
 @Composable
 internal fun ScanningBody(state: ScanState.Scanning) {
-    val percent = state.progress?.let { (it * 100).toInt().coerceIn(0, 100) }
+    var displayPercent by remember { mutableIntStateOf(1) }
+
+    // Mock progress ticker: continuously increments so the UI actively runs
+    LaunchedEffect(Unit) {
+        while (isActive) {
+            val delayMs = when {
+                displayPercent < 20 -> 35L
+                displayPercent < 50 -> 45L
+                displayPercent < 75 -> 65L
+                displayPercent < 90 -> 95L
+                displayPercent < 98 -> 180L
+                else -> 400L
+            }
+            delay(delayMs)
+            if (displayPercent < 99) {
+                displayPercent++
+            }
+        }
+    }
+
+    // Catch up immediately when real progress is further ahead (e.g. 100% on complete)
+    val realPercent = state.progress?.let { (it * 100).toInt().coerceIn(0, 100) }
+    LaunchedEffect(realPercent) {
+        if (realPercent != null && realPercent > displayPercent) {
+            displayPercent = realPercent
+        }
+    }
+
     val animatedProgress by animateFloatAsState(
-        targetValue = percent?.let { it / 100f } ?: 0f,
+        targetValue = displayPercent / 100f,
         label = "scanProgressAnimation",
     )
 
@@ -126,23 +159,16 @@ internal fun ScanningBody(state: ScanState.Scanning) {
             contentAlignment = Alignment.Center,
             modifier = Modifier.size(72.dp),
         ) {
-            if (percent != null) {
-                CircularProgressIndicator(
-                    progress = { animatedProgress },
-                    modifier = Modifier.size(72.dp),
-                    strokeWidth = 6.dp,
-                )
-                Text(
-                    text = "$percent%",
-                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.primary,
-                )
-            } else {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(72.dp),
-                    strokeWidth = 6.dp,
-                )
-            }
+            CircularProgressIndicator(
+                progress = { animatedProgress },
+                modifier = Modifier.size(72.dp),
+                strokeWidth = 6.dp,
+            )
+            Text(
+                text = "$displayPercent%",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.primary,
+            )
         }
         Spacer(Modifier.height(20.dp))
         Text(
