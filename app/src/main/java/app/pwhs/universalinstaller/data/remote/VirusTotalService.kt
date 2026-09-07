@@ -6,11 +6,12 @@ import app.pwhs.universalinstaller.domain.model.VtStatus
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.plugins.timeout
-import io.ktor.client.request.forms.ChannelProvider
-import io.ktor.client.request.forms.formData
-import io.ktor.client.request.forms.submitFormWithBinaryData
+import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
+import io.ktor.http.content.PartData
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.Headers
@@ -133,23 +134,21 @@ class VirusTotalService(
                 onProgress(0) // reset progress indicator
             }
             try {
-                val response: HttpResponse = client.submitFormWithBinaryData(
-                    url = url,
-                    formData = formData {
-                        append(
-                            key = "file",
-                            value = ChannelProvider(size = file.length()) { file.readChannel() },
-                            headers = Headers.build {
-                                append(HttpHeaders.ContentType, "application/octet-stream")
-                                append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"${file.name}\"")
-                            },
-                        )
+                val filePart = PartData.FileItem(
+                    provider = { file.readChannel() },
+                    dispose = {},
+                    partHeaders = Headers.build {
+                        append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"${file.name}\"")
+                        append(HttpHeaders.ContentType, "application/octet-stream")
+                        append(HttpHeaders.ContentLength, file.length().toString())
                     },
-                ) {
+                )
+                val response: HttpResponse = client.post(url) {
                     headers {
                         append(HEADER_KEY, apiKey)
                         append(HttpHeaders.Accept, "application/json")
                     }
+                    setBody(MultiPartFormDataContent(listOf(filePart)))
                     timeout {
                         // 20 minutes covers the 650 MB ceiling on a sub-1 MB/s link.
                         requestTimeoutMillis = UPLOAD_REQUEST_TIMEOUT_MS
@@ -325,11 +324,14 @@ class VirusTotalService(
      * Throw a [VtHttpException] carrying the mapped status. Retrying an upload after a 401 or a
      * 429 only burns the remaining quota, so these must be distinguishable from an I/O failure.
      */
-    private fun throwTyped(response: HttpResponse, what: String): Nothing {
+    private suspend fun throwTyped(response: HttpResponse, what: String): Nothing {
         val mapped = httpFailure(response)
+        val responseBody = runCatching { response.bodyAsText() }.getOrDefault("")
+        Timber.e("VT $what failed: HTTP ${response.status.value} ${response.status.description} - Body: $responseBody")
+        val detail = responseBody.takeIf { it.isNotBlank() } ?: response.status.description
         throw VtHttpException(
             vtStatus = mapped.status,
-            message = "$what HTTP ${response.status.value}: ${response.status.description}",
+            message = "$what HTTP ${response.status.value}: $detail",
         )
     }
 
