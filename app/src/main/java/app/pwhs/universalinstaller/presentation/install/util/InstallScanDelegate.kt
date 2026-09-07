@@ -87,9 +87,11 @@ class InstallScanDelegate(
 
     fun startDeviceScan(context: Context) {
         deviceScanJob?.cancel()
-        _scanState.value = ScanState.Scanning
+        _scanState.value = ScanState.Scanning()
         deviceScanJob = scope.launch {
-            _scanState.value = InstallScanHelper.performDeviceScan(application)
+            _scanState.value = InstallScanHelper.performDeviceScan(application) { status, count ->
+                _scanState.value = ScanState.Scanning(status = status, foundCount = count)
+            }
         }
     }
 

@@ -74,7 +74,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.universalinstaller.R
-import app.pwhs.universalinstaller.presentation.install.components.StatusChip
+import app.pwhs.universalinstaller.presentation.install.components.FoundRow
+import app.pwhs.universalinstaller.presentation.install.components.PermissionBody
+import app.pwhs.universalinstaller.presentation.install.components.ScanningBody
+import app.pwhs.universalinstaller.presentation.install.components.SheetHeader
 import app.pwhs.core.ui.ApkFileIconData
 import app.pwhs.core.util.PermissionMonitor
 import coil3.compose.SubcomposeAsyncImage
@@ -134,7 +137,7 @@ internal fun FoundApksSheet(
                         onGrantPermission()
                     }
                 )
-                is ScanState.Scanning -> ScanningBody()
+                is ScanState.Scanning -> ScanningBody(scanState)
                 is ScanState.Ready -> ResultsBody(
                     files = scanState.files,
                     onPickOne = onPick,
@@ -147,99 +150,6 @@ internal fun FoundApksSheet(
     }
 }
 
-@Composable
-private fun SheetHeader(scanState: ScanState, onRescan: () -> Unit, onDismiss: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Column(modifier = Modifier.weight(1f)) {
-            Text(
-                text = stringResource(R.string.find_auto_sheet_title),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-            if (scanState is ScanState.Ready && scanState.files.isNotEmpty()) {
-                Text(
-                    text = stringResource(R.string.find_auto_count, scanState.files.size),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-        if (scanState is ScanState.Ready) {
-            IconButton(onClick = onRescan) {
-                Icon(
-                    imageVector = Icons.Rounded.Refresh,
-                    contentDescription = stringResource(R.string.find_auto_rescan),
-                )
-            }
-        }
-        IconButton(onClick = onDismiss) {
-            Icon(
-                imageVector = Icons.Rounded.Close,
-                contentDescription = stringResource(R.string.cancel),
-            )
-        }
-    }
-}
-
-@Composable
-private fun PermissionBody(onGrant: () -> Unit) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.FolderOff,
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(44.dp),
-        )
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = stringResource(R.string.find_auto_permission_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        Spacer(Modifier.height(6.dp))
-        Text(
-            text = stringResource(R.string.find_auto_permission_body),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-        )
-        Spacer(Modifier.height(16.dp))
-        OutlinedButton(
-            onClick = onGrant,
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Text(stringResource(R.string.find_auto_grant))
-        }
-    }
-}
-
-@Composable
-private fun ScanningBody() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 40.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        CircularProgressIndicator()
-        Spacer(Modifier.height(12.dp))
-        Text(
-            text = stringResource(R.string.find_auto_scanning),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
 
 @Composable
 private fun ResultsBody(
@@ -514,152 +424,6 @@ private fun ResultsBody(
                 }
             },
         )
-    }
-}
-
-@Composable
-private fun FoundRow(
-    file: FoundPackageFile,
-    selected: Boolean,
-    onToggle: () -> Unit,
-) {
-    val context = LocalContext.current
-    val bg = if (selected) MaterialTheme.colorScheme.surfaceContainerHigh
-             else MaterialTheme.colorScheme.surfaceContainerLow
-    Surface(
-        shape = RoundedCornerShape(14.dp),
-        color = bg,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .clickable(onClick = onToggle),
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Box(
-                modifier = Modifier.size(40.dp),
-                contentAlignment = Alignment.Center,
-            ) {
-                SubcomposeAsyncImage(
-                    model = coil3.request.ImageRequest.Builder(context)
-                        .data(ApkFileIconData(file.path))
-                        .build(),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    error = {
-                        Icon(
-                            imageVector = Icons.Rounded.Android,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                        )
-                    },
-                    success = { SubcomposeAsyncImageContent() }
-                )
-            }
-            Spacer(Modifier.size(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = file.name,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                val sizeStr = Formatter.formatShortFileSize(context, file.sizeBytes)
-                val dateStr = DateFormat.getDateInstance(DateFormat.MEDIUM).format(Date(file.modifiedMillis))
-                Text(
-                    text = "${file.extension.uppercase()} · $sizeStr · $dateStr",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                FoundFileChips(file)
-            }
-            Spacer(Modifier.size(10.dp))
-            Icon(
-                imageVector = if (selected) Icons.Rounded.CheckBox
-                               else Icons.Rounded.CheckBoxOutlineBlank,
-                contentDescription = null,
-                tint = if (selected) MaterialTheme.colorScheme.primary
-                       else MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-/**
- * Status chip strip — shown under each file's metadata. Up to two chips:
- *
- * - "Split" for archive bundles (.xapk/.apks/.apkm). Always shown when applicable.
- * - One install-state chip:
- *     New        — package not yet installed (primary tint)
- *     Update     — APK is newer than what's installed (success/primary tint)
- *     Installed  — same versionCode already installed (muted)
- *     Older      — APK older than installed (error tint, downgrade warning)
- *
- * Archives stay InstallState.Unknown (we don't unpack base.apk during a scan), so they
- * only get the Split chip. .apk files get the install-state chip.
- */
-@Composable
-private fun FoundFileChips(file: FoundPackageFile) {
-    val isArchive = file.extension in setOf("xapk", "apks", "apkm")
-    val showStateChip = file.installState != InstallState.Unknown
-    val showAaChip = file.isAndroidAutoSupported
-
-    if (!isArchive && !showStateChip && !showAaChip) return
-
-    Row(
-        modifier = Modifier.padding(top = 6.dp),
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        if (showAaChip) {
-            StatusChip(
-                label = stringResource(R.string.aa_compatibility_ok),
-                container = MaterialTheme.colorScheme.primaryContainer,
-                content = MaterialTheme.colorScheme.onPrimaryContainer,
-            )
-        }
-        if (isArchive) {
-            StatusChip(
-                label = stringResource(R.string.found_chip_split),
-                container = MaterialTheme.colorScheme.tertiaryContainer,
-                content = MaterialTheme.colorScheme.onTertiaryContainer,
-            )
-        }
-        if (showStateChip) {
-            val (labelRes, container, contentColor) = when (file.installState) {
-                InstallState.NotInstalled -> Triple(
-                    R.string.found_chip_new,
-                    MaterialTheme.colorScheme.secondaryContainer,
-                    MaterialTheme.colorScheme.onSecondaryContainer,
-                )
-                InstallState.Newer -> Triple(
-                    R.string.found_chip_update,
-                    MaterialTheme.colorScheme.primaryContainer,
-                    MaterialTheme.colorScheme.onPrimaryContainer,
-                )
-                InstallState.SameVersion -> Triple(
-                    R.string.found_chip_installed,
-                    MaterialTheme.colorScheme.surfaceContainerHighest,
-                    MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-                InstallState.Older -> Triple(
-                    R.string.found_chip_older,
-                    MaterialTheme.colorScheme.errorContainer,
-                    MaterialTheme.colorScheme.onErrorContainer,
-                )
-                InstallState.Unknown -> return@Row
-            }
-            StatusChip(
-                label = stringResource(labelRes),
-                container = container,
-                content = contentColor,
-            )
-        }
     }
 }
 

@@ -256,6 +256,14 @@
   <string name="find_auto_permission_body">Để quét thiết bị của bạn tìm các gói, hãy cho phép quyền truy cập tất cả các tệp trong cài đặt hệ thống.</string>
   <string name="find_auto_grant">Cấp quyền truy cập</string>
   <string name="find_auto_scanning">Đang quét thiết bị…</string>
+  <string name="find_auto_scanning_mediastore">Đang tìm các gói từ MediaStore…</string>
+  <string name="find_auto_scanning_storage">Đang quét các thư mục bộ nhớ…</string>
+  <string name="find_auto_scanning_folder">Đang quét %s…</string>
+  <string name="find_auto_scanning_root">Đang quét Android/data (Root)…</string>
+  <string name="find_auto_scanning_enrich">Đang đọc thông tin gói (%1$d/%2$d)…</string>
+  <string name="find_auto_found_so_far">Đã tìm thấy %d gói</string>
+  <string name="source_folder_root">Bộ nhớ gốc</string>
+  <string name="source_folder_sdcard">Thẻ nhớ SD</string>
   <string name="find_auto_empty">Không tìm thấy gói nào trên thiết bị này.</string>
   <string name="find_auto_rescan">Quét lại</string>
   <string name="find_auto_count">%d gói</string>

@@ -173,7 +173,7 @@ private fun WatchSendSheetNoWatchPreview() {
             watchName = null,
             isLookingUpWatch = false,
             pendingApk = null,
-            scanState = ScanState.Scanning,
+            scanState = ScanState.Scanning(),
             onRefreshWatch = {}, onRescan = {}, onGrantPermission = {},
             onSendPending = {}, onSendFound = {}, onPickFile = {}, onDismiss = {},
         )

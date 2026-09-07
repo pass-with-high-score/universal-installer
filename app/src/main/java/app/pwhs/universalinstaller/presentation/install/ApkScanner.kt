@@ -11,6 +11,7 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import app.pwhs.core.util.WatchAppCheck
+import app.pwhs.universalinstaller.R
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -95,29 +96,39 @@ object ApkScanner {
      * common user download directories directly, falling back to a bounded recursive scan
      * if MediaStore yields no results. Enriches metadata in parallel to minimize latency.
      */
-    suspend fun scan(context: Context): List<FoundPackageFile> = withContext(Dispatchers.IO) {
+    suspend fun scan(
+        context: Context,
+        onProgress: (status: String, foundCount: Int) -> Unit = { _, _ -> },
+    ): List<FoundPackageFile> = withContext(Dispatchers.IO) {
         val foundMap = LinkedHashMap<String, FoundPackageFile>()
 
         // 1. Fast path: MediaStore query (fetches all indexed APKs on the device in milliseconds)
+        onProgress(context.getString(R.string.find_auto_scanning_mediastore), 0)
         scanMediaStore(context).forEach { foundMap[it.path] = it }
+        onProgress(context.getString(R.string.find_auto_scanning_storage), foundMap.size)
 
         // 2. Comprehensive filesystem walk across all volume roots (excluding heavy media folders).
-        // This guarantees catching unindexed files, custom folders (e.g. MT2, APK Installer, backups),
-        // and folders containing .nomedia (e.g. Telegram, WhatsApp).
         val roots = collectVolumeRoots(context)
         for (root in roots) {
             currentCoroutineContext().ensureActive()
-            scanRecursive(root, foundMap, depth = 0, maxDepth = 6)
+            scanRecursive(root, foundMap, depth = 0, maxDepth = 6) { currentDir ->
+                onProgress(context.getString(R.string.find_auto_scanning_folder, currentDir.name), foundMap.size)
+            }
 
             // Specifically scan Android/media (e.g. WhatsApp Documents) since Android/ is skipped at root level
             val androidMedia = File(root, "Android/media")
             if (androidMedia.exists() && androidMedia.canRead()) {
-                scanRecursive(androidMedia, foundMap, depth = 0, maxDepth = 5)
+                scanRecursive(androidMedia, foundMap, depth = 0, maxDepth = 5) { currentDir ->
+                    onProgress(context.getString(R.string.find_auto_scanning_folder, currentDir.name), foundMap.size)
+                }
             }
         }
 
         // 3. If Root is available, scan restricted Android/data and Android/obb folders via high-speed native shell
-        scanRootRestrictedDirs(roots, foundMap)
+        if (isRootAvailable()) {
+            onProgress(context.getString(R.string.find_auto_scanning_root), foundMap.size)
+            scanRootRestrictedDirs(roots, foundMap)
+        }
 
         if (foundMap.isEmpty()) return@withContext emptyList()
 
@@ -125,12 +136,16 @@ object ApkScanner {
         val pm = context.packageManager
         val rawList = foundMap.values.toList()
         val enrichDispatcher = Dispatchers.IO.limitedParallelism(8)
+        val completedCount = java.util.concurrent.atomic.AtomicInteger(0)
 
         coroutineScope {
             rawList.map { file ->
                 async(enrichDispatcher) {
                     currentCoroutineContext().ensureActive()
-                    if (file.extension == "apk") enrichWithPackageInfo(pm, file) else file
+                    val enriched = if (file.extension == "apk") enrichWithPackageInfo(pm, file) else file
+                    val done = completedCount.incrementAndGet()
+                    onProgress(context.getString(R.string.find_auto_scanning_enrich, done, rawList.size), foundMap.size)
+                    enriched
                 }
             }.awaitAll()
         }.sortedByDescending { it.modifiedMillis }
@@ -379,6 +394,7 @@ object ApkScanner {
         out: MutableMap<String, FoundPackageFile>,
         depth: Int,
         maxDepth: Int,
+        onDirectoryVisited: ((File) -> Unit)? = null,
     ) {
         currentCoroutineContext().ensureActive()
         if (depth > maxDepth) return
@@ -391,7 +407,8 @@ object ApkScanner {
                 if (name.startsWith(".")) continue
                 if (depth == 0 && name.equals("Android", ignoreCase = true)) continue
                 if (name.lowercase() in IGNORED_DIR_NAMES) continue
-                scanRecursive(child, out, depth + 1, maxDepth)
+                onDirectoryVisited?.invoke(child)
+                scanRecursive(child, out, depth + 1, maxDepth, onDirectoryVisited)
             } else {
                 addIfPackageFile(child, out)
             }

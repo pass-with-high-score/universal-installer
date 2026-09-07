@@ -14,12 +14,15 @@ import java.io.File
 
 object InstallScanHelper {
 
-    suspend fun performDeviceScan(context: Context): ScanState {
+    suspend fun performDeviceScan(
+        context: Context,
+        onProgress: (status: String, foundCount: Int) -> Unit = { _, _ -> },
+    ): ScanState {
         if (!ApkScanner.hasAllFilesAccess(context)) {
             return ScanState.PermissionNeeded
         }
         val results = try {
-            ApkScanner.scan(context)
+            ApkScanner.scan(context, onProgress)
         } catch (ce: CancellationException) {
             throw ce
         } catch (t: Throwable) {

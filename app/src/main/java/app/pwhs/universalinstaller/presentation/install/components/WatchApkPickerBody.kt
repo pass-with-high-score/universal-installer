@@ -110,7 +110,7 @@ private fun WatchApkPickerBodyReadyPreview() {
 @Composable
 private fun WatchApkPickerBodyScanningPreview() {
     UniversalInstallerTheme {
-        WatchApkPickerBody(ScanState.Scanning, false, {}, {})
+        WatchApkPickerBody(ScanState.Scanning(), false, {}, {})
     }
 }
 

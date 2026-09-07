@@ -186,6 +186,14 @@
     <string name="find_auto_permission_body">To scan your device for packages, allow all-files access in system settings.</string>
     <string name="find_auto_grant">Grant access</string>
     <string name="find_auto_scanning">Scanning device…</string>
+    <string name="find_auto_scanning_mediastore">Indexing packages from MediaStore…</string>
+    <string name="find_auto_scanning_storage">Scanning storage folders…</string>
+    <string name="find_auto_scanning_folder">Scanning %s…</string>
+    <string name="find_auto_scanning_root">Scanning Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">Reading package info (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">%d packages found</string>
+    <string name="source_folder_root">Root storage</string>
+    <string name="source_folder_sdcard">SD Card</string>
     <string name="find_auto_empty">No packages found on this device.</string>
     <string name="find_auto_rescan">Rescan</string>
     <string name="find_auto_count">%d packages</string>
