@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">%d Engine(s) haben Bedrohungen erkannt!</string>
     <string name="apk_info_vt_suspicious">%d Engine(s) haben die Datei als verdächtig eingestuft</string>
     <string name="apk_info_vt_not_found">Datei in der VirusTotal-Datenbank nicht gefunden</string>
+    <string name="apk_info_vt_upload_action">Hochladen und scannen</string>
     <string name="uninstall_search_hint">Apps suchen…</string>
     <string name="uninstall_no_apps_found">Keine Apps gefunden</string>
     <string name="uninstall_no_match">Keine Treffer für \&quot;%s\&quot;</string>

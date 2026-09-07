@@ -225,6 +225,7 @@
     <string name="apk_info_vt_malicious">%d silnik(ów) wykrył(o) zagrożenia!</string>
     <string name="apk_info_vt_suspicious">%d silnik(ów) uznał(o) plik za podejrzany</string>
     <string name="apk_info_vt_not_found">Nie znaleziono pliku w bazie VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Prześlij i skanuj</string>
     <string name="apk_info_vt_no_api_key">Nie skonfigurowano klucza API VirusTotal. Otwórz Ustawienia → Zaawansowane → Klucz API VirusTotal</string>
     <string name="apk_info_vt_uploading">Przesyłanie do VirusTotal… %d%%</string>
     <string name="apk_info_vt_queued">W kolejce do VirusTotal…</string>

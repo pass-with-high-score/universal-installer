@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">%d개 엔진에서 위협 감지!</string>
     <string name="apk_info_vt_suspicious">%d개 엔진에서 의심스러움으로 표시</string>
     <string name="apk_info_vt_not_found">VirusTotal 데이터베이스에서 파일을 찾을 수 없음</string>
+    <string name="apk_info_vt_upload_action">업로드 및 검사</string>
     <string name="uninstall_search_hint">앱 검색…</string>
     <string name="uninstall_no_apps_found">앱을 찾을 수 없습니다</string>
     <string name="uninstall_no_match">\&quot;%s\&quot;과 일치하는 앱이 없습니다</string>

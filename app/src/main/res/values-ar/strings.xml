@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">%d محرك(محركات) اكتشفت تهديدات!</string>
     <string name="apk_info_vt_suspicious">%d محرك(محركات) تم وضع علامة مشبوهة عليها</string>
     <string name="apk_info_vt_not_found">لم يتم العثور على الملف في قاعدة بيانات VirusTotal</string>
+    <string name="apk_info_vt_upload_action">تحميل وفحص</string>
     <string name="uninstall_search_hint">البحث في التطبيقات…</string>
     <string name="uninstall_no_apps_found">لم يتم العثور على تطبيقات</string>
     <string name="uninstall_no_match">لا توجد تطبيقات تطابق \&quot;%s\&quot;</string>

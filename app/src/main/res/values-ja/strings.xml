@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">%d エンジンが脅威を検出しました！</string>
     <string name="apk_info_vt_suspicious">%d エンジンが疑わしいとフラグを立てました</string>
     <string name="apk_info_vt_not_found">VirusTotal データベースにファイルが見つかりません</string>
+    <string name="apk_info_vt_upload_action">アップロードしてスキャン</string>
     <string name="uninstall_search_hint">アプリを検索…</string>
     <string name="uninstall_no_apps_found">アプリが見つかりません</string>
     <string name="uninstall_no_match">\&quot;%s\&quot; に一致するアプリはありません</string>

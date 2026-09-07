@@ -209,6 +209,7 @@
     <string name="apk_info_vt_malicious">%d motore/i ha rilevato minacce!</string>
     <string name="apk_info_vt_suspicious">%d motore/i ha contrassegnato come sospetto</string>
     <string name="apk_info_vt_not_found">File non trovato nel database VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Carica e scansiona</string>
     <string name="apk_info_vt_no_api_key">Nessuna chiave API VirusTotal configurata. Apri Impostazioni → Advanced → Chiave API VirusTotal per aggiungerne una — chiave gratuita su virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Caricamento su VirusTotal… %d%%</string>
     <string name="vt_notif_channel_name">Scansioni VirusTotal</string>

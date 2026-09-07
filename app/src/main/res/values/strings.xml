@@ -270,6 +270,7 @@
     <string name="apk_info_vt_malicious">%d engine(s) detected threats!</string>
     <string name="apk_info_vt_suspicious">%d engine(s) flagged as suspicious</string>
     <string name="apk_info_vt_not_found">File not found in VirusTotal database</string>
+    <string name="apk_info_vt_upload_action">Upload &amp; scan</string>
     <string name="apk_info_vt_no_api_key">No VirusTotal API key configured. Open Settings → Advanced → VirusTotal API Key to add one — free key at virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Uploading to VirusTotal… %d%%</string>
     <string name="apk_info_vt_queued">Queued on VirusTotal…</string>

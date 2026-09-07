@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">%d motor tehdit algıladı!</string>
     <string name="apk_info_vt_suspicious">%d motor şüpheli olarak işaretledi</string>
     <string name="apk_info_vt_not_found">Dosya VirusTotal veritabanında bulunamadı</string>
+    <string name="apk_info_vt_upload_action">Yükle ve tara</string>
     <string name="uninstall_search_hint">Uygulamalarda ara…</string>
     <string name="uninstall_no_apps_found">Uygulama bulunamadı</string>
     <string name="uninstall_no_match">\&quot;%s\&quot; ile eşleşen uygulama yok</string>

@@ -208,6 +208,7 @@
     <string name="apk_info_vt_malicious">%d μηχανή(ές) εντόπισαν απειλές!</string>
     <string name="apk_info_vt_suspicious">%d μηχανή(ές) το επισήμαναν ως ύποπτο</string>
     <string name="apk_info_vt_not_found">Το αρχείο δεν βρέθηκε στη βάση δεδομένων του VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Μεταφόρτωση &amp; σάρωση</string>
     <string name="apk_info_vt_no_api_key">Δεν έχει ρυθμιστεί κλειδί API του VirusTotal. Ανοίξτε Ρυθμίσεις → Advanced → Κλειδί API VirusTotal για να προσθέσετε ένα — δωρεάν κλειδί στο virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Μεταφόρτωση στο VirusTotal… %d%%</string>
     <string name="vt_notif_channel_name">Σαρώσεις VirusTotal</string>

@@ -209,6 +209,7 @@
     <string name="apk_info_vt_malicious">%d рушій(їв) виявили загрози!</string>
     <string name="apk_info_vt_suspicious">%d рушій(їв) позначили як підозрілий</string>
     <string name="apk_info_vt_not_found">Файл не знайдено в базі даних VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Завантажити та перевірити</string>
     <string name="apk_info_vt_no_api_key">Не налаштовано API-ключ VirusTotal. Відкрийте Налаштування → Advanced → Ключ API VirusTotal, щоб додати його — безкоштовний ключ на virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Завантаження на VirusTotal… %d%%</string>
     <string name="vt_notif_channel_name">Сканування VirusTotal</string>

@@ -42,6 +42,7 @@
     <string name="apk_info_vt_malicious">%d 个引擎检测到威胁！</string>
     <string name="apk_info_vt_suspicious">%d 个引擎标记为可疑</string>
     <string name="apk_info_vt_not_found">在 VirusTotal 数据库中未找到该文件</string>
+    <string name="apk_info_vt_upload_action">上传并扫描</string>
     <string name="uninstall_search_hint">搜索应用…</string>
     <string name="uninstall_no_apps_found">未找到应用</string>
     <string name="uninstall_no_match">没有与 \&quot;%s\&quot; 匹配的应用</string>

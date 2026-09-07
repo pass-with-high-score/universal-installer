@@ -41,6 +41,7 @@
   <string name="apk_info_vt_malicious">%d इंजन(इंजनों) को खतरे मिले!</string>
   <string name="apk_info_vt_suspicious">%d इंजन(इंजनों) ने संदिग्ध के रूप में चिह्नित किया</string>
   <string name="apk_info_vt_not_found">VirusTotal डेटाबेस में फ़ाइल नहीं मिली</string>
+    <string name="apk_info_vt_upload_action">अपलोड करें और स्कैन करें</string>
   <string name="uninstall_search_hint">ऐप्स खोजें…</string>
   <string name="uninstall_no_apps_found">कोई ऐप नहीं मिले</string>
   <string name="uninstall_no_match">\&quot;%s\&quot; से मेल खाने वाले कोई ऐप नहीं</string>

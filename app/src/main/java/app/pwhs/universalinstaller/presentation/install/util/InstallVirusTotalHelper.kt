@@ -108,7 +108,8 @@ object InstallVirusTotalHelper {
 
         val tempFile = runCatching {
             withContext(Dispatchers.IO) {
-                val f = File(context.cacheDir, "vt_upload_${System.currentTimeMillis()}")
+                val ext = fileName.substringAfterLast('.', "apk").ifBlank { "apk" }
+                val f = File(context.cacheDir, "vt_${System.currentTimeMillis()}_upload.$ext")
                 context.contentResolver.openInputStream(uri)?.use { input ->
                     f.outputStream().use { output -> input.copyTo(output) }
                 } ?: return@withContext null
@@ -150,7 +151,7 @@ object InstallVirusTotalHelper {
             virusTotalNotifier.notifyQueued(scanNotifId, fileName)
 
             val finalResult = virusTotalService.pollAnalysis(apiKey, analysisId) { status ->
-                onProgress(VtResult(status = status))
+                onProgress(VtResult(status = status, analysisId = analysisId))
                 when (status) {
                     VtStatus.ANALYZING -> virusTotalNotifier.notifyAnalyzing(scanNotifId, fileName)
                     VtStatus.QUEUED -> virusTotalNotifier.notifyQueued(scanNotifId, fileName)

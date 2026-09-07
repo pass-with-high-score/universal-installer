@@ -141,7 +141,7 @@ class VirusTotalService(
                             value = ChannelProvider(size = file.length()) { file.readChannel() },
                             headers = Headers.build {
                                 append(HttpHeaders.ContentType, "application/octet-stream")
-                                append(HttpHeaders.ContentDisposition, "filename=\"${file.name}\"")
+                                append(HttpHeaders.ContentDisposition, "form-data; name=\"file\"; filename=\"${file.name}\"")
                             },
                         )
                     },

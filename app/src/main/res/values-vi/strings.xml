@@ -43,6 +43,7 @@
     <string name="apk_info_vt_malicious">%d công cụ đã phát hiện mối đe dọa!</string>
     <string name="apk_info_vt_suspicious">%d công cụ đã gắn cờ là đáng ngờ</string>
     <string name="apk_info_vt_not_found">Không tìm thấy tệp trong cơ sở dữ liệu VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Tải lên &amp; quét</string>
     <string name="uninstall_search_hint">Tìm kiếm ứng dụng…</string>
     <string name="uninstall_no_apps_found">Không tìm thấy ứng dụng nào</string>
     <string name="uninstall_no_match">Không có ứng dụng nào khớp với \&quot;%s\&quot;</string>

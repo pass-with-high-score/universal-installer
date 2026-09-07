@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">¡%d motor(es) detectaron amenazas!</string>
     <string name="apk_info_vt_suspicious">%d motor(es) marcados como sospechosos</string>
     <string name="apk_info_vt_not_found">Archivo no encontrado en la base de datos de VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Subir y analizar</string>
     <string name="uninstall_search_hint">Buscar aplicaciones…</string>
     <string name="uninstall_no_apps_found">No se encontraron aplicaciones</string>
     <string name="uninstall_no_match">No hay aplicaciones que coincidan con \&quot;%s\&quot;</string>

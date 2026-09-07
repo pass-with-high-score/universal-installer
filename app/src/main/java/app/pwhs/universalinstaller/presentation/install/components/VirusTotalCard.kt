@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.GppGood
+import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.CardDefaults
@@ -189,6 +191,60 @@ fun VirusTotalCard(
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
+                }
+            } else if (status == VtStatus.NOT_FOUND) {
+                Spacer(Modifier.height(8.dp))
+                FilledTonalButton(
+                    onClick = onCheck,
+                    shape = MaterialTheme.shapes.medium,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.CloudUpload,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.apk_info_vt_upload_action),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            } else if (status == VtStatus.ERROR) {
+                Spacer(Modifier.height(8.dp))
+                FilledTonalButton(
+                    onClick = onCheck,
+                    shape = MaterialTheme.shapes.medium,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Refresh,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.dialog_failed_retry),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
+            } else if (status == null) {
+                Spacer(Modifier.height(8.dp))
+                FilledTonalButton(
+                    onClick = onCheck,
+                    shape = MaterialTheme.shapes.medium,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Security,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.scan_virustotal_btn),
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 }
             }
         }

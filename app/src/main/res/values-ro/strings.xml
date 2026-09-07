@@ -215,6 +215,7 @@
     <string name="apk_info_vt_malicious">%d motor(oare) au detectat amenințări!</string>
     <string name="apk_info_vt_suspicious">%d motor(oare) semnalate ca suspecte</string>
     <string name="apk_info_vt_not_found">Fișierul nu a fost găsit în baza de date VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Încarcă și scanează</string>
     <string name="apk_info_vt_no_api_key">Nicio cheie API VirusTotal configurată. Deschide Setări → Advanced → Cheie API VirusTotal pentru a adăuga una — cheie gratuită la virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Se încarcă pe VirusTotal… %d%%</string>
     <string name="vt_notif_channel_name">Scanări VirusTotal</string>

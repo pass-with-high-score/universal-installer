@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">%d антивирус(ов) обнаружили угрозы!</string>
     <string name="apk_info_vt_suspicious">%d антивирус(ов) отметили как подозрительный</string>
     <string name="apk_info_vt_not_found">Файл не найден в базе данных VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Загрузить и проверить</string>
     <string name="uninstall_search_hint">Поиск приложений…</string>
     <string name="uninstall_no_apps_found">Приложения не найдены</string>
     <string name="uninstall_no_match">Нет приложений, совпадающих с \&quot;%s\&quot;</string>

@@ -223,6 +223,7 @@
     <string name="apk_info_vt_malicious">%d motor(es) detectou ameaças!</string>
     <string name="apk_info_vt_suspicious">%d motor(es) sinalizou como suspeito</string>
     <string name="apk_info_vt_not_found">Arquivo não encontrado no banco de dados do VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Enviar e verificar</string>
     <string name="apk_info_vt_no_api_key">Nenhuma chave de API do VirusTotal configurada. Abra Configurações → Advanced → Chave da API do VirusTotal para adicionar uma — obtenha uma chave gratuita em virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Enviando para o VirusTotal… %d%%</string>
     <string name="apk_info_vt_queued">Na fila do VirusTotal…</string>

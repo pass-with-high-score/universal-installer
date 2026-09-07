@@ -41,6 +41,7 @@
     <string name="apk_info_vt_malicious">%d mesin mendeteksi ancaman!</string>
     <string name="apk_info_vt_suspicious">%d mesin menandai sebagai mencurigakan</string>
     <string name="apk_info_vt_not_found">Berkas tidak ditemukan dalam basis data VirusTotal</string>
+    <string name="apk_info_vt_upload_action">Unggah &amp; pindai</string>
     <string name="uninstall_search_hint">Cari aplikasi…</string>
     <string name="uninstall_no_apps_found">Tidak ada aplikasi yang ditemukan</string>
     <string name="uninstall_no_match">Tidak ada aplikasi yang cocok dengan \&quot;%s\&quot;</string>
