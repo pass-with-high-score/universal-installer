@@ -52,9 +52,6 @@ internal fun AppListLayout(
             ),
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            item(key = "updates_banner") {
-                UpdatesBanner(modifier = Modifier.padding(bottom = 4.dp))
-            }
             if (groupBy == GroupBy.Installer) {
                 // Group-by-installer view. We compute the bucket label per app
                 // (known store → display name; everything else → sideload), then

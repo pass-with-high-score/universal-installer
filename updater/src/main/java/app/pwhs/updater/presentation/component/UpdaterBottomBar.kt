@@ -5,8 +5,8 @@ import android.content.Intent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
@@ -35,7 +35,7 @@ private enum class UpdaterBottomNavDestination(
     UPDATES(
         targetActivityClassName = null,
         labelRes = CoreR.string.nav_updates,
-        icon = Icons.Rounded.SystemUpdate,
+        icon = Icons.Rounded.RocketLaunch,
     ),
     MANAGE(
         targetActivityClassName = "app.pwhs.universalinstaller.presentation.manage.ManageActivity",
