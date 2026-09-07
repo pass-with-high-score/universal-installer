@@ -83,7 +83,11 @@ sealed interface DownloadState {
 sealed interface ScanState {
     data object Idle : ScanState
     data object PermissionNeeded : ScanState
-    data class Scanning(val status: String? = null, val foundCount: Int = 0) : ScanState
+    data class Scanning(
+        val status: String? = null,
+        val foundCount: Int = 0,
+        val progress: Float? = null,
+    ) : ScanState
     data class Ready(val files: List<FoundPackageFile>) : ScanState
 }
 

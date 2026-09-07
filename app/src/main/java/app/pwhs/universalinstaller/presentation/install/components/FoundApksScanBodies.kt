@@ -1,5 +1,7 @@
 package app.pwhs.universalinstaller.presentation.install.components
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,9 +21,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -106,14 +110,41 @@ internal fun PermissionBody(onGrant: () -> Unit) {
 
 @Composable
 internal fun ScanningBody(state: ScanState.Scanning) {
+    val percent = state.progress?.let { (it * 100).toInt().coerceIn(0, 100) }
+    val animatedProgress by animateFloatAsState(
+        targetValue = percent?.let { it / 100f } ?: 0f,
+        label = "scanProgressAnimation",
+    )
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 40.dp),
+            .padding(horizontal = 20.dp, vertical = 36.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        CircularProgressIndicator()
-        Spacer(Modifier.height(16.dp))
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.size(72.dp),
+        ) {
+            if (percent != null) {
+                CircularProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier.size(72.dp),
+                    strokeWidth = 6.dp,
+                )
+                Text(
+                    text = "$percent%",
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            } else {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(72.dp),
+                    strokeWidth = 6.dp,
+                )
+            }
+        }
+        Spacer(Modifier.height(20.dp))
         Text(
             text = state.status.takeIf { !it.isNullOrBlank() }
                 ?: stringResource(R.string.find_auto_scanning),

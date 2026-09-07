@@ -66,6 +66,11 @@ object ApkScanner {
         ".thumbnails", "cache", ".cache", ".git"
     )
 
+    private fun isExcludedDir(name: String): Boolean {
+        val lower = name.lowercase()
+        return lower.startsWith(".") || lower.equals("android", ignoreCase = true) || lower in IGNORED_DIR_NAMES
+    }
+
 
 
     fun hasAllFilesAccess(context: Context): Boolean {
@@ -98,39 +103,61 @@ object ApkScanner {
      */
     suspend fun scan(
         context: Context,
-        onProgress: (status: String, foundCount: Int) -> Unit = { _, _ -> },
+        onProgress: (status: String, foundCount: Int, progress: Float?) -> Unit = { _, _, _ -> },
     ): List<FoundPackageFile> = withContext(Dispatchers.IO) {
         val foundMap = LinkedHashMap<String, FoundPackageFile>()
 
         // 1. Fast path: MediaStore query (fetches all indexed APKs on the device in milliseconds)
-        onProgress(context.getString(R.string.find_auto_scanning_mediastore), 0)
+        onProgress(context.getString(R.string.find_auto_scanning_mediastore), 0, 0.05f)
         scanMediaStore(context).forEach { foundMap[it.path] = it }
-        onProgress(context.getString(R.string.find_auto_scanning_storage), foundMap.size)
+        onProgress(context.getString(R.string.find_auto_scanning_storage), foundMap.size, 0.10f)
 
         // 2. Comprehensive filesystem walk across all volume roots (excluding heavy media folders).
         val roots = collectVolumeRoots(context)
+        val hasRoot = isRootAvailable()
+        val walkMaxProgress = if (hasRoot) 0.35f else 0.40f
+
+        val topDirs = roots.flatMap { root ->
+            root.listFiles { f -> f.isDirectory && !isExcludedDir(f.name) }?.toList() ?: emptyList()
+        }
+        val totalTopDirs = topDirs.size.coerceAtLeast(1)
+        var topDirsProcessed = 0
+
         for (root in roots) {
             currentCoroutineContext().ensureActive()
-            scanRecursive(root, foundMap, depth = 0, maxDepth = 6) { currentDir ->
-                onProgress(context.getString(R.string.find_auto_scanning_folder, currentDir.name), foundMap.size)
+            val dirs = root.listFiles { f -> f.isDirectory && !isExcludedDir(f.name) } ?: emptyArray()
+            for (dir in dirs) {
+                currentCoroutineContext().ensureActive()
+                val currentP = 0.10f + (walkMaxProgress - 0.10f) * (topDirsProcessed.toFloat() / totalTopDirs)
+                onProgress(context.getString(R.string.find_auto_scanning_folder, dir.name), foundMap.size, currentP)
+                scanRecursive(dir, foundMap, depth = 1, maxDepth = 6) { subDir ->
+                    onProgress(context.getString(R.string.find_auto_scanning_folder, subDir.name), foundMap.size, currentP)
+                }
+                topDirsProcessed++
             }
+
+            // Direct files in volume root
+            root.listFiles { f -> f.isFile }?.forEach { addIfPackageFile(it, foundMap) }
 
             // Specifically scan Android/media (e.g. WhatsApp Documents) since Android/ is skipped at root level
             val androidMedia = File(root, "Android/media")
             if (androidMedia.exists() && androidMedia.canRead()) {
-                scanRecursive(androidMedia, foundMap, depth = 0, maxDepth = 5) { currentDir ->
-                    onProgress(context.getString(R.string.find_auto_scanning_folder, currentDir.name), foundMap.size)
+                scanRecursive(androidMedia, foundMap, depth = 0, maxDepth = 5) { subDir ->
+                    onProgress(context.getString(R.string.find_auto_scanning_folder, subDir.name), foundMap.size, walkMaxProgress)
                 }
             }
         }
 
         // 3. If Root is available, scan restricted Android/data and Android/obb folders via high-speed native shell
-        if (isRootAvailable()) {
-            onProgress(context.getString(R.string.find_auto_scanning_root), foundMap.size)
+        if (hasRoot) {
+            onProgress(context.getString(R.string.find_auto_scanning_root), foundMap.size, 0.38f)
             scanRootRestrictedDirs(roots, foundMap)
         }
 
-        if (foundMap.isEmpty()) return@withContext emptyList()
+        if (foundMap.isEmpty()) {
+            onProgress("", 0, 1.0f)
+            return@withContext emptyList()
+        }
 
         // 4. Enrich APK metadata concurrently (limited parallelism to avoid I/O starvation)
         val pm = context.packageManager
@@ -144,7 +171,12 @@ object ApkScanner {
                     currentCoroutineContext().ensureActive()
                     val enriched = if (file.extension == "apk") enrichWithPackageInfo(pm, file) else file
                     val done = completedCount.incrementAndGet()
-                    onProgress(context.getString(R.string.find_auto_scanning_enrich, done, rawList.size), foundMap.size)
+                    val enrichProgress = 0.40f + 0.60f * (done.toFloat() / rawList.size)
+                    onProgress(
+                        context.getString(R.string.find_auto_scanning_enrich, done, rawList.size),
+                        foundMap.size,
+                        enrichProgress,
+                    )
                     enriched
                 }
             }.awaitAll()

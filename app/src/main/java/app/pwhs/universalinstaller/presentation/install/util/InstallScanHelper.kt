@@ -16,7 +16,7 @@ object InstallScanHelper {
 
     suspend fun performDeviceScan(
         context: Context,
-        onProgress: (status: String, foundCount: Int) -> Unit = { _, _ -> },
+        onProgress: (status: String, foundCount: Int, progress: Float?) -> Unit = { _, _, _ -> },
     ): ScanState {
         if (!ApkScanner.hasAllFilesAccess(context)) {
             return ScanState.PermissionNeeded

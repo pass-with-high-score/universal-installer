@@ -51,8 +51,8 @@ class InstallWearDelegate(
         scanJob?.cancel()
         _apkScanState.value = ScanState.Scanning()
         scanJob = scope.launch {
-            _apkScanState.value = InstallScanHelper.performDeviceScan(application) { status, count ->
-                _apkScanState.value = ScanState.Scanning(status = status, foundCount = count)
+            _apkScanState.value = InstallScanHelper.performDeviceScan(application) { status, count, progress ->
+                _apkScanState.value = ScanState.Scanning(status = status, foundCount = count, progress = progress)
             }
         }
     }
