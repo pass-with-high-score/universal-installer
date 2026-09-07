@@ -18,6 +18,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import com.topjohnwu.superuser.Shell
 import timber.log.Timber
 import java.io.File
 
@@ -115,9 +116,12 @@ object ApkScanner {
             }
         }
 
+        // 3. If Root is available, scan restricted Android/data and Android/obb folders via high-speed native shell
+        scanRootRestrictedDirs(roots, foundMap)
+
         if (foundMap.isEmpty()) return@withContext emptyList()
 
-        // 3. Enrich APK metadata concurrently (limited parallelism to avoid I/O starvation)
+        // 4. Enrich APK metadata concurrently (limited parallelism to avoid I/O starvation)
         val pm = context.packageManager
         val rawList = foundMap.values.toList()
         val enrichDispatcher = Dispatchers.IO.limitedParallelism(8)
@@ -182,6 +186,61 @@ object ApkScanner {
             Timber.w(e, "MediaStore package query failed")
         }
         return out
+    }
+
+    private fun isRootAvailable(): Boolean {
+        return runCatching {
+            when (Shell.isAppGrantedRoot()) {
+                true -> true
+                false -> false
+                null -> {
+                    if (File("/system/bin/su").exists() || File("/system/xbin/su").exists()) {
+                        Shell.getShell().isRoot
+                    } else {
+                        false
+                    }
+                }
+            }
+        }.getOrDefault(false)
+    }
+
+    private fun scanRootRestrictedDirs(
+        roots: List<File>,
+        out: MutableMap<String, FoundPackageFile>,
+    ) {
+        if (!isRootAvailable()) return
+
+        val targetPaths = roots.flatMap { root ->
+            listOf(
+                File(root, "Android/data").absolutePath,
+                File(root, "Android/obb").absolutePath,
+            )
+        }.filter { File(it).exists() }
+
+        if (targetPaths.isEmpty()) return
+
+        val pathsArg = targetPaths.joinToString(" ")
+        val exts = SUPPORTED_EXTENSIONS.joinToString(" -o ") { "-name \"*.$it\"" }
+        val cmd = "find $pathsArg -maxdepth 5 \\( $exts \\) 2>/dev/null"
+
+        val result = runCatching { Shell.cmd(cmd).exec() }.getOrNull() ?: return
+        if (!result.isSuccess) return
+
+        for (line in result.out) {
+            val path = line.trim()
+            if (path.isBlank() || out.containsKey(path)) continue
+            val file = File(path)
+            val ext = file.extension.lowercase()
+            if (ext in SUPPORTED_EXTENSIONS) {
+                out[path] = FoundPackageFile(
+                    path = path,
+                    name = file.name,
+                    sizeBytes = if (file.exists()) file.length() else 0L,
+                    modifiedMillis = if (file.exists()) file.lastModified() else System.currentTimeMillis(),
+                    extension = ext,
+                )
+            }
+        }
     }
 
 
