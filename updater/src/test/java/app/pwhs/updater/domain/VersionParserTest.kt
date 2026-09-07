@@ -4,6 +4,8 @@ import app.pwhs.updater.domain.matcher.VersionParser
 import app.pwhs.updater.domain.model.TrackedApp
 import app.pwhs.updater.domain.model.UpdateSourceType
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -20,11 +22,42 @@ class VersionParserTest {
     }
 
     @Test
+    fun extractVersion_withExplicitMatchGroup_extractsSpecifiedGroup() {
+        val result1 = VersionParser.extractVersion(
+            tagName = "app-release-2.4.0-final",
+            defaultVersion = "app-release-2.4.0-final",
+            versionRegex = "app-(release)-(\\d+\\.\\d+\\.\\d+)",
+            matchGroup = "2",
+        )
+        assertEquals("2.4.0", result1)
+
+        val resultTemplate = VersionParser.extractVersion(
+            tagName = "v2-patch4",
+            defaultVersion = "v2-patch4",
+            versionRegex = "v(\\d+)-patch(\\d+)",
+            matchGroup = "$1.$2",
+        )
+        assertEquals("2.4", resultTemplate)
+    }
+
+    @Test
     fun extractVersion_withoutCapturingGroup_extractsFullMatch() {
         val result = VersionParser.extractVersion(
             tagName = "NeoPlayer1.6.7",
             defaultVersion = "NeoPlayer1.6.7",
             versionRegex = "[0-9]+\\.[0-9]+\\.[0-9]+",
+        )
+        assertEquals("1.6.7", result)
+    }
+
+    @Test
+    fun extractVersion_useReleaseTitleAsVersion_prioritizesTitleOverTag() {
+        val result = VersionParser.extractVersion(
+            tagName = "build-12345",
+            releaseTitle = "NextPlayer v1.6.7",
+            defaultVersion = "build-12345",
+            versionRegex = "v?(\\d+\\.\\d+\\.\\d+)",
+            useReleaseTitleAsVersion = true,
         )
         assertEquals("1.6.7", result)
     }
@@ -67,6 +100,14 @@ class VersionParserTest {
     }
 
     @Test
+    fun validateRegex_detectsSyntaxErrors() {
+        assertNull(VersionParser.validateRegex(null))
+        assertNull(VersionParser.validateRegex(""))
+        assertNull(VersionParser.validateRegex("^v?([0-9.]+)$"))
+        assertNotNull(VersionParser.validateRegex("[unclosed"))
+    }
+
+    @Test
     fun extractVersion_trackedAppUpdateComparison_worksWithCustomRegex() {
         val tagName = "NeoPlayer1.6.7"
         val regex = "^NeoPlayer(.+)$"
@@ -87,6 +128,7 @@ class VersionParserTest {
             latestReleaseTag = tagName,
             latestDownloadUrl = "https://github.com/NextPlayerCloud/NextPlayerCloud/releases/download/NeoPlayer1.6.7/app.apk",
             versionRegex = regex,
+            matchGroup = "1",
         )
 
         assertTrue(app.hasUpdate)

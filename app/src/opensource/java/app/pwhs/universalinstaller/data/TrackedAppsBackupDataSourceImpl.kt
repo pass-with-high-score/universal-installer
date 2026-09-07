@@ -28,6 +28,8 @@ class TrackedAppsBackupDataSourceImpl(
                     includePrereleases = entity.includePrereleases,
                     customRegexFilter = entity.customRegexFilter,
                     versionRegex = entity.versionRegex,
+                    matchGroup = entity.matchGroup,
+                    useReleaseTitleAsVersion = entity.useReleaseTitleAsVersion,
                     category = entity.category,
                 )
             }
@@ -47,6 +49,8 @@ class TrackedAppsBackupDataSourceImpl(
                         includePrereleases = dto.includePrereleases,
                         customRegexFilter = dto.customRegexFilter,
                         versionRegex = dto.versionRegex,
+                        matchGroup = dto.matchGroup,
+                        useReleaseTitleAsVersion = dto.useReleaseTitleAsVersion,
                         category = dto.category,
                     )
                 } else {
@@ -60,6 +64,8 @@ class TrackedAppsBackupDataSourceImpl(
                         includePrereleases = dto.includePrereleases,
                         customRegexFilter = dto.customRegexFilter,
                         versionRegex = dto.versionRegex,
+                        matchGroup = dto.matchGroup,
+                        useReleaseTitleAsVersion = dto.useReleaseTitleAsVersion,
                         category = dto.category,
                     )
                 }

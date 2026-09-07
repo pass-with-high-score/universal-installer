@@ -20,6 +20,8 @@ data class TrackedApp(
     val includePrereleases: Boolean = false,
     val customRegexFilter: String? = null,
     val versionRegex: String? = null,
+    val matchGroup: String? = null,
+    val useReleaseTitleAsVersion: Boolean = false,
     val category: String? = null,
     val ignoredVersion: String? = null,
     val eTag: String? = null,

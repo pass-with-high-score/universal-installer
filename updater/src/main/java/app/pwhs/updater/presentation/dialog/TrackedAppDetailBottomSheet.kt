@@ -74,8 +74,25 @@ fun TrackedAppDetailBottomSheet(
     var includePrereleases by remember(app) { mutableStateOf(app.includePrereleases) }
     var customRegex by remember(app) { mutableStateOf(app.customRegexFilter.orEmpty()) }
     var versionRegex by remember(app) { mutableStateOf(app.versionRegex.orEmpty()) }
+    var matchGroup by remember(app) { mutableStateOf(app.matchGroup.orEmpty()) }
+    var useReleaseTitleAsVersion by remember(app) { mutableStateOf(app.useReleaseTitleAsVersion) }
     var category by remember(app) { mutableStateOf(app.category.orEmpty()) }
     var isEditingSettings by remember { mutableStateOf(false) }
+
+    val regexError = remember(versionRegex) { VersionParser.validateRegex(versionRegex) }
+    val previewVersion = remember(app, versionRegex, matchGroup, useReleaseTitleAsVersion) {
+        if (versionRegex.isBlank()) null
+        else {
+            VersionParser.extractVersion(
+                tagName = app.latestReleaseTag ?: app.currentVersionName,
+                releaseTitle = null,
+                defaultVersion = app.latestVersionName ?: app.currentVersionName,
+                versionRegex = versionRegex.trim(),
+                matchGroup = matchGroup.trim().takeIf { it.isNotBlank() },
+                useReleaseTitleAsVersion = useReleaseTitleAsVersion,
+            )
+        }
+    }
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
@@ -265,27 +282,35 @@ fun TrackedAppDetailBottomSheet(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                 )
-                TextButton(onClick = {
-                    val trimmedVersionRegex = versionRegex.trim().takeIf { it.isNotBlank() }
-                    val updatedLatestVersion = if (trimmedVersionRegex != app.versionRegex && app.latestReleaseTag != null) {
-                        VersionParser.extractVersion(
-                            tagName = app.latestReleaseTag,
-                            defaultVersion = app.latestVersionName,
+                TextButton(
+                    enabled = regexError == null,
+                    onClick = {
+                        val trimmedVersionRegex = versionRegex.trim().takeIf { it.isNotBlank() }
+                        val trimmedMatchGroup = matchGroup.trim().takeIf { it.isNotBlank() }
+                        val updatedLatestVersion = if (app.latestReleaseTag != null) {
+                            VersionParser.extractVersion(
+                                tagName = app.latestReleaseTag,
+                                defaultVersion = app.latestVersionName,
+                                versionRegex = trimmedVersionRegex,
+                                matchGroup = trimmedMatchGroup,
+                                useReleaseTitleAsVersion = useReleaseTitleAsVersion,
+                            )
+                        } else {
+                            app.latestVersionName
+                        }
+                        val updated = app.copy(
+                            includePrereleases = includePrereleases,
+                            customRegexFilter = customRegex.trim().takeIf { it.isNotBlank() },
                             versionRegex = trimmedVersionRegex,
+                            matchGroup = trimmedMatchGroup,
+                            useReleaseTitleAsVersion = useReleaseTitleAsVersion,
+                            category = category.trim().takeIf { it.isNotBlank() },
+                            latestVersionName = updatedLatestVersion,
                         )
-                    } else {
-                        app.latestVersionName
-                    }
-                    val updated = app.copy(
-                        includePrereleases = includePrereleases,
-                        customRegexFilter = customRegex.trim().takeIf { it.isNotBlank() },
-                        versionRegex = trimmedVersionRegex,
-                        category = category.trim().takeIf { it.isNotBlank() },
-                        latestVersionName = updatedLatestVersion,
-                    )
-                    onUpdateApp(updated)
-                    isEditingSettings = false
-                }) {
+                        onUpdateApp(updated)
+                        isEditingSettings = false
+                    },
+                ) {
                     Text("Save Config")
                 }
             }
@@ -299,6 +324,25 @@ fun TrackedAppDetailBottomSheet(
             ) {
                 Text("Include Pre-releases (Beta)", style = MaterialTheme.typography.bodyMedium)
                 Switch(checked = includePrereleases, onCheckedChange = { includePrereleases = it })
+            }
+
+            Spacer(modifier = Modifier.height(Spacing.S))
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
+                    Text("Use Release Title as Version", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        "Extract from title instead of Git tag",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(modifier = Modifier.width(Spacing.S))
+                Switch(checked = useReleaseTitleAsVersion, onCheckedChange = { useReleaseTitleAsVersion = it })
             }
 
             Spacer(modifier = Modifier.height(Spacing.S))
@@ -318,8 +362,32 @@ fun TrackedAppDetailBottomSheet(
             OutlinedTextField(
                 value = versionRegex,
                 onValueChange = { versionRegex = it },
-                label = { Text("Version Regex Filter (Optional)") },
-                placeholder = { Text("e.g. ^NeoPlayer(.+)$") },
+                label = { Text("Version Extraction RegEx (Optional)") },
+                placeholder = { Text("e.g. ^NeoPlayer(.+)$ or [0-9.]+") },
+                isError = regexError != null,
+                supportingText = {
+                    if (regexError != null) {
+                        Text(regexError, color = MaterialTheme.colorScheme.error)
+                    } else if (previewVersion != null) {
+                        Text(
+                            "Preview extracted: $previewVersion",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                    }
+                },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+            )
+
+            Spacer(modifier = Modifier.height(Spacing.S))
+
+            OutlinedTextField(
+                value = matchGroup,
+                onValueChange = { matchGroup = it },
+                label = { Text("Match Group to Use (Optional)") },
+                placeholder = { Text("e.g. 1 or \$1 or \$1.\$2 (default: \$1 or \$0)") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,

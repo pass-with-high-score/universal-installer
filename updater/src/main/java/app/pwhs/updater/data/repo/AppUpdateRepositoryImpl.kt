@@ -56,6 +56,8 @@ class AppUpdateRepositoryImpl(
                 tagName = app.latestReleaseTag,
                 defaultVersion = app.latestVersionName,
                 versionRegex = app.versionRegex,
+                matchGroup = app.matchGroup,
+                useReleaseTitleAsVersion = app.useReleaseTitleAsVersion,
             )
             app.copy(latestVersionName = effectiveVersion)
         } else {
@@ -121,8 +123,11 @@ class AppUpdateRepositoryImpl(
 
                 val effectiveVersion = VersionParser.extractVersion(
                     tagName = releaseDetails.tagName,
+                    releaseTitle = releaseDetails.title,
                     defaultVersion = releaseDetails.versionName,
                     versionRegex = currentApp.versionRegex,
+                    matchGroup = currentApp.matchGroup,
+                    useReleaseTitleAsVersion = currentApp.useReleaseTitleAsVersion,
                 )
 
                 val updated = currentApp.copy(
