@@ -53,6 +53,7 @@ data class FoundPackageFile(
     val installState: InstallState = InstallState.Unknown,
     val isAndroidAutoSupported: Boolean = false,
     val isWearOsSupported: Boolean = false,
+    val originalPath: String? = null,
 )
 
 object ApkScanner {
@@ -114,7 +115,7 @@ object ApkScanner {
 
         // 2. Comprehensive filesystem walk across all volume roots (excluding heavy media folders).
         val roots = collectVolumeRoots(context)
-        val hasRoot = isRootAvailable()
+        val hasRoot = RootApkScanner.isRootAvailable()
         val walkMaxProgress = if (hasRoot) 0.35f else 0.40f
 
         val topDirs = roots.flatMap { root ->
@@ -148,10 +149,10 @@ object ApkScanner {
             }
         }
 
-        // 3. If Root is available, scan restricted Android/data and Android/obb folders via high-speed native shell
+        // 3. If Root is available, scan restricted Android/data, Android/obb, and app cache folders via high-speed native shell
         if (hasRoot) {
             onProgress(context.getString(R.string.find_auto_scanning_root), foundMap.size, 0.38f)
-            scanRootRestrictedDirs(roots, foundMap)
+            RootApkScanner.scanRootRestrictedDirs(context, roots, SUPPORTED_EXTENSIONS, foundMap)
         }
 
         if (foundMap.isEmpty()) {
@@ -235,60 +236,6 @@ object ApkScanner {
         return out
     }
 
-    private fun isRootAvailable(): Boolean {
-        return runCatching {
-            when (Shell.isAppGrantedRoot()) {
-                true -> true
-                false -> false
-                null -> {
-                    if (File("/system/bin/su").exists() || File("/system/xbin/su").exists()) {
-                        Shell.getShell().isRoot
-                    } else {
-                        false
-                    }
-                }
-            }
-        }.getOrDefault(false)
-    }
-
-    private fun scanRootRestrictedDirs(
-        roots: List<File>,
-        out: MutableMap<String, FoundPackageFile>,
-    ) {
-        if (!isRootAvailable()) return
-
-        val targetPaths = roots.flatMap { root ->
-            listOf(
-                File(root, "Android/data").absolutePath,
-                File(root, "Android/obb").absolutePath,
-            )
-        }.filter { File(it).exists() }
-
-        if (targetPaths.isEmpty()) return
-
-        val pathsArg = targetPaths.joinToString(" ")
-        val exts = SUPPORTED_EXTENSIONS.joinToString(" -o ") { "-name \"*.$it\"" }
-        val cmd = "find $pathsArg -maxdepth 5 \\( $exts \\) 2>/dev/null"
-
-        val result = runCatching { Shell.cmd(cmd).exec() }.getOrNull() ?: return
-        if (!result.isSuccess) return
-
-        for (line in result.out) {
-            val path = line.trim()
-            if (path.isBlank() || out.containsKey(path)) continue
-            val file = File(path)
-            val ext = file.extension.lowercase()
-            if (ext in SUPPORTED_EXTENSIONS) {
-                out[path] = FoundPackageFile(
-                    path = path,
-                    name = file.name,
-                    sizeBytes = if (file.exists()) file.length() else 0L,
-                    modifiedMillis = if (file.exists()) file.lastModified() else System.currentTimeMillis(),
-                    extension = ext,
-                )
-            }
-        }
-    }
 
 
     private fun addIfPackageFile(file: File, out: MutableMap<String, FoundPackageFile>) {

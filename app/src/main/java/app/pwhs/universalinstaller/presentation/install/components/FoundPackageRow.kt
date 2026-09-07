@@ -100,7 +100,8 @@ internal fun FoundRow(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                val sourceDir = remember(file.path) { formatSourceDirectory(file.path, context) }
+                val displaySourcePath = file.originalPath ?: file.path
+                val sourceDir = remember(displaySourcePath) { formatSourceDirectory(displaySourcePath, context) }
                 if (sourceDir.isNotBlank()) {
                     Row(
                         modifier = Modifier.padding(top = 2.dp),

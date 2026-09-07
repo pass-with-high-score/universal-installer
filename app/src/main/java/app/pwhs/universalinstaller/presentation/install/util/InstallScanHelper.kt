@@ -48,6 +48,11 @@ object InstallScanHelper {
     suspend fun deleteFoundFiles(files: List<FoundPackageFile>) = withContext(Dispatchers.IO) {
         files.forEach { entry ->
             runCatching { File(entry.path).delete() }
+            if (!entry.originalPath.isNullOrBlank() && entry.originalPath != entry.path) {
+                runCatching {
+                    com.topjohnwu.superuser.Shell.cmd("rm -f \"${entry.originalPath}\"").exec()
+                }
+            }
         }
     }
 }
