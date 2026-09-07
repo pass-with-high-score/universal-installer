@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Restaurați-vă datele</string>
     <string name="onboarding_restore_desc">Treceți de la un alt dispozitiv sau Obtainium? Vă puteți restaura setările, aplicațiile urmărite și jetoanele API chiar acum.</string>
     <string name="onboarding_restore_action">Restaurare din backup</string>
+    <string name="updates_card_badge_not_installed">Neinstalat</string>
+    <string name="updates_card_btn_install">Instalează</string>
+    <string name="updates_dialog_pick_apk_title">Selectează fișierul de descărcat</string>
+    <string name="updates_dialog_pick_apk_subtitle">Această versiune conține mai multe pachete. Selectați fișierul compatibil cu dispozitivul dvs.:</string>
+    <string name="updates_dialog_device_arch">Arhitectura dispozitivului: %1$s</string>
+    <string name="updates_dialog_recommended">Recomandat</string>
+    <string name="updates_detail_choose_asset_btn">Alege fișierul de descărcat (%1$d)</string>
+    <string name="nav_install">Instalează</string>
+    <string name="nav_updates">Actualizări</string>
+    <string name="nav_manage">Gestionează</string>
+    <string name="nav_settings">Setări</string>
 </resources>

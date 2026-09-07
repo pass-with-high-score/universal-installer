@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Verilerinizi geri yükleyin</string>
     <string name="onboarding_restore_desc">Başka bir cihazdan veya Obtainium\'dan mı geçiyorsunuz? Ayarlarınızı, takip edilen uygulamaları ve API belirteçlerini hemen şimdi geri yükleyebilirsiniz.</string>
     <string name="onboarding_restore_action">Yedekten geri yükle</string>
+    <string name="updates_card_badge_not_installed">Yüklü Değil</string>
+    <string name="updates_card_btn_install">Yükle</string>
+    <string name="updates_dialog_pick_apk_title">İndirilecek Dosyayı Seçin</string>
+    <string name="updates_dialog_pick_apk_subtitle">Bu sürüm birden fazla paket içeriyor. Cihazınızla uyumlu dosyayı seçin:</string>
+    <string name="updates_dialog_device_arch">Cihaz mimarisi: %1$s</string>
+    <string name="updates_dialog_recommended">Önerilen</string>
+    <string name="updates_detail_choose_asset_btn">İndirilecek Dosyayı Seçin (%1$d)</string>
+    <string name="nav_install">Yükle</string>
+    <string name="nav_updates">Güncellemeler</string>
+    <string name="nav_manage">Yönet</string>
+    <string name="nav_settings">Ayarlar</string>
 </resources>

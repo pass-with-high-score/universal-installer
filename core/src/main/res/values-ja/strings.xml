@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">データを復元</string>
     <string name="onboarding_restore_desc">他のデバイスや Obtainium から移行しますか？設定、追跡中のアプリ、API トークンを今すぐ復元できます。</string>
     <string name="onboarding_restore_action">バックアップから復元</string>
+    <string name="updates_card_badge_not_installed">未インストール</string>
+    <string name="updates_card_btn_install">インストール</string>
+    <string name="updates_dialog_pick_apk_title">ダウンロードするファイルを選択</string>
+    <string name="updates_dialog_pick_apk_subtitle">このリリースには複数のパッケージが含まれています。お使いの端末に対応するファイルを選択してください:</string>
+    <string name="updates_dialog_device_arch">端末アーキテクチャ: %1$s</string>
+    <string name="updates_dialog_recommended">推奨</string>
+    <string name="updates_detail_choose_asset_btn">ダウンロードするファイルを選択 (%1$d)</string>
+    <string name="nav_install">インストール</string>
+    <string name="nav_updates">更新</string>
+    <string name="nav_manage">管理</string>
+    <string name="nav_settings">設定</string>
 </resources>

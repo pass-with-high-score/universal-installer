@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">데이터 복원</string>
     <string name="onboarding_restore_desc">다른 기기나 Obtainium에서 전환하시나요? 지금 설정, 추적 중인 앱, API 토큰을 복원할 수 있습니다.</string>
     <string name="onboarding_restore_action">백업에서 복원</string>
+    <string name="updates_card_badge_not_installed">설치되지 않음</string>
+    <string name="updates_card_btn_install">설치</string>
+    <string name="updates_dialog_pick_apk_title">다운로드할 파일 선택</string>
+    <string name="updates_dialog_pick_apk_subtitle">이 릴리스에는 여러 패키지가 포함되어 있습니다. 기기와 호환되는 파일을 선택하세요:</string>
+    <string name="updates_dialog_device_arch">기기 아키텍처: %1$s</string>
+    <string name="updates_dialog_recommended">권장</string>
+    <string name="updates_detail_choose_asset_btn">다운로드할 파일 선택 (%1$d)</string>
+    <string name="nav_install">설치</string>
+    <string name="nav_updates">업데이트</string>
+    <string name="nav_manage">관리</string>
+    <string name="nav_settings">설정</string>
 </resources>

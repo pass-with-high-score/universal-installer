@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Επαναφορά των δεδομένων σας</string>
     <string name="onboarding_restore_desc">Κάνετε μετάβαση από άλλη συσκευή ή από το Obtainium; Μπορείτε να επαναφέρετε τις ρυθμίσεις, τις παρακολουθούμενες εφαρμογές και τα διακριτικά API σας τώρα.</string>
     <string name="onboarding_restore_action">Επαναφορά από αντίγραφο ασφαλείας</string>
+    <string name="updates_card_badge_not_installed">Δεν είναι εγκατεστημένο</string>
+    <string name="updates_card_btn_install">Εγκατάσταση</string>
+    <string name="updates_dialog_pick_apk_title">Επιλογή αρχείου για λήψη</string>
+    <string name="updates_dialog_pick_apk_subtitle">Αυτή η έκδοση περιέχει πολλαπλά πακέτα. Επιλέξτε το αρχείο που είναι συμβατό με τη συσκευή σας:</string>
+    <string name="updates_dialog_device_arch">Αρχιτεκτονική συσκευής: %1$s</string>
+    <string name="updates_dialog_recommended">Προτεινόμενο</string>
+    <string name="updates_detail_choose_asset_btn">Επιλογή αρχείου για λήψη (%1$d)</string>
+    <string name="nav_install">Εγκατάσταση</string>
+    <string name="nav_updates">Ενημερώσεις</string>
+    <string name="nav_manage">Διαχείριση</string>
+    <string name="nav_settings">Ρυθμίσεις</string>
 </resources>

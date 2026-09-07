@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">سيؤدي هذا إلى تعطيل قدرة التطبيقات الأخرى على تثبيت ملفات APK، مما يبقي Universal Installer كمثبت وحيد.</string>
     <string name="setting_revoke_other_installers_toast_success">تم إلغاء أذونات التثبيت من %1$d تطبيقًا</string>
     <string name="setting_revoke_other_installers_toast_none">لا توجد تطبيقات أخرى تملك أذونات التثبيت</string>
+    <string name="txt_updates">التحديثات</string>
+    <string name="find_auto_scanning_mediastore">جارٍ فهرسة الحزم من MediaStore…</string>
+    <string name="find_auto_scanning_storage">جارٍ فحص مجلدات التخزين…</string>
+    <string name="find_auto_scanning_folder">جارٍ فحص %s…</string>
+    <string name="find_auto_scanning_root">جارٍ فحص Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">جارٍ قراءة معلومات الحزمة (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">تم العثور على %d حزمة</string>
+    <string name="source_folder_root">وحدة التخزين الجذرية</string>
+    <string name="source_folder_sdcard">بطاقة SD</string>
 </resources>

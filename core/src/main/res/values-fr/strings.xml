@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Restaurer vos données</string>
     <string name="onboarding_restore_desc">Vous changez d\'appareil ou venez d\'Obtainium ? Vous pouvez restaurer vos paramètres, applications suivies et jetons d\'API dès maintenant.</string>
     <string name="onboarding_restore_action">Restaurer depuis une sauvegarde</string>
+    <string name="updates_card_badge_not_installed">Non installé</string>
+    <string name="updates_card_btn_install">Installer</string>
+    <string name="updates_dialog_pick_apk_title">Sélectionner le fichier à télécharger</string>
+    <string name="updates_dialog_pick_apk_subtitle">Cette version contient plusieurs paquets. Sélectionnez le fichier compatible avec votre appareil :</string>
+    <string name="updates_dialog_device_arch">Architecture de l\'appareil : %1$s</string>
+    <string name="updates_dialog_recommended">Recommandé</string>
+    <string name="updates_detail_choose_asset_btn">Choisir le fichier à télécharger (%1$d)</string>
+    <string name="nav_install">Installer</string>
+    <string name="nav_updates">Mises à jour</string>
+    <string name="nav_manage">Gérer</string>
+    <string name="nav_settings">Paramètres</string>
 </resources>

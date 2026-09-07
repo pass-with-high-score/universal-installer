@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">Αυτό θα απενεργοποιήσει τη δυνατότητα άλλων εφαρμογών να εγκαθιστούν APK, αφήνοντας το Universal Installer ως το μοναδικό πρόγραμμα εγκατάστασης.</string>
     <string name="setting_revoke_other_installers_toast_success">Ανακλήθηκαν οι άδειες εγκατάστασης από %1$d εφαρμογές</string>
     <string name="setting_revoke_other_installers_toast_none">Καμία άλλη εφαρμογή δεν έχει άδεια εγκατάστασης</string>
+    <string name="txt_updates">Ενημερώσεις</string>
+    <string name="find_auto_scanning_mediastore">Ευρετηρίαση πακέτων από το MediaStore…</string>
+    <string name="find_auto_scanning_storage">Σάρωση φακέλων αποθήκευσης…</string>
+    <string name="find_auto_scanning_folder">Σάρωση %s…</string>
+    <string name="find_auto_scanning_root">Σάρωση Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">Ανάγνωση πληροφοριών πακέτου (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">Βρέθηκαν %d πακέτα</string>
+    <string name="source_folder_root">Ριζικός χώρος αποθήκευσης</string>
+    <string name="source_folder_sdcard">Κάρτα SD</string>
 </resources>

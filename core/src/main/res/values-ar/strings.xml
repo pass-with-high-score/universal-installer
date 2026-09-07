@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">استعادة بياناتك</string>
     <string name="onboarding_restore_desc">هل تنتقل من جهاز آخر أو من Obtainium؟ يمكنك استعادة إعداداتك والتطبيقات المتتبعة ورموز API المميزة الآن.</string>
     <string name="onboarding_restore_action">استعادة من النسخة الاحتياطية</string>
+    <string name="updates_card_badge_not_installed">غير مثبت</string>
+    <string name="updates_card_btn_install">تثبيت</string>
+    <string name="updates_dialog_pick_apk_title">حدد ملفًا لتنزيله</string>
+    <string name="updates_dialog_pick_apk_subtitle">يحتوي هذا الإصدار على حزم متعددة. حدد الملف المتوافق مع جهازك:</string>
+    <string name="updates_dialog_device_arch">معمارية الجهاز: %1$s</string>
+    <string name="updates_dialog_recommended">موصى به</string>
+    <string name="updates_detail_choose_asset_btn">اختر ملفًا للتنزيل (%1$d)</string>
+    <string name="nav_install">تثبيت</string>
+    <string name="nav_updates">التحديثات</string>
+    <string name="nav_manage">إدارة</string>
+    <string name="nav_settings">الإعدادات</string>
 </resources>

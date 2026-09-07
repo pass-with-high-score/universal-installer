@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">Bu işlem diğer uygulamaların APK yükleme yeteneğini devre dışı bırakacak ve Universal Installer\'ı tek yükleyici yapacaktır.</string>
     <string name="setting_revoke_other_installers_toast_success">%1$d uygulamanın yükleme izinleri iptal edildi</string>
     <string name="setting_revoke_other_installers_toast_none">Yükleme iznine sahip başka uygulama yok</string>
+    <string name="txt_updates">Güncellemeler</string>
+    <string name="find_auto_scanning_mediastore">MediaStore\'dan paketler dizine ekleniyor…</string>
+    <string name="find_auto_scanning_storage">Depolama klasörleri taranıyor…</string>
+    <string name="find_auto_scanning_folder">%s taranıyor…</string>
+    <string name="find_auto_scanning_root">Android/data (Root) taranıyor…</string>
+    <string name="find_auto_scanning_enrich">Paket bilgileri okunuyor (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">%d paket bulundu</string>
+    <string name="source_folder_root">Kök depolama</string>
+    <string name="source_folder_sdcard">SD Kart</string>
 </resources>

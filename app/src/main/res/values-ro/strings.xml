@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">Aceasta va dezactiva capacitatea altor aplicații de a instala fișiere APK, lăsând Universal Installer ca unic instalator.</string>
     <string name="setting_revoke_other_installers_toast_success">S-au revocat permisiunile de instalare pentru %1$d aplicații</string>
     <string name="setting_revoke_other_installers_toast_none">Nicio altă aplicație nu deține permisiuni de instalare</string>
+    <string name="txt_updates">Actualizări</string>
+    <string name="find_auto_scanning_mediastore">Se indexează pachetele din MediaStore…</string>
+    <string name="find_auto_scanning_storage">Se scanează folderele de stocare…</string>
+    <string name="find_auto_scanning_folder">Se scanează %s…</string>
+    <string name="find_auto_scanning_root">Se scanează Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">Se citesc informațiile pachetului (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">%d pachete găsite</string>
+    <string name="source_folder_root">Stocare rădăcină</string>
+    <string name="source_folder_sdcard">Card SD</string>
 </resources>

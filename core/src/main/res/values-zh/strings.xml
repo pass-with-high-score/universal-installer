@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">恢复您的数据</string>
     <string name="onboarding_restore_desc">从其他设备或 Obtainium 换机过来？您可以立即恢复您的设置、跟踪的应用以及 API 令牌。</string>
     <string name="onboarding_restore_action">从备份恢复</string>
+    <string name="updates_card_badge_not_installed">未安装</string>
+    <string name="updates_card_btn_install">安装</string>
+    <string name="updates_dialog_pick_apk_title">选择要下载的文件</string>
+    <string name="updates_dialog_pick_apk_subtitle">此版本包含多个安装包。请选择与您设备兼容的文件：</string>
+    <string name="updates_dialog_device_arch">设备架构：%1$s</string>
+    <string name="updates_dialog_recommended">推荐</string>
+    <string name="updates_detail_choose_asset_btn">选择要下载的文件 (%1$d)</string>
+    <string name="nav_install">安装</string>
+    <string name="nav_updates">更新</string>
+    <string name="nav_manage">管理</string>
+    <string name="nav_settings">设置</string>
 </resources>

@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">Ini akan menonaktifkan kemampuan aplikasi lain untuk menginstal APK, menjadikan Universal Installer sebagai satu-satunya penginstal.</string>
     <string name="setting_revoke_other_installers_toast_success">Izin instalasi dicabut dari %1$d aplikasi</string>
     <string name="setting_revoke_other_installers_toast_none">Tidak ada aplikasi lain yang memiliki izin instalasi</string>
+    <string name="txt_updates">Pembaruan</string>
+    <string name="find_auto_scanning_mediastore">Mengindeks paket dari MediaStore…</string>
+    <string name="find_auto_scanning_storage">Memindai folder penyimpanan…</string>
+    <string name="find_auto_scanning_folder">Memindai %s…</string>
+    <string name="find_auto_scanning_root">Memindai Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">Membaca info paket (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">%d paket ditemukan</string>
+    <string name="source_folder_root">Penyimpanan root</string>
+    <string name="source_folder_sdcard">Kartu SD</string>
 </resources>

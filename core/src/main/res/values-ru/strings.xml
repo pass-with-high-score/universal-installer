@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Восстановление данных</string>
     <string name="onboarding_restore_desc">Переходите с другого устройства или Obtainium? Вы можете восстановить настройки, отслеживаемые приложения и токены API прямо сейчас.</string>
     <string name="onboarding_restore_action">Восстановить из резервной копии</string>
+    <string name="updates_card_badge_not_installed">Не установлено</string>
+    <string name="updates_card_btn_install">Установить</string>
+    <string name="updates_dialog_pick_apk_title">Выберите файл для загрузки</string>
+    <string name="updates_dialog_pick_apk_subtitle">Этот релиз содержит несколько пакетов. Выберите файл, совместимый с вашим устройством:</string>
+    <string name="updates_dialog_device_arch">Архитектура устройства: %1$s</string>
+    <string name="updates_dialog_recommended">Рекомендуется</string>
+    <string name="updates_detail_choose_asset_btn">Выбрать файл для загрузки (%1$d)</string>
+    <string name="nav_install">Установить</string>
+    <string name="nav_updates">Обновления</string>
+    <string name="nav_manage">Управление</string>
+    <string name="nav_settings">Настройки</string>
 </resources>

@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">Esto desactivará la capacidad de otras apps para instalar APKs, dejando a Universal Installer como único instalador.</string>
     <string name="setting_revoke_other_installers_toast_success">Se revocaron los permisos de instalación a %1$d apps</string>
     <string name="setting_revoke_other_installers_toast_none">Ninguna otra app tiene permisos de instalación</string>
+    <string name="txt_updates">Actualizaciones</string>
+    <string name="find_auto_scanning_mediastore">Indexando paquetes desde MediaStore…</string>
+    <string name="find_auto_scanning_storage">Escaneando carpetas de almacenamiento…</string>
+    <string name="find_auto_scanning_folder">Escaneando %s…</string>
+    <string name="find_auto_scanning_root">Escaneando Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">Leyendo información del paquete (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">%d paquetes encontrados</string>
+    <string name="source_folder_root">Almacenamiento raíz</string>
+    <string name="source_folder_sdcard">Tarjeta SD</string>
 </resources>

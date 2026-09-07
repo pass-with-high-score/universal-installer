@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">अपना डेटा पुनर्स्थापित करें</string>
     <string name="onboarding_restore_desc">किसी अन्य डिवाइस या Obtainium से स्विच कर रहे हैं? आप अभी अपनी सेटिंग्स, ट्रैक किए गए ऐप और API टोकन पुनर्स्थापित कर सकते हैं।</string>
     <string name="onboarding_restore_action">बैकअप से पुनर्स्थापित करें</string>
+    <string name="updates_card_badge_not_installed">इंस्टॉल नहीं है</string>
+    <string name="updates_card_btn_install">इंस्टॉल करें</string>
+    <string name="updates_dialog_pick_apk_title">डाउनलोड करने के लिए फ़ाइल चुनें</string>
+    <string name="updates_dialog_pick_apk_subtitle">इस रिलीज़ में कई पैकेज हैं। अपने डिवाइस के अनुकूल फ़ाइल चुनें:</string>
+    <string name="updates_dialog_device_arch">डिवाइस आर्किटेक्चर: %1$s</string>
+    <string name="updates_dialog_recommended">अनुशंसित</string>
+    <string name="updates_detail_choose_asset_btn">डाउनलोड करने के लिए फ़ाइल चुनें (%1$d)</string>
+    <string name="nav_install">इंस्टॉल करें</string>
+    <string name="nav_updates">अपडेट</string>
+    <string name="nav_manage">प्रबंधित करें</string>
+    <string name="nav_settings">सेटिंग्स</string>
 </resources>

@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Pulihkan data Anda</string>
     <string name="onboarding_restore_desc">Beralih dari perangkat lain atau Obtainium? Anda dapat memulihkan setelan, aplikasi yang dilacak, dan token API sekarang juga.</string>
     <string name="onboarding_restore_action">Pulihkan dari Cadangan</string>
+    <string name="updates_card_badge_not_installed">Belum Terpasang</string>
+    <string name="updates_card_btn_install">Instal</string>
+    <string name="updates_dialog_pick_apk_title">Pilih File untuk Diunduh</string>
+    <string name="updates_dialog_pick_apk_subtitle">Rilis ini berisi beberapa paket. Pilih file yang kompatibel dengan perangkat Anda:</string>
+    <string name="updates_dialog_device_arch">Arsitektur perangkat: %1$s</string>
+    <string name="updates_dialog_recommended">Disarankan</string>
+    <string name="updates_detail_choose_asset_btn">Pilih File untuk Diunduh (%1$d)</string>
+    <string name="nav_install">Instal</string>
+    <string name="nav_updates">Pembaruan</string>
+    <string name="nav_manage">Kelola</string>
+    <string name="nav_settings">Pengaturan</string>
 </resources>

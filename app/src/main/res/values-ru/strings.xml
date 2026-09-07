@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">Это отключит возможность установки APK другими приложениями, сделав Universal Installer единственным установщиком.</string>
     <string name="setting_revoke_other_installers_toast_success">Отозваны разрешения на установку у %1$d приложений</string>
     <string name="setting_revoke_other_installers_toast_none">Другие приложения не имеют разрешений на установку</string>
+    <string name="txt_updates">Обновления</string>
+    <string name="find_auto_scanning_mediastore">Индексация пакетов из MediaStore…</string>
+    <string name="find_auto_scanning_storage">Сканирование папок хранилища…</string>
+    <string name="find_auto_scanning_folder">Сканирование %s…</string>
+    <string name="find_auto_scanning_root">Сканирование Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">Чтение информации о пакете (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">Найдено пакетов: %d</string>
+    <string name="source_folder_root">Корневое хранилище</string>
+    <string name="source_folder_sdcard">SD-карта</string>
 </resources>

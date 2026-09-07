@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">这将禁用其他应用安装 APK 的能力，仅保留 Universal Installer 作为唯一的安装程序。</string>
     <string name="setting_revoke_other_installers_toast_success">已撤销 %1$d 个应用的安装权限</string>
     <string name="setting_revoke_other_installers_toast_none">没有其他应用拥有安装权限</string>
+    <string name="txt_updates">更新</string>
+    <string name="find_auto_scanning_mediastore">正在从 MediaStore 建立安装包索引…</string>
+    <string name="find_auto_scanning_storage">正在扫描存储文件夹…</string>
+    <string name="find_auto_scanning_folder">正在扫描 %s…</string>
+    <string name="find_auto_scanning_root">正在扫描 Android/data (Root)…</string>
+    <string name="find_auto_scanning_enrich">正在读取安装包信息 (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">找到 %d 个安装包</string>
+    <string name="source_folder_root">根存储</string>
+    <string name="source_folder_sdcard">SD 卡</string>
 </resources>

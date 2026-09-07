@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Відновлення даних</string>
     <string name="onboarding_restore_desc">Переходите з іншого пристрою або Obtainium? Ви можете відновити налаштування, відстежувані програми та токени API просто зараз.</string>
     <string name="onboarding_restore_action">Відновити з резервної копії</string>
+    <string name="updates_card_badge_not_installed">Не встановлено</string>
+    <string name="updates_card_btn_install">Встановити</string>
+    <string name="updates_dialog_pick_apk_title">Виберіть файл для завантаження</string>
+    <string name="updates_dialog_pick_apk_subtitle">Цей випуск містить кілька пакетів. Виберіть файл, сумісний з вашим пристроєм:</string>
+    <string name="updates_dialog_device_arch">Архітектура пристрою: %1$s</string>
+    <string name="updates_dialog_recommended">Рекомендовано</string>
+    <string name="updates_detail_choose_asset_btn">Вибрати файл для завантаження (%1$d)</string>
+    <string name="nav_install">Встановити</string>
+    <string name="nav_updates">Оновлення</string>
+    <string name="nav_manage">Керувати</string>
+    <string name="nav_settings">Налаштування</string>
 </resources>

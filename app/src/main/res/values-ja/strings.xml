@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">これにより他のアプリによる APK のインストールが無効になり、Universal Installer のみが唯一のインストーラーになります。</string>
     <string name="setting_revoke_other_installers_toast_success">%1$d 個のアプリからインストール権限を取り消しました</string>
     <string name="setting_revoke_other_installers_toast_none">インストール権限を持つ他のアプリはありません</string>
+    <string name="txt_updates">更新</string>
+    <string name="find_auto_scanning_mediastore">MediaStore からパッケージをインデックス中…</string>
+    <string name="find_auto_scanning_storage">ストレージフォルダをスキャン中…</string>
+    <string name="find_auto_scanning_folder">%s をスキャン中…</string>
+    <string name="find_auto_scanning_root">Android/data (Root) をスキャン中…</string>
+    <string name="find_auto_scanning_enrich">パッケージ情報を読み取り中 (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">%d 個のパッケージが見つかりました</string>
+    <string name="source_folder_root">ルートストレージ</string>
+    <string name="source_folder_sdcard">SDカード</string>
 </resources>

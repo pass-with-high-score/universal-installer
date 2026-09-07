@@ -976,4 +976,13 @@
     <string name="setting_revoke_other_installers_dialog_desc">다른 앱에서 APK를 설치하는 기능이 비활성화되며, Universal Installer만 유일한 설치 프로그램으로 남습니다.</string>
     <string name="setting_revoke_other_installers_toast_success">%1$d개 앱의 설치 권한이 취소되었습니다</string>
     <string name="setting_revoke_other_installers_toast_none">설치 권한을 가진 다른 앱이 없습니다</string>
+    <string name="txt_updates">업데이트</string>
+    <string name="find_auto_scanning_mediastore">MediaStore에서 패키지 색인 생성 중…</string>
+    <string name="find_auto_scanning_storage">저장소 폴더 검사 중…</string>
+    <string name="find_auto_scanning_folder">%s 검사 중…</string>
+    <string name="find_auto_scanning_root">Android/data (Root) 검사 중…</string>
+    <string name="find_auto_scanning_enrich">패키지 정보 읽는 중 (%1$d/%2$d)…</string>
+    <string name="find_auto_found_so_far">%d개 패키지 발견됨</string>
+    <string name="source_folder_root">루트 저장소</string>
+    <string name="source_folder_sdcard">SD 카드</string>
 </resources>

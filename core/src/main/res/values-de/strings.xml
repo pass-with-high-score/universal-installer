@@ -66,4 +66,15 @@
     <string name="onboarding_restore_title">Daten wiederherstellen</string>
     <string name="onboarding_restore_desc">Wechseln Sie von einem anderen Gerät oder von Obtainium? Sie können Ihre Einstellungen, verfolgten Apps und API-Token jetzt wiederherstellen.</string>
     <string name="onboarding_restore_action">Aus Sicherung wiederherstellen</string>
+    <string name="updates_card_badge_not_installed">Nicht installiert</string>
+    <string name="updates_card_btn_install">Installieren</string>
+    <string name="updates_dialog_pick_apk_title">Datei zum Herunterladen auswählen</string>
+    <string name="updates_dialog_pick_apk_subtitle">Diese Version enthält mehrere Pakete. Wählen Sie die mit Ihrem Gerät kompatible Datei aus:</string>
+    <string name="updates_dialog_device_arch">Gerätearchitektur: %1$s</string>
+    <string name="updates_dialog_recommended">Empfohlen</string>
+    <string name="updates_detail_choose_asset_btn">Datei zum Herunterladen auswählen (%1$d)</string>
+    <string name="nav_install">Installieren</string>
+    <string name="nav_updates">Updates</string>
+    <string name="nav_manage">Verwalten</string>
+    <string name="nav_settings">Einstellungen</string>
 </resources>
