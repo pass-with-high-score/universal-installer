@@ -160,4 +160,35 @@
     <string name="tv_dialog_btn_done">Done</string>
     <string name="tv_dialog_btn_cancel">Cancel</string>
     <string name="tv_dialog_auto_close">Closing in %ds…</string>
+
+    <!-- TV Updates Screen (Issue #135) -->
+    <string name="tv_nav_updates">Updates</string>
+    <string name="tv_updates_title">App Updates</string>
+    <string name="tv_updates_check_now">Check updates</string>
+    <string name="tv_updates_checking">Checking…</string>
+    <string name="tv_updates_update_all">Update all (%d)</string>
+    <string name="tv_updates_filter_all">All</string>
+    <string name="tv_updates_filter_installed">Installed</string>
+    <string name="tv_updates_filter_updates">Updates</string>
+    <string name="tv_updates_empty">No tracked apps found</string>
+    <string name="tv_updates_add_app">Add app</string>
+    <string name="tv_updates_detail_current">Current version</string>
+    <string name="tv_updates_detail_latest">Latest release</string>
+    <string name="tv_updates_detail_source">Source</string>
+    <string name="tv_updates_detail_status">Status</string>
+    <string name="tv_updates_status_update_available">Update available</string>
+    <string name="tv_updates_status_up_to_date">Up to date</string>
+    <string name="tv_updates_status_not_installed">Not installed</string>
+    <string name="tv_updates_status_ignored">Version ignored</string>
+    <string name="tv_updates_btn_update">Update</string>
+    <string name="tv_updates_btn_install">Install</string>
+    <string name="tv_updates_btn_check">Check update</string>
+    <string name="tv_updates_btn_ignore">Ignore version</string>
+    <string name="tv_updates_btn_remove">Remove</string>
+    <string name="tv_updates_release_notes">Release Notes</string>
+    <string name="tv_updates_no_release_notes">No release notes available</string>
+    <string name="tv_updates_add_title">Add Tracked App</string>
+    <string name="tv_updates_add_url_hint">GitHub / GitLab / Direct APK URL</string>
+    <string name="tv_updates_add_submit">Add</string>
+    <string name="tv_updates_add_cancel">Cancel</string>
 </resources>

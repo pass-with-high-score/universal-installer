@@ -32,6 +32,7 @@
         android:required="true" />
 
     <application
+        android:name=".TvApplication"
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
         android:banner="@drawable/banner"

@@ -146,4 +146,35 @@
     <string name="tv_dialog_btn_done">Xong</string>
     <string name="tv_dialog_btn_cancel">Hủy</string>
     <string name="tv_dialog_auto_close">Tự động đóng sau %ds…</string>
+
+    <!-- TV Updates Screen (Issue #135) -->
+    <string name="tv_nav_updates">Cập nhật</string>
+    <string name="tv_updates_title">Cập nhật ứng dụng</string>
+    <string name="tv_updates_check_now">Kiểm tra bản mới</string>
+    <string name="tv_updates_checking">Đang kiểm tra…</string>
+    <string name="tv_updates_update_all">Cập nhật tất cả (%d)</string>
+    <string name="tv_updates_filter_all">Tất cả</string>
+    <string name="tv_updates_filter_installed">Đã cài</string>
+    <string name="tv_updates_filter_updates">Bản mới</string>
+    <string name="tv_updates_empty">Chưa có ứng dụng theo dõi</string>
+    <string name="tv_updates_add_app">Thêm ứng dụng</string>
+    <string name="tv_updates_detail_current">Phiên bản hiện tại</string>
+    <string name="tv_updates_detail_latest">Bản phát hành mới nhất</string>
+    <string name="tv_updates_detail_source">Nguồn</string>
+    <string name="tv_updates_detail_status">Trạng thái</string>
+    <string name="tv_updates_status_update_available">Có bản cập nhật mới</string>
+    <string name="tv_updates_status_up_to_date">Đã là mới nhất</string>
+    <string name="tv_updates_status_not_installed">Chưa cài đặt</string>
+    <string name="tv_updates_status_ignored">Đã bỏ qua phiên bản này</string>
+    <string name="tv_updates_btn_update">Cập nhật</string>
+    <string name="tv_updates_btn_install">Cài đặt</string>
+    <string name="tv_updates_btn_check">Kiểm tra</string>
+    <string name="tv_updates_btn_ignore">Bỏ qua bản này</string>
+    <string name="tv_updates_btn_remove">Xóa theo dõi</string>
+    <string name="tv_updates_release_notes">Thông tin cập nhật</string>
+    <string name="tv_updates_no_release_notes">Không có thông tin chi tiết</string>
+    <string name="tv_updates_add_title">Theo dõi ứng dụng mới</string>
+    <string name="tv_updates_add_url_hint">URL GitHub / GitLab / Direct APK</string>
+    <string name="tv_updates_add_submit">Thêm</string>
+    <string name="tv_updates_add_cancel">Hủy</string>
 </resources>

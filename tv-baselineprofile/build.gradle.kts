@@ -22,6 +22,7 @@ android {
         minSdk = libs.versions.baselineProfileMinSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        missingDimensionStrategy("distribution", "opensource")
     }
 
     targetProjectPath = ":tv"

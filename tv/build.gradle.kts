@@ -9,12 +9,29 @@ plugins {
     alias(libs.plugins.androidx.baselineprofile)
 }
 
-val firebaseConfig = file("google-services.json")
+val firebaseConfig = file("src/play/google-services.json")
 val hasFirebaseConfig = firebaseConfig.exists()
+
+val strayFirebaseConfig = file("google-services.json")
+require(!strayFirebaseConfig.exists()) {
+    "$strayFirebaseConfig applies to every flavor, including the open-source build. " +
+        "Move it to $firebaseConfig — that is the only location the `play` flavor reads."
+}
 
 if (hasFirebaseConfig) {
     apply(plugin = "com.google.gms.google-services")
     apply(plugin = "com.google.firebase.crashlytics")
+
+    extensions.findByName("googleServices")?.let { ext ->
+        try {
+            val strategyClass = Class.forName("com.google.gms.googleservices.GoogleServicesPlugin\$MissingGoogleServicesStrategy")
+            val ignoreStrategy = strategyClass.enumConstants?.firstOrNull { (it as Enum<*>).name == "IGNORE" }
+            if (ignoreStrategy != null) {
+                ext.javaClass.getMethod("setMissingGoogleServicesStrategy", strategyClass)
+                    .invoke(ext, ignoreStrategy)
+            }
+        } catch (_: Throwable) {}
+    }
 }
 
 android {
@@ -71,12 +88,25 @@ android {
             }
         }
     }
+
+    flavorDimensions += "distribution"
+    productFlavors {
+        create("opensource") {
+            dimension = "distribution"
+            isDefault = true
+        }
+        create("play") {
+            dimension = "distribution"
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     dependenciesInfo {
         includeInApk = false
@@ -99,6 +129,7 @@ kotlin {
 
 dependencies {
     implementation(project(":core"))
+    "opensourceImplementation"(project(":updater"))
     implementation(libs.shizuku.api)
     implementation(libs.shizuku.provider)
     testImplementation(libs.junit)
@@ -124,10 +155,21 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
 
+    // Koin DI
+    implementation(project.dependencies.platform(libs.koin.bom))
+    implementation(libs.koin.core)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
+
+    // Image loading
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
+    implementation(libs.timber)
+
     if (hasFirebaseConfig) {
-        implementation(platform(libs.firebase.bom))
-        implementation(libs.firebase.analytics)
-        implementation(libs.firebase.crashlytics)
+        "playImplementation"(platform(libs.firebase.bom))
+        "playImplementation"(libs.firebase.analytics)
+        "playImplementation"(libs.firebase.crashlytics)
     }
 
     androidTestImplementation(platform(libs.androidx.compose.bom))

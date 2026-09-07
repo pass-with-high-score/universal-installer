@@ -32,13 +32,22 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.RocketLaunch
+import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.Text as M3Text
+import androidx.compose.runtime.produceState
+import androidx.compose.ui.graphics.vector.ImageVector
 import app.pwhs.tv.presentation.manage.ManageScreen
 import app.pwhs.tv.presentation.receive.ReceiveScreen
 import app.pwhs.tv.presentation.settings.SettingsScreen
+import app.pwhs.tv.presentation.updates.TvUpdatesProvider
 
 /** Top-level destinations reachable from the side rail. */
 private object TvRoute {
     const val RECEIVE = "receive"
+    const val UPDATES = "updates"
     const val MANAGE = "manage"
     const val SETTINGS = "settings"
 }
@@ -57,6 +66,12 @@ fun TvApp(modifier: Modifier = Modifier) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = backStackEntry?.destination?.route ?: TvRoute.RECEIVE
+
+    val updateCount by produceState(initialValue = 0) {
+        if (TvUpdatesProvider.isAvailable) {
+            TvUpdatesProvider.getUpdateCountFlow().collect { value = it }
+        }
+    }
 
     Box(
         modifier = modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface),
@@ -92,6 +107,15 @@ fun TvApp(modifier: Modifier = Modifier) {
                     onClick = { navController.switchTab(TvRoute.RECEIVE) },
                     iconRes = R.drawable.ic_apk_install
                 )
+                if (TvUpdatesProvider.isAvailable) {
+                    Spacer(Modifier.height(12.dp))
+                    NavigationItem(
+                        selected = currentRoute == TvRoute.UPDATES,
+                        onClick = { navController.switchTab(TvRoute.UPDATES) },
+                        imageVector = Icons.Rounded.RocketLaunch,
+                        badgeCount = updateCount,
+                    )
+                }
                 Spacer(Modifier.height(12.dp))
                 NavigationItem(
                     selected = currentRoute == TvRoute.MANAGE,
@@ -114,6 +138,9 @@ fun TvApp(modifier: Modifier = Modifier) {
                     modifier = Modifier.fillMaxSize(),
                 ) {
                     composable(TvRoute.RECEIVE) { ReceiveScreen(modifier = Modifier.fillMaxSize()) }
+                    if (TvUpdatesProvider.isAvailable) {
+                        composable(TvRoute.UPDATES) { TvUpdatesProvider.UpdatesScreen(modifier = Modifier.fillMaxSize()) }
+                    }
                     composable(TvRoute.MANAGE) { ManageScreen(modifier = Modifier.fillMaxSize()) }
                     composable(TvRoute.SETTINGS) { SettingsScreen(modifier = Modifier.fillMaxSize()) }
                 }
@@ -140,7 +167,9 @@ private fun NavController.switchTab(route: String) {
 private fun NavigationItem(
     selected: Boolean,
     onClick: () -> Unit,
-    iconRes: Int
+    iconRes: Int? = null,
+    imageVector: ImageVector? = null,
+    badgeCount: Int = 0,
 ) {
     val shape = RoundedCornerShape(12.dp)
     Surface(
@@ -163,11 +192,37 @@ private fun NavigationItem(
             Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                painter = painterResource(iconRes),
-                contentDescription = null,
-                modifier = Modifier.size(24.dp)
-            )
+            if (badgeCount > 0) {
+                BadgedBox(
+                    badge = {
+                        Badge {
+                            M3Text(if (badgeCount > 99) "99+" else badgeCount.toString())
+                        }
+                    }
+                ) {
+                    RenderIcon(iconRes, imageVector)
+                }
+            } else {
+                RenderIcon(iconRes, imageVector)
+            }
         }
+    }
+}
+
+@OptIn(ExperimentalTvMaterial3Api::class)
+@Composable
+private fun RenderIcon(iconRes: Int?, imageVector: ImageVector?) {
+    if (imageVector != null) {
+        Icon(
+            imageVector = imageVector,
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
+    } else if (iconRes != null) {
+        Icon(
+            painter = painterResource(iconRes),
+            contentDescription = null,
+            modifier = Modifier.size(24.dp)
+        )
     }
 }
