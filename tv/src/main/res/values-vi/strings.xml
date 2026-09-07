@@ -135,4 +135,15 @@
     <string name="installer_mode_root" translatable="false">Root</string>
     <string name="installer_mode_package_installer">Trình cài đặt gói</string>
     <string name="installer_mode_using">Đang dùng %s</string>
+
+    <!-- TV Install Dialog (Issue #134) -->
+    <string name="tv_dialog_install_title">Cài đặt ứng dụng</string>
+    <string name="tv_dialog_parsing_apk">Đang đọc thông tin gói cài đặt…</string>
+    <string name="tv_dialog_parse_error">Không thể đọc thông tin gói APK</string>
+    <string name="tv_dialog_install_success">Cài đặt hoàn tất</string>
+    <string name="tv_dialog_install_failed">Cài đặt thất bại</string>
+    <string name="tv_dialog_btn_open">Mở</string>
+    <string name="tv_dialog_btn_done">Xong</string>
+    <string name="tv_dialog_btn_cancel">Hủy</string>
+    <string name="tv_dialog_auto_close">Tự động đóng sau %ds…</string>
 </resources>

@@ -58,10 +58,22 @@
 
                 <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
             </intent-filter>
+        </activity>
 
-            <!-- Issue #94: without these the app never appears in "Open with" on TV, so a
-                 sideloaded package could only arrive over the network receiver. Mirrors the
-                 phone filters — matches broadly and validates the extension in code. -->
+        <!-- Issue #134: Dialog-style install entry point for TV.
+             External apps open APKs here as a popup card over their UI,
+             auto-finishing after install so the user returns to their app. -->
+        <activity
+            android:name=".presentation.install.TvDialogInstallActivity"
+            android:autoRemoveFromRecents="true"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.UniversalInstaller.TvDialog">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.INSTALL_PACKAGE" />

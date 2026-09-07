@@ -70,15 +70,13 @@ fun BottomBar(
     )
 
     val updateCount by produceState(initialValue = 0) {
-        val repo = runCatching {
-            org.koin.core.context.GlobalContext.get().getOrNull<app.pwhs.updater.data.repo.AppUpdateRepository>()
-        }.getOrNull() ?: runCatching {
-            org.koin.java.KoinJavaComponent.get<app.pwhs.updater.data.repo.AppUpdateRepository>(
-                app.pwhs.updater.data.repo.AppUpdateRepository::class.java
-            )
-        }.getOrNull()
-        if (repo != null) {
-            repo.getUpdateCount().collect { value = it }
+        runCatching {
+            val repoClass = Class.forName("app.pwhs.updater.data.repo.AppUpdateRepository")
+            val repo = org.koin.java.KoinJavaComponent.get<Any>(repoClass)
+            val method = repoClass.getMethod("getUpdateCount")
+            @Suppress("UNCHECKED_CAST")
+            val flow = method.invoke(repo) as? kotlinx.coroutines.flow.Flow<Int>
+            flow?.collect { value = it }
         }
     }
 

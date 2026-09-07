@@ -1,4 +1,13 @@
 <resources>
 
     <style name="Theme.UniversalInstaller" parent="Theme.AppCompat.DayNight.NoActionBar" />
+
+    <style name="Theme.UniversalInstaller.TvDialog" parent="Theme.UniversalInstaller">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowAnimationStyle">@null</item>
+        <item name="android:backgroundDimEnabled">true</item>
+        <item name="android:backgroundDimAmount">0.65</item>
+    </style>
 </resources>
