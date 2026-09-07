@@ -6,14 +6,19 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Environment
 import android.os.storage.StorageManager
+import android.provider.MediaStore
 import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 import app.pwhs.core.util.WatchAppCheck
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 
 /**
@@ -53,6 +58,14 @@ object ApkScanner {
     private val SUPPORTED_EXTENSIONS = setOf("apk", "apks", "xapk", "apkm", "apk+")
     private val ARCHIVE_EXTENSIONS = setOf("apks", "xapk", "apkm", "apk+")
 
+    private val IGNORED_DIR_NAMES = setOf(
+        "android", "dcim", "pictures", "movies", "music", "podcasts",
+        "alarms", "ringtones", "notifications", "audiobooks",
+        ".thumbnails", "cache", ".cache", ".git"
+    )
+
+
+
     fun hasAllFilesAccess(context: Context): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             Environment.isExternalStorageManager()
@@ -77,29 +90,115 @@ object ApkScanner {
     }
 
     /**
-     * Walk external storage looking for installable package files. Returns entries sorted
-     * newest-first. Respects coroutine cancellation so the caller can bail on a long scan.
-     *
-     * For raw .apk files we parse the archive manifest (via PackageManager.getPackageArchiveInfo)
-     * and compare its versionCode against the currently-installed package. This drives the
-     * "New / Installed / Update / Older" chip tags in the UI. Split-bundle archives
-     * (.apks/.xapk/.apkm) are zipped containers — we'd need to extract base.apk to read the
-     * manifest, which is too slow during a scan, so they stay InstallState.Unknown and only
-     * get the "Split" chip.
+     * Finds installable package files quickly by querying MediaStore and scanning
+     * common user download directories directly, falling back to a bounded recursive scan
+     * if MediaStore yields no results. Enriches metadata in parallel to minimize latency.
      */
     suspend fun scan(context: Context): List<FoundPackageFile> = withContext(Dispatchers.IO) {
+        val foundMap = LinkedHashMap<String, FoundPackageFile>()
+
+        // 1. Fast path: MediaStore query (fetches all indexed APKs on the device in milliseconds)
+        scanMediaStore(context).forEach { foundMap[it.path] = it }
+
+        // 2. Comprehensive filesystem walk across all volume roots (excluding heavy media folders).
+        // This guarantees catching unindexed files, custom folders (e.g. MT2, APK Installer, backups),
+        // and folders containing .nomedia (e.g. Telegram, WhatsApp).
         val roots = collectVolumeRoots(context)
-        if (roots.isEmpty()) return@withContext emptyList()
-        val raw = mutableListOf<FoundPackageFile>()
         for (root in roots) {
             currentCoroutineContext().ensureActive()
-            scanRecursive(root, raw, depth = 0, maxDepth = 10)
+            scanRecursive(root, foundMap, depth = 0, maxDepth = 6)
+
+            // Specifically scan Android/media (e.g. WhatsApp Documents) since Android/ is skipped at root level
+            val androidMedia = File(root, "Android/media")
+            if (androidMedia.exists() && androidMedia.canRead()) {
+                scanRecursive(androidMedia, foundMap, depth = 0, maxDepth = 5)
+            }
         }
+
+        if (foundMap.isEmpty()) return@withContext emptyList()
+
+        // 3. Enrich APK metadata concurrently (limited parallelism to avoid I/O starvation)
         val pm = context.packageManager
-        raw.map { file ->
-            currentCoroutineContext().ensureActive()
-            if (file.extension == "apk") enrichWithPackageInfo(pm, file) else file
+        val rawList = foundMap.values.toList()
+        val enrichDispatcher = Dispatchers.IO.limitedParallelism(8)
+
+        coroutineScope {
+            rawList.map { file ->
+                async(enrichDispatcher) {
+                    currentCoroutineContext().ensureActive()
+                    if (file.extension == "apk") enrichWithPackageInfo(pm, file) else file
+                }
+            }.awaitAll()
         }.sortedByDescending { it.modifiedMillis }
+    }
+
+    private fun scanMediaStore(context: Context): List<FoundPackageFile> {
+        val out = mutableListOf<FoundPackageFile>()
+        val collection = MediaStore.Files.getContentUri("external")
+        val projection = arrayOf(
+            MediaStore.Files.FileColumns.DATA,
+            MediaStore.Files.FileColumns.DISPLAY_NAME,
+            MediaStore.Files.FileColumns.SIZE,
+            MediaStore.Files.FileColumns.DATE_MODIFIED,
+        )
+
+        val nameCol = MediaStore.Files.FileColumns.DISPLAY_NAME
+        val selection = SUPPORTED_EXTENSIONS.joinToString(" OR ") { "$nameCol LIKE '%.$it'" }
+        val sortOrder = "${MediaStore.Files.FileColumns.DATE_MODIFIED} DESC"
+
+        try {
+            context.contentResolver.query(collection, projection, selection, null, sortOrder)?.use { cursor ->
+                val dataIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA)
+                val nameIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME)
+                val sizeIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE)
+                val dateIdx = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED)
+
+                while (cursor.moveToNext()) {
+                    val path = if (dataIdx != -1) cursor.getString(dataIdx) else null
+                    if (path.isNullOrBlank()) continue
+                    val file = File(path)
+                    if (!file.exists() || !file.canRead()) continue
+
+                    val name = if (nameIdx != -1) cursor.getString(nameIdx) ?: file.name else file.name
+                    val size = if (sizeIdx != -1) cursor.getLong(sizeIdx) else file.length()
+                    val modifiedSec = if (dateIdx != -1) cursor.getLong(dateIdx) else 0L
+                    val modifiedMillis = if (modifiedSec > 0L) modifiedSec * 1000L else file.lastModified()
+                    val ext = file.extension.lowercase()
+
+                    if (ext in SUPPORTED_EXTENSIONS) {
+                        out.add(
+                            FoundPackageFile(
+                                path = file.absolutePath,
+                                name = name,
+                                sizeBytes = if (size > 0L) size else file.length(),
+                                modifiedMillis = modifiedMillis,
+                                extension = ext,
+                            )
+                        )
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Timber.w(e, "MediaStore package query failed")
+        }
+        return out
+    }
+
+
+    private fun addIfPackageFile(file: File, out: MutableMap<String, FoundPackageFile>) {
+        val ext = file.extension.lowercase()
+        if (ext in SUPPORTED_EXTENSIONS) {
+            val path = file.absolutePath
+            if (!out.containsKey(path)) {
+                out[path] = FoundPackageFile(
+                    path = path,
+                    name = file.name,
+                    sizeBytes = file.length(),
+                    modifiedMillis = file.lastModified(),
+                    extension = ext,
+                )
+            }
+        }
     }
 
     /**
@@ -151,7 +250,7 @@ object ApkScanner {
         file: FoundPackageFile,
     ): FoundPackageFile {
         val archive = runCatching {
-            val flags = PackageManager.GET_CONFIGURATIONS
+            val flags = PackageManager.GET_CONFIGURATIONS or PackageManager.GET_SERVICES
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 pm.getPackageArchiveInfo(file.path, PackageManager.PackageInfoFlags.of(flags.toLong()))
             } else {
@@ -159,7 +258,7 @@ object ApkScanner {
             }
         }.getOrNull() ?: return file
 
-        val pkgName = archive.packageName
+        val pkgName = archive.packageName.takeIf { it.isNotBlank() } ?: return file
         val archiveCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             archive.longVersionCode
         } else {
@@ -184,7 +283,14 @@ object ApkScanner {
             archiveCode > installedCode -> InstallState.Newer
             else -> InstallState.Older
         }
-        val isAa = runCatching {
+
+        val hasCarService = archive.services?.any { service ->
+            service.name.contains("MediaBrowserService", ignoreCase = true) ||
+                service.name.contains("CarAppService", ignoreCase = true) ||
+                service.name.contains("CarService", ignoreCase = true)
+        } == true
+
+        val isAa = if (hasCarService) true else runCatching {
             java.util.zip.ZipFile(file.path).use { zip ->
                 val entry = zip.getEntry("AndroidManifest.xml")
                 if (entry != null) {
@@ -211,7 +317,7 @@ object ApkScanner {
 
     private suspend fun scanRecursive(
         dir: File,
-        out: MutableList<FoundPackageFile>,
+        out: MutableMap<String, FoundPackageFile>,
         depth: Int,
         maxDepth: Int,
     ) {
@@ -223,23 +329,12 @@ object ApkScanner {
             currentCoroutineContext().ensureActive()
             if (child.isDirectory) {
                 val name = child.name
-                // Skip dotfiles, app-scoped dirs (restricted even with MANAGE access), and thumbnails.
                 if (name.startsWith(".")) continue
-                if (depth == 0 && name == "Android") continue
+                if (depth == 0 && name.equals("Android", ignoreCase = true)) continue
+                if (name.lowercase() in IGNORED_DIR_NAMES) continue
                 scanRecursive(child, out, depth + 1, maxDepth)
             } else {
-                val ext = child.extension.lowercase()
-                if (ext in SUPPORTED_EXTENSIONS) {
-                    out.add(
-                        FoundPackageFile(
-                            path = child.absolutePath,
-                            name = child.name,
-                            sizeBytes = child.length(),
-                            modifiedMillis = child.lastModified(),
-                            extension = ext,
-                        )
-                    )
-                }
+                addIfPackageFile(child, out)
             }
         }
     }
