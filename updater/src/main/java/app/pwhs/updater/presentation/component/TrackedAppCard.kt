@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Refresh
@@ -142,6 +143,18 @@ fun TrackedAppCard(
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.padding(horizontal = Spacing.S, vertical = Spacing.XS),
+                        )
+                    }
+                } else if (!app.isInstalled) {
+                    Surface(
+                        shape = MaterialTheme.shapes.small,
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.updates_card_badge_not_installed),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(horizontal = Spacing.S, vertical = Spacing.XS),
                         )
                     }
@@ -311,7 +324,22 @@ fun TrackedAppCard(
                     )
                 }
 
-                if (app.hasUpdate && !app.latestDownloadUrl.isNullOrBlank()) {
+                if (!app.isInstalled && !app.latestDownloadUrl.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.width(Spacing.S))
+                    Button(
+                        onClick = onUpdateClick,
+                        enabled = !isDownloading,
+                        shape = MaterialTheme.shapes.medium,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Download,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = stringResource(R.string.updates_card_btn_install))
+                    }
+                } else if (app.hasUpdate && !app.latestDownloadUrl.isNullOrBlank()) {
                     Spacer(modifier = Modifier.width(Spacing.S))
                     Button(
                         onClick = onUpdateClick,

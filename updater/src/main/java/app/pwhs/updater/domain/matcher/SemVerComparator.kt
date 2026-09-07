@@ -37,8 +37,29 @@ object SemVerComparator {
             val p2 = parts2.getOrNull(i)
 
             if (p1 == null && p2 == null) break
-            if (p1 == null) return if (p2?.isNumeric == true && p2.numValue == 0L) 0 else -1
-            if (p2 == null) return if (p1.isNumeric && p1.numValue == 0L) 0 else 1
+            if (p1 == null) {
+                // p1 ended. Check if remaining parts of p2 represent a pre-release tag (e.g. -rc10, -beta)
+                // A normal version (p1) is GREATER than a pre-release version (p2).
+                val remainingHasNonNumeric = parts2.subList(i, parts2.size).any { !it.isNumeric }
+                return if (remainingHasNonNumeric) {
+                    1 // p1 (normal) > p2 (pre-release)
+                } else if (parts2.subList(i, parts2.size).all { it.numValue == 0L }) {
+                    0 // e.g. 1.0 vs 1.0.0
+                } else {
+                    -1 // p1 (1.0) < p2 (1.0.1)
+                }
+            }
+            if (p2 == null) {
+                // p2 ended. Check if remaining parts of p1 represent a pre-release tag
+                val remainingHasNonNumeric = parts1.subList(i, parts1.size).any { !it.isNumeric }
+                return if (remainingHasNonNumeric) {
+                    -1 // p1 (pre-release) < p2 (normal)
+                } else if (parts1.subList(i, parts1.size).all { it.numValue == 0L }) {
+                    0 // e.g. 1.0.0 vs 1.0
+                } else {
+                    1 // p1 (1.0.1) > p2 (1.0)
+                }
+            }
 
             if (p1.isNumeric && p2.isNumeric) {
                 if (p1.numValue != p2.numValue) {

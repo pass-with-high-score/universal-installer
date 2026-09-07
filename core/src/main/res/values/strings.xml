@@ -62,11 +62,13 @@
     <string name="updates_banner_desc_idle">Automatically track releases from GitHub / GitLab</string>
     <string name="updates_card_badge_new">New: %1$s</string>
     <string name="updates_card_badge_up_to_date">Up to date</string>
+    <string name="updates_card_badge_not_installed">Not Installed</string>
     <string name="updates_card_current_version">Current: %1$s</string>
     <string name="updates_card_tag">Tag: %1$s</string>
     <string name="updates_card_downloading">Downloading update…</string>
     <string name="updates_card_changelog_title">Changelog / Release Notes</string>
     <string name="updates_card_btn_update">Update</string>
+    <string name="updates_card_btn_install">Install</string>
     <string name="updates_card_btn_delete">Delete</string>
     <string name="updates_card_btn_check">Check update</string>
     <string name="updates_menu_import">Import Apps (JSON)</string>

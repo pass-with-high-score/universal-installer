@@ -31,6 +31,8 @@ class GitHubReleaseProvider(
         isLenient = true
     }
 
+    private val packageExtensions = setOf(".apk", ".apks", ".xapk", ".apkm")
+
     override fun canHandle(url: String): Boolean {
         val lower = url.lowercase().trim()
         return lower.contains("github.com") && extractRepoPath(url) != null
@@ -46,11 +48,7 @@ class GitHubReleaseProvider(
             ?: return@withContext Result.failure(IllegalArgumentException("Invalid GitHub repository URL: $url"))
 
         try {
-            val apiUrl = if (includePrereleases) {
-                "https://api.github.com/repos/$repoPath/releases"
-            } else {
-                "https://api.github.com/repos/$repoPath/releases/latest"
-            }
+            val apiUrl = "https://api.github.com/repos/$repoPath/releases?per_page=20"
 
             val response = client.get(apiUrl) {
                 header("Accept", "application/vnd.github.v3+json")
@@ -76,19 +74,41 @@ class GitHubReleaseProvider(
             val responseBody = response.bodyAsText()
             val newETag = response.headers["ETag"]
 
-            val releaseJson = if (includePrereleases) {
-                val array = json.parseToJsonElement(responseBody).jsonArray
-                if (array.isEmpty()) return@withContext Result.failure(NoSuchElementException("No releases found"))
-                array.first().jsonObject
-            } else {
-                json.parseToJsonElement(responseBody).jsonObject
+            val array = json.parseToJsonElement(responseBody).jsonArray
+            if (array.isEmpty()) return@withContext Result.failure(NoSuchElementException("No releases found"))
+
+            val candidates = array.mapNotNull { it as? JsonObject }.filter { obj ->
+                val isDraft = obj["draft"]?.jsonPrimitive?.booleanOrNull ?: false
+                !isDraft
             }
 
-            val details = parseReleaseObject(releaseJson, newETag)
+            val targetRelease = if (includePrereleases) {
+                candidates.firstOrNull { hasPackageAsset(it) }
+                    ?: candidates.firstOrNull()
+                    ?: array.first().jsonObject
+            } else {
+                candidates.firstOrNull { obj ->
+                    val isPrerelease = obj["prerelease"]?.jsonPrimitive?.booleanOrNull ?: false
+                    !isPrerelease && hasPackageAsset(obj)
+                } ?: candidates.firstOrNull { obj ->
+                    val isPrerelease = obj["prerelease"]?.jsonPrimitive?.booleanOrNull ?: false
+                    !isPrerelease
+                } ?: array.first().jsonObject
+            }
+
+            val details = parseReleaseObject(targetRelease, newETag)
             Result.success(details)
         } catch (e: Exception) {
             Timber.e(e, "Failed to fetch release from GitHub for $url")
             Result.failure(e)
+        }
+    }
+
+    private fun hasPackageAsset(obj: JsonObject): Boolean {
+        val assets = obj["assets"]?.jsonArray ?: return false
+        return assets.any { item ->
+            val name = (item as? JsonObject)?.get("name")?.jsonPrimitive?.content ?: ""
+            packageExtensions.any { ext -> name.endsWith(ext, ignoreCase = true) }
         }
     }
 

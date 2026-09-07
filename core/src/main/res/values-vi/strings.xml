@@ -58,11 +58,13 @@
     <string name="updates_banner_desc_idle">Tự động theo dõi release từ GitHub / GitLab</string>
     <string name="updates_card_badge_new">Mới: %1$s</string>
     <string name="updates_card_badge_up_to_date">Đã mới nhất</string>
+    <string name="updates_card_badge_not_installed">Chưa cài đặt</string>
     <string name="updates_card_current_version">Hiện tại: %1$s</string>
     <string name="updates_card_tag">Tag: %1$s</string>
     <string name="updates_card_downloading">Đang tải bản cập nhật…</string>
     <string name="updates_card_changelog_title">Nhật ký thay đổi / Ghi chú phát hành</string>
     <string name="updates_card_btn_update">Cập nhật</string>
+    <string name="updates_card_btn_install">Cài đặt</string>
     <string name="updates_card_btn_delete">Xóa</string>
     <string name="updates_card_btn_check">Kiểm tra bản mới</string>
     <string name="updates_menu_import">Nhập danh sách (JSON / Obtainium)</string>

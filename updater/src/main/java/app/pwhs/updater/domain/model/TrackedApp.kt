@@ -31,9 +31,10 @@ data class TrackedApp(
 
     val hasUpdate: Boolean
         get() {
+            if (!isInstalled) return false // Fix #130: Uninstalled apps are not updates
             if (latestVersionName.isNullOrBlank()) return false
+            if (latestDownloadUrl.isNullOrBlank()) return false // Fix #133: Release without APK cannot be updated
             if (isVersionIgnored) return false
-            if (!isInstalled) return true // App is tracked but not yet installed on device
             if (isLatestVersionNameBackedByCurrentVersionCode()) return false
             return SemVerComparator.isNewer(currentVersionName, latestVersionName)
         }
