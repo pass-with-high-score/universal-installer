@@ -1,5 +1,6 @@
 package app.pwhs.updater.presentation
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -22,7 +23,9 @@ import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.domain.AppThemePreset
 import app.pwhs.core.domain.ThemeMode
 import app.pwhs.core.ui.theme.UniversalInstallerTheme
+import app.pwhs.core.util.disableSceneTransition
 import app.pwhs.updater.presentation.add.AddAppScreen
+import app.pwhs.updater.presentation.component.UpdaterBottomBar
 import kotlinx.coroutines.flow.map
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -37,6 +40,7 @@ class UpdatesActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        disableSceneTransition()
         enableEdgeToEdge()
 
         setContent {
@@ -101,12 +105,16 @@ class UpdatesActivity : ComponentActivity() {
                 ) { route ->
                     when (route) {
                         UpdaterScreenRoute.UPDATES_LIST -> {
+                            val uiState by viewModel.uiState.collectAsState()
                             UpdatesScreen(
                                 viewModel = viewModel,
                                 onNavigateToAddApp = {
                                     currentRoute = UpdaterScreenRoute.ADD_APP
                                 },
-                                onBackClick = { finish() },
+                                onBackClick = null,
+                                bottomBar = {
+                                    UpdaterBottomBar(updateCount = uiState.updateCount)
+                                },
                             )
                         }
                         UpdaterScreenRoute.ADD_APP -> {
@@ -121,6 +129,17 @@ class UpdatesActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        disableSceneTransition()
+    }
+
+    override fun finish() {
+        super.finish()
+        disableSceneTransition()
     }
 
     private data class ThemeConfig(

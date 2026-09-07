@@ -71,6 +71,7 @@ fun UpdatesScreen(
     viewModel: UpdatesViewModel,
     onNavigateToAddApp: () -> Unit,
     onBackClick: (() -> Unit)? = null,
+    bottomBar: @Composable () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -156,6 +157,7 @@ fun UpdatesScreen(
                 shape = MaterialTheme.shapes.large,
             )
         },
+        bottomBar = bottomBar,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
         PullToRefreshBox(

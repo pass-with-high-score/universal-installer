@@ -1,4 +1,4 @@
-package app.pwhs.universalinstaller.presentation.composable
+package app.pwhs.updater.presentation.component
 
 import android.app.Activity
 import android.content.Intent
@@ -16,48 +16,42 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.pwhs.core.R as CoreR
-import app.pwhs.universalinstaller.presentation.install.InstallActivity
-import app.pwhs.universalinstaller.presentation.manage.ManageActivity
-import app.pwhs.universalinstaller.presentation.setting.SettingActivity
-import app.pwhs.universalinstaller.util.extension.disableSceneTransition
+import app.pwhs.core.util.disableSceneTransition
 
-enum class BottomBarItem(
-    val activityClass: Class<*>?,
-    val label: Int,
+private enum class UpdaterBottomNavDestination(
+    val targetActivityClassName: String?,
+    val labelRes: Int,
     val icon: ImageVector,
 ) {
-    Install(
-        activityClass = InstallActivity::class.java,
-        label = CoreR.string.nav_install,
+    INSTALL(
+        targetActivityClassName = "app.pwhs.universalinstaller.presentation.install.InstallActivity",
+        labelRes = CoreR.string.nav_install,
         icon = Icons.Rounded.InstallMobile,
     ),
-    Updates(
-        activityClass = runCatching { Class.forName("app.pwhs.updater.presentation.UpdatesActivity") }.getOrNull(),
-        label = CoreR.string.nav_updates,
+    UPDATES(
+        targetActivityClassName = null,
+        labelRes = CoreR.string.nav_updates,
         icon = Icons.Rounded.SystemUpdate,
     ),
-    Manage(
-        activityClass = ManageActivity::class.java,
-        label = CoreR.string.nav_manage,
+    MANAGE(
+        targetActivityClassName = "app.pwhs.universalinstaller.presentation.manage.ManageActivity",
+        labelRes = CoreR.string.nav_manage,
         icon = Icons.Rounded.Apps,
     ),
-    Settings(
-        activityClass = SettingActivity::class.java,
-        label = CoreR.string.nav_settings,
+    SETTINGS(
+        targetActivityClassName = "app.pwhs.universalinstaller.presentation.setting.SettingActivity",
+        labelRes = CoreR.string.nav_settings,
         icon = Icons.Rounded.Settings,
-    );
+    ),
 }
 
 @Composable
-fun BottomBar(
-    currentTab: BottomBarItem,
+fun UpdaterBottomBar(
+    updateCount: Int = 0,
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
@@ -69,30 +63,15 @@ fun BottomBar(
         unselectedTextColor = colors.onSurfaceVariant,
     )
 
-    val updateCount by produceState(initialValue = 0) {
-        val repo = runCatching {
-            org.koin.java.KoinJavaComponent.get<app.pwhs.updater.data.repo.AppUpdateRepository>(
-                app.pwhs.updater.data.repo.AppUpdateRepository::class.java
-            )
-        }.getOrNull()
-        if (repo != null) {
-            repo.getUpdateCount().collect { value = it }
-        }
-    }
-
-    val destinations = remember {
-        BottomBarItem.entries.filter { it.activityClass != null }
-    }
-
     NavigationBar {
-        destinations.forEach { destination ->
-            val isSelected = currentTab == destination
+        UpdaterBottomNavDestination.entries.forEach { destination ->
+            val isSelected = destination == UpdaterBottomNavDestination.UPDATES
             NavigationBarItem(
                 selected = isSelected,
                 colors = itemColors,
                 onClick = {
-                    if (!isSelected && destination.activityClass != null) {
-                        val intent = Intent(context, destination.activityClass).apply {
+                    if (!isSelected && destination.targetActivityClassName != null) {
+                        val intent = Intent().setClassName(context.packageName, destination.targetActivityClassName).apply {
                             flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NO_ANIMATION
                         }
                         context.startActivity(intent)
@@ -100,7 +79,7 @@ fun BottomBar(
                     }
                 },
                 icon = {
-                    if (destination == BottomBarItem.Updates && updateCount > 0) {
+                    if (destination == UpdaterBottomNavDestination.UPDATES && updateCount > 0) {
                         BadgedBox(
                             badge = {
                                 Badge {
@@ -110,17 +89,17 @@ fun BottomBar(
                         ) {
                             Icon(
                                 imageVector = destination.icon,
-                                contentDescription = stringResource(destination.label),
+                                contentDescription = stringResource(destination.labelRes),
                             )
                         }
                     } else {
                         Icon(
                             imageVector = destination.icon,
-                            contentDescription = stringResource(destination.label),
+                            contentDescription = stringResource(destination.labelRes),
                         )
                     }
                 },
-                label = { Text(stringResource(destination.label)) },
+                label = { Text(stringResource(destination.labelRes)) },
             )
         }
     }

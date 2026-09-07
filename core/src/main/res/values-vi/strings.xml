@@ -75,4 +75,10 @@
     <string name="updates_dialog_device_arch">Kiến trúc thiết bị: %1$s</string>
     <string name="updates_dialog_recommended">Khuyên dùng</string>
     <string name="updates_detail_choose_asset_btn">Chọn file tải về (%1$d file)</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_install">Cài đặt</string>
+    <string name="nav_updates">Cập nhật</string>
+    <string name="nav_manage">Quản lý</string>
+    <string name="nav_settings">Cài đặt</string>
 </resources>

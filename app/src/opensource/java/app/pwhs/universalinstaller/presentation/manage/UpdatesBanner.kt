@@ -9,6 +9,7 @@ import androidx.compose.ui.platform.LocalContext
 import app.pwhs.updater.data.repo.AppUpdateRepository
 import app.pwhs.updater.presentation.UpdatesActivity
 import app.pwhs.updater.presentation.component.UpdatesBannerCard
+import app.pwhs.universalinstaller.util.extension.disableSceneTransition
 import org.koin.compose.koinInject
 
 @Composable
@@ -22,7 +23,11 @@ fun UpdatesBanner(
     UpdatesBannerCard(
         updateCount = updateCount,
         onClick = {
-            context.startActivity(Intent(context, UpdatesActivity::class.java))
+            val intent = Intent(context, UpdatesActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NO_ANIMATION
+            }
+            context.startActivity(intent)
+            (context as? android.app.Activity)?.disableSceneTransition()
         },
         modifier = modifier,
     )
