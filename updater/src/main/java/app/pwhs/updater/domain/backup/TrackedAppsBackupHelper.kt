@@ -19,6 +19,7 @@ data class TrackedAppBackupDto(
     val sourceType: String,
     val includePrereleases: Boolean = false,
     val customRegexFilter: String? = null,
+    val versionRegex: String? = null,
     val category: String? = null,
 )
 
@@ -46,6 +47,7 @@ object TrackedAppsBackupHelper {
                 sourceType = app.sourceType.name,
                 includePrereleases = app.includePrereleases,
                 customRegexFilter = app.customRegexFilter,
+                versionRegex = app.versionRegex,
                 category = app.category,
             )
         }
@@ -73,6 +75,7 @@ object TrackedAppsBackupHelper {
                         currentVersionCode = 0L,
                         includePrereleases = dto.includePrereleases,
                         customRegexFilter = dto.customRegexFilter,
+                        versionRegex = dto.versionRegex,
                         category = dto.category,
                     )
                 }
@@ -113,6 +116,10 @@ object TrackedAppsBackupHelper {
                 val customFilter = obj["filter"]?.jsonPrimitive?.content
                     ?: obj["customRegexFilter"]?.jsonPrimitive?.content
 
+                val versionRegex = obj["version_extract_regex"]?.jsonPrimitive?.content
+                    ?: obj["versionExtractRegex"]?.jsonPrimitive?.content
+                    ?: obj["versionRegex"]?.jsonPrimitive?.content
+
                 val category = obj["category"]?.jsonPrimitive?.content
                     ?: obj["categories"]?.jsonArray?.firstOrNull()?.jsonPrimitive?.content
 
@@ -126,6 +133,7 @@ object TrackedAppsBackupHelper {
                         currentVersionCode = 0L,
                         includePrereleases = includePrereleases,
                         customRegexFilter = customFilter,
+                        versionRegex = versionRegex,
                         category = category,
                     )
                 )

@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [TrackedAppEntity::class],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 abstract class UpdaterDatabase : RoomDatabase() {
@@ -15,6 +15,12 @@ abstract class UpdaterDatabase : RoomDatabase() {
 
     companion object {
         private const val DATABASE_NAME = "universal_updater.db"
+
+        private val MIGRATION_3_4 = object : androidx.room.migration.Migration(3, 4) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE tracked_apps ADD COLUMN versionRegex TEXT DEFAULT NULL")
+            }
+        }
 
         @Volatile
         private var INSTANCE: UpdaterDatabase? = null
@@ -25,7 +31,10 @@ abstract class UpdaterDatabase : RoomDatabase() {
                     context.applicationContext,
                     UpdaterDatabase::class.java,
                     DATABASE_NAME,
-                ).fallbackToDestructiveMigration(dropAllTables = true).build()
+                )
+                    .addMigrations(MIGRATION_3_4)
+                    .fallbackToDestructiveMigration(dropAllTables = true)
+                    .build()
                 INSTANCE = instance
                 instance
             }

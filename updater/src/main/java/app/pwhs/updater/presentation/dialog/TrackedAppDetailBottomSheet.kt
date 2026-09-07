@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import app.pwhs.core.R
 import app.pwhs.core.ui.theme.LocalExtendedColors
 import app.pwhs.core.ui.theme.Spacing
+import app.pwhs.updater.domain.matcher.VersionParser
 import app.pwhs.updater.domain.model.TrackedApp
 import app.pwhs.updater.presentation.component.AppIconView
 
@@ -72,6 +73,7 @@ fun TrackedAppDetailBottomSheet(
     val context = LocalContext.current
     var includePrereleases by remember(app) { mutableStateOf(app.includePrereleases) }
     var customRegex by remember(app) { mutableStateOf(app.customRegexFilter.orEmpty()) }
+    var versionRegex by remember(app) { mutableStateOf(app.versionRegex.orEmpty()) }
     var category by remember(app) { mutableStateOf(app.category.orEmpty()) }
     var isEditingSettings by remember { mutableStateOf(false) }
 
@@ -264,10 +266,22 @@ fun TrackedAppDetailBottomSheet(
                     fontWeight = FontWeight.Bold,
                 )
                 TextButton(onClick = {
+                    val trimmedVersionRegex = versionRegex.trim().takeIf { it.isNotBlank() }
+                    val updatedLatestVersion = if (trimmedVersionRegex != app.versionRegex && app.latestReleaseTag != null) {
+                        VersionParser.extractVersion(
+                            tagName = app.latestReleaseTag,
+                            defaultVersion = app.latestVersionName,
+                            versionRegex = trimmedVersionRegex,
+                        )
+                    } else {
+                        app.latestVersionName
+                    }
                     val updated = app.copy(
                         includePrereleases = includePrereleases,
                         customRegexFilter = customRegex.trim().takeIf { it.isNotBlank() },
+                        versionRegex = trimmedVersionRegex,
                         category = category.trim().takeIf { it.isNotBlank() },
+                        latestVersionName = updatedLatestVersion,
                     )
                     onUpdateApp(updated)
                     isEditingSettings = false
@@ -294,6 +308,18 @@ fun TrackedAppDetailBottomSheet(
                 onValueChange = { customRegex = it },
                 label = { Text("Asset Regex Filter (Optional)") },
                 placeholder = { Text("e.g. .*-arm64.*\\.apk") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth(),
+                shape = MaterialTheme.shapes.medium,
+            )
+
+            Spacer(modifier = Modifier.height(Spacing.S))
+
+            OutlinedTextField(
+                value = versionRegex,
+                onValueChange = { versionRegex = it },
+                label = { Text("Version Regex Filter (Optional)") },
+                placeholder = { Text("e.g. ^NeoPlayer(.+)$") },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,

@@ -27,6 +27,7 @@ class TrackedAppsBackupDataSourceImpl(
                     sourceType = entity.sourceType,
                     includePrereleases = entity.includePrereleases,
                     customRegexFilter = entity.customRegexFilter,
+                    versionRegex = entity.versionRegex,
                     category = entity.category,
                 )
             }
@@ -45,6 +46,7 @@ class TrackedAppsBackupDataSourceImpl(
                         sourceType = dto.sourceType,
                         includePrereleases = dto.includePrereleases,
                         customRegexFilter = dto.customRegexFilter,
+                        versionRegex = dto.versionRegex,
                         category = dto.category,
                     )
                 } else {
@@ -57,6 +59,7 @@ class TrackedAppsBackupDataSourceImpl(
                         currentVersionCode = 0L,
                         includePrereleases = dto.includePrereleases,
                         customRegexFilter = dto.customRegexFilter,
+                        versionRegex = dto.versionRegex,
                         category = dto.category,
                     )
                 }

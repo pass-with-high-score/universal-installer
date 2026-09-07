@@ -5,6 +5,7 @@ import app.pwhs.updater.data.local.TrackedAppDao
 import app.pwhs.updater.data.local.TrackedAppEntity
 import app.pwhs.updater.domain.matcher.InstalledAppMatcher
 import app.pwhs.updater.domain.matcher.SmartAbiMatcher
+import app.pwhs.updater.domain.matcher.VersionParser
 import app.pwhs.updater.domain.model.TrackedApp
 import app.pwhs.updater.domain.provider.GitHubReleaseProvider
 import app.pwhs.updater.domain.provider.UpdateSourceProvider
@@ -50,13 +51,23 @@ class AppUpdateRepositoryImpl(
 
     override suspend fun saveTrackedApp(app: TrackedApp) = withContext(Dispatchers.IO) {
         val installedVer = InstalledAppMatcher.getInstalledVersion(context.packageManager, app.packageName)
+        val normalizedApp = if (app.latestReleaseTag != null) {
+            val effectiveVersion = VersionParser.extractVersion(
+                tagName = app.latestReleaseTag,
+                defaultVersion = app.latestVersionName,
+                versionRegex = app.versionRegex,
+            )
+            app.copy(latestVersionName = effectiveVersion)
+        } else {
+            app
+        }
         val toSave = if (installedVer != null) {
-            app.copy(
+            normalizedApp.copy(
                 currentVersionName = installedVer.first,
                 currentVersionCode = installedVer.second,
             )
         } else {
-            app
+            normalizedApp
         }
         dao.insertOrUpdate(TrackedAppEntity.fromDomain(toSave))
     }
@@ -108,8 +119,14 @@ class AppUpdateRepositoryImpl(
                     customFilterRegex = currentApp.customRegexFilter,
                 )
 
+                val effectiveVersion = VersionParser.extractVersion(
+                    tagName = releaseDetails.tagName,
+                    defaultVersion = releaseDetails.versionName,
+                    versionRegex = currentApp.versionRegex,
+                )
+
                 val updated = currentApp.copy(
-                    latestVersionName = releaseDetails.versionName,
+                    latestVersionName = effectiveVersion,
                     latestReleaseTag = releaseDetails.tagName,
                     latestDownloadUrl = bestAsset?.downloadUrl,
                     releaseNotes = releaseDetails.releaseNotes,

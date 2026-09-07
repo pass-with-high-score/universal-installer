@@ -140,6 +140,7 @@ data class TrackedAppBackupDto(
     val sourceType: String,
     val includePrereleases: Boolean = false,
     val customRegexFilter: String? = null,
+    val versionRegex: String? = null,
     val category: String? = null,
 )
 
