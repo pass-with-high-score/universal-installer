@@ -11,7 +11,10 @@ import app.pwhs.updater.domain.model.AssetArtifact
  */
 object SmartAbiMatcher {
 
-    private val PACKAGE_EXTENSIONS = setOf(".apk", ".apks", ".xapk", ".apkm")
+    val PACKAGE_EXTENSIONS = setOf(".apk", ".apks", ".xapk", ".apkm")
+
+    fun isPackageAsset(name: String): Boolean =
+        PACKAGE_EXTENSIONS.any { ext -> name.endsWith(ext, ignoreCase = true) }
 
     private val ABI_ALIASES = mapOf(
         "arm64-v8a" to listOf("arm64-v8a", "arm64", "aarch64"),

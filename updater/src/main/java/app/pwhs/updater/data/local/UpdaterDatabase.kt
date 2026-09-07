@@ -26,6 +26,7 @@ abstract class UpdaterDatabase : RoomDatabase() {
             override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE tracked_apps ADD COLUMN matchGroup TEXT DEFAULT NULL")
                 db.execSQL("ALTER TABLE tracked_apps ADD COLUMN useReleaseTitleAsVersion INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("ALTER TABLE tracked_apps ADD COLUMN availableAssetsJson TEXT DEFAULT NULL")
             }
         }
 

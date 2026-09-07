@@ -74,4 +74,9 @@
     <string name="updates_menu_import">Import Apps (JSON)</string>
     <string name="updates_menu_export">Export Apps (JSON)</string>
     <string name="updates_import_success">Imported %1$d app(s)</string>
+    <string name="updates_dialog_pick_apk_title">Select File to Download</string>
+    <string name="updates_dialog_pick_apk_subtitle">This release contains multiple packages. Select the file compatible with your device:</string>
+    <string name="updates_dialog_device_arch">Device architecture: %1$s</string>
+    <string name="updates_dialog_recommended">Recommended</string>
+    <string name="updates_detail_choose_asset_btn">Choose File to Download (%1$d)</string>
 </resources>

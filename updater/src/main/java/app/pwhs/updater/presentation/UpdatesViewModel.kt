@@ -324,6 +324,7 @@ class UpdatesViewModel(
                     includePrereleases = includePrereleases,
                     category = category?.trim()?.takeIf { it.isNotBlank() },
                     eTag = release.eTag,
+                    availableAssets = release.assets.filter { SmartAbiMatcher.isPackageAsset(it.name) }.ifEmpty { release.assets },
                 )
 
                 repository.saveTrackedApp(trackedApp)

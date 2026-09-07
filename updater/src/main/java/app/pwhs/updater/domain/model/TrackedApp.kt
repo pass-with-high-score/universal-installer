@@ -25,6 +25,7 @@ data class TrackedApp(
     val category: String? = null,
     val ignoredVersion: String? = null,
     val eTag: String? = null,
+    val availableAssets: List<AssetArtifact> = emptyList(),
 ) {
     val isInstalled: Boolean
         get() = currentVersionName.isNotBlank() && !currentVersionName.equals("Not Installed", ignoreCase = true)

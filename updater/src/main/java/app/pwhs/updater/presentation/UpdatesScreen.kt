@@ -62,6 +62,7 @@ import app.pwhs.updater.presentation.component.UpdaterSearchBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import app.pwhs.updater.presentation.dialog.AppFilePickerDialog
 import app.pwhs.updater.presentation.dialog.SourceTokensDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,6 +83,7 @@ fun UpdatesScreen(
     var searchActive by rememberSaveable { mutableStateOf(false) }
     val searchFocusRequester = remember { FocusRequester() }
     var appToEditCategory by remember { mutableStateOf<TrackedApp?>(null) }
+    var appForFilePicker by remember { mutableStateOf<TrackedApp?>(null) }
 
     LaunchedEffect(searchActive) {
         if (searchActive) {
@@ -274,7 +276,11 @@ fun UpdatesScreen(
                                     viewModel.selectAppForDetail(app)
                                 },
                                 onUpdateClick = {
-                                    viewModel.downloadAndInstall(context, app)
+                                    if (app.availableAssets.size > 1) {
+                                        appForFilePicker = app
+                                    } else {
+                                        viewModel.downloadAndInstall(context, app)
+                                    }
                                 },
                                 onCheckClick = {
                                     viewModel.checkSingleUpdate(app.packageName)
@@ -323,7 +329,27 @@ fun UpdatesScreen(
                 viewModel.checkSingleUpdate(appToCheck.packageName)
             },
             onDownloadAndInstall = { appToInstall ->
-                viewModel.downloadAndInstall(context, appToInstall)
+                if (appToInstall.availableAssets.size > 1) {
+                    appForFilePicker = appToInstall
+                } else {
+                    viewModel.downloadAndInstall(context, appToInstall)
+                }
+            },
+        )
+    }
+
+    if (appForFilePicker != null) {
+        val currentApp = appForFilePicker!!
+        AppFilePickerDialog(
+            appName = currentApp.appName,
+            assets = currentApp.availableAssets,
+            currentDownloadUrl = currentApp.latestDownloadUrl,
+            onDismiss = { appForFilePicker = null },
+            onConfirm = { chosenAsset ->
+                val chosenApp = currentApp.copy(latestDownloadUrl = chosenAsset.downloadUrl)
+                viewModel.updateTrackedApp(chosenApp)
+                viewModel.downloadAndInstall(context, chosenApp)
+                appForFilePicker = null
             },
         )
     }

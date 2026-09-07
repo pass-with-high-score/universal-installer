@@ -19,7 +19,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Launch
 import androidx.compose.material.icons.rounded.Block
 import androidx.compose.material.icons.rounded.DeleteOutline
+import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.FilterAlt
+import androidx.compose.material.icons.rounded.FolderZip
 import androidx.compose.material.icons.rounded.Launch
 import androidx.compose.material.icons.rounded.OpenInBrowser
 import androidx.compose.material.icons.rounded.Refresh
@@ -227,7 +229,7 @@ fun TrackedAppDetailBottomSheet(
                 }
             }
 
-            if (app.hasUpdate && !app.latestDownloadUrl.isNullOrBlank()) {
+            if ((app.hasUpdate || !app.isInstalled) && !app.latestDownloadUrl.isNullOrBlank()) {
                 Spacer(modifier = Modifier.height(Spacing.M))
                 Button(
                     onClick = {
@@ -237,9 +239,29 @@ fun TrackedAppDetailBottomSheet(
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 ) {
-                    Icon(Icons.Rounded.SystemUpdate, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Icon(
+                        if (app.isInstalled) Icons.Rounded.SystemUpdate else Icons.Rounded.Download,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp),
+                    )
                     Spacer(modifier = Modifier.width(Spacing.S))
-                    Text("Download & Install Update")
+                    Text(if (app.isInstalled) "Download & Install Update" else stringResource(R.string.updates_card_btn_install))
+                }
+
+                if (app.availableAssets.size > 1) {
+                    Spacer(modifier = Modifier.height(Spacing.S))
+                    OutlinedButton(
+                        onClick = {
+                            onDismiss()
+                            onDownloadAndInstall(app)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = MaterialTheme.shapes.medium,
+                    ) {
+                        Icon(Icons.Rounded.FolderZip, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(Spacing.S))
+                        Text(stringResource(R.string.updates_detail_choose_asset_btn, app.availableAssets.size))
+                    }
                 }
             }
 

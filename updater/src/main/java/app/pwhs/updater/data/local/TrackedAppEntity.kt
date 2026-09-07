@@ -2,8 +2,11 @@ package app.pwhs.updater.data.local
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import app.pwhs.updater.domain.model.AssetArtifact
 import app.pwhs.updater.domain.model.TrackedApp
 import app.pwhs.updater.domain.model.UpdateSourceType
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Entity(tableName = "tracked_apps")
 data class TrackedAppEntity(
@@ -29,6 +32,7 @@ data class TrackedAppEntity(
     val category: String? = null,
     val ignoredVersion: String? = null,
     val eTag: String? = null,
+    val availableAssetsJson: String? = null,
 ) {
     fun toDomain(): TrackedApp = TrackedApp(
         packageName = packageName,
@@ -53,6 +57,11 @@ data class TrackedAppEntity(
         category = category,
         ignoredVersion = ignoredVersion,
         eTag = eTag,
+        availableAssets = availableAssetsJson?.takeIf { it.isNotBlank() }?.let { raw ->
+            runCatching {
+                Json.decodeFromString<List<AssetArtifact>>(raw)
+            }.getOrDefault(emptyList())
+        } ?: emptyList(),
     )
 
     companion object {
@@ -79,6 +88,13 @@ data class TrackedAppEntity(
             category = domain.category,
             ignoredVersion = domain.ignoredVersion,
             eTag = domain.eTag,
+            availableAssetsJson = if (domain.availableAssets.isNotEmpty()) {
+                runCatching {
+                    Json.encodeToString(domain.availableAssets)
+                }.getOrNull()
+            } else {
+                null
+            },
         )
     }
 }

@@ -130,10 +130,13 @@ class AppUpdateRepositoryImpl(
                     useReleaseTitleAsVersion = currentApp.useReleaseTitleAsVersion,
                 )
 
+                val packageAssets = releaseDetails.assets.filter { SmartAbiMatcher.isPackageAsset(it.name) }.ifEmpty { releaseDetails.assets }
+
                 val updated = currentApp.copy(
                     latestVersionName = effectiveVersion,
                     latestReleaseTag = releaseDetails.tagName,
                     latestDownloadUrl = bestAsset?.downloadUrl,
+                    availableAssets = packageAssets,
                     releaseNotes = releaseDetails.releaseNotes,
                     publishedAt = releaseDetails.publishedAt,
                     lastCheckedAt = now,

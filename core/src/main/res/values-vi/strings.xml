@@ -70,4 +70,9 @@
     <string name="updates_menu_import">Nhập danh sách (JSON / Obtainium)</string>
     <string name="updates_menu_export">Xuất danh sách (JSON)</string>
     <string name="updates_import_success">Đã nhập thành công %1$d ứng dụng</string>
+    <string name="updates_dialog_pick_apk_title">Chọn file tải về</string>
+    <string name="updates_dialog_pick_apk_subtitle">Bản phát hành có nhiều file cài đặt. Vui lòng chọn file phù hợp với thiết bị của bạn:</string>
+    <string name="updates_dialog_device_arch">Kiến trúc thiết bị: %1$s</string>
+    <string name="updates_dialog_recommended">Khuyên dùng</string>
+    <string name="updates_detail_choose_asset_btn">Chọn file tải về (%1$d file)</string>
 </resources>
