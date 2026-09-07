@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Category
+import androidx.compose.material.icons.automirrored.rounded.Label
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Download
@@ -303,7 +303,7 @@ fun TrackedAppCard(
                 if (onEditCategoryClick != null) {
                     IconButton(onClick = onEditCategoryClick) {
                         Icon(
-                            imageVector = Icons.Rounded.Category,
+                            imageVector = Icons.AutoMirrored.Rounded.Label,
                             contentDescription = "Edit Category",
                         )
                     }
