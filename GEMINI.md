@@ -9,7 +9,7 @@
 - **Pre-Release CI & Fastlane Verification:** Trước khi release/bump version mới:
   - Bắt buộc kiểm tra tính đồng bộ giữa `fastlane/Fastfile` và `.github/workflows/publish-release.yml` (tasks build của các module thay đổi như `:app:bundlePlayRelease`, `:tv:bundlePlayRelease`, `:wearos:bundleRelease`, đường dẫn artifact output).
   - Bắt buộc chạy build test các task release của module có thay đổi (kèm `./gradlew assembleDebug`) trước khi push tag để đảm bảo GitHub Actions hoàn toàn không bị fail.
-  - Changelog release trên GitHub phải tổng hợp tất cả các form factor có thay đổi (Phone, Android TV, Wear OS).
+  - Changelog release trên GitHub: Bắt buộc tổng hợp tất cả các form factor có thay đổi trong đợt release đó (Phone, Android TV, Wear OS). Form factor nào có thay đổi thì bắt buộc phải có mục release note riêng (`### 📱 Phone (App)`, `### 📺 Android TV`, `### ⌚ Wear OS`).
 
 ## AI Guidance & Custom Skills
 This project uses specialized Gemini CLI skills to automate complex tasks. When you encounter the following scenarios, you SHOULD activate and follow the corresponding skill:
