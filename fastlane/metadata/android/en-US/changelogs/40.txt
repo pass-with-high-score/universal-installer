@@ -1,0 +1,7 @@
+• Dedicated Updates tab with live badge count
+• Smart app update tracking with custom regex and pre-release support
+• Multi-asset APK file picker dialog with ABI detection
+• Modern bottom sheet redesign for install and sync settings
+• VirusTotal APK upload support and enhanced security scanning
+• Faster device APK scanning with real-time progress display
+• Bug fixes and performance optimizations

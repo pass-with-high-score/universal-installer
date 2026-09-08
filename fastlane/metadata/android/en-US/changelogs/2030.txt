@@ -1,0 +1,6 @@
+• Install popup card: install APKs directly in an overlay without opening fullscreen
+• App Updates tracking tab with full remote and D-pad navigation
+• Multi-asset APK selection dialog with smart CPU architecture recommendations
+• Auto-delete APK after installation option in Settings
+• Enhanced Shizuku and Root installer mode indicators with permissions details
+• Performance improvements and bug fixes
