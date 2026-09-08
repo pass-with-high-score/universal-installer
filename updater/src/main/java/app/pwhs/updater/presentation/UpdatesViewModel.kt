@@ -1,5 +1,6 @@
 package app.pwhs.updater.presentation
 
+import android.content.ClipData
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
@@ -466,30 +467,21 @@ class UpdatesViewModel(
 
     private fun launchInstallerForFile(context: Context, file: File) {
         val uri = runCatching {
-            FileProvider.getUriForFile(
-                context,
-                "${context.packageName}.fileprovider",
-                file,
-            )
+            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
         }.getOrElse { Uri.fromFile(file) }
+        val isTv = runCatching { Class.forName("app.pwhs.tv.presentation.install.TvDialogInstallActivity"); true }.getOrDefault(false)
+        val targetClass = if (isTv) "app.pwhs.tv.presentation.install.TvDialogInstallActivity"
+        else "app.pwhs.universalinstaller.presentation.install.DialogInstallActivity"
 
-        val intent = Intent(Intent.ACTION_VIEW).apply {
+        fun createIntent(className: String? = null) = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(uri, "application/vnd.android.package-archive")
-            setClassName(context.packageName, "app.pwhs.universalinstaller.presentation.install.DialogInstallActivity")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            className?.let { setClassName(context.packageName, it) }
+            clipData = ClipData.newRawUri("package", uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
         }
 
-        val fallbackIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/vnd.android.package-archive")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-
-        runCatching {
-            context.startActivity(intent)
-        }.onFailure {
-            context.startActivity(fallbackIntent)
-        }
+        runCatching { context.startActivity(createIntent(targetClass)) }
+            .recoverCatching { context.startActivity(createIntent()) }
+            .onFailure { e -> Timber.e(e, "Failed to launch installer for file: ${file.absolutePath}") }
     }
 }

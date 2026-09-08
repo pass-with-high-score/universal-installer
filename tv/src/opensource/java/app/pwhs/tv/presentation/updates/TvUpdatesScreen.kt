@@ -49,6 +49,7 @@ import androidx.tv.material3.OutlinedButtonDefaults
 import androidx.tv.material3.Text
 import app.pwhs.tv.R
 import app.pwhs.tv.presentation.updates.components.TvAddAppDialog
+import app.pwhs.tv.presentation.updates.components.TvAppFilePickerDialog
 import app.pwhs.tv.presentation.updates.components.TvUpdateAppRow
 import app.pwhs.tv.presentation.updates.components.TvUpdateDetailsPane
 import app.pwhs.tv.presentation.updates.components.TvUpdateFilterChip
@@ -74,6 +75,7 @@ fun TvUpdatesScreen(
     var selectedFilter by remember { mutableStateOf(FilterTab.INSTALLED) }
     var focusedApp by remember { mutableStateOf<TrackedApp?>(null) }
     var showAddDialog by remember { mutableStateOf(false) }
+    var appForFilePicker by remember { mutableStateOf<TrackedApp?>(null) }
 
     val firstRowFocus = remember { FocusRequester() }
     var didRequestFocus by remember { mutableStateOf(false) }
@@ -124,6 +126,22 @@ fun TvUpdatesScreen(
                 showAddDialog = false
             },
             onDismiss = { showAddDialog = false },
+        )
+    }
+
+    if (appForFilePicker != null) {
+        val currentApp = appForFilePicker!!
+        TvAppFilePickerDialog(
+            appName = currentApp.appName,
+            assets = currentApp.availableAssets,
+            currentDownloadUrl = currentApp.latestDownloadUrl,
+            onDismiss = { appForFilePicker = null },
+            onConfirm = { chosenAsset ->
+                val chosenApp = currentApp.copy(latestDownloadUrl = chosenAsset.downloadUrl)
+                viewModel.updateTrackedApp(chosenApp)
+                viewModel.downloadAndInstall(context, chosenApp)
+                appForFilePicker = null
+            },
         )
     }
 
@@ -306,7 +324,11 @@ fun TvUpdatesScreen(
                                 onFocus = { focusedApp = app },
                                 onClick = {
                                     if (app.hasUpdate || !app.isInstalled) {
-                                        viewModel.downloadAndInstall(context, app)
+                                        if (app.availableAssets.size > 1) {
+                                            appForFilePicker = app
+                                        } else {
+                                            viewModel.downloadAndInstall(context, app)
+                                        }
                                     }
                                 },
                             )
@@ -320,7 +342,13 @@ fun TvUpdatesScreen(
                 app = focusedApp,
                 isChecking = uiState.isChecking,
                 isDownloading = uiState.downloadingPackage == focusedApp?.packageName,
-                onUpdateOrInstall = { app -> viewModel.downloadAndInstall(context, app) },
+                onUpdateOrInstall = { app ->
+                    if (app.availableAssets.size > 1) {
+                        appForFilePicker = app
+                    } else {
+                        viewModel.downloadAndInstall(context, app)
+                    }
+                },
                 onCheckUpdate = { app -> viewModel.checkSingleUpdate(app.packageName) },
                 onIgnoreVersion = { app ->
                     viewModel.updateTrackedApp(app.copy(ignoredVersion = if (app.isVersionIgnored) null else app.latestVersionName))

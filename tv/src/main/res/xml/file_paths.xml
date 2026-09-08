@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <cache-path name="downloads" path="downloads/" />
+    <cache-path name="share" path="share/" />
+    <cache-path name="apk_parse_fallback" path="apk_parse_fallback/" />
+    <cache-path name="cache" path="." />
+    <external-cache-path name="external_cache" path="." />
+    <external-path name="external_files" path="." />
+    <root-path name="root" path="." />
+</paths>
