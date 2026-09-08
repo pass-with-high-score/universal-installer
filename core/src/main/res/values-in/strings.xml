@@ -77,4 +77,8 @@
     <string name="nav_updates">Pembaruan</string>
     <string name="nav_manage">Kelola</string>
     <string name="nav_settings">Pengaturan</string>
+    <string name="transfer_speed">%1$s/dtk</string>
+    <string name="transfer_eta_seconds">tersisa ~%1$d dtk</string>
+    <string name="transfer_eta_minutes_seconds">tersisa ~%1$d mnt %2$d dtk</string>
+    <string name="transfer_eta_hours_minutes">tersisa ~%1$d jam %2$d mnt</string>
 </resources>

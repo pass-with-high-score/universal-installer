@@ -27,7 +27,7 @@ object WearApkSender {
         context: Context,
         apkUri: Uri,
         fileName: String,
-        onProgress: ((Float) -> Unit)? = null,
+        onProgress: ((WearSendProgress) -> Unit)? = null,
     ): SendResult = SendResult.NoWatchFound
 
     @Suppress("UnusedParameter")

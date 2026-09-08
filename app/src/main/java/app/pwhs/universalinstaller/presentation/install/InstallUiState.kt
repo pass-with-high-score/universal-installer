@@ -72,6 +72,8 @@ sealed interface DownloadState {
         val url: String,
         val bytesRead: Long,
         val totalBytes: Long,
+        val speedBytesPerSec: Long = 0L,
+        val etaSeconds: Long? = null,
     ) : DownloadState {
         val progressPercent: Int?
             get() = if (totalBytes > 0) ((bytesRead * 100L) / totalBytes).toInt().coerceIn(0, 100) else null
@@ -141,7 +143,13 @@ sealed interface ObbCopyState {
 sealed interface WatchSendState {
     data object Idle : WatchSendState
     data object CheckingWatch : WatchSendState
-    data class Sending(val progress: Float) : WatchSendState  // 0.0–1.0
+    data class Sending(
+        val progress: Float, // 0.0–1.0
+        val bytesSent: Long = 0L,
+        val totalBytes: Long = 0L,
+        val speedBytesPerSec: Long = 0L,
+        val etaSeconds: Long? = null,
+    ) : WatchSendState
     data object Success : WatchSendState
     data object NoWatch : WatchSendState
     /** APK does not declare the watch feature; the user decides whether to send it anyway. */

@@ -61,15 +61,17 @@ fun ReceivingCard(state: WearReceiveState, modifier: Modifier = Modifier) {
                 overflow = TextOverflow.Ellipsis,
             )
         }
-        val progress = (state as? WearReceiveState.Receiving)?.progress
+        val receiving = state as? WearReceiveState.Receiving
+        val progress = receiving?.progress
         if (progress != null) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 ThinProgressBar(progress = progress, modifier = Modifier.weight(1f))
+                val etaStr = app.pwhs.core.util.TransferFormatter.formatEtaShort(receiving.etaSeconds)
                 Text(
-                    text = "${(progress * 100).toInt()}%",
+                    text = if (etaStr != null) "${(progress * 100).toInt()}% ($etaStr)" else "${(progress * 100).toInt()}%",
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -82,7 +84,15 @@ fun ReceivingCard(state: WearReceiveState, modifier: Modifier = Modifier) {
 @Composable
 private fun ReceivingCardProgressPreview() {
     UniversalInstallerTheme {
-        ReceivingCard(WearReceiveState.Receiving("watchface.apk", 4_000_000, 12_000_000))
+        ReceivingCard(
+            WearReceiveState.Receiving(
+                fileName = "watchface.apk",
+                bytes = 4_000_000,
+                expectedBytes = 12_000_000,
+                speedBytesPerSec = 120_000L,
+                etaSeconds = 66L,
+            )
+        )
     }
 }
 

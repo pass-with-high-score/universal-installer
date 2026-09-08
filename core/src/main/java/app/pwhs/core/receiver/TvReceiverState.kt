@@ -21,6 +21,8 @@ data class ReceivingProgress(
     val totalBytes: Long,
     val progress: Float = if (totalBytes > 0) (bytesReceived.toFloat() / totalBytes).coerceIn(0f, 1f) else 0f,
     val percent: Int = (progress * 100).toInt().coerceIn(0, 100),
+    val speedBytesPerSec: Long = 0L,
+    val etaSeconds: Long? = null,
 )
 
 data class ConnectedClient(

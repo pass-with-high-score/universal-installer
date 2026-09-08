@@ -77,4 +77,8 @@
     <string name="nav_updates">التحديثات</string>
     <string name="nav_manage">إدارة</string>
     <string name="nav_settings">الإعدادات</string>
+    <string name="transfer_speed">%1$s/ث</string>
+    <string name="transfer_eta_seconds">متبقي ~%1$d ث</string>
+    <string name="transfer_eta_minutes_seconds">متبقي ~%1$d د %2$d ث</string>
+    <string name="transfer_eta_hours_minutes">متبقي ~%1$d س %2$d د</string>
 </resources>

@@ -15,6 +15,8 @@ sealed interface WearReceiveState {
         val bytes: Long,
         val expectedBytes: Long,
         val icon: Bitmap? = null,
+        val speedBytesPerSec: Long = 0L,
+        val etaSeconds: Long? = null,
     ) : WearReceiveState {
         val progress: Float?
             get() = if (expectedBytes > 0) (bytes.toFloat() / expectedBytes).coerceIn(0f, 1f) else null

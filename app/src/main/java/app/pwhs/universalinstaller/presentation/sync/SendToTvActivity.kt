@@ -8,23 +8,9 @@ import android.widget.Toast
 import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -72,6 +58,8 @@ private fun SendToTvScreen(onBack: () -> Unit) {
     var uploading by remember { mutableStateOf(false) }
     var uploadProgress by remember { mutableIntStateOf(0) }
     var uploadBytes by remember { mutableStateOf<Pair<Long, Long>?>(null) }
+    var uploadSpeed by remember { mutableLongStateOf(0L) }
+    var uploadEta by remember { mutableStateOf<Long?>(null) }
     var currentFileName by remember { mutableStateOf<String?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var isSuccess by remember { mutableStateOf(false) }
@@ -188,13 +176,19 @@ private fun SendToTvScreen(onBack: () -> Unit) {
             uploading = true
             uploadProgress = 0
             uploadBytes = null
+            uploadSpeed = 0L
+            uploadEta = null
             errorMessage = null
             isSuccess = false
 
             scope.launch {
+                val estimator = app.pwhs.core.util.TransferEstimator()
                 val result = TvUploadClient.upload(context, target, uri, name) { copied, total, pct ->
+                    val est = estimator.update(copied, total)
                     uploadProgress = pct
                     uploadBytes = Pair(copied, total)
+                    uploadSpeed = est.speedBytesPerSec
+                    uploadEta = est.etaSeconds
                 }
                 uploading = false
                 when (result) {
@@ -259,6 +253,8 @@ private fun SendToTvScreen(onBack: () -> Unit) {
         currentFileName = null
         uploadProgress = 0
         uploadBytes = null
+        uploadSpeed = 0L
+        uploadEta = null
     }
 
     // Ping TV periodically to keep connection active
@@ -426,7 +422,9 @@ private fun SendToTvScreen(onBack: () -> Unit) {
                             TvUploadingProgressCard(
                                 fileName = currentFileName ?: "application.apk",
                                 progress = uploadProgress,
-                                bytes = uploadBytes
+                                bytes = uploadBytes,
+                                speedBytesPerSec = uploadSpeed,
+                                etaSeconds = uploadEta,
                             )
                         }
 

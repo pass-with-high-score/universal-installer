@@ -85,4 +85,10 @@
     <string name="nav_updates">Updates</string>
     <string name="nav_manage">Manage</string>
     <string name="nav_settings">Settings</string>
+
+    <!-- Transfer Estimator -->
+    <string name="transfer_speed">%1$s/s</string>
+    <string name="transfer_eta_seconds">~%1$d s left</string>
+    <string name="transfer_eta_minutes_seconds">~%1$d m %2$d s left</string>
+    <string name="transfer_eta_hours_minutes">~%1$d h %2$d m left</string>
 </resources>

@@ -77,4 +77,8 @@
     <string name="nav_updates">Updates</string>
     <string name="nav_manage">Verwalten</string>
     <string name="nav_settings">Einstellungen</string>
+    <string name="transfer_speed">%1$s/s</string>
+    <string name="transfer_eta_seconds">noch ~%1$d s</string>
+    <string name="transfer_eta_minutes_seconds">noch ~%1$d Min. %2$d Sek.</string>
+    <string name="transfer_eta_hours_minutes">noch ~%1$d Std. %2$d Min.</string>
 </resources>

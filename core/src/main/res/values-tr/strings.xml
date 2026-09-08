@@ -77,4 +77,8 @@
     <string name="nav_updates">Güncellemeler</string>
     <string name="nav_manage">Yönet</string>
     <string name="nav_settings">Ayarlar</string>
+    <string name="transfer_speed">%1$s/sn</string>
+    <string name="transfer_eta_seconds">yaklaşık %1$d sn kaldı</string>
+    <string name="transfer_eta_minutes_seconds">yaklaşık %1$d dk %2$d sn kaldı</string>
+    <string name="transfer_eta_hours_minutes">yaklaşık %1$d sa %2$d dk kaldı</string>
 </resources>

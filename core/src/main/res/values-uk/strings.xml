@@ -77,4 +77,8 @@
     <string name="nav_updates">Оновлення</string>
     <string name="nav_manage">Керувати</string>
     <string name="nav_settings">Налаштування</string>
+    <string name="transfer_speed">%1$s/с</string>
+    <string name="transfer_eta_seconds">залишилося ~%1$d с</string>
+    <string name="transfer_eta_minutes_seconds">залишилося ~%1$d хв %2$d с</string>
+    <string name="transfer_eta_hours_minutes">залишилося ~%1$d год %2$d хв</string>
 </resources>

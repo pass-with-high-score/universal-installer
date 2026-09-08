@@ -54,12 +54,16 @@ object InstallDownloadHelper {
         ).apply { mkdirs() }
         val destination = File(downloadsDir, uniqueFileName(downloadsDir, displayName))
 
+        val estimator = app.pwhs.core.util.TransferEstimator()
         val result = packageDownloadService.download(trimmed, destination) { read, total ->
+            val est = estimator.update(read, total)
             onProgress(
                 DownloadState.Running(
                     url = trimmed,
                     bytesRead = read,
                     totalBytes = total,
+                    speedBytesPerSec = est.speedBytesPerSec,
+                    etaSeconds = est.etaSeconds,
                 )
             )
             downloadNotifier.notifyProgress(displayName, read, total)

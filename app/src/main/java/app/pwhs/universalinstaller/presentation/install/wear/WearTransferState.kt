@@ -5,6 +5,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
+data class WearSendProgress(
+    val progress: Float,
+    val bytesSent: Long = 0L,
+    val totalBytes: Long = 0L,
+    val speedBytesPerSec: Long = 0L,
+    val etaSeconds: Long? = null,
+)
+
 /**
  * Process-wide bridge between [WearTransferService], which owns the transfer, and the install
  * screen, which only renders it. Mirrors `SyncManager` so a transfer outlives the ViewModel.

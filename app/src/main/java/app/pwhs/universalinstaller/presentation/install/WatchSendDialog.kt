@@ -24,7 +24,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
@@ -91,18 +93,49 @@ private fun WatchSendBody(state: WatchSendState) {
             )
         }
 
-        is WatchSendState.Sending -> Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.watch_send_sending, (state.progress * 100).toInt()),
-                style = MaterialTheme.typography.bodyMedium,
-            )
-            LinearProgressIndicator(
-                progress = { state.progress },
+        is WatchSendState.Sending -> {
+            val context = LocalContext.current
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-            )
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(R.string.watch_send_sending, (state.progress * 100).toInt()),
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Medium,
+                    )
+                    if (state.totalBytes > 0) {
+                        Text(
+                            text = "${android.text.format.Formatter.formatShortFileSize(context, state.bytesSent)} / ${android.text.format.Formatter.formatShortFileSize(context, state.totalBytes)}",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+                LinearProgressIndicator(
+                    progress = { state.progress },
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                val speedStr = app.pwhs.core.util.TransferFormatter.formatSpeed(state.speedBytesPerSec)
+                val etaStr = app.pwhs.core.util.TransferFormatter.formatEta(context, state.etaSeconds)
+                val statsText = listOfNotNull(
+                    speedStr.takeIf { it.isNotEmpty() },
+                    etaStr
+                ).joinToString(" • ")
+                if (statsText.isNotEmpty()) {
+                    Text(
+                        text = statsText,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
+                    )
+                }
+            }
         }
 
         else -> Text(
@@ -164,7 +197,18 @@ private fun WatchSendDialogCheckingPreview() {
 @Preview
 @Composable
 private fun WatchSendDialogSendingPreview() {
-    UniversalInstallerTheme { WatchSendDialog(WatchSendState.Sending(0.42f), onDismiss = {}) }
+    UniversalInstallerTheme {
+        WatchSendDialog(
+            WatchSendState.Sending(
+                progress = 0.42f,
+                bytesSent = 10_500_000L,
+                totalBytes = 25_000_000L,
+                speedBytesPerSec = 150_000L,
+                etaSeconds = 97L,
+            ),
+            onDismiss = {}
+        )
+    }
 }
 
 @Preview

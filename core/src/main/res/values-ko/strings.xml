@@ -77,4 +77,8 @@
     <string name="nav_updates">업데이트</string>
     <string name="nav_manage">관리</string>
     <string name="nav_settings">설정</string>
+    <string name="transfer_speed">%1$s/초</string>
+    <string name="transfer_eta_seconds">약 %1$d초 남음</string>
+    <string name="transfer_eta_minutes_seconds">약 %1$d분 %2$d초 남음</string>
+    <string name="transfer_eta_hours_minutes">약 %1$d시간 %2$d분 남음</string>
 </resources>

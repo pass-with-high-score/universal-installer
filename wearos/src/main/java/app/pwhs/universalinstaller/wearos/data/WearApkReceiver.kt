@@ -93,18 +93,29 @@ object WearApkReceiver {
         fileName: String,
         expectedBytes: Long,
     ) {
+        val estimator = app.pwhs.core.util.TransferEstimator()
         val buffer = ByteArray(BUFFER_SIZE)
         var received = 0L
         var lastPercent = -1
+        var lastReportTime = 0L
         var read = input.read(buffer)
         while (read != -1) {
             output.write(buffer, 0, read)
             received += read
             val percent = if (expectedBytes > 0) ((received * 100) / expectedBytes).toInt() else -1
-            if (percent != lastPercent) {
+            val now = System.currentTimeMillis()
+            if (percent != lastPercent || now - lastReportTime >= 400L) {
                 lastPercent = percent
+                lastReportTime = now
+                val est = estimator.update(received, expectedBytes)
                 WearReceiveProgress.update(
-                    WearReceiveState.Receiving(fileName, received, expectedBytes)
+                    WearReceiveState.Receiving(
+                        fileName = fileName,
+                        bytes = received,
+                        expectedBytes = expectedBytes,
+                        speedBytesPerSec = est.speedBytesPerSec,
+                        etaSeconds = est.etaSeconds,
+                    )
                 )
             }
             read = input.read(buffer)

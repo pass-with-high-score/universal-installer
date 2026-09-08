@@ -80,7 +80,7 @@ object WearApkSender {
         context: Context,
         apkUri: Uri,
         fileName: String,
-        onProgress: ((Float) -> Unit)? = null,
+        onProgress: ((WearSendProgress) -> Unit)? = null,
     ): SendResult = withContext(Dispatchers.IO) {
         val targetNode = findReceiverNode(context) ?: return@withContext SendResult.NoWatchFound
         Log.d(TAG, "Sending to node: ${targetNode.displayName} (${targetNode.id})")
@@ -134,7 +134,7 @@ object WearApkSender {
         input: java.io.InputStream,
         output: java.io.OutputStream,
         totalBytes: Long,
-        onProgress: ((Float) -> Unit)?,
+        onProgress: ((WearSendProgress) -> Unit)?,
     ) = coroutineScope {
         val lastMovement = AtomicLong(System.currentTimeMillis())
         val watchdog = launch {
@@ -200,11 +200,13 @@ object WearApkSender {
         input: java.io.InputStream,
         output: java.io.OutputStream,
         totalBytes: Long,
-        onProgress: ((Float) -> Unit)?,
+        onProgress: ((WearSendProgress) -> Unit)?,
     ) {
+        val estimator = app.pwhs.core.util.TransferEstimator()
         val buffer = ByteArray(BUFFER_SIZE)
         var sent = 0L
         var lastPercent = -1
+        var lastReportTime = 0L
         var read = input.read(buffer)
         while (read != -1) {
             // Lets a cancel take effect within one chunk instead of at the end of the file.
@@ -213,9 +215,20 @@ object WearApkSender {
             sent += read
             if (onProgress != null && totalBytes > 0) {
                 val percent = ((sent * 100) / totalBytes).toInt()
-                if (percent != lastPercent) {
+                val now = System.currentTimeMillis()
+                if (percent != lastPercent || now - lastReportTime >= 400L) {
                     lastPercent = percent
-                    onProgress(sent.toFloat() / totalBytes)
+                    lastReportTime = now
+                    val est = estimator.update(sent, totalBytes)
+                    onProgress(
+                        WearSendProgress(
+                            progress = sent.toFloat() / totalBytes,
+                            bytesSent = sent,
+                            totalBytes = totalBytes,
+                            speedBytesPerSec = est.speedBytesPerSec,
+                            etaSeconds = est.etaSeconds,
+                        )
+                    )
                 }
             }
             read = input.read(buffer)

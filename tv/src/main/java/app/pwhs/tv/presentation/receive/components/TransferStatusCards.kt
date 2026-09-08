@@ -123,6 +123,23 @@ fun ReceivingProgressCard(progress: ReceivingProgress) {
                         .background(MaterialTheme.colorScheme.primary)
                 )
             }
+
+            val speedStr = app.pwhs.core.util.TransferFormatter.formatSpeed(progress.speedBytesPerSec)
+            val etaStr = app.pwhs.core.util.TransferFormatter.formatEta(context, progress.etaSeconds)
+            val statsText = listOfNotNull(
+                speedStr.takeIf { it.isNotEmpty() },
+                etaStr
+            ).joinToString(" • ")
+
+            if (statsText.isNotEmpty()) {
+                Spacer(Modifier.height(10.dp))
+                Text(
+                    text = statsText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

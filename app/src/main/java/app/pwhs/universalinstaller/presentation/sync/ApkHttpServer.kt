@@ -192,6 +192,7 @@ private class TrackingInputStream(
     private var closed = false
     private var bytesRead: Long = 0L
     private var lastReportedPercent: Int = -1
+    private var lastReportTime: Long = 0L
 
     override fun read(): Int {
         val b = super.read()
@@ -214,9 +215,11 @@ private class TrackingInputStream(
     private fun reportProgress() {
         if (totalBytes <= 0) return
         val percent = ((bytesRead * 100) / totalBytes).toInt().coerceIn(0, 100)
-        // Only update when percentage actually changes to avoid flooding
-        if (percent != lastReportedPercent) {
+        val now = System.currentTimeMillis()
+        // Update when percentage changes or at least every 400ms for smooth speed/ETA
+        if (percent != lastReportedPercent || now - lastReportTime >= 400L) {
             lastReportedPercent = percent
+            lastReportTime = now
             SyncManager.updateProgress(transferId, fileName, bytesRead, totalBytes)
         }
     }

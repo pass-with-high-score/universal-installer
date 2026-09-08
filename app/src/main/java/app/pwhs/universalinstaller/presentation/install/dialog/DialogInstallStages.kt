@@ -206,8 +206,13 @@ fun DialogDownloadingContent(
 
         val downloadedStr = android.text.format.Formatter.formatFileSize(context, progress.bytesDownloaded)
         val totalStr = if (progress.totalBytes > 0) android.text.format.Formatter.formatFileSize(context, progress.totalBytes) else "—"
-        val speedStr = if (progress.speedBytesPerSec > 0) "${android.text.format.Formatter.formatFileSize(context, progress.speedBytesPerSec)}/s" else ""
+        val speedStr = app.pwhs.core.util.TransferFormatter.formatSpeed(progress.speedBytesPerSec)
+        val etaStr = app.pwhs.core.util.TransferFormatter.formatEta(context, progress.etaSeconds)
         val percentStr = currentProgress?.let { " (${(it * 100).toInt()}%)" } ?: ""
+        val statsList = listOfNotNull(
+            speedStr.takeIf { it.isNotEmpty() },
+            etaStr
+        ).joinToString(" • ")
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -218,9 +223,9 @@ fun DialogDownloadingContent(
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
-            if (speedStr.isNotBlank()) {
+            if (statsList.isNotBlank()) {
                 Text(
-                    text = speedStr,
+                    text = statsList,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.Medium,

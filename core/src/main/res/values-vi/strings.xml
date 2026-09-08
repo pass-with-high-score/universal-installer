@@ -81,4 +81,10 @@
     <string name="nav_updates">Cập nhật</string>
     <string name="nav_manage">Quản lý</string>
     <string name="nav_settings">Cài đặt</string>
+
+    <!-- Transfer Estimator -->
+    <string name="transfer_speed">%1$s/s</string>
+    <string name="transfer_eta_seconds">Còn ~%1$d giây</string>
+    <string name="transfer_eta_minutes_seconds">Còn ~%1$d ph %2$d giây</string>
+    <string name="transfer_eta_hours_minutes">Còn ~%1$d giờ %2$d ph</string>
 </resources>

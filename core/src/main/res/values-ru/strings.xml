@@ -77,4 +77,8 @@
     <string name="nav_updates">Обновления</string>
     <string name="nav_manage">Управление</string>
     <string name="nav_settings">Настройки</string>
+    <string name="transfer_speed">%1$s/с</string>
+    <string name="transfer_eta_seconds">осталось ~%1$d с</string>
+    <string name="transfer_eta_minutes_seconds">осталось ~%1$d мин %2$d с</string>
+    <string name="transfer_eta_hours_minutes">осталось ~%1$d ч %2$d мин</string>
 </resources>

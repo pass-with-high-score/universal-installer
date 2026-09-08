@@ -77,4 +77,8 @@
     <string name="nav_updates">更新</string>
     <string name="nav_manage">管理</string>
     <string name="nav_settings">设置</string>
+    <string name="transfer_speed">%1$s/秒</string>
+    <string name="transfer_eta_seconds">剩余约 %1$d 秒</string>
+    <string name="transfer_eta_minutes_seconds">剩余约 %1$d 分 %2$d 秒</string>
+    <string name="transfer_eta_hours_minutes">剩余约 %1$d 小时 %2$d 分</string>
 </resources>

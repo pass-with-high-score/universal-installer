@@ -77,4 +77,8 @@
     <string name="nav_updates">Ενημερώσεις</string>
     <string name="nav_manage">Διαχείριση</string>
     <string name="nav_settings">Ρυθμίσεις</string>
+    <string name="transfer_speed">%1$s/δευτ.</string>
+    <string name="transfer_eta_seconds">απομένουν ~%1$d δευτ.</string>
+    <string name="transfer_eta_minutes_seconds">απομένουν ~%1$d λεπ. %2$d δευτ.</string>
+    <string name="transfer_eta_hours_minutes">απομένουν ~%1$d ώρες %2$d λεπ.</string>
 </resources>

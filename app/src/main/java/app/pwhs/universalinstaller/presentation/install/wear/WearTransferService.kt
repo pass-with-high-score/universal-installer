@@ -71,9 +71,17 @@ class WearTransferService : Service() {
             context = applicationContext,
             apkUri = uri,
             fileName = fileName,
-            onProgress = { progress ->
-                WearTransferState.update(WatchSendState.Sending(progress))
-                updateNotification(progress)
+            onProgress = { p ->
+                WearTransferState.update(
+                    WatchSendState.Sending(
+                        progress = p.progress,
+                        bytesSent = p.bytesSent,
+                        totalBytes = p.totalBytes,
+                        speedBytesPerSec = p.speedBytesPerSec,
+                        etaSeconds = p.etaSeconds,
+                    )
+                )
+                updateNotification(p.progress, p.etaSeconds)
             },
         )
         if (!scope.isActive) return
@@ -106,9 +114,14 @@ class WearTransferService : Service() {
         )
     }
 
-    private fun updateNotification(progress: Float) {
+    private fun updateNotification(progress: Float, etaSeconds: Long? = null) {
         val percent = (progress * 100).toInt().coerceIn(0, 100)
-        val text = getString(R.string.watch_send_sending, percent)
+        val etaStr = app.pwhs.core.util.TransferFormatter.formatEta(this, etaSeconds)
+        val text = if (etaStr != null) {
+            "${getString(R.string.watch_send_sending, percent)} ($etaStr)"
+        } else {
+            getString(R.string.watch_send_sending, percent)
+        }
         getSystemService(NotificationManager::class.java)
             .notify(NOTIFICATION_ID, notification(text, percent))
     }

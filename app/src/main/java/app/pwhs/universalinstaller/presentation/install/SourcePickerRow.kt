@@ -430,13 +430,23 @@ private fun DownloadSourceContent(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
+                    val sizeText = "$downloadedStr / $totalStr"
+                    val speedStr = app.pwhs.core.util.TransferFormatter.formatSpeed(running.speedBytesPerSec)
+                    val leftText = if (speedStr.isNotEmpty()) "$sizeText • $speedStr" else sizeText
                     Text(
-                        text = "$downloadedStr / $totalStr",
+                        text = leftText,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
+                    val etaStr = app.pwhs.core.util.TransferFormatter.formatEta(context, running.etaSeconds)
+                    val rightText = when {
+                        percent != null && etaStr != null -> "$percent% ($etaStr)"
+                        percent != null -> "$percent%"
+                        etaStr != null -> etaStr
+                        else -> stringResource(R.string.dialog_downloading_package)
+                    }
                     Text(
-                        text = if (percent != null) "$percent%" else stringResource(R.string.dialog_downloading_package),
+                        text = rightText,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold,

@@ -18,6 +18,7 @@ data class DownloadProgress(
     val totalBytes: Long,
     val progress: Float?, // 0.0 .. 1.0, null if indeterminate (unknown total)
     val speedBytesPerSec: Long = 0L,
+    val etaSeconds: Long? = null,
 )
 
 sealed interface DownloadResult {
@@ -64,9 +65,8 @@ class NetworkApkDownloader(private val context: Context) {
 
             val buffer = ByteArray(32 * 1024)
             var bytesReadTotal = 0L
-            var lastSpeedUpdate = System.currentTimeMillis()
-            var bytesSinceLastSpeed = 0L
-            var currentSpeed = 0L
+            val estimator = app.pwhs.core.util.TransferEstimator()
+            var lastUpdate = System.currentTimeMillis()
 
             while (isActive) {
                 val read = inputStream.read(buffer)
@@ -74,21 +74,26 @@ class NetworkApkDownloader(private val context: Context) {
 
                 outputStream.write(buffer, 0, read)
                 bytesReadTotal += read
-                bytesSinceLastSpeed += read
 
                 val now = System.currentTimeMillis()
-                val delta = now - lastSpeedUpdate
+                val delta = now - lastUpdate
                 if (delta >= 250) {
-                    currentSpeed = (bytesSinceLastSpeed * 1000L) / delta
-                    lastSpeedUpdate = now
-                    bytesSinceLastSpeed = 0L
-                    
+                    lastUpdate = now
+                    val estimate = estimator.update(bytesReadTotal, totalBytes)
                     val progressRatio = if (totalBytes > 0) {
                         (bytesReadTotal.toFloat() / totalBytes.toFloat()).coerceIn(0f, 1f)
                     } else {
                         null
                     }
-                    onProgress(DownloadProgress(bytesReadTotal, totalBytes, progressRatio, currentSpeed))
+                    onProgress(
+                        DownloadProgress(
+                            bytesDownloaded = bytesReadTotal,
+                            totalBytes = totalBytes,
+                            progress = progressRatio,
+                            speedBytesPerSec = estimate.speedBytesPerSec,
+                            etaSeconds = estimate.etaSeconds,
+                        )
+                    )
                 }
             }
 
@@ -98,7 +103,7 @@ class NetworkApkDownloader(private val context: Context) {
             }
 
             outputStream.flush()
-            onProgress(DownloadProgress(bytesReadTotal, totalBytes, 1f, 0L))
+            onProgress(DownloadProgress(bytesReadTotal, totalBytes, 1f, 0L, 0L))
 
             DownloadResult.Success(
                 file = targetFile,

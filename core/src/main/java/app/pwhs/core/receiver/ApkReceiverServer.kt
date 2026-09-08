@@ -202,6 +202,7 @@ class ApkReceiverServer(
         var lastProgressMs = 0L
         var totalWritten = 0L
         var remainingBodyBytes = if (contentLength > 0) (contentLength - headerCount) else Long.MAX_VALUE
+        val estimator = app.pwhs.core.util.TransferEstimator()
 
         FileOutputStream(tempFile).use { fos ->
             val buf = ByteArray(64 * 1024)
@@ -242,10 +243,14 @@ class ApkReceiverServer(
                 val now = System.currentTimeMillis()
                 if (now - lastProgressMs >= 50L || totalWritten >= totalExpected) {
                     lastProgressMs = now
+                    val written = totalWritten.coerceAtMost(totalExpected)
+                    val estimate = estimator.update(written, totalExpected)
                     TvReceiverState.emitReceivingProgress(
                         ReceivingProgress(
-                            bytesReceived = totalWritten.coerceAtMost(totalExpected),
-                            totalBytes = totalExpected
+                            bytesReceived = written,
+                            totalBytes = totalExpected,
+                            speedBytesPerSec = estimate.speedBytesPerSec,
+                            etaSeconds = estimate.etaSeconds,
                         )
                     )
                 }

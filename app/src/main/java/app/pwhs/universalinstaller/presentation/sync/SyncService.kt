@@ -32,6 +32,8 @@ data class TransferProgress(
     val fileName: String,
     val bytesTransferred: Long,
     val totalBytes: Long,
+    val speedBytesPerSec: Long = 0L,
+    val etaSeconds: Long? = null,
 ) {
     val percentage: Int
         get() = if (totalBytes > 0) ((bytesTransferred * 100) / totalBytes).toInt().coerceIn(0, 100) else 0
@@ -47,6 +49,7 @@ object SyncManager {
 
     private val connectionCounter = java.util.concurrent.atomic.AtomicInteger(0)
     private val transferIdCounter = java.util.concurrent.atomic.AtomicLong(0)
+    private val estimators = java.util.concurrent.ConcurrentHashMap<String, app.pwhs.core.util.TransferEstimator>()
 
     fun nextTransferId(): String = "transfer_${transferIdCounter.incrementAndGet()}"
 
@@ -64,15 +67,25 @@ object SyncManager {
         connectionCounter.set(0)
         activeConnections.update { 0 }
         activeTransfers.value = emptyMap()
+        estimators.clear()
     }
 
     fun updateProgress(transferId: String, fileName: String, bytesTransferred: Long, totalBytes: Long) {
+        val estimator = estimators.getOrPut(transferId) { app.pwhs.core.util.TransferEstimator() }
+        val estimate = estimator.update(bytesTransferred, totalBytes)
         activeTransfers.update { map ->
-            map + (transferId to TransferProgress(fileName, bytesTransferred, totalBytes))
+            map + (transferId to TransferProgress(
+                fileName = fileName,
+                bytesTransferred = bytesTransferred,
+                totalBytes = totalBytes,
+                speedBytesPerSec = estimate.speedBytesPerSec,
+                etaSeconds = estimate.etaSeconds,
+            ))
         }
     }
 
     fun removeTransfer(transferId: String) {
+        estimators.remove(transferId)
         activeTransfers.update { map -> map - transferId }
     }
 }
@@ -219,7 +232,13 @@ class SyncService : Service() {
                     val transferredBytes = transfers.values.sumOf { it.bytesTransferred }
                     val overallPercent = if (totalBytes > 0) ((transferredBytes * 100) / totalBytes).toInt().coerceIn(0, 100) else 0
                     val text = if (transfers.size == 1) {
-                        "Sending: ${transfers.values.first().fileName}"
+                        val single = transfers.values.first()
+                        val eta = app.pwhs.core.util.TransferFormatter.formatEta(this@SyncService, single.etaSeconds)
+                        if (eta != null) {
+                            "Sending: ${single.fileName} ($eta)"
+                        } else {
+                            "Sending: ${single.fileName}"
+                        }
                     } else {
                         "Sending ${transfers.size} files"
                     }

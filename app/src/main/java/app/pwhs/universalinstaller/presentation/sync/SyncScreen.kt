@@ -555,54 +555,10 @@ private fun SyncUi(
                         items = uiState.activeTransfers.entries.toList(),
                         key = { it.key }
                     ) { (_, progress) ->
-                        Surface(
-                            shape = MaterialTheme.shapes.large,
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateItem()
-                        ) {
-                            Column(
-                                modifier = Modifier.padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(8.dp),
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                ) {
-                                    Text(
-                                        text = progress.fileName,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.Medium,
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis,
-                                        modifier = Modifier.weight(1f),
-                                    )
-                                    Spacer(Modifier.width(12.dp))
-                                    Text(
-                                        text = stringResource(R.string.sync_percentage, progress.percentage),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary,
-                                    )
-                                }
-                                LinearProgressIndicator(
-                                    progress = { progress.percentage / 100f },
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(6.dp),
-                                    trackColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                )
-                                Text(
-                                    text = stringResource(
-                                        R.string.sync_transfer_progress,
-                                        formatFileSize(context, progress.bytesTransferred),
-                                        formatFileSize(context, progress.totalBytes)
-                                    ),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
+                        SyncTransferProgressCard(
+                            progress = progress,
+                            modifier = Modifier.animateItem()
+                        )
                     }
                 }
 
