@@ -49,7 +49,10 @@ import androidx.compose.material.icons.rounded.Work
 import androidx.compose.material.icons.rounded.Splitscreen
 import androidx.compose.material.icons.rounded.Store
 import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material.icons.rounded.Warning
+import app.pwhs.universalinstaller.presentation.install.dialog.components.DialogMenuTabRow
+import app.pwhs.universalinstaller.presentation.install.dialog.components.DialogTabItem
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
@@ -63,7 +66,6 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -71,8 +73,6 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Switch
-import androidx.compose.material3.PrimaryTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -297,9 +297,9 @@ fun DialogMenuContent(
     }
     
     val tabs = listOf(
-        stringResource(R.string.dialog_tab_info),
-        stringResource(R.string.dialog_tab_security),
-        stringResource(R.string.dialog_tab_advanced),
+        DialogTabItem(stringResource(R.string.dialog_tab_info), Icons.Rounded.Info),
+        DialogTabItem(stringResource(R.string.dialog_tab_security), Icons.Rounded.Security),
+        DialogTabItem(stringResource(R.string.dialog_tab_advanced), Icons.Rounded.Tune),
     )
     val pagerState = rememberPagerState(pageCount = { tabs.size })
 
@@ -310,32 +310,15 @@ fun DialogMenuContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // ── Tabs ──
-        PrimaryTabRow(
-            selectedTabIndex = pagerState.currentPage,
-            containerColor = Color.Transparent,
-            divider = { HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)) },
-        ) {
-            tabs.forEachIndexed { index, title ->
-                Tab(
-                    selected = pagerState.currentPage == index,
-                    onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(index)
-                        }
-                    },
-                    text = {
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography.labelLarge,
-                            color = if (pagerState.currentPage == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 1,
-                            softWrap = false,
-                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-                        )
-                    }
-                )
-            }
-        }
+        DialogMenuTabRow(
+            tabs = tabs,
+            selectedIndex = pagerState.currentPage,
+            onTabSelected = { index ->
+                scope.launch {
+                    pagerState.animateScrollToPage(index)
+                }
+            },
+        )
 
         Spacer(modifier = Modifier.height(12.dp)) // Reduced spacer
 

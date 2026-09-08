@@ -231,9 +231,9 @@ fun DialogInstallContent(
                             detectTapGestures(onTap = { /* consume clicks */ })
                         },
                     shape = if (isSheet) FLOATING_SHEET_SHAPE else AlertDialogDefaults.shape,
-                    color = if (isSheet) BottomSheetDefaults.ContainerColor else AlertDialogDefaults.containerColor,
+                    color = AlertDialogDefaults.containerColor,
                     tonalElevation = if (isSheet) BottomSheetDefaults.Elevation else AlertDialogDefaults.TonalElevation,
-                    shadowElevation = if (isSheet) 0.dp else 12.dp,
+                    shadowElevation = if (isSheet) 8.dp else 12.dp,
                 ) {
                     SheetChrome(enabled = isSheet) {
                         val params = generateDialogParams(

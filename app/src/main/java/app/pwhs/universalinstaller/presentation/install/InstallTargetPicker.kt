@@ -41,12 +41,26 @@ fun InstallTargetPicker(
     onSelectUserId: (Int?) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val currentProfile = profiles.firstOrNull { it.isCurrent }
+        ?: profiles.firstOrNull { it.isOwner }
+        ?: profiles.firstOrNull()
+
+    val currentName = currentProfile?.displayName?.takeIf { it.isNotBlank() }
+    val currentTitle = if (currentName != null) {
+        "$currentName (${stringResource(R.string.dialog_menu_target_current)})"
+    } else {
+        stringResource(R.string.dialog_menu_target_current)
+    }
+    val currentSubtitle = "User ID: ${currentProfile?.id ?: 0} · ${stringResource(R.string.dialog_menu_target_current_sub)}"
+
+    val otherProfiles = profiles.filter { it.id != (currentProfile?.id ?: 0) }
+
     Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         TargetOptionRow(
             icon = Icons.Rounded.Person,
-            title = stringResource(R.string.dialog_menu_target_current),
-            subtitle = stringResource(R.string.dialog_menu_target_current_sub),
-            selected = !allUsers && selectedUserId == null,
+            title = currentTitle,
+            subtitle = currentSubtitle,
+            selected = !allUsers && (selectedUserId == null || selectedUserId == currentProfile?.id),
             onClick = {
                 onSelectAllUsers(false)
                 onSelectUserId(null)
@@ -63,7 +77,7 @@ fun InstallTargetPicker(
             },
         )
 
-        if (profiles.size > 1) {
+        if (otherProfiles.isNotEmpty()) {
             Spacer(modifier = Modifier.height(4.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f))
             Text(
@@ -72,7 +86,7 @@ fun InstallTargetPicker(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(start = 8.dp, top = 8.dp, bottom = 4.dp),
             )
-            profiles.forEach { profile ->
+            otherProfiles.forEach { profile ->
                 TargetOptionRow(
                     icon = when {
                         profile.isWorkProfile -> Icons.Rounded.Work
