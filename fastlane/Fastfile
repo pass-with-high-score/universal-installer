@@ -10,7 +10,7 @@ default_platform(:android)
 # on the target track. This cuts CI time significantly when only one or two modules have changes.
 PHONE_AAB = "app/build/outputs/bundle/playRelease/app-play-release.aab"
 WEAR_AAB  = "wearos/build/outputs/bundle/release/wearos-release.aab"
-TV_AAB    = "tv/build/outputs/bundle/release/tv-release.aab"
+TV_AAB    = "tv/build/outputs/bundle/playRelease/tv-play-release.aab"
 
 platform :android do
 
@@ -186,7 +186,7 @@ platform :android do
     tv_changed = tv_now != tv_last
     UI.message("📺 TV versionCode: last=#{tv_last} now=#{tv_now} → #{tv_changed ? 'BUILDING & UPLOADING' : 'SKIPPING (no change)'}")
     if tv_changed
-      gradle(task: ":tv:bundleRelease")
+      gradle(task: ":tv:bundlePlayRelease")
       upload_to_play_store(
         track:                   options[:track],
         package_name:            "app.pwhs.universalinstaller",

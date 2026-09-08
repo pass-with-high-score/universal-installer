@@ -68,9 +68,9 @@ jobs:
       # bundlePlayRelease below fails with "task not found" — see docs/FIREBASE.md.
       - name: Decode Firebase config
         run: |
-          mkdir -p app/src/play
+          mkdir -p app/src/play tv/src/play
           echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > app/src/play/google-services.json
-          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > tv/google-services.json
+          echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > tv/src/play/google-services.json
 
       # Build & Deploy
       - name: Grant execute permission
@@ -92,6 +92,8 @@ jobs:
           mkdir -p dist
           cp app/build/outputs/bundle/playRelease/app-play-release.aab dist/ || \
             echo "::warning::no play bundle to attach to the release"
+          cp tv/build/outputs/bundle/playRelease/tv-play-release.aab dist/ || \
+            echo "::warning::no TV play bundle to attach to the release"
 
       # F-Droid rebuilds the opensource APK from a plain checkout and requires it to match the
       # one published here byte for byte. A checkout has no google-services.json, so leaving
@@ -103,7 +105,7 @@ jobs:
       - name: Drop the Firebase config before building the open-source artifacts
         run: |
           rm -f app/src/play/google-services.json
-          rm -f tv/google-services.json
+          rm -f tv/src/play/google-services.json
 
       # The APK published here is the `opensource` flavor: same app, minus Firebase Analytics and
       # Crashlytics. That is the build F-Droid reproduces and the one people sideload.
@@ -113,7 +115,7 @@ jobs:
       # the flavor difference costs installers nothing — but it does mean the release page hosts a
       # bundle containing Analytics and Crashlytics.
       - name: Build release APK & AAB
-        run: ./gradlew :app:assembleOpensourceRelease :tv:assembleRelease :tv:bundleRelease :wearos:assembleRelease :wearos:bundleRelease
+        run: ./gradlew :app:assembleOpensourceRelease :tv:assembleOpensourceRelease :wearos:assembleRelease :wearos:bundleRelease
 
       # The flavor dimension renamed this to app-opensource-release.apk, but two downstream
       # consumers key off the old name: F-Droid's recipe pins `binary:` to app-release.apk for
@@ -123,6 +125,8 @@ jobs:
         run: |
           mv app/build/outputs/apk/opensource/release/app-opensource-release.apk \
              app/build/outputs/apk/opensource/release/app-release.apk
+          mv tv/build/outputs/apk/opensource/release/tv-opensource-release.apk \
+             tv/build/outputs/apk/opensource/release/tv-release.apk
 
       # Artifacts
       - name: Upload release AAB & APK
@@ -132,8 +136,8 @@ jobs:
           path: |
             dist/app-play-release.aab
             app/build/outputs/apk/opensource/release/app-release.apk
-            tv/build/outputs/bundle/release/tv-release.aab
-            tv/build/outputs/apk/release/tv-release.apk
+            dist/tv-play-release.aab
+            tv/build/outputs/apk/opensource/release/tv-release.apk
             wearos/build/outputs/bundle/release/wearos-release.aab
             wearos/build/outputs/apk/release/wearos-release.apk
           retention-days: 30
@@ -148,8 +152,8 @@ jobs:
           files: |
             app/build/outputs/apk/opensource/release/app-release.apk
             dist/app-play-release.aab
-            tv/build/outputs/apk/release/tv-release.apk
-            tv/build/outputs/bundle/release/tv-release.aab
+            tv/build/outputs/apk/opensource/release/tv-release.apk
+            dist/tv-play-release.aab
             wearos/build/outputs/apk/release/wearos-release.apk
             wearos/build/outputs/bundle/release/wearos-release.aab
           token: ${{ secrets.GITHUB_TOKEN }}

@@ -120,6 +120,21 @@ android {
     }
 }
 
+if (hasFirebaseConfig) {
+    tasks.matching {
+        (it.name.startsWith("injectCrashlytics") || it.name.startsWith("uploadCrashlyticsMappingFile")) &&
+            it.name.contains("Opensource")
+    }.configureEach {
+        enabled = false
+    }
+}
+
+androidComponents {
+    beforeVariants(selector().withFlavor("distribution" to "play")) { variant ->
+        variant.enable = hasFirebaseConfig
+    }
+}
+
 kotlin {
     compilerOptions {
         jvmTarget = JvmTarget.JVM_11
