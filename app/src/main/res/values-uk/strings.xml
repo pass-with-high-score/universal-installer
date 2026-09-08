@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">Цей APK не сумісний з архітектурою процесора вашого пристрою (наприклад, 32-біт проти 64-біт).</string>
     <string name="install_error_incompatible_feature_title">Відсутня функція пристрою</string>
     <string name="install_error_incompatible_feature_guidance">Ця програма потребує апаратної або системної функції, яка не підтримується вашим пристроєм.</string>
+    <string name="setting_install_options_subtitle">Привілейовані параметри, пониження версії, дозволи, джерело встановлення</string>
+    <string name="setting_install_options_unprivileged_note">Розширені параметри потребують увімкнення режиму Shizuku, Root або Dhizuku.</string>
+    <string name="sync_server_settings_sub">Порт сервера, автентифікація за PIN-кодом</string>
+    <string name="sync_require_pin_off">Без PIN-коду</string>
 </resources>

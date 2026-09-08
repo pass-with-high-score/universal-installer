@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">此 APK 与您设备的 CPU 架构不兼容（例如 32 位与 64 位）。</string>
     <string name="install_error_incompatible_feature_title">缺少设备功能</string>
     <string name="install_error_incompatible_feature_guidance">此应用需要您设备不支持的硬件或系统功能。</string>
+    <string name="setting_install_options_subtitle">特权标志、降级、权限、安装来源</string>
+    <string name="setting_install_options_unprivileged_note">高级选项需要启用 Shizuku、Root 或 Dhizuku 模式。</string>
+    <string name="sync_server_settings_sub">服务器端口、PIN 码验证</string>
+    <string name="sync_require_pin_off">无 PIN 码</string>
 </resources>

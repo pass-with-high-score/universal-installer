@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">ملف APK هذا غير متوافق مع معمارية المعالج بجهازك (مثل 32 بت مقابل 64 بت).</string>
     <string name="install_error_incompatible_feature_title">ميزة الجهاز مفقودة</string>
     <string name="install_error_incompatible_feature_guidance">يتطلب هذا التطبيق ميزة جهاز أو ميزة نظام لا يدعمها جهازك.</string>
+    <string name="setting_install_options_subtitle">أعلام الامتيازات، الرجوع إلى إصدار أقدم، الأذونات، مصدر التثبيت</string>
+    <string name="setting_install_options_unprivileged_note">تتطلب الخيارات المتقدمة تفعيل وضع Shizuku أو Root أو Dhizuku.</string>
+    <string name="sync_server_settings_sub">منفذ الخادم، المصادقة برمز PIN</string>
+    <string name="sync_require_pin_off">بدون PIN</string>
 </resources>

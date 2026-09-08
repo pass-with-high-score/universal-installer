@@ -995,4 +995,8 @@
   <string name="install_error_incompatible_abi_guidance">Cet APK n\'est pas compatible avec l\'architecture processeur de votre appareil (ex. 32 bits vs 64 bits).</string>
   <string name="install_error_incompatible_feature_title">Fonctionnalité de l\'appareil manquante</string>
   <string name="install_error_incompatible_feature_guidance">Cette application nécessite une fonctionnalité matérielle ou système non prise en charge par votre appareil.</string>
+  <string name="setting_install_options_subtitle">Options avec privilèges, rétrogradation, autorisations, source d\'installation</string>
+  <string name="setting_install_options_unprivileged_note">Les options avancées nécessitent l\'activation du mode Shizuku, Root ou Dhizuku.</string>
+  <string name="sync_server_settings_sub">Port du serveur, authentification par code PIN</string>
+  <string name="sync_require_pin_off">Aucun code PIN</string>
 </resources>

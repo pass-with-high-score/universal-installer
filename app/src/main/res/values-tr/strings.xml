@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">Bu APK cihazınızın CPU mimarisiyle uyumlu değil (ör. 32-bit ve 64-bit).</string>
     <string name="install_error_incompatible_feature_title">Eksik cihaz özelliği</string>
     <string name="install_error_incompatible_feature_guidance">Bu uygulama, cihazınız tarafından desteklenmeyen bir donanım hoặc sistem özelliği gerektirir.</string>
+    <string name="setting_install_options_subtitle">Ayrıcalıklı bayraklar, sürüm düşürme, izinler, yükleme kaynağı</string>
+    <string name="setting_install_options_unprivileged_note">Gelişmiş seçenekler için Shizuku, Root veya Dhizuku modunun etkinleştirilmesi gerekir.</string>
+    <string name="sync_server_settings_sub">Sunucu bağlantı noktası, PIN kodu kimlik doğrulaması</string>
+    <string name="sync_require_pin_off">PIN yok</string>
 </resources>

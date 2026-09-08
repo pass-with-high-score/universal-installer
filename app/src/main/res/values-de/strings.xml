@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">Diese APK ist nicht mit der CPU-Architektur deines Geräts kompatibel (z. B. 32-Bit vs. 64-Bit).</string>
     <string name="install_error_incompatible_feature_title">Fehlende Gerätefunktion</string>
     <string name="install_error_incompatible_feature_guidance">Diese App erfordert eine Hardware- oder Systemfunktion, die von deinem Gerät nicht unterstützt wird.</string>
+    <string name="setting_install_options_subtitle">Privilegierte Flags, Downgrade, Berechtigungen, Installationsquelle</string>
+    <string name="setting_install_options_unprivileged_note">Erweiterte Flags erfordern die Aktivierung des Shizuku-, Root- oder Dhizuku-Modus.</string>
+    <string name="sync_server_settings_sub">Server-Port, PIN-Code-Authentifizierung</string>
+    <string name="sync_require_pin_off">Keine PIN</string>
 </resources>

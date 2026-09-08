@@ -361,6 +361,8 @@
   <string name="setting_shizuku_uninstall_all_users">Gỡ cài đặt cho tất cả người dùng</string>
   <string name="setting_shizuku_uninstall_all_users_sub">Xóa gói khỏi mọi người dùng trên thiết bị</string>
   <string name="setting_section_install_options">Tuỳ chọn cài đặt</string>
+  <string name="setting_install_options_subtitle">Cờ đặc quyền, hạ cấp, cấp quyền, nguồn cài đặt</string>
+  <string name="setting_install_options_unprivileged_note">Các tuỳ chọn nâng cao yêu cầu bật chế độ Shizuku, Root hoặc Dhizuku.</string>
   <string name="setting_install_options_dhizuku_note">Dhizuku chỉ hỗ trợ \&quot;Cho phép hạ cấp\&quot;. Các tuỳ chọn còn lại có tác dụng khi bạn quay lại Shizuku hoặc Root.</string>
   <string name="setting_section_sync">Đồng bộ &amp; Chia sẻ</string>
   <string name="setting_rate_subtitle">Đánh giá chúng tôi trên Google Play</string>
@@ -751,9 +753,11 @@
   <string name="sync_server_running">Đang chạy</string>
   <string name="sync_server_tap_to_start">Nhấn để bắt đầu</string>
   <string name="sync_server_settings">Cài đặt máy chủ</string>
+  <string name="sync_server_settings_sub">Cổng máy chủ, xác thực bằng mã PIN</string>
   <string name="sync_port">Cổng</string>
   <string name="sync_require_pin">Yêu cầu mã PIN</string>
   <string name="sync_require_pin_subtitle">Bảo vệ việc chuyển tệp bằng mật khẩu</string>
+  <string name="sync_require_pin_off">Không dùng PIN</string>
   <string name="sync_pin_code">Mã PIN</string>
   <string name="sync_active_downloads">Tải xuống đang hoạt động</string>
   <string name="sync_active_downloads_count">Đang tải xuống %d</string>

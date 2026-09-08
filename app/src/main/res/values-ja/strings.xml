@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">この APK はお使いのデバイスの CPU アーキテクチャと互換性がありません (例: 32 ビットと 64 ビット)。</string>
     <string name="install_error_incompatible_feature_title">不足しているデバイス機能</string>
     <string name="install_error_incompatible_feature_guidance">このアプリには、お使いのデバイスでサポートされていないハードウェアまたはシステム機能が必要です。</string>
+    <string name="setting_install_options_subtitle">特権フラグ、ダウングレード、権限、インストール元</string>
+    <string name="setting_install_options_unprivileged_note">高度なフラグを使用するには、Shizuku、Root、またはDhizukuモードを有効にする必要があります。</string>
+    <string name="sync_server_settings_sub">サーバーポート、PINコード認証</string>
+    <string name="sync_require_pin_off">PINなし</string>
 </resources>

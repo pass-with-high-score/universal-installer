@@ -48,10 +48,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -66,13 +62,11 @@ import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.universalinstaller.util.AppIconData
 import app.pwhs.universalinstaller.util.DhizukuState
-import app.pwhs.universalinstaller.presentation.setting.profile.PackageNamePickerDialog
 import androidx.datastore.preferences.core.Preferences
 import org.koin.androidx.compose.koinViewModel
 import app.pwhs.universalinstaller.presentation.setting.sections.AboutSection
 import app.pwhs.universalinstaller.presentation.setting.sections.AdvancedSection
 import app.pwhs.universalinstaller.presentation.setting.sections.ProfilesSection
-import app.pwhs.universalinstaller.presentation.setting.sections.InstallOptionsSection
 import app.pwhs.universalinstaller.presentation.setting.sections.InstallSection
 import app.pwhs.universalinstaller.presentation.setting.sections.InterfaceSection
 import app.pwhs.universalinstaller.presentation.setting.sections.PrivacySection
@@ -206,6 +200,8 @@ private fun SettingUi(
     val context = androidx.compose.ui.platform.LocalContext.current
     val backupViewModel: BackupViewModel = koinViewModel()
     var openRestorePicker by remember { mutableStateOf<(() -> Unit)?>(null) }
+    var showInstallOptionsSheet by rememberSaveable { mutableStateOf(false) }
+    var showSyncOptionsSheet by rememberSaveable { mutableStateOf(false) }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
@@ -282,8 +278,11 @@ private fun SettingUi(
             // gates below — which aren't composable — can decide section visibility without
             // calling stringResource. `matchesQuery` returns true on a blank query, so the
             // full list renders when search is empty.
-            val installLabels = listOf(stringResource(R.string.setting_use_dhizuku_title), "dhizuku",
+            val installLabels = listOf(
+                stringResource(R.string.setting_use_dhizuku_title), "dhizuku",
                 stringResource(R.string.setting_install_mode_title), "shizuku", "root", "default",
+                stringResource(R.string.setting_section_install_options),
+                "downgrade", "replace", "permission", "test", "bypass", "source", "rollback",
                 stringResource(R.string.setting_delete_apk_title),
                 stringResource(R.string.setting_auto_open_title),
                 stringResource(R.string.setting_auto_confirm_title),
@@ -291,10 +290,6 @@ private fun SettingUi(
                 stringResource(R.string.setting_default_installer_title),
                 stringResource(R.string.setting_auto_approve_title),
                 "auto approve", "whitelist", "trusted",
-            )
-            val privilegedLabels = listOf(
-                stringResource(R.string.setting_section_install_options),
-                "shizuku", "root", "dhizuku", "downgrade", "replace",
             )
             val profileLabels = listOf(
                 stringResource(R.string.setting_profiles_title),
@@ -323,7 +318,6 @@ private fun SettingUi(
             // Whether any (currently-applicable) section survives the filter — drives the
             // "no results" state. Shizuku/Root only count when they'd be shown at all.
             val anyVisible = matchesQuery(q, installLabels) ||
-                    matchesQuery(q, privilegedLabels) ||
                     matchesQuery(q, profileLabels) ||
                     matchesQuery(q, interfaceLabels) ||
                     matchesQuery(q, securityLabels) ||
@@ -368,19 +362,7 @@ private fun SettingUi(
                     onDefaultInstallerChanged = onDefaultInstallerChanged,
                     onCustomAuthorizerCommandChange = onCustomAuthorizerCommandChange,
                     onTestCustomAuthorizerCommand = onTestCustomAuthorizerCommand,
-                )
-
-                // ── Install options ──────────────────────────
-                // Install options section: shows full privileged flags when Shizuku/Root/Dhizuku is enabled,
-                // and shows Install Source configuration for all modes.
-                InstallOptionsSection(
-                    q = q,
-                    privilegedLabels = privilegedLabels,
-                    uiState = uiState,
-                    useDhizuku = useDhizuku,
-                    onPrivilegedOptionChanged = onPrivilegedOptionChanged,
-                    onInstallerPackageChanged = onInstallerPackageChanged,
-                    onShizukuOptionChanged = onShizukuOptionChanged
+                    onOpenInstallOptions = { showInstallOptionsSheet = true },
                 )
 
                 // ── Profiles Section ─────────────────────────
@@ -421,9 +403,7 @@ private fun SettingUi(
                     syncLabels = syncLabels,
                     context = context,
                     syncOptions = uiState.syncOptions,
-                    onSyncServerPortChanged = onSyncServerPortChanged,
-                    onSyncRequirePinChanged = onSyncRequirePinChanged,
-                    onSyncPinCodeChanged = onSyncPinCodeChanged
+                    onOpenSyncOptions = { showSyncOptionsSheet = true },
                 )
 
                 // ── Advanced Options ─────────────────────────
@@ -473,6 +453,27 @@ private fun SettingUi(
         viewModel = backupViewModel,
         onPickerReady = { openRestorePicker = it },
     )
+
+    if (showInstallOptionsSheet) {
+        InstallOptionsBottomSheet(
+            uiState = uiState,
+            useDhizuku = useDhizuku,
+            onDismiss = { showInstallOptionsSheet = false },
+            onPrivilegedOptionChanged = onPrivilegedOptionChanged,
+            onInstallerPackageChanged = onInstallerPackageChanged,
+            onShizukuOptionChanged = onShizukuOptionChanged,
+        )
+    }
+
+    if (showSyncOptionsSheet) {
+        SyncOptionsBottomSheet(
+            syncOptions = uiState.syncOptions,
+            onDismiss = { showSyncOptionsSheet = false },
+            onSyncServerPortChanged = onSyncServerPortChanged,
+            onSyncRequirePinChanged = onSyncRequirePinChanged,
+            onSyncPinCodeChanged = onSyncPinCodeChanged,
+        )
+    }
 } // end of SettingUi
 
 /** True when [query] is blank (everything passes) or any [haystacks] entry contains it. */

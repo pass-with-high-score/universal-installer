@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">APK ini tidak kompatibel dengan arsitektur CPU perangkat Anda (misalnya 32-bit vs 64-bit).</string>
     <string name="install_error_incompatible_feature_title">Fitur perangkat tidak ditemukan</string>
     <string name="install_error_incompatible_feature_guidance">Aplikasi ini memerlukan fitur perangkat keras atau sistem yang tidak didukung oleh perangkat Anda.</string>
+    <string name="setting_install_options_subtitle">Opsi istimewa, downgrade, izin, sumber pemasangan</string>
+    <string name="setting_install_options_unprivileged_note">Opsi lanjutan memerlukan mode Shizuku, Root, atau Dhizuku diaktifkan.</string>
+    <string name="sync_server_settings_sub">Port server, autentikasi kode PIN</string>
+    <string name="sync_require_pin_off">Tanpa PIN</string>
 </resources>

@@ -3,8 +3,11 @@ package app.pwhs.universalinstaller.presentation.setting.sections
 import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.KeyboardArrowRight
+import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.Wallpaper
@@ -48,6 +51,7 @@ internal fun LazyListScope.InstallSection(
     onDefaultInstallerChanged: (Boolean) -> Unit,
     onCustomAuthorizerCommandChange: (String) -> Unit = {},
     onTestCustomAuthorizerCommand: suspend (String) -> Result<String> = { Result.success("") },
+    onOpenInstallOptions: () -> Unit = {},
 ) {
     if (matchesQuery(q, installLabels)) item {
         SettingsSection(title = stringResource(R.string.setting_section_installation), icon = Icons.Rounded.SettingsApplications) {
@@ -87,6 +91,45 @@ internal fun LazyListScope.InstallSection(
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                     )
                 }
+            }
+
+            SearchableItem(
+                q,
+                stringResource(R.string.setting_section_install_options),
+                "shizuku root dhizuku downgrade replace permission test bypass source rollback uninstall",
+            ) {
+                ListItem(
+                    headlineContent = {
+                        Text(
+                            text = stringResource(R.string.setting_section_install_options),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    },
+                    supportingContent = {
+                        Text(
+                            text = stringResource(R.string.setting_install_options_subtitle),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    leadingContent = {
+                        Icon(
+                            imageVector = Icons.Rounded.AdminPanelSettings,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp),
+                        )
+                    },
+                    trailingContent = {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Rounded.KeyboardArrowRight,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    },
+                    modifier = Modifier.clickable(onClick = onOpenInstallOptions),
+                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                )
             }
 
             if (q.isBlank()) OptionGroupHeader(stringResource(R.string.setting_group_after_install))

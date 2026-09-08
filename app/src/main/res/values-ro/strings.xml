@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">Acest APK nu este compatibil cu arhitectura CPU a dispozitivului tău (de ex. 32 de biți vs 64 de biți).</string>
     <string name="install_error_incompatible_feature_title">Funcție lipsă a dispozitivului</string>
     <string name="install_error_incompatible_feature_guidance">Această aplicație necesită o funcție hardware sau de sistem care nu este acceptată de dispozitivul tău.</string>
+    <string name="setting_install_options_subtitle">Opțiuni cu privilegii, downgrade, permisiuni, sursă de instalare</string>
+    <string name="setting_install_options_unprivileged_note">Opțiunile avansate necesită activarea modului Shizuku, Root sau Dhizuku.</string>
+    <string name="sync_server_settings_sub">Port server, autentificare cu cod PIN</string>
+    <string name="sync_require_pin_off">Fără PIN</string>
 </resources>

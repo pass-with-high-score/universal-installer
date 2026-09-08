@@ -995,4 +995,8 @@
     <string name="install_error_incompatible_abi_guidance">Αυτό το APK δεν είναι συμβατό με την αρχιτεκτονική CPU της συσκευής σας (π.χ. 32-bit έναντι 64-bit).</string>
     <string name="install_error_incompatible_feature_title">Λείπει δυνατότητα συσκευής</string>
     <string name="install_error_incompatible_feature_guidance">Αυτή η εφαρμογή απαιτεί μια δυνατότητα υλικού ή συστήματος που δεν υποστηρίζεται από τη συσκευή σας.</string>
+    <string name="setting_install_options_subtitle">Σημαίες δικαιωμάτων, υποβάθμιση, άδειες, πηγή εγκατάστασης</string>
+    <string name="setting_install_options_unprivileged_note">Οι σύνθετες επιλογές απαιτούν την ενεργοποίηση της λειτουργίας Shizuku, Root ή Dhizuku.</string>
+    <string name="sync_server_settings_sub">Θύρα διακομιστή, έλεγχος ταυτότητας με κωδικό PIN</string>
+    <string name="sync_require_pin_off">Χωρίς PIN</string>
 </resources>

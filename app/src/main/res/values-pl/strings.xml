@@ -971,4 +971,8 @@
     <string name="install_error_incompatible_abi_guidance">Ten plik APK nie jest zgodny z architekturą procesora Twojego urządzenia (np. 32-bit vs 64-bit).</string>
     <string name="install_error_incompatible_feature_title">Brakująca funkcja urządzenia</string>
     <string name="install_error_incompatible_feature_guidance">Ta aplikacja wymaga funkcji sprzętowej lub systemowej, której Twoje urządzenie nie obsługuje.</string>
+    <string name="setting_install_options_subtitle">Flagi uprzywilejowane, obniżenie wersji, uprawnienia, źródło instalacji</string>
+    <string name="setting_install_options_unprivileged_note">Zaawansowane opcje wymagają włączenia trybu Shizuku, Root lub Dhizuku.</string>
+    <string name="sync_server_settings_sub">Port serwera, uwierzytelnianie kodem PIN</string>
+    <string name="sync_require_pin_off">Brak kodu PIN</string>
 </resources>

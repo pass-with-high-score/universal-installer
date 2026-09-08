@@ -995,4 +995,8 @@
   <string name="install_error_incompatible_abi_guidance">यह APK आपके डिवाइस के CPU आर्किटेक्चर (उदा. 32-बिट बनाम 64-बिट) के अनुकूल नहीं है।</string>
   <string name="install_error_incompatible_feature_title">डिवाइस सुविधा अनुपलब्ध है</string>
   <string name="install_error_incompatible_feature_guidance">इस ऐप के लिए ऐसी हार्डवेयर या सिस्टम सुविधा आवश्यक है जो आपके डिवाइस पर समर्थित नहीं है।</string>
+  <string name="setting_install_options_subtitle">विशेषाधिकार प्राप्त विकल्प, डाउनग्रेड, अनुमतियां, इंस्टॉलेशन स्रोत</string>
+  <string name="setting_install_options_unprivileged_note">उन्नत विकल्पों के लिए Shizuku, Root या Dhizuku मोड सक्षम होना आवश्यक है।</string>
+  <string name="sync_server_settings_sub">सर्वर पोर्ट, पिन कोड प्रमाणीकरण</string>
+  <string name="sync_require_pin_off">कोई पिन नहीं</string>
 </resources>

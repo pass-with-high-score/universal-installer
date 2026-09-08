@@ -555,7 +555,9 @@
     <string name="installer_mode_custom">Custom</string>
     <string name="installer_engine_custom_desc">Install via custom authorizer command</string>
     <string name="setting_section_install_options">Install options</string>
-    <string name="setting_install_options_dhizuku_note">Dhizuku only supports \&quot;Allow downgrade\&quot;. The rest apply when you switch back to Shizuku or Root.</string>
+    <string name="setting_install_options_subtitle">Privileged flags, downgrade, permissions, install source</string>
+    <string name="setting_install_options_unprivileged_note">Advanced flags require Shizuku, Root, or Dhizuku mode to be enabled.</string>
+    <string name="setting_install_options_dhizuku_note">Dhizuku only supports &quot;Allow downgrade&quot;. The rest apply when you switch back to Shizuku or Root.</string>
     <string name="install_error_cancelled_title">Installation cancelled</string>
     <string name="install_error_cancelled_guidance">The installation was cancelled by the user or system. Tap Retry to try again.</string>
     <string name="install_error_blocked_title">Installation blocked</string>
@@ -810,9 +812,11 @@
     <string name="sync_server_running">Running</string>
     <string name="sync_server_tap_to_start">Tap to start</string>
     <string name="sync_server_settings">Server Settings</string>
+    <string name="sync_server_settings_sub">Server port, PIN code authentication</string>
     <string name="sync_port">Port</string>
     <string name="sync_require_pin">Require PIN</string>
     <string name="sync_require_pin_subtitle">Guard transfers with a password</string>
+    <string name="sync_require_pin_off">No PIN</string>
     <string name="sync_pin_code">PIN Code</string>
     <string name="sync_active_downloads">Active Downloads</string>
     <string name="sync_active_downloads_count">%d downloading</string>
