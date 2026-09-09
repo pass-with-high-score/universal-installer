@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
@@ -54,9 +55,11 @@ class MainActivity : ComponentActivity() {
         setContent {
             val accentId by settings.accentId.collectAsState(initial = null)
             UniversalInstallerTheme(accent = WearAccent.fromId(accentId)) {
-                val apkId by pendingApkId.collectAsState()
-                NotificationPermissionRequest()
-                WearNavGraph(apkId, onRecreate = { recreate() }) { pendingApkId.value = null }
+                AppScaffold {
+                    val apkId by pendingApkId.collectAsState()
+                    NotificationPermissionRequest()
+                    WearNavGraph(apkId, onRecreate = { recreate() }) { pendingApkId.value = null }
+                }
             }
         }
     }

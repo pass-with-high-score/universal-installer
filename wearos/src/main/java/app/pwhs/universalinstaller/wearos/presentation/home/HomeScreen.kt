@@ -7,12 +7,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.ListHeaderDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
@@ -61,76 +63,78 @@ fun HomeScreenContent(
     onMoreClick: () -> Unit,
     onDelete: (String) -> Unit,
 ) {
-    AppScaffold {
-        val listState = rememberTransformingLazyColumnState()
-        val spec = rememberTransformationSpec()
+    val listState = rememberTransformingLazyColumnState()
+    val spec = rememberTransformationSpec()
 
-        ScreenScaffold(
-            scrollState = listState,
-            // A persistent destination rather than a list item: the queue can be long and Manage
-            // must not sit behind it.
-            edgeButton = {
-                EdgeButton(onClick = onMoreClick) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_more_horiz),
-                        contentDescription = stringResource(R.string.more_title),
-                    )
+    ScreenScaffold(
+        scrollState = listState,
+        // A persistent destination rather than a list item: the queue can be long and Manage
+        // must not sit behind it.
+        edgeButton = {
+            EdgeButton(onClick = onMoreClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_more_horiz),
+                    contentDescription = stringResource(R.string.more_title),
+                )
+            }
+        },
+    ) { contentPadding ->
+        TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
+            item {
+                ListHeader(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .transformedHeight(this, spec)
+                        .minimumVerticalContentPadding(
+                            top = ListHeaderDefaults.minimumTopListContentPadding,
+                            bottom = 0.dp
+                        ),
+                    transformation = SurfaceTransformation(spec),
+                ) {
+                    Text(text = stringResource(R.string.home_title))
                 }
-            },
-        ) { contentPadding ->
-            TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
-                item {
-                    ListHeader(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
-                    ) {
-                        Text(text = stringResource(R.string.home_title))
-                    }
-                }
+            }
 
+            item {
+                StorageSummary(
+                    queueBytes = queueBytes,
+                    freeBytes = freeBytes,
+                    usedFraction = usedFraction,
+                    modifier = Modifier.transformedHeight(this, spec),
+                )
+            }
+
+            if (receiveState !is WearReceiveState.Idle) {
                 item {
-                    StorageSummary(
-                        queueBytes = queueBytes,
-                        freeBytes = freeBytes,
-                        usedFraction = usedFraction,
+                    ReceivingCard(
+                        state = receiveState,
                         modifier = Modifier.transformedHeight(this, spec),
                     )
                 }
+            }
 
-                if (receiveState !is WearReceiveState.Idle) {
-                    item {
-                        ReceivingCard(
-                            state = receiveState,
-                            modifier = Modifier.transformedHeight(this, spec),
+            items(apks.size, key = { apks[it].id }) { index ->
+                val apk = apks[index]
+                ApkListItem(
+                    info = apk,
+                    onClick = { onApkClick(apk.id) },
+                    onDelete = { onDelete(apk.id) },
+                    modifier = Modifier.transformedHeight(this, spec),
+                    transformation = SurfaceTransformation(spec),
+                )
+            }
+
+            if (apks.isEmpty() && receiveState is WearReceiveState.Idle) {
+                item {
+                    if (isLoading) {
+                        Text(
+                            text = stringResource(R.string.loading),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .transformedHeight(this, spec),
                         )
-                    }
-                }
-
-                items(apks.size, key = { apks[it].id }) { index ->
-                    val apk = apks[index]
-                    ApkListItem(
-                        info = apk,
-                        onClick = { onApkClick(apk.id) },
-                        onDelete = { onDelete(apk.id) },
-                        modifier = Modifier.transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
-                    )
-                }
-
-                if (apks.isEmpty() && receiveState is WearReceiveState.Idle) {
-                    item {
-                        if (isLoading) {
-                            Text(
-                                text = stringResource(R.string.loading),
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .transformedHeight(this, spec),
-                            )
-                        } else {
-                            HomeEmpty(modifier = Modifier.transformedHeight(this, spec))
-                        }
+                    } else {
+                        HomeEmpty(modifier = Modifier.transformedHeight(this, spec))
                     }
                 }
             }
@@ -154,21 +158,23 @@ private fun previewApk(
 @Composable
 private fun HomeScreenPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(
-            apks = listOf(
-                previewApk(),
-                previewApk(id = "b.apk", appName = "Instagram", declaresWatchFeature = false),
-                previewApk(id = "c.apk", appName = "Tiles Demo", installedVersionCode = 210),
-            ),
-            isLoading = false,
-            receiveState = WearReceiveState.Idle,
-            queueBytes = 160_000_000L,
-            freeBytes = 5_300_000_000L,
-            usedFraction = 0.34f,
-            onApkClick = {},
-            onMoreClick = {},
-            onDelete = {},
-        )
+        AppScaffold {
+            HomeScreenContent(
+                apks = listOf(
+                    previewApk(),
+                    previewApk(id = "b.apk", appName = "Instagram", declaresWatchFeature = false),
+                    previewApk(id = "c.apk", appName = "Tiles Demo", installedVersionCode = 210),
+                ),
+                isLoading = false,
+                receiveState = WearReceiveState.Idle,
+                queueBytes = 160_000_000L,
+                freeBytes = 5_300_000_000L,
+                usedFraction = 0.34f,
+                onApkClick = {},
+                onMoreClick = {},
+                onDelete = {},
+            )
+        }
     }
 }
 
@@ -176,17 +182,19 @@ private fun HomeScreenPreview() {
 @Composable
 private fun HomeScreenReceivingPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(
-            apks = listOf(previewApk()),
-            isLoading = false,
-            receiveState = WearReceiveState.Receiving("watchface.apk", 4_000_000, 12_000_000),
-            queueBytes = 160_000_000L,
-            freeBytes = 5_300_000_000L,
-            usedFraction = 0.34f,
-            onApkClick = {},
-            onMoreClick = {},
-            onDelete = {},
-        )
+        AppScaffold {
+            HomeScreenContent(
+                apks = listOf(previewApk()),
+                isLoading = false,
+                receiveState = WearReceiveState.Receiving("watchface.apk", 4_000_000, 12_000_000),
+                queueBytes = 160_000_000L,
+                freeBytes = 5_300_000_000L,
+                usedFraction = 0.34f,
+                onApkClick = {},
+                onMoreClick = {},
+                onDelete = {},
+            )
+        }
     }
 }
 
@@ -194,7 +202,9 @@ private fun HomeScreenReceivingPreview() {
 @Composable
 private fun HomeScreenEmptyPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(emptyList(), false, WearReceiveState.Idle, 0L, 5_300_000_000L, 0.34f, {}, {}, {})
+        AppScaffold {
+            HomeScreenContent(emptyList(), false, WearReceiveState.Idle, 0L, 5_300_000_000L, 0.34f, {}, {}, {})
+        }
     }
 }
 
@@ -202,6 +212,8 @@ private fun HomeScreenEmptyPreview() {
 @Composable
 private fun HomeScreenLoadingPreview() {
     UniversalInstallerTheme {
-        HomeScreenContent(emptyList(), true, WearReceiveState.Idle, 0L, 5_300_000_000L, 0.34f, {}, {}, {})
+        AppScaffold {
+            HomeScreenContent(emptyList(), true, WearReceiveState.Idle, 0L, 5_300_000_000L, 0.34f, {}, {}, {})
+        }
     }
 }

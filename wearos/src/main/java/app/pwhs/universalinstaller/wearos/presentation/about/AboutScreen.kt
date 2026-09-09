@@ -20,6 +20,8 @@ import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.ListHeaderDefaults
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -75,43 +77,49 @@ fun AboutScreenContent(
     sourceDir: String?,
     onRate: () -> Unit,
 ) {
-    AppScaffold {
-        val listState = rememberTransformingLazyColumnState()
-        val spec = rememberTransformationSpec()
+    val listState = rememberTransformingLazyColumnState()
+    val spec = rememberTransformationSpec()
 
-        ScreenScaffold(scrollState = listState) { contentPadding ->
-            TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
-                item {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                            .transformedHeight(this, spec),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(6.dp),
-                    ) {
-                        if (sourceDir != null) ApkIcon(apkPath = sourceDir, size = 48.dp)
-                        Text(
-                            text = appName,
-                            style = MaterialTheme.typography.titleMedium,
-                            textAlign = TextAlign.Center,
-                        )
-                        Label(stringResource(R.string.about_version), version)
-                        Label(stringResource(R.string.about_package), packageName)
-                    }
+    ScreenScaffold(scrollState = listState) { contentPadding ->
+        TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
+            item {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .transformedHeight(this, spec)
+                        .minimumVerticalContentPadding(
+                            top = ListHeaderDefaults.minimumTopListContentPadding,
+                            bottom = 0.dp
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    if (sourceDir != null) ApkIcon(apkPath = sourceDir, size = 48.dp)
+                    Text(
+                        text = appName,
+                        style = MaterialTheme.typography.titleMedium,
+                        textAlign = TextAlign.Center,
+                    )
+                    Label(stringResource(R.string.about_version), version)
+                    Label(stringResource(R.string.about_package), packageName)
                 }
+            }
 
-                item {
-                    Button(
-                        onClick = onRate,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
-                            .transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
-                    ) {
-                        Text(stringResource(R.string.about_rate))
-                    }
+            item {
+                Button(
+                    onClick = onRate,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp)
+                        .transformedHeight(this, spec)
+                        .minimumVerticalContentPadding(
+                            top = 0.dp,
+                            bottom = ButtonDefaults.minimumVerticalListContentPadding
+                        ),
+                    transformation = SurfaceTransformation(spec),
+                ) {
+                    Text(stringResource(R.string.about_rate))
                 }
             }
         }
@@ -140,12 +148,14 @@ private fun Label(caption: String, value: String) {
 @Composable
 private fun AboutScreenPreview() {
     UniversalInstallerTheme {
-        AboutScreenContent(
-            appName = "Universal Installer",
-            version = "1.12.0 (1035)",
-            packageName = "app.pwhs.universalinstaller",
-            sourceDir = null,
-            onRate = {},
-        )
+        AppScaffold {
+            AboutScreenContent(
+                appName = "Universal Installer",
+                version = "1.12.0 (1035)",
+                packageName = "app.pwhs.universalinstaller",
+                sourceDir = null,
+                onRate = {},
+            )
+        }
     }
 }

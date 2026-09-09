@@ -13,7 +13,9 @@ import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.ListHeaderDefaults
 import androidx.wear.compose.material3.RadioButton
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -27,42 +29,54 @@ import app.pwhs.universalinstaller.wearos.presentation.theme.WearAccent
 
 @Composable
 fun AccentScreen(selected: WearAccent, onSelect: (WearAccent) -> Unit) {
-    AppScaffold {
-        val listState = rememberTransformingLazyColumnState()
-        val spec = rememberTransformationSpec()
+    val listState = rememberTransformingLazyColumnState()
+    val spec = rememberTransformationSpec()
 
-        ScreenScaffold(scrollState = listState) { contentPadding ->
-            TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
-                item {
-                    ListHeader(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
-                    ) {
-                        Text(stringResource(R.string.settings_accent))
-                    }
+    ScreenScaffold(scrollState = listState) { contentPadding ->
+        TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
+            item {
+                ListHeader(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .transformedHeight(this, spec)
+                        .minimumVerticalContentPadding(
+                            top = ListHeaderDefaults.minimumTopListContentPadding,
+                            bottom = 0.dp
+                        ),
+                    transformation = SurfaceTransformation(spec),
+                ) {
+                    Text(stringResource(R.string.settings_accent))
                 }
-                items(WearAccent.entries.size) { index ->
-                    val accent = WearAccent.entries[index]
-                    RadioButton(
-                        selected = accent == selected,
-                        onSelect = { onSelect(accent) },
-                        label = { Text(stringResource(accent.labelRes())) },
-                        icon = {
-                            Box(
-                                modifier = Modifier
-                                    .size(20.dp)
-                                    .clip(CircleShape)
-                                    .background(accent.primary),
-                            ) {}
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
+            }
+            items(WearAccent.entries.size) { index ->
+                val accent = WearAccent.entries[index]
+                val isLast = index == WearAccent.entries.size - 1
+                val itemModifier = Modifier
+                    .fillMaxWidth()
+                    .transformedHeight(this, spec)
+                    .then(
+                        if (isLast) {
+                            Modifier.minimumVerticalContentPadding(
+                                top = 0.dp,
+                                bottom = ButtonDefaults.minimumVerticalListContentPadding
+                            )
+                        } else Modifier
                     )
-                }
+                RadioButton(
+                    selected = accent == selected,
+                    onSelect = { onSelect(accent) },
+                    label = { Text(stringResource(accent.labelRes())) },
+                    icon = {
+                        Box(
+                            modifier = Modifier
+                                .size(20.dp)
+                                .clip(CircleShape)
+                                .background(accent.primary),
+                        ) {}
+                    },
+                    modifier = itemModifier,
+                    transformation = SurfaceTransformation(spec),
+                )
             }
         }
     }
@@ -71,5 +85,9 @@ fun AccentScreen(selected: WearAccent, onSelect: (WearAccent) -> Unit) {
 @WearPreviewDevices
 @Composable
 private fun AccentScreenPreview() {
-    UniversalInstallerTheme { AccentScreen(WearAccent.Orange, {}) }
+    UniversalInstallerTheme {
+        AppScaffold {
+            AccentScreen(WearAccent.Orange, {})
+        }
+    }
 }

@@ -6,11 +6,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.material3.AppScaffold
 import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.ListHeaderDefaults
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
@@ -48,63 +51,80 @@ fun ManageScreenContent(
     onOpen: (String) -> Unit,
     onUninstall: (String) -> Unit,
 ) {
-    AppScaffold {
-        val listState = rememberTransformingLazyColumnState()
-        val spec = rememberTransformationSpec()
+    val listState = rememberTransformingLazyColumnState()
+    val spec = rememberTransformationSpec()
 
-        ScreenScaffold(scrollState = listState) { contentPadding ->
-            TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
-                item {
-                    ListHeader(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
-                    ) {
-                        Text(stringResource(R.string.manage_title))
-                    }
+    ScreenScaffold(scrollState = listState) { contentPadding ->
+        TransformingLazyColumn(contentPadding = contentPadding, state = listState) {
+            item {
+                ListHeader(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .transformedHeight(this, spec)
+                        .minimumVerticalContentPadding(
+                            top = ListHeaderDefaults.minimumTopListContentPadding,
+                            bottom = 0.dp
+                        ),
+                    transformation = SurfaceTransformation(spec),
+                ) {
+                    Text(stringResource(R.string.manage_title))
                 }
+            }
 
-                item {
-                    Button(
-                        onClick = onToggleSystem,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
-                    ) {
-                        Text(
-                            stringResource(
-                                if (includeSystem) R.string.manage_hide_system
-                                else R.string.manage_show_system
-                            )
+            item {
+                Button(
+                    onClick = onToggleSystem,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .transformedHeight(this, spec),
+                    transformation = SurfaceTransformation(spec),
+                ) {
+                    Text(
+                        stringResource(
+                            if (includeSystem) R.string.manage_hide_system
+                            else R.string.manage_show_system
                         )
-                    }
-                }
-
-                items(apps.size, key = { apps[it].packageName }) { index ->
-                    val app = apps[index]
-                    InstalledAppRow(
-                        app = app,
-                        sourceDir = sourceDirOf(app.packageName),
-                        onOpen = { onOpen(app.packageName) },
-                        onUninstall = { onUninstall(app.packageName) },
-                        modifier = Modifier.transformedHeight(this, spec),
-                        transformation = SurfaceTransformation(spec),
                     )
                 }
+            }
 
-                if (apps.isEmpty()) {
-                    item {
-                        Text(
-                            text = stringResource(
-                                if (isLoading) R.string.loading else R.string.manage_empty
+            items(apps.size, key = { apps[it].packageName }) { index ->
+                val app = apps[index]
+                val isLast = index == apps.size - 1
+                val itemModifier = Modifier
+                    .transformedHeight(this, spec)
+                    .then(
+                        if (isLast) {
+                            Modifier.minimumVerticalContentPadding(
+                                top = 0.dp,
+                                bottom = ButtonDefaults.minimumVerticalListContentPadding
+                            )
+                        } else Modifier
+                    )
+                InstalledAppRow(
+                    app = app,
+                    sourceDir = sourceDirOf(app.packageName),
+                    onOpen = { onOpen(app.packageName) },
+                    onUninstall = { onUninstall(app.packageName) },
+                    modifier = itemModifier,
+                    transformation = SurfaceTransformation(spec),
+                )
+            }
+
+            if (apps.isEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(
+                            if (isLoading) R.string.loading else R.string.manage_empty
+                        ),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .transformedHeight(this, spec)
+                            .minimumVerticalContentPadding(
+                                top = 0.dp,
+                                bottom = ButtonDefaults.minimumVerticalListContentPadding
                             ),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .transformedHeight(this, spec),
-                        )
-                    }
+                    )
                 }
             }
         }
@@ -120,14 +140,16 @@ private fun previewApp(name: String, pkg: String, size: Long) = InstalledApp(
 @Composable
 private fun ManageScreenPreview() {
     UniversalInstallerTheme {
-        ManageScreenContent(
-            apps = listOf(
-                previewApp("Watch Face Studio", "com.example.wfs", 15_000_000L),
-                previewApp("Sleep Tracker", "com.example.sleep", 8_400_000L),
-            ),
-            isLoading = false, includeSystem = false,
-            sourceDirOf = { null }, onToggleSystem = {}, onOpen = {}, onUninstall = {},
-        )
+        AppScaffold {
+            ManageScreenContent(
+                apps = listOf(
+                    previewApp("Watch Face Studio", "com.example.wfs", 15_000_000L),
+                    previewApp("Sleep Tracker", "com.example.sleep", 8_400_000L),
+                ),
+                isLoading = false, includeSystem = false,
+                sourceDirOf = { null }, onToggleSystem = {}, onOpen = {}, onUninstall = {},
+            )
+        }
     }
 }
 
@@ -135,6 +157,8 @@ private fun ManageScreenPreview() {
 @Composable
 private fun ManageScreenEmptyPreview() {
     UniversalInstallerTheme {
-        ManageScreenContent(emptyList(), false, false, { null }, {}, {}, {})
+        AppScaffold {
+            ManageScreenContent(emptyList(), false, false, { null }, {}, {}, {})
+        }
     }
 }

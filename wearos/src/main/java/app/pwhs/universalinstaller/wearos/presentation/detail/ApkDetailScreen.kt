@@ -26,6 +26,7 @@ import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.CircularProgressIndicator
 import androidx.wear.compose.material3.EdgeButton
 import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.ListHeaderDefaults
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.ScreenScaffold
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -86,101 +87,108 @@ private fun ApkDetailContent(
     onOpenSettings: () -> Unit,
     onDelete: () -> Unit,
 ) {
-    AppScaffold {
-        val listState = rememberTransformingLazyColumnState()
-        val spec = rememberTransformationSpec()
+    val listState = rememberTransformingLazyColumnState()
+    val spec = rememberTransformationSpec()
 
-        ScreenScaffold(
-            scrollState = listState,
-            edgeButton = {
-                if (installState is InstallState.Idle && apkInfo != null) {
-                    EdgeButton(
-                        onClick = onDelete,
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                            contentColor = MaterialTheme.colorScheme.onErrorContainer,
-                        ),
+    ScreenScaffold(
+        scrollState = listState,
+        edgeButton = {
+            if (installState is InstallState.Idle && apkInfo != null) {
+                EdgeButton(
+                    onClick = onDelete,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                    ),
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            }
+        },
+    ) { contentPadding ->
+        TransformingLazyColumn(
+            contentPadding = contentPadding,
+            state = listState,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            item {
+                if (apkInfo != null) {
+                    ApkDetailHeader(
+                        info = apkInfo,
+                        modifier = Modifier
+                            .transformedHeight(this, spec)
+                            .minimumVerticalContentPadding(
+                                top = ListHeaderDefaults.minimumTopListContentPadding,
+                                bottom = 0.dp
+                            ),
+                    )
+                } else {
+                    ListHeader(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .transformedHeight(this, spec)
+                            .minimumVerticalContentPadding(
+                                top = ListHeaderDefaults.minimumTopListContentPadding,
+                                bottom = 0.dp
+                            ),
+                        transformation = SurfaceTransformation(spec),
                     ) {
-                        Text(stringResource(R.string.delete))
+                        Text(stringResource(R.string.loading))
                     }
                 }
-            },
-        ) { contentPadding ->
-            TransformingLazyColumn(
-                contentPadding = contentPadding,
-                state = listState,
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
+            }
+
+            if (installState is InstallState.Installing) {
                 item {
-                    if (apkInfo != null) {
-                        ApkDetailHeader(
-                            info = apkInfo,
-                            modifier = Modifier.transformedHeight(this, spec),
+                    if (installState.progress != null) {
+                        CircularProgressIndicator(
+                            progress = { installState.progress },
+                            modifier = Modifier.size(48.dp).transformedHeight(this, spec),
                         )
                     } else {
-                        ListHeader(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .transformedHeight(this, spec),
-                            transformation = SurfaceTransformation(spec),
-                        ) {
-                            Text(stringResource(R.string.loading))
-                        }
-                    }
-                }
-
-                if (installState is InstallState.Installing) {
-                    item {
-                        if (installState.progress != null) {
-                            CircularProgressIndicator(
-                                progress = { installState.progress },
-                                modifier = Modifier.size(48.dp).transformedHeight(this, spec),
-                            )
-                        } else {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(48.dp).transformedHeight(this, spec),
-                            )
-                        }
-                    }
-                }
-
-                if (installState.hasStatus()) {
-                    item {
-                        CenteredText(
-                            text = installState.statusText(),
-                            modifier = Modifier.transformedHeight(this, spec),
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp).transformedHeight(this, spec),
                         )
                     }
                 }
+            }
 
-                val action = installState.action()
-                if (action != null && apkInfo != null) {
-                    item {
-                        Button(
-                            onClick = when (action) {
-                                Action.INSTALL -> onInstall
-                                Action.INSTALL_ANYWAY -> onInstallAnyway
-                                Action.RETRY -> onInstall
-                                Action.OPEN_SETTINGS -> onOpenSettings
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .transformedHeight(this, spec),
-                            transformation = SurfaceTransformation(spec),
-                        ) {
-                            Text(stringResource(action.labelRes))
-                        }
+            if (installState.hasStatus()) {
+                item {
+                    CenteredText(
+                        text = installState.statusText(),
+                        modifier = Modifier.transformedHeight(this, spec),
+                    )
+                }
+            }
+
+            val action = installState.action()
+            if (action != null && apkInfo != null) {
+                item {
+                    Button(
+                        onClick = when (action) {
+                            Action.INSTALL -> onInstall
+                            Action.INSTALL_ANYWAY -> onInstallAnyway
+                            Action.RETRY -> onInstall
+                            Action.OPEN_SETTINGS -> onOpenSettings
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .transformedHeight(this, spec),
+                        transformation = SurfaceTransformation(spec),
+                    ) {
+                        Text(stringResource(action.labelRes))
                     }
                 }
+            }
 
-                if (installState is InstallState.NeedsUnknownSources) {
-                    item {
-                        CenteredText(
-                            text = stringResource(R.string.unknown_sources_hidden),
-                            modifier = Modifier.transformedHeight(this, spec),
-                        )
-                    }
+            if (installState is InstallState.NeedsUnknownSources) {
+                item {
+                    CenteredText(
+                        text = stringResource(R.string.unknown_sources_hidden),
+                        modifier = Modifier.transformedHeight(this, spec),
+                    )
                 }
             }
         }
@@ -209,29 +217,49 @@ private fun previewApk() = WearApkInfo(
 @WearPreviewDevices
 @Composable
 private fun ApkDetailIdlePreview() {
-    UniversalInstallerTheme { ApkDetailContent(previewApk(), InstallState.Idle, {}, {}, {}, {}) }
+    UniversalInstallerTheme {
+        AppScaffold {
+            ApkDetailContent(previewApk(), InstallState.Idle, {}, {}, {}, {})
+        }
+    }
 }
 
 @WearPreviewDevices
 @Composable
 private fun ApkDetailInstallingPreview() {
-    UniversalInstallerTheme { ApkDetailContent(previewApk(), InstallState.Installing(0.6f), {}, {}, {}, {}) }
+    UniversalInstallerTheme {
+        AppScaffold {
+            ApkDetailContent(previewApk(), InstallState.Installing(0.6f), {}, {}, {}, {})
+        }
+    }
 }
 
 @WearPreviewDevices
 @Composable
 private fun ApkDetailFailedPreview() {
-    UniversalInstallerTheme { ApkDetailContent(previewApk(), InstallState.Failed("INSTALL_FAILED_INVALID_APK"), {}, {}, {}, {}) }
+    UniversalInstallerTheme {
+        AppScaffold {
+            ApkDetailContent(previewApk(), InstallState.Failed("INSTALL_FAILED_INVALID_APK"), {}, {}, {}, {})
+        }
+    }
 }
 
 @WearPreviewDevices
 @Composable
 private fun ApkDetailNeedsUnknownSourcesPreview() {
-    UniversalInstallerTheme { ApkDetailContent(previewApk(), InstallState.NeedsUnknownSources, {}, {}, {}, {}) }
+    UniversalInstallerTheme {
+        AppScaffold {
+            ApkDetailContent(previewApk(), InstallState.NeedsUnknownSources, {}, {}, {}, {})
+        }
+    }
 }
 
 @WearPreviewDevices
 @Composable
 private fun ApkDetailIncompatiblePreview() {
-    UniversalInstallerTheme { ApkDetailContent(previewApk(), InstallState.Incompatible("This is a phone app."), {}, {}, {}, {}) }
+    UniversalInstallerTheme {
+        AppScaffold {
+            ApkDetailContent(previewApk(), InstallState.Incompatible("This is a phone app."), {}, {}, {}, {})
+        }
+    }
 }
