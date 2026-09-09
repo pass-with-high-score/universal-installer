@@ -1,0 +1,54 @@
+# What this module is
+
+Wear OS smartwatch companion for Universal Installer.
+Handles sideloading APKs directly to the watch, viewing installation queue,
+and communicating with the phone application.
+
+Derived: 52 translatable string(s) (+1 translatable="false") across 18 locale(s), in `strings.xml`.
+
+## Audience & tone
+
+Ultra-terse, compact, and action-oriented for tiny round and square smartwatch screens.
+Avoid lengthy descriptions; labels must fit minimal screen space.
+Use direct register: `vi` uses "bạn", `pt-BR` uses "você".
+
+## Do not translate
+
+- API
+- Wi-Fi
+- Wear OS
+- Universal Installer
+
+## Glossary
+
+| term | locale | translation |
+| --- | --- | --- |
+| install | vi | cài đặt |
+| apps | vi | ứng dụng |
+| watch | vi | đồng hồ |
+| package | vi | gói |
+| queue | vi | hàng đợi |
+| installed | vi | đã cài đặt |
+| settings | vi | cài đặt |
+| phone | vi | điện thoại |
+
+## Notes per locale
+
+- `ar` — Arabic (RTL, CLDR requires all six plural quantities: zero, one, two, few, many, other)
+- `de` — German (informal/direct UI register)
+- `el` — Greek
+- `es` — Spanish (standard direct second-person "tú")
+- `fr` — French (standard polite UI register "vous")
+- `hi` — Hindi
+- `in` — Indonesian (Android's legacy code `in`, never write `id` in CSV)
+- `it` — Italian
+- `ja` — Japanese
+- `ko` — Korean
+- `pl` — Polish
+- `pt-BR` — Brazilian Portuguese (uses "você")
+- `ro` — Romanian
+- `ru` — Russian
+- `tr` — Turkish
+- `uk` — Ukrainian
+- `vi` — Vietnamese (uses pronoun "bạn", "cài đặt" for install, "đồng hồ" for watch)
+- `zh` — Simplified Chinese (简体中文: uses "安装", "设置", "手表")

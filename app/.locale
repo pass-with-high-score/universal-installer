@@ -1,0 +1,72 @@
+# What this module is
+
+Main Phone and Tablet application for Universal Installer.
+An advanced package manager and APK sideloading tool supporting standard PackageInstaller,
+Shizuku, Dhizuku (Device Owner), and Root. Features include batch uninstallation, VirusTotal security analysis,
+split APK installation (APKS, XAPK, APKM), and TV/Watch sync.
+`install` always means writing an application package onto this device, never "set up an account".
+
+Derived: 979 translatable string(s) (+26 translatable="false"), 1 <plurals> block(s) across 18 locale(s), in `strings.xml`.
+
+## Audience & tone
+
+Direct second-person, clear and technical yet accessible.
+Keep dialog actions and button labels compact enough to fit single lines on 360dp screens.
+Use direct register: `vi` uses "bạn" (never "quý khách"), `pt-BR` uses "você".
+
+## Do not translate
+
+- Shizuku
+- Dhizuku
+- VirusTotal
+- Universal Installer
+- UniversalInstaller
+- Google Play Store
+- microG Companion
+- Package Installer
+- Device Owner
+- PIN
+- APKs
+- APKM
+- OBB
+- API
+- Wi-Fi
+- IP
+- Root
+
+## Glossary
+
+| term | locale | translation |
+| --- | --- | --- |
+| install | vi | cài đặt |
+| package | vi | gói |
+| apps | vi | ứng dụng |
+| installer | vi | trình cài đặt |
+| file | vi | tệp |
+| installed | vi | đã cài đặt |
+| device | vi | thiết bị |
+| settings | vi | cài đặt |
+| uninstall | vi | gỡ cài đặt |
+| packages | vi | các gói |
+| failed | vi | thất bại |
+
+## Notes per locale
+
+- `ar` — Arabic (RTL, CLDR requires all six plural quantities: zero, one, two, few, many, other)
+- `de` — German (informal/direct UI register)
+- `el` — Greek (standard modern Greek UI terminology)
+- `es` — Spanish (standard direct second-person "tú")
+- `fr` — French (standard polite UI register "vous")
+- `hi` — Hindi
+- `in` — Indonesian (Android's legacy code `in`, never write `id` in CSV)
+- `it` — Italian
+- `ja` — Japanese (standard polite Japanese UI conventions)
+- `ko` — Korean (standard polite Korean UI conventions)
+- `pl` — Polish (standard direct UI register)
+- `pt-BR` — Brazilian Portuguese (uses "você", "celular", "tela")
+- `ro` — Romanian
+- `ru` — Russian (inflects nouns by case and plural forms)
+- `tr` — Turkish
+- `uk` — Ukrainian
+- `vi` — Vietnamese (uses pronoun "bạn", "cài đặt" for install, "gỡ cài đặt" for uninstall)
+- `zh` — Simplified Chinese (简体中文: uses "安装", "设置", "卸载", "正在卸载…")

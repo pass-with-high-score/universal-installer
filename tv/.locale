@@ -1,0 +1,55 @@
+# What this module is
+
+Android TV interface for Universal Installer, designed for large screen displays and 10-foot UI.
+Provides D-pad navigable APK installation, tracked app updates, device storage status, and TV sync.
+`install` always means writing an application package onto this TV device.
+
+Derived: 172 translatable string(s) (+3 translatable="false") across 17 locale(s), in `strings.xml`.
+
+## Audience & tone
+
+Clear, concise, and optimized for TV remote navigation.
+Short labels for buttons and menu actions so they fit TV cards and rows without truncation.
+Use direct register: `vi` uses "bạn", `pt-BR` uses "você".
+
+## Do not translate
+
+- Shizuku
+- Dhizuku
+- Universal Installer
+- APK
+- TV
+
+## Glossary
+
+| term | locale | translation |
+| --- | --- | --- |
+| install | vi | cài đặt |
+| installed | vi | đã cài đặt |
+| update | vi | cập nhật |
+| storage | vi | bộ nhớ |
+| package | vi | gói |
+| apps | vi | ứng dụng |
+| device | vi | thiết bị |
+| delete | vi | xóa |
+| file | vi | tệp |
+
+## Notes per locale
+
+- `ar` — Arabic (RTL, CLDR requires all six plural quantities: zero, one, two, few, many, other)
+- `de` — German (informal/direct UI register)
+- `el` — Greek
+- `es` — Spanish (standard direct second-person "tú")
+- `fr` — French (standard polite UI register "vous")
+- `hi` — Hindi
+- `in` — Indonesian (Android's legacy code `in`, never write `id` in CSV)
+- `it` — Italian
+- `ja` — Japanese
+- `ko` — Korean
+- `pt-BR` — Brazilian Portuguese (uses "você")
+- `ro` — Romanian
+- `ru` — Russian
+- `tr` — Turkish
+- `uk` — Ukrainian
+- `vi` — Vietnamese (uses pronoun "bạn", "cài đặt" for install, "xóa" for delete)
+- `zh` — Simplified Chinese (简体中文: uses "安装", "设置", "卸载")

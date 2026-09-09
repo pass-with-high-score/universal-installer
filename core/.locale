@@ -1,0 +1,60 @@
+# What this module is
+
+Shared core library for Universal Installer across Phone, TV, and Wear OS.
+It provides common domain models, updates tracker, repository sources (GitHub, GitLab, F-Droid),
+and shared backup/restore strings.
+
+Derived: 83 translatable string(s) across 17 locale(s), in `strings.xml`.
+
+## Audience & tone
+
+Clear, concise, and direct second-person.
+Fits small buttons and dialogs across mobile, TV, and wearable surfaces.
+Use direct register: `vi` uses "bạn", `pt-BR` uses "você".
+
+## Do not translate
+
+- API
+- GitLab
+- GitHub
+- JSON
+- Shizuku
+- Dhizuku
+- VirusTotal
+- F-Droid
+
+## Glossary
+
+| term | locale | translation |
+| --- | --- | --- |
+| install | vi | cài đặt |
+| apps | vi | ứng dụng |
+| track | vi | theo dõi |
+| settings | vi | cài đặt |
+| permission | vi | quyền |
+| updates | vi | cập nhật |
+| update | vi | cập nhật |
+| device | vi | thiết bị |
+| check | vi | kiểm tra |
+| restore | vi | khôi phục |
+| backup | vi | sao lưu |
+
+## Notes per locale
+
+- `ar` — Arabic (RTL, CLDR requires all six plural quantities: zero, one, two, few, many, other)
+- `de` — German (standard informal/direct UI register)
+- `el` — Greek
+- `es` — Spanish (standard direct second-person "tú")
+- `fr` — French (standard polite UI register "vous")
+- `hi` — Hindi
+- `in` — Indonesian (Android's legacy code `in`, never write `id` in CSV)
+- `it` — Italian
+- `ja` — Japanese (standard polite Japanese UI conventions)
+- `ko` — Korean (standard polite Korean UI conventions)
+- `pt-BR` — Brazilian Portuguese (uses "você", "celular")
+- `ro` — Romanian
+- `ru` — Russian (inflects nouns by case and plural forms)
+- `tr` — Turkish
+- `uk` — Ukrainian
+- `vi` — Vietnamese (uses pronoun "bạn", "cài đặt" for install, "gỡ cài đặt" for uninstall)
+- `zh` — Simplified Chinese (简体中文: uses "安装", "设置", "卸载")
