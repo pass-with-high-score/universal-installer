@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.contentOrNull
 import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
@@ -88,80 +89,130 @@ object TrackedAppsBackupHelper {
             }
         }.onFailure { Timber.d(it, "Not a standard Universal Installer backup format") }
 
-        // 2. Try parsing Obtainium export format or raw array
+        // 2. Try parsing Obtainium export format or raw array/map
         val results = mutableListOf<TrackedApp>()
         runCatching {
             val element = json.parseToJsonElement(trimmed)
-            val appArray = when {
-                element is JsonObject && element.containsKey("apps") -> element["apps"]?.jsonArray
-                element is JsonObject && element.containsKey("trackedApps") -> element["trackedApps"]?.jsonArray
-                element is JsonObject && element.containsKey("app_sources") -> element["app_sources"]?.jsonArray
+            val items: Collection<kotlinx.serialization.json.JsonElement>? = when {
                 element is kotlinx.serialization.json.JsonArray -> element
+                element is JsonObject && element.containsKey("apps") -> {
+                    when (val apps = element["apps"]) {
+                        is kotlinx.serialization.json.JsonArray -> apps
+                        is JsonObject -> apps.values
+                        else -> null
+                    }
+                }
+                element is JsonObject && element.containsKey("trackedApps") -> {
+                    when (val apps = element["trackedApps"]) {
+                        is kotlinx.serialization.json.JsonArray -> apps
+                        is JsonObject -> apps.values
+                        else -> null
+                    }
+                }
+                element is JsonObject && element.containsKey("tracked_apps") -> {
+                    when (val apps = element["tracked_apps"]) {
+                        is kotlinx.serialization.json.JsonArray -> apps
+                        is JsonObject -> apps.values
+                        else -> null
+                    }
+                }
+                element is JsonObject && element.containsKey("app_sources") -> {
+                    when (val apps = element["app_sources"]) {
+                        is kotlinx.serialization.json.JsonArray -> apps
+                        is JsonObject -> apps.values
+                        else -> null
+                    }
+                }
+                element is JsonObject && element.values.any { it is JsonObject && (it.containsKey("url") || it.containsKey("source_url") || it.containsKey("id")) } -> {
+                    element.values
+                }
                 else -> null
             }
 
+            items?.forEach { item ->
+                runCatching {
+                    val obj = item as? JsonObject ?: return@forEach
+                    val url = obj["url"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["source_url"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["sourceUrl"]?.jsonPrimitive?.contentOrNull
+                        ?: return@forEach
 
-            appArray?.forEach { item ->
-                val obj = item.jsonObject
-                val url = obj["url"]?.jsonPrimitive?.content
-                    ?: obj["source_url"]?.jsonPrimitive?.content
-                    ?: return@forEach
+                    if (url.isBlank()) return@forEach
 
-                val name = obj["name"]?.jsonPrimitive?.content
-                    ?: obj["author"]?.jsonPrimitive?.content?.let { "$it/${url.substringAfterLast('/')}" }
-                    ?: url.substringBefore('?').substringAfterLast('/')
+                    val name = obj["name"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["appName"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["app_name"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["author"]?.jsonPrimitive?.contentOrNull?.let { "$it/${url.substringAfterLast('/')}" }
+                        ?: url.substringBefore('?').substringAfterLast('/')
 
-                val id = obj["id"]?.jsonPrimitive?.content
-                    ?: obj["package_name"]?.jsonPrimitive?.content
-                    ?: "tracked.${name.lowercase().replace(Regex("[^a-z0-9_]"), "_")}"
+                    val id = obj["id"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["package_name"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["packageName"]?.jsonPrimitive?.contentOrNull
+                        ?: "tracked.${name.lowercase().replace(Regex("[^a-z0-9_]"), "_")}"
 
-                val additionalSettings = obj["additionalSettings"]?.jsonObject
+                    val additionalSettings: JsonObject? = when (val elem = obj["additionalSettings"]) {
+                        is JsonObject -> elem
+                        is kotlinx.serialization.json.JsonPrimitive -> {
+                            val content = elem.contentOrNull
+                            if (!content.isNullOrBlank()) {
+                                runCatching { json.parseToJsonElement(content) as? JsonObject }
+                                    .recoverCatching {
+                                        val sanitized = content.replace(Regex("""\\([^"\\/bfnrtu])"""), """\\\\$1""")
+                                        json.parseToJsonElement(sanitized) as? JsonObject
+                                    }
+                                    .getOrNull()
+                            } else null
+                        }
+                        else -> null
+                    }
 
-                val includePrereleases = obj["include_prereleases"]?.jsonPrimitive?.booleanOrNull
-                    ?: obj["includePrereleases"]?.jsonPrimitive?.booleanOrNull
-                    ?: additionalSettings?.get("includePrereleases")?.jsonPrimitive?.booleanOrNull
-                    ?: false
+                    val includePrereleases = obj["include_prereleases"]?.jsonPrimitive?.booleanOrNull
+                        ?: obj["includePrereleases"]?.jsonPrimitive?.booleanOrNull
+                        ?: additionalSettings?.get("includePrereleases")?.jsonPrimitive?.booleanOrNull
+                        ?: false
 
-                val customFilter = obj["filter"]?.jsonPrimitive?.content
-                    ?: obj["customRegexFilter"]?.jsonPrimitive?.content
-                    ?: additionalSettings?.get("apkFilterRegEx")?.jsonPrimitive?.content
-                    ?: additionalSettings?.get("customRegexFilter")?.jsonPrimitive?.content
+                    val customFilter = obj["filter"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["customRegexFilter"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["custom_regex_filter"]?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("apkFilterRegEx")?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("customRegexFilter")?.jsonPrimitive?.contentOrNull
 
-                val versionRegex = obj["version_extract_regex"]?.jsonPrimitive?.content
-                    ?: obj["versionExtractRegex"]?.jsonPrimitive?.content
-                    ?: obj["versionRegex"]?.jsonPrimitive?.content
-                    ?: additionalSettings?.get("versionExtractionRegEx")?.jsonPrimitive?.content
-                    ?: additionalSettings?.get("versionRegex")?.jsonPrimitive?.content
+                    val versionRegex = obj["version_extract_regex"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["versionExtractRegex"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["versionRegex"]?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("versionExtractionRegEx")?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("versionRegex")?.jsonPrimitive?.contentOrNull
 
-                val matchGroup = obj["match_group"]?.jsonPrimitive?.content
-                    ?: obj["matchGroup"]?.jsonPrimitive?.content
-                    ?: additionalSettings?.get("matchGroupToUse")?.jsonPrimitive?.content
-                    ?: additionalSettings?.get("matchGroup")?.jsonPrimitive?.content
+                    val matchGroup = obj["match_group"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["matchGroup"]?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("matchGroupToUse")?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("matchGroup")?.jsonPrimitive?.contentOrNull
 
-                val useReleaseTitle = obj["use_release_title"]?.jsonPrimitive?.booleanOrNull
-                    ?: obj["useReleaseTitleAsVersion"]?.jsonPrimitive?.booleanOrNull
-                    ?: additionalSettings?.get("releaseTitleAsVersion")?.jsonPrimitive?.booleanOrNull
-                    ?: false
+                    val useReleaseTitle = obj["use_release_title"]?.jsonPrimitive?.booleanOrNull
+                        ?: obj["useReleaseTitleAsVersion"]?.jsonPrimitive?.booleanOrNull
+                        ?: additionalSettings?.get("releaseTitleAsVersion")?.jsonPrimitive?.booleanOrNull
+                        ?: false
 
-                val category = obj["category"]?.jsonPrimitive?.content
-                    ?: obj["categories"]?.jsonArray?.firstOrNull()?.jsonPrimitive?.content
+                    val category = obj["category"]?.jsonPrimitive?.contentOrNull
+                        ?: runCatching { obj["categories"]?.jsonArray?.firstOrNull()?.jsonPrimitive?.contentOrNull }.getOrNull()
 
-                results.add(
-                    TrackedApp(
-                        packageName = id,
-                        appName = name,
-                        sourceType = UpdateSourceType.fromUrl(url),
-                        sourceUrl = url,
-                        currentVersionName = "Not Installed",
-                        currentVersionCode = 0L,
-                        includePrereleases = includePrereleases,
-                        customRegexFilter = customFilter,
-                        versionRegex = versionRegex,
-                        matchGroup = matchGroup,
-                        useReleaseTitleAsVersion = useReleaseTitle,
-                        category = category,
+                    results.add(
+                        TrackedApp(
+                            packageName = id.trim(),
+                            appName = name.trim(),
+                            sourceType = UpdateSourceType.fromUrl(url.trim()),
+                            sourceUrl = url.trim(),
+                            currentVersionName = "Not Installed",
+                            currentVersionCode = 0L,
+                            includePrereleases = includePrereleases,
+                            customRegexFilter = customFilter,
+                            versionRegex = versionRegex,
+                            matchGroup = matchGroup,
+                            useReleaseTitleAsVersion = useReleaseTitle,
+                            category = category,
+                        )
                     )
-                )
+                }.onFailure { Timber.w(it, "Skipping malformed app in backup JSON") }
             }
         }.onFailure { Timber.e(it, "Failed to parse backup JSON") }
 

@@ -41,4 +41,33 @@ class TrackedAppsBackupHelperTest {
         assertEquals(".*-arm64.*\\.apk", app.customRegexFilter)
         assertTrue(app.includePrereleases)
     }
+
+    @Test
+    fun importFromJson_obtainiumStringifiedAdditionalSettings_parsesCorrectly() {
+        val obtainiumJson = """
+        [
+          {
+            "id": "org.fdroid.fdroid",
+            "url": "https://gitlab.com/fdroid/fdroidclient",
+            "name": "F-Droid",
+            "author": "F-Droid",
+            "additionalSettings": "{\"versionExtractionRegEx\":\"^v(.+)$\",\"matchGroupToUse\":\"1\",\"releaseTitleAsVersion\":false,\"apkFilterRegEx\":\".*\\.apk\",\"includePrereleases\":true}"
+          },
+          {
+            "invalid_entry": true
+          }
+        ]
+        """.trimIndent()
+
+        val apps = TrackedAppsBackupHelper.importFromJson(obtainiumJson)
+        assertEquals(1, apps.size)
+        val app = apps.first()
+        assertEquals("org.fdroid.fdroid", app.packageName)
+        assertEquals("F-Droid", app.appName)
+        assertEquals("^v(.+)$", app.versionRegex)
+        assertEquals("1", app.matchGroup)
+        assertFalse(app.useReleaseTitleAsVersion)
+        assertEquals(".*\\.apk", app.customRegexFilter)
+        assertTrue(app.includePrereleases)
+    }
 }
