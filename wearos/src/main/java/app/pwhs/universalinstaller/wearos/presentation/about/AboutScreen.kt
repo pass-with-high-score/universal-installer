@@ -87,7 +87,6 @@ fun AboutScreenContent(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 12.dp)
-                        .transformedHeight(this, spec)
                         .minimumVerticalContentPadding(
                             top = ListHeaderDefaults.minimumTopListContentPadding,
                             bottom = 0.dp

@@ -117,7 +117,7 @@ private fun ApkDetailContent(
                     ApkDetailHeader(
                         info = apkInfo,
                         modifier = Modifier
-                            .transformedHeight(this, spec)
+                            .fillMaxWidth()
                             .minimumVerticalContentPadding(
                                 top = ListHeaderDefaults.minimumTopListContentPadding,
                                 bottom = 0.dp
