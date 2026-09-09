@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Text
@@ -52,10 +53,13 @@ fun ApkBadge(info: WearApkInfo, modifier: Modifier = Modifier) {
         text = stringResource(labelRes),
         style = MaterialTheme.typography.labelSmall,
         color = tint,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        softWrap = false,
         modifier = modifier
-            .clip(RoundedCornerShape(6.dp))
+            .clip(RoundedCornerShape(4.dp))
             .background(tint.copy(alpha = 0.16f))
-            .padding(horizontal = 6.dp, vertical = 1.dp),
+            .padding(horizontal = 4.dp, vertical = 1.dp),
     )
 }
 
