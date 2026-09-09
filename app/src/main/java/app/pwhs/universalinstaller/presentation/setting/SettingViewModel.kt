@@ -89,6 +89,10 @@ class SettingViewModel(
             PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE,
             PreferencesKeys.ROOT_SET_INSTALL_SOURCE,
         ),
+        Dex2oatOptimization(
+            PreferencesKeys.DEX2OAT_OPTIMIZATION,
+            PreferencesKeys.DEX2OAT_OPTIMIZATION,
+        ),
     }
 
     private val dataStore = application.dataStore
@@ -163,6 +167,7 @@ class SettingViewModel(
                 requestUpdateOwnership = prefs[PreferencesKeys.SHIZUKU_REQUEST_UPDATE_OWNERSHIP] ?: false,
                 uninstallKeepData = prefs[PreferencesKeys.SHIZUKU_UNINSTALL_KEEP_DATA] ?: false,
                 uninstallAllUsers = prefs[PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS] ?: false,
+                dex2oatOptimization = prefs[PreferencesKeys.DEX2OAT_OPTIMIZATION] ?: false,
             )
         },
         dataStore.data.map { it[PreferencesKeys.DELETE_APK_AFTER_INSTALL] ?: false },
@@ -184,6 +189,7 @@ class SettingViewModel(
                 disableVerification = prefs[PreferencesKeys.ROOT_DISABLE_VERIFICATION] ?: false,
                 enableRollback = prefs[PreferencesKeys.ROOT_ENABLE_ROLLBACK] ?: false,
                 requestUpdateOwnership = prefs[PreferencesKeys.ROOT_REQUEST_UPDATE_OWNERSHIP] ?: false,
+                dex2oatOptimization = prefs[PreferencesKeys.DEX2OAT_OPTIMIZATION] ?: false,
             )
         },
         dataStore.data.map { prefs ->

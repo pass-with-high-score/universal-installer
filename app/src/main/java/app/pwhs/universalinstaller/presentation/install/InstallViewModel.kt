@@ -99,6 +99,7 @@ class InstallViewModel(
     private val batchDelegate = InstallBatchDelegate(
         application = application,
         scope = viewModelScope,
+        backendFactory = backendFactory,
         resolveController = { activeController(it) },
         onStorageInsufficient = { showStorageWarning(it) },
     )

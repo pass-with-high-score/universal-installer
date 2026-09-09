@@ -70,6 +70,9 @@ object PreferencesKeys {
     val SHIZUKU_UNINSTALL_KEEP_DATA = booleanPreferencesKey("shizuku_uninstall_keep_data")
     val SHIZUKU_UNINSTALL_ALL_USERS = booleanPreferencesKey("shizuku_uninstall_all_users")
 
+    // Post-install optimization (cmd package compile -m speed)
+    val DEX2OAT_OPTIMIZATION = booleanPreferencesKey("dex2oat_optimization_after_install")
+
     // Root (libsu) install options — full flavor only, but the keys live here so common
     // code can read them unconditionally. On the store flavor these stay at their defaults.
     val ROOT_BYPASS_LOW_TARGET_SDK = booleanPreferencesKey("root_bypass_low_target_sdk")

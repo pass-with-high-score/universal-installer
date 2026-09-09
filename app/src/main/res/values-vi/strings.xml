@@ -104,6 +104,10 @@
   <string name="setting_shizuku_enable_rollback_sub">Cho phép hệ thống hỗ trợ rollback ứng dụng này trong tương lai</string>
   <string name="setting_shizuku_request_update_ownership">Giữ quyền sở hữu cập nhật</string>
   <string name="setting_shizuku_request_update_ownership_sub">Khóa quyền sở hữu cập nhật trên Android 14+ để ngăn các chợ app khác cài đè</string>
+  <string name="setting_dex2oat_optimization">Tối ưu hoá Dex2oat</string>
+  <string name="setting_dex2oat_optimization_sub">Biên dịch mã máy AOT (speed) sau khi cài đặt qua Root/Shizuku</string>
+  <string name="install_optimizing_dex2oat">Đang tối ưu hoá %1$s bằng Dex2oat…</string>
+  <string name="install_optimized_dex2oat">Đã tối ưu hoá Dex2oat thành công cho %1$s</string>
   <string name="help_title">Trợ giúp</string>
   <string name="help_replay_tutorial">Xem lại hướng dẫn</string>
   <string name="help_replay_tutorial_sub">Hiện lại các trang giới thiệu từ đầu</string>

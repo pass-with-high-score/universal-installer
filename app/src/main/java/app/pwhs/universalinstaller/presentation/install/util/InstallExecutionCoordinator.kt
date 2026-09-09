@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.install.util
 
 import android.app.Application
 import android.net.Uri
+import android.widget.Toast
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.manager.ProfileManager
@@ -14,13 +15,18 @@ import app.pwhs.universalinstaller.presentation.install.ObbEntry
 import app.pwhs.universalinstaller.presentation.install.controller.BaseInstallController
 import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.universalinstaller.presentation.install.controller.ManualInstallController
+import app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor
 import app.pwhs.universalinstaller.presentation.install.dialog.isDowngrade
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.universalinstaller.telemetry.TelemetryEvents
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.util.UUID
 
 object InstallExecutionCoordinator {
@@ -83,11 +89,19 @@ object InstallExecutionCoordinator {
         )
         val hasZipObbs = obbEntries.isNotEmpty() && originalUri != null
         val hasAttachedObbs = attachedObbs.isNotEmpty()
-        val onSuccess: (suspend () -> Unit)? = if ((hasZipObbs || hasAttachedObbs) && apkInfo != null) {
-            val pkg = apkInfo.packageName
-            val appName = apkInfo.appName.ifBlank { pkg }
+        val dex2oatEnabled = prefs?.get(PreferencesKeys.DEX2OAT_OPTIMIZATION) ?: false
+        val pkg = apkInfo?.packageName
+        val appName = apkInfo?.appName?.ifBlank { pkg.orEmpty() } ?: pkg.orEmpty()
+        val isPrivilegedBackend = backendName == "Shizuku" || backendName == "Root"
+
+        val onSuccess: (suspend () -> Unit)? = if (apkInfo != null && (hasZipObbs || hasAttachedObbs || (dex2oatEnabled && isPrivilegedBackend))) {
             val callback: suspend () -> Unit = {
-                onCopyObbs(originalUri, obbEntries, attachedObbs, pkg, appName)
+                if (hasZipObbs || hasAttachedObbs) {
+                    onCopyObbs(originalUri, obbEntries, attachedObbs, pkg.orEmpty(), appName)
+                }
+                if (dex2oatEnabled && isPrivilegedBackend && !pkg.isNullOrBlank()) {
+                    triggerDex2oatOptimization(application, pkg, appName, backendName, backendFactory, appScope)
+                }
             }
             callback
         } else {
@@ -160,6 +174,7 @@ object InstallExecutionCoordinator {
         scope: CoroutineScope,
         picked: List<BatchApkEntry>,
         currentProfileId: String?,
+        backendFactory: InstallerBackendFactory? = null,
         resolveActiveController: suspend (String?) -> BaseInstallController,
     ) {
         if (picked.isEmpty()) return
@@ -169,7 +184,14 @@ object InstallExecutionCoordinator {
         val profile = ProfileManager.parseProfiles(prefs?.get(PreferencesKeys.INSTALLER_PROFILES)).find { it.id == currentProfileId }
         InstallSessionManager.writeProfileFlags(application, profile)
         val controller = resolveActiveController(currentProfileId)
-        val backendName = profile?.preferredBackend ?: "Default"
+        val backendName = profile?.preferredBackend ?: when (controller) {
+            is app.pwhs.universalinstaller.presentation.install.controller.ShizukuInstallController -> "Shizuku"
+            is app.pwhs.universalinstaller.presentation.install.controller.RootInstallController -> "Root"
+            else -> "Default"
+        }
+        val dex2oatEnabled = prefs?.get(PreferencesKeys.DEX2OAT_OPTIMIZATION) ?: false
+        val isPrivilegedBackend = backendName == "Shizuku" || backendName == "Root"
+
         for (entry in picked) {
             val iconPath = InstallSessionManager.cacheIcon(application, entry.apkInfo)
             val opType = when {
@@ -194,6 +216,19 @@ object InstallExecutionCoordinator {
                 fileSizeBytes = entry.apkInfo.fileSizeBytes,
                 filePath = entry.uri.path,
             )
+            val batchOnSuccess: (suspend () -> Unit)? = if (dex2oatEnabled && isPrivilegedBackend && backendFactory != null) {
+                {
+                    triggerDex2oatOptimization(
+                        application = application,
+                        packageName = entry.apkInfo.packageName,
+                        appName = entry.apkInfo.appName,
+                        backendName = backendName,
+                        backendFactory = backendFactory,
+                        scope = scope,
+                    )
+                }
+            } else null
+
             controller.install(
                 uris = entry.splitUris,
                 sessionData = sessionData,
@@ -202,7 +237,7 @@ object InstallExecutionCoordinator {
                 originalUri = entry.uri,
                 deleteAfterInstall = deleteAfterInstall,
                 allowDowngrade = isDowngrade(entry.apkInfo),
-                onSuccess = null,
+                onSuccess = batchOnSuccess,
             )
         }
     }
@@ -258,6 +293,43 @@ object InstallExecutionCoordinator {
                 deleteAfterInstall = deleteAfterInstall,
                 onSuccess = null,
             )
+        }
+    }
+
+    private fun triggerDex2oatOptimization(
+        application: Application,
+        packageName: String,
+        appName: String,
+        backendName: String,
+        backendFactory: InstallerBackendFactory,
+        scope: CoroutineScope,
+    ) {
+        scope.launch(Dispatchers.IO) {
+            Timber.i("Triggering dex2oat optimization for $packageName ($backendName)")
+            withContext(Dispatchers.Main) {
+                Toast.makeText(
+                    application,
+                    application.getString(R.string.install_optimizing_dex2oat, appName),
+                    Toast.LENGTH_SHORT,
+                ).show()
+            }
+            val result = if (backendName == "Shizuku") {
+                ShizukuShellExecutor.compilePackage(packageName)
+            } else {
+                backendFactory.compilePackageViaRoot(packageName)
+            }
+            result.onSuccess {
+                Timber.i("Dex2oat optimization completed for $packageName: $it")
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(
+                        application,
+                        application.getString(R.string.install_optimized_dex2oat, appName),
+                        Toast.LENGTH_SHORT,
+                    ).show()
+                }
+            }.onFailure { e ->
+                Timber.w(e, "Dex2oat optimization failed for $packageName")
+            }
         }
     }
 }

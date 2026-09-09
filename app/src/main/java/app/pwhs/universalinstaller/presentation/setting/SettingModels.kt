@@ -34,6 +34,7 @@ data class CommonInstallOptions(
     val disableVerification: Boolean = false,
     val enableRollback: Boolean = false,
     val requestUpdateOwnership: Boolean = false,
+    val dex2oatOptimization: Boolean = false,
 )
 
 fun ShizukuOptions.asCommon() = CommonInstallOptions(
@@ -50,6 +51,7 @@ fun ShizukuOptions.asCommon() = CommonInstallOptions(
     disableVerification = disableVerification,
     enableRollback = enableRollback,
     requestUpdateOwnership = requestUpdateOwnership,
+    dex2oatOptimization = dex2oatOptimization,
 )
 
 fun RootOptions.asCommon() = CommonInstallOptions(
@@ -66,6 +68,7 @@ fun RootOptions.asCommon() = CommonInstallOptions(
     disableVerification = disableVerification,
     enableRollback = enableRollback,
     requestUpdateOwnership = requestUpdateOwnership,
+    dex2oatOptimization = dex2oatOptimization,
 )
 
 enum class SecurityLevel {
@@ -154,6 +157,7 @@ data class ShizukuOptions(
     val requestUpdateOwnership: Boolean = false,
     val uninstallKeepData: Boolean = false,
     val uninstallAllUsers: Boolean = false,
+    val dex2oatOptimization: Boolean = false,
 )
 
 data class RootOptions(
@@ -170,6 +174,7 @@ data class RootOptions(
     val disableVerification: Boolean = false,
     val enableRollback: Boolean = false,
     val requestUpdateOwnership: Boolean = false,
+    val dex2oatOptimization: Boolean = false,
 )
 
 data class SettingUiState(

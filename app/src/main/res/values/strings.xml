@@ -460,6 +460,10 @@
     <string name="setting_shizuku_enable_rollback_sub">Allow future rollbacks of this package (requires system rollback support)</string>
     <string name="setting_shizuku_request_update_ownership">Request update ownership</string>
     <string name="setting_shizuku_request_update_ownership_sub">Enforce update ownership on Android 14+ to prevent unauthorized overwrites</string>
+    <string name="setting_dex2oat_optimization">Dex2oat optimization</string>
+    <string name="setting_dex2oat_optimization_sub">Compile package code into machine code (speed) after installation via Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">Optimizing %1$s with Dex2oat…</string>
+    <string name="install_optimized_dex2oat">Dex2oat optimization complete for %1$s</string>
     <string name="setting_shizuku_set_source">Set install source</string>
     <string name="setting_shizuku_set_source_sub">Defaults to this app when off</string>
     <string name="setting_shizuku_installer_label">installed by (package name)</string>

@@ -203,6 +203,12 @@ fun InstallOptionsBottomSheet(
                     checked = opts.requestUpdateOwnership,
                     onCheckedChange = { onPrivilegedOptionChanged(SettingViewModel.PrivilegedOption.RequestUpdateOwnership, it) },
                 )
+                OptionSwitch(
+                    title = stringResource(R.string.setting_dex2oat_optimization),
+                    subtitle = stringResource(R.string.setting_dex2oat_optimization_sub),
+                    checked = opts.dex2oatOptimization,
+                    onCheckedChange = { onPrivilegedOptionChanged(SettingViewModel.PrivilegedOption.Dex2oatOptimization, it) },
+                )
             }
 
             OptionGroupHeader(stringResource(R.string.setting_group_installing))

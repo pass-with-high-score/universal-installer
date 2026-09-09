@@ -118,6 +118,10 @@ object ShizukuShellExecutor {
     suspend fun setAppOp(packageName: String, op: String, mode: String): Result<String> =
         runShell(packageName, "appops set $packageName $op $mode", successToken = null)
 
+    /** Compiles package code via Dex2oat with speed filter. */
+    suspend fun compilePackage(packageName: String): Result<String> =
+        runShell(packageName, "cmd package compile -m speed -f $packageName", successToken = null, timeoutSeconds = 120)
+
     /**
      * Single-shot shell. [successToken] gates "did the command actually do the thing" beyond
      * the exit code — `pm` is notorious for printing soft failures ("Failure [...]") with

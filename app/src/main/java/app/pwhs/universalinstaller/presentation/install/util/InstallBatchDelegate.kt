@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 class InstallBatchDelegate(
     private val application: Application,
     private val scope: CoroutineScope,
+    private val backendFactory: app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory? = null,
     private val resolveController: suspend (String?) -> BaseInstallController,
     private val onStorageInsufficient: (Long) -> Unit = {},
 ) {
@@ -92,6 +93,7 @@ class InstallBatchDelegate(
                 scope = scope,
                 picked = picked,
                 currentProfileId = selectedProfileId,
+                backendFactory = backendFactory,
                 resolveActiveController = resolveController,
             )
         }

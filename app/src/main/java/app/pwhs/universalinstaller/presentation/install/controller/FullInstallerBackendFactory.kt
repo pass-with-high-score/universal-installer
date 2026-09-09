@@ -159,6 +159,9 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
         return runRootShell(packageName, cmd, successToken = null)
     }
 
+    override suspend fun compilePackageViaRoot(packageName: String): Result<String> =
+        runRootShell(packageName, "cmd package compile -m speed -f $packageName", successToken = null)
+
     override suspend fun installTargetedViaRoot(
         context: android.content.Context,
         uris: List<android.net.Uri>,

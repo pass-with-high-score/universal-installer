@@ -77,6 +77,9 @@ interface InstallerBackendFactory {
      */
     suspend fun setSystemAppEnabled(packageName: String, enabled: Boolean): Result<String>
 
+    /** Compiles package code via Dex2oat with speed filter via root shell. */
+    suspend fun compilePackageViaRoot(packageName: String): Result<String>
+
     /**
      * Installs one or more APKs (uris) for a specific user ID.
      * Implementations should use elevated privileges (Root/Shizuku) to bypass
