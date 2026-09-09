@@ -6,7 +6,12 @@ Shizuku, Dhizuku (Device Owner), and Root. Features include batch uninstallation
 split APK installation (APKS, XAPK, APKM), and TV/Watch sync.
 `install` always means writing an application package onto this device, never "set up an account".
 
-Derived: 979 translatable string(s) (+26 translatable="false"), 1 <plurals> block(s) across 18 locale(s), in `strings.xml`.
+Resources are split by domain for maintainability (each under 350 lines):
+- `strings.xml`: Core brand, navigation tabs, shared buttons & generic alerts.
+- `strings_install.xml`: Install card/sheet, install prompt, engine modes, OBB, VirusTotal, and profiles.
+- `strings_manage.xml`: Manage apps, batch actions (disable, stop, clear data), permissions, and backups.
+- `strings_settings.xml`: Preferences, themes, language, root/shizuku modes, parental controls, and about info.
+- `strings_sync.xml`: TV sync, Watch sync, remote transfers, and local web downloads.
 
 ## Audience & tone
 
@@ -50,6 +55,13 @@ Use direct register: `vi` uses "bạn" (never "quý khách"), `pt-BR` uses "voc�
 | uninstall | vi | gỡ cài đặt |
 | packages | vi | các gói |
 | failed | vi | thất bại |
+| dismiss | vi, ar, de, es, fr, in, it, ja, ko, pt-BR, ro, ru, tr, uk, el, hi | Bỏ qua, إغلاق, Schließen, Descartar, Fermer, Tutup, Chiudi, 閉じる, 닫기, Fechar, Închide, Закрыть, Kapat, Закрити, Κλείσιμο, बंद करें |
+| disabled | vi, ar, in, it, ja, ko, zh, tr, el, ru | Đã vô hiệu hóa, معطّل, Dinonaktifkan, Disattivato, 無効, 사용 중지됨, 已停用, Devre dışı, Απενεργοποιημένο, Отключено |
+| close | es, it, ja, ko, tr, el, ro | Cerrar, Chiudi, 閉じる, 닫기, Kapat, Κλείσιμο, Închide |
+| storage | vi, de, it, tr, ro, el, uk, hi | Bộ nhớ, Speicher, Spazio di archiviazione, Depolama, Stocare, Χώρος αποθήκευσης, Сховище, स्टोरेज |
+| free | vi, ru, es, pt-BR, ar, fr, in, de, it, ja, ko, zh, tr, el, ro, uk, hi | còn trống, свободно, libre, livre, متاح, libres, tersedia, frei, liberi, 空き, 사용 가능, 可用, boş, ελεύθερα, liber, вільно, खाली |
+| appearance | vi, ru, de, ja, ko, zh, tr, el, hi | Giao diện, Внешний вид, Erscheinungsbild, 外観, 화면 표시, 外观, Görünüm, Εμφάνιση, थीम |
+| open source | fr, it, ro, el, hi, zh, ja | Open source, Open source, Open source, Open source, ओपन सोर्स, 开源, オープンソース |
 
 ## Notes per locale
 
