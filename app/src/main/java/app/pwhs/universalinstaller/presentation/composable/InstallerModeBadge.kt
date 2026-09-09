@@ -257,7 +257,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                             showPicker = false
                         },
                     )
-                    if (dhizukuSupported && dhizukuState != DhizukuState.NOT_INSTALLED) {
+                    if (dhizukuSupported) {
                         EngineOption(
                             title = stringResource(R.string.installer_mode_dhizuku),
                             subtitle = when (dhizukuState) {

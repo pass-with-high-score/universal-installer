@@ -92,14 +92,14 @@ internal fun InstallModeSelector(
         )
     }
 
-    val options: List<InstallMode> = remember(rootSupported, dhizukuSupported, microGSupported, currentMode) {
+    val options: List<InstallMode> = remember(rootSupported, dhizukuSupported) {
         buildList {
             add(InstallMode.DEFAULT)
             add(InstallMode.SHIZUKU)
             if (dhizukuSupported) add(InstallMode.DHIZUKU)
             if (rootSupported) add(InstallMode.ROOT)
             add(InstallMode.CUSTOM)
-            if (microGSupported || currentMode == InstallMode.MICROG) add(InstallMode.MICROG)
+            add(InstallMode.MICROG)
         }
     }
     Column(
@@ -117,6 +117,7 @@ internal fun InstallModeSelector(
             (rootState == RootState.NOT_ROOTED || rootState == RootState.UNAVAILABLE)
         val dhizukuDimmed = currentMode != InstallMode.DHIZUKU &&
             (dhizukuState == DhizukuState.NOT_INSTALLED || dhizukuState == DhizukuState.UNSUPPORTED || dhizukuState == DhizukuState.PROFILE_OWNER_UNSUPPORTED)
+        val microGDimmed = currentMode != InstallMode.MICROG && !microGSupported
 
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
@@ -126,6 +127,7 @@ internal fun InstallModeSelector(
             options.forEach { mode ->
                 val dim = (mode == InstallMode.ROOT && rootDimmed) ||
                     (mode == InstallMode.DHIZUKU && dhizukuDimmed) ||
+                    (mode == InstallMode.MICROG && microGDimmed) ||
                     (mode == InstallMode.DEFAULT && isSystemInstallerFrozen)
                 val selected = mode == currentMode
                 FilterChip(
@@ -224,7 +226,11 @@ internal fun InstallModeSelector(
                 else -> "Not Rooted"
             }
             InstallMode.CUSTOM -> stringResource(R.string.setting_install_mode_custom_sub)
-            InstallMode.MICROG -> stringResource(R.string.installer_mode_microg_desc)
+            InstallMode.MICROG -> if (microGSupported) {
+                stringResource(R.string.installer_mode_microg_desc)
+            } else {
+                stringResource(R.string.microg_not_installed)
+            }
         }
         val canRequestPermission = currentMode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED
         Text(
