@@ -1,0 +1,4 @@
+• Import tracked apps from JSON directly in TV Updates screen
+• Improved backup JSON compatibility for Obtainium exports
+• UI and navigation polish for remote controls
+• Bug fixes and performance optimizations

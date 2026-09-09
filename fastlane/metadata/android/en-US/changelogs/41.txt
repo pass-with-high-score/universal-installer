@@ -1,0 +1,5 @@
+• Optional Dex2oat compilation optimization after install
+• Synchronized installer engine options across settings, profiles, and picker dialog
+• Fixed Dhizuku installation mode reverting unexpectedly
+• Improved backup JSON compatibility for Obtainium exports
+• General performance improvements and bug fixes

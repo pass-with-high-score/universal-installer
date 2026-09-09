@@ -1,0 +1,4 @@
+• Resolved watch shapes clipping and dialog layout issues
+• Prevented badge label wrapping and overflow in APK list
+• Fixed header layout in APK detail and about screens
+• UI refinements and stability improvements
