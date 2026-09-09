@@ -1,4 +1,4 @@
-<resources>    <string name="app_name">المثبت العالمي</string>
+<resources>    <string name="app_name">Universal Installer</string>
     <string name="tv_receive_from_phone">الاستلام من الهاتف</string>
     <string name="tv_receive_starting">جارٍ تشغيل جهاز الاستقبال…</string>
     <string name="tv_receive_installing">جارٍ تثبيت %s…</string>

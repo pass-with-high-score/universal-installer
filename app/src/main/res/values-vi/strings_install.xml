@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="fab_install">Cài đặt Gói</string>
-    <string name="install_sessions_header">Sessions</string>
+    <string name="install_sessions_header">Phiên cài đặt</string>
     <string name="install_history_header">Lịch sử</string>
     <string name="install_history_clear">Xóa</string>
     <string name="install_unsupported_file">Tệp không được hỗ trợ. Vui lòng chọn tệp APK, APK+, APKS, XAPK hoặc APKM.</string>

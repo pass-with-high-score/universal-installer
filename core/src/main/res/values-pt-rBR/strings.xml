@@ -12,7 +12,7 @@
     <string name="permission_return_channel_name">Voltar ao aplicativo</string>
     <string name="permission_return_channel_desc">Notificação para retornar ao aplicativo após conceder permissão nas configurações do sistema.</string>
     <string name="permission_return_title">Permissão concedida</string>
-    <string name="permission_return_body">Toque para retornar ao Instalador Universal.</string>
+    <string name="permission_return_body">Toque para retornar ao Universal Installer.</string>
     <string name="onboarding_analytics_title">Ajude a consertar o que quebra</string>
     <string name="onboarding_analytics_desc">Instalar aplicativos funciona de forma diferente em cada telefone, e só descobrimos o que falha quando o app avisa. Ele informa se uma instalação funcionou e o que deu errado — nunca qual aplicativo você instalou.</string>
     <string name="onboarding_analytics_switch">Compartilhar diagnósticos anônimos</string>

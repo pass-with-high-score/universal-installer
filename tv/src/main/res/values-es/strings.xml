@@ -1,9 +1,9 @@
-<resources>    <string name="app_name">Instalador universal</string>
+<resources>    <string name="app_name">Universal Installer</string>
     <string name="tv_receive_from_phone">Recibir desde el teléfono</string>
     <string name="tv_receive_starting">Iniciando receptor…</string>
     <string name="tv_receive_installing">Instalando %s…</string>
     <string name="tv_receive_installing_plain">Instalando…</string>
-    <string name="tv_receive_installed_success">%s instalados ✓</string>
+    <string name="tv_receive_installed_success">%s instalado ✓</string>
     <string name="tv_receive_failed">Error: %s</string>
     <string name="tv_receive_install">Instalar</string>
     <string name="tv_receive_dismiss">Descartar</string>

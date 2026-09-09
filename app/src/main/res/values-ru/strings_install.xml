@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="fab_install">Установить пакет</string>
-    <string name="install_sessions_header">Sessions</string>
+    <string name="install_sessions_header">Сессии</string>
     <string name="install_history_header">История</string>
     <string name="install_history_clear">Очистить</string>
     <string name="install_unsupported_file">Неподдерживаемый файл. Выберите файл APK, APKS, XAPK или APKM.</string>
@@ -14,7 +14,7 @@
     <string name="apk_info_label_min_sdk">Min SDK</string>
     <string name="apk_info_label_target_sdk">Target SDK</string>
     <string name="apk_info_version_chip">v%s</string>
-    <string name="apk_info_splits_count">%d Splits</string>
+    <string name="apk_info_splits_count">%d сплитов</string>
     <string name="apk_info_section_architectures">Поддерживаемые архитектуры</string>
     <string name="apk_info_section_permissions">Разрешения (%d)</string>
     <string name="apk_info_vt_scan_title">Сканирование VirusTotal</string>

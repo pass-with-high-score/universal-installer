@@ -17,7 +17,7 @@
     <string name="txt_manage">प्रबंधित करें</string>
     <string name="edit">संपादित करें</string>
     <string name="more_actions_cd">अधिक क्रियाएं</string>
-    <string name="app_name">यूनिवर्सल इंस्टालर</string>
+    <string name="app_name">Universal Installer</string>
     <string name="file_size_gb">%1$.1f GB</string>
     <string name="file_size_mb">%1$.1f MB</string>
     <string name="file_size_kb">%1$.0f KB</string>

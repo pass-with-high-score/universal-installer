@@ -17,7 +17,7 @@
     <string name="txt_manage">إدارة</string>
     <string name="edit">تحرير</string>
     <string name="more_actions_cd">المزيد من الإجراءات</string>
-    <string name="app_name">المثبت العالمي</string>
+    <string name="app_name">Universal Installer</string>
     <string name="file_size_gb">%1$.1f جيجابايت</string>
     <string name="file_size_mb">%1$.1f ميجابايت</string>
     <string name="file_size_kb">%1$.0f كيلوبايت</string>
