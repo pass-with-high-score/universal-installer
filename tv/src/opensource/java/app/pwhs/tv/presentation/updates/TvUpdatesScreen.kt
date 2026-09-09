@@ -1,6 +1,8 @@
 package app.pwhs.tv.presentation.updates
 
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Download
+import androidx.compose.material.icons.rounded.FileUpload
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -105,6 +108,28 @@ fun TvUpdatesScreen(
         if (!didRequestFocus && filteredApps.isNotEmpty()) {
             didRequestFocus = true
             runCatching { firstRowFocus.requestFocus() }
+        }
+    }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.GetContent(),
+    ) { uri ->
+        if (uri != null) {
+            runCatching {
+                val stream = context.contentResolver.openInputStream(uri)
+                val jsonString = stream?.bufferedReader()?.use { it.readText() }.orEmpty()
+                if (jsonString.isNotBlank()) {
+                    viewModel.importTrackedAppsFromJson(jsonString) { count ->
+                        Toast.makeText(
+                            context,
+                            context.getString(app.pwhs.core.R.string.updates_import_success, count),
+                            Toast.LENGTH_SHORT,
+                        ).show()
+                    }
+                }
+            }.onFailure {
+                Toast.makeText(context, it.localizedMessage ?: "Import failed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -260,14 +285,38 @@ fun TvUpdatesScreen(
 
                     Spacer(Modifier.weight(1f))
 
+                    val actionBtnShape = RoundedCornerShape(12.dp)
+
+                    // Import Button
+                    OutlinedButton(
+                        onClick = { importLauncher.launch("*/*") },
+                        modifier = Modifier
+                            .height(40.dp)
+                            .clip(actionBtnShape),
+                        shape = OutlinedButtonDefaults.shape(actionBtnShape),
+                        colors = OutlinedButtonDefaults.colors(
+                            focusedContainerColor = MaterialTheme.colorScheme.onSurface,
+                            focusedContentColor = MaterialTheme.colorScheme.surface,
+                        ),
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Rounded.FileUpload, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                text = stringResource(app.pwhs.core.R.string.updates_menu_import),
+                                style = MaterialTheme.typography.labelMedium,
+                                maxLines = 1,
+                            )
+                        }
+                    }
+
                     // Add App Button
-                    val addBtnShape = RoundedCornerShape(12.dp)
                     OutlinedButton(
                         onClick = { showAddDialog = true },
                         modifier = Modifier
                             .height(40.dp)
-                            .clip(addBtnShape),
-                        shape = OutlinedButtonDefaults.shape(addBtnShape),
+                            .clip(actionBtnShape),
+                        shape = OutlinedButtonDefaults.shape(actionBtnShape),
                         colors = OutlinedButtonDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.onSurface,
                             focusedContentColor = MaterialTheme.colorScheme.surface,
