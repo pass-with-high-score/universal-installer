@@ -1,3 +1,5 @@
+const fs = require("fs");
+
 /**
  * RFC 4180 CSV parsing and serialising.
  *
@@ -100,4 +102,14 @@ function toCsv(header, records) {
     return lines.join('\n') + '\n';
 }
 
-module.exports = { parseCsv, parseCsvRecords, toCsv, quoteField };
+/** Read a CSV with a one-line error instead of a Node stack trace when it is not there. */
+function readCsvFile(file) {
+    if (!fs.existsSync(file)) {
+        console.error(`No such file: ${file}`);
+        console.error(`  (paths are relative to your cwd: ${process.cwd()})`);
+        process.exit(1);
+    }
+    return parseCsvRecords(fs.readFileSync(file, "utf8"));
+}
+
+module.exports = { parseCsv, parseCsvRecords, toCsv, quoteField, readCsvFile };

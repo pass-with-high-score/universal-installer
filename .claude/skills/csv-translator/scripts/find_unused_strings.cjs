@@ -12,6 +12,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { readStrings, readPlurals } = require('./res.cjs');
 
 const CODE_EXT = new Set(['.kt', '.java', '.xml', '.kts', '.js', '.ts']);
 
@@ -34,16 +35,6 @@ function walk(dir, files = []) {
     return files;
 }
 
-function readStringNames(file) {
-    if (!fs.existsSync(file)) return [];
-    const content = fs.readFileSync(file, 'utf8');
-    const names = [];
-    const re = /<string(?:\s[^>]*?)?\sname="([^"]+)"/g;
-    let m;
-    while ((m = re.exec(content)) !== null) names.push(m[1]);
-    return names;
-}
-
 const args = process.argv.slice(2);
 if (args.length < 1) {
     console.log('Usage: node find_unused_strings.cjs <module_dir> [<extra_search_dir> ...]');
@@ -52,7 +43,8 @@ if (args.length < 1) {
 
 const moduleDir = args[0];
 const stringsFile = path.join(moduleDir, 'src', 'main', 'res', 'values', 'strings.xml');
-const names = readStringNames(stringsFile);
+// <plurals> names are referenced the same way and go stale the same way.
+const names = [...readStrings(stringsFile).keys(), ...readPlurals(stringsFile).keys()];
 if (names.length === 0) {
     console.error(`No strings found in ${stringsFile}`);
     process.exit(1);

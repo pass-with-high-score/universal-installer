@@ -10,7 +10,7 @@
  */
 
 const fs = require('fs');
-const { parseCsvRecords, toCsv } = require('./csv.cjs');
+const { readCsvFile, toCsv } = require('./csv.cjs');
 
 const args = process.argv.slice(2);
 if (args.length < 2) {
@@ -25,7 +25,7 @@ let header = null;
 const merged = [];
 
 for (const file of inputFiles) {
-    const parsed = parseCsvRecords(fs.readFileSync(file, 'utf8'));
+    const parsed = readCsvFile(file);
     if (parsed.records.length === 0) {
         console.warn(`warning: ${file} has no data rows`);
         continue;

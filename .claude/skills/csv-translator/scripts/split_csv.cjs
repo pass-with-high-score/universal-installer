@@ -13,7 +13,7 @@
  */
 
 const fs = require('fs');
-const { parseCsvRecords, toCsv } = require('./csv.cjs');
+const { readCsvFile, toCsv } = require('./csv.cjs');
 
 function write(prefix, suffix, header, records) {
     const fileName = `${prefix}_${suffix}.csv`;
@@ -29,7 +29,7 @@ if (args.length < 3) {
 }
 
 const [input, prefix] = args;
-const { header, records } = parseCsvRecords(fs.readFileSync(input, 'utf8'));
+const { header, records } = readCsvFile(input);
 
 if (args[2] === '--by') {
     const column = args[3];
