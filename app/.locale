@@ -27,18 +27,10 @@ Use direct register: `vi` uses "bạn" (never "quý khách"), `pt-BR` uses "voc�
 - VirusTotal
 - Universal Installer
 - UniversalInstaller
-- Google Play Store
+- Google Play
 - microG Companion
-- Package Installer
-- Device Owner
-- PIN
-- APKs
 - APKM
-- OBB
 - API
-- Wi-Fi
-- IP
-- Root
 
 ## Glossary
 
@@ -55,13 +47,80 @@ Use direct register: `vi` uses "bạn" (never "quý khách"), `pt-BR` uses "voc�
 | uninstall | vi | gỡ cài đặt |
 | packages | vi | các gói |
 | failed | vi | thất bại |
-| dismiss | vi, ar, de, es, fr, in, it, ja, ko, pt-BR, ro, ru, tr, uk, el, hi | Bỏ qua, إغلاق, Schließen, Descartar, Fermer, Tutup, Chiudi, 閉じる, 닫기, Fechar, Închide, Закрыть, Kapat, Закрити, Κλείσιμο, बंद करें |
-| disabled | vi, ar, in, it, ja, ko, zh, tr, el, ru | Đã vô hiệu hóa, معطّل, Dinonaktifkan, Disattivato, 無効, 사용 중지됨, 已停用, Devre dışı, Απενεργοποιημένο, Отключено |
-| close | es, it, ja, ko, tr, el, ro | Cerrar, Chiudi, 閉じる, 닫기, Kapat, Κλείσιμο, Închide |
-| storage | vi, de, it, tr, ro, el, uk, hi | Bộ nhớ, Speicher, Spazio di archiviazione, Depolama, Stocare, Χώρος αποθήκευσης, Сховище, स्टोरेज |
-| free | vi, ru, es, pt-BR, ar, fr, in, de, it, ja, ko, zh, tr, el, ro, uk, hi | còn trống, свободно, libre, livre, متاح, libres, tersedia, frei, liberi, 空き, 사용 가능, 可用, boş, ελεύθερα, liber, вільно, खाली |
-| appearance | vi, ru, de, ja, ko, zh, tr, el, hi | Giao diện, Внешний вид, Erscheinungsbild, 外観, 화면 표시, 外观, Görünüm, Εμφάνιση, थीम |
-| open source | fr, it, ro, el, hi, zh, ja | Open source, Open source, Open source, Open source, ओपन सोर्स, 开源, オープンソース |
+| dismiss | vi | Bỏ qua |
+| dismiss | ar | إغلاق |
+| dismiss | de | Schließen |
+| dismiss | es | Descartar |
+| dismiss | fr | Fermer |
+| dismiss | in | Tutup |
+| dismiss | it | Chiudi |
+| dismiss | ja | 閉じる |
+| dismiss | ko | 닫기 |
+| dismiss | pt-BR | Fechar |
+| dismiss | ro | Închide |
+| dismiss | ru | Закрыть |
+| dismiss | tr | Kapat |
+| dismiss | uk | Закрити |
+| dismiss | el | Κλείσιμο |
+| dismiss | hi | बंद करें |
+| disabled | vi | Đã vô hiệu hóa |
+| disabled | ar | معطّل |
+| disabled | in | Dinonaktifkan |
+| disabled | it | Disattivato |
+| disabled | ja | 無効 |
+| disabled | ko | 사용 중지됨 |
+| disabled | zh | 已停用 |
+| disabled | tr | Devre dışı |
+| disabled | el | Απενεργοποιημένο |
+| disabled | ru | Отключено |
+| close | es | Cerrar |
+| close | it | Chiudi |
+| close | ja | 閉じる |
+| close | ko | 닫기 |
+| close | tr | Kapat |
+| close | el | Κλείσιμο |
+| close | ro | Închide |
+| storage | vi | Bộ nhớ |
+| storage | de | Speicher |
+| storage | it | Spazio di archiviazione |
+| storage | tr | Depolama |
+| storage | ro | Stocare |
+| storage | el | Χώρος αποθήκευσης |
+| storage | uk | Сховище |
+| storage | hi | स्टोरेज |
+| free | vi | còn trống |
+| free | ru | свободно |
+| free | es | libre |
+| free | pt-BR | livre |
+| free | ar | متاح |
+| free | fr | libres |
+| free | in | tersedia |
+| free | de | frei |
+| free | it | liberi |
+| free | ja | 空き |
+| free | ko | 사용 가능 |
+| free | zh | 可用 |
+| free | tr | boş |
+| free | el | ελεύθερα |
+| free | ro | liber |
+| free | uk | вільно |
+| free | hi | खाली |
+| appearance | vi | Giao diện |
+| appearance | ru | Внешний вид |
+| appearance | de | Erscheinungsbild |
+| appearance | ja | 外観 |
+| appearance | ko | 화면 표시 |
+| appearance | zh | 外观 |
+| appearance | tr | Görünüm |
+| appearance | el | Εμφάνιση |
+| appearance | hi | थीम |
+| open source | fr | Open source |
+| open source | it | Open source |
+| open source | ro | Open source |
+| open source | el | Open source |
+| open source | hi | ओपन सोर्स |
+| open source | zh | 开源 |
+| open source | ja | オープンソース |
 
 ## Notes per locale
 

@@ -139,7 +139,7 @@
     <string name="uninstall_system_method_per_user_title">Uninstall for user 0</string>
     <string name="uninstall_system_method_per_user_sub">Hides the app for the current user. Restore via factory reset or \&quot;cmd package install-existing\&quot;.</string>
     <string name="uninstall_system_method_disable_title">Disable (freeze)</string>
-    <string name="uninstall_system_method_disable_sub">Freezes the app without removing it. Re-enable via root shell \&quot;pm enable\&quot;.</string>
+    <string name="uninstall_system_method_disable_sub">Freezes the app without removing it. Re-enable via Root shell \&quot;pm enable\&quot;.</string>
     <string name="uninstall_system_method_skip_title">Skip system apps</string>
     <string name="uninstall_system_method_skip_sub">Uninstall only the regular apps in this selection.</string>
     <string name="uninstall_system_continue">Continue</string>
