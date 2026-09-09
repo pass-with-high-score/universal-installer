@@ -1,5 +1,5 @@
-<resources>    <string name="onboarding_skip">Пропускать</string>
-    <string name="onboarding_next">Следующий</string>
+<resources>    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_next">Далее</string>
     <string name="onboarding_get_started">Начать</string>
     <string name="onboarding_permission_granted">Разрешение получено</string>
     <string name="onboarding_grant_permission">Предоставить разрешение</string>
@@ -12,7 +12,7 @@
     <string name="permission_return_channel_name">Вернуться в приложение</string>
     <string name="permission_return_channel_desc">Уведомление о возврате в приложение после предоставления разрешения в настройках системы.</string>
     <string name="permission_return_title">Разрешение получено</string>
-    <string name="permission_return_body">Нажмите, чтобы вернуться к универсальному установщику.</string>
+    <string name="permission_return_body">Нажмите, чтобы вернуться в Universal Installer.</string>
     <string name="onboarding_analytics_title">Помогите исправить сбои</string>
     <string name="onboarding_analytics_desc">Установка приложений работает по-разному на каждом телефоне, и мы узнаём о сбоях, только если приложение сообщает о них. Оно передаёт, удалась ли установка и что пошло не так, — но никогда не передаёт, какое приложение вы установили.</string>
     <string name="onboarding_analytics_switch">Отправлять анонимную диагностику</string>
