@@ -999,4 +999,12 @@
     <string name="setting_install_options_unprivileged_note">Οι σύνθετες επιλογές απαιτούν την ενεργοποίηση της λειτουργίας Shizuku, Root ή Dhizuku.</string>
     <string name="sync_server_settings_sub">Θύρα διακομιστή, έλεγχος ταυτότητας με κωδικό PIN</string>
     <string name="sync_require_pin_off">Χωρίς PIN</string>
+    <string name="setting_dex2oat_optimization">Βελτιστοποίηση Dex2oat</string>
+    <string name="setting_dex2oat_optimization_sub">Μεταγλώττιση κώδικα πακέτου σε κώδικα μηχανής (speed) μετά την εγκατάσταση μέσω Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">Βελτιστοποίηση του %1$s με Dex2oat…</string>
+    <string name="install_optimized_dex2oat">Η βελτιστοποίηση Dex2oat ολοκληρώθηκε για το %1$s</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="one">Εντοπίστηκε %1$d ιχνηλάτης</item>
+        <item quantity="other">Εντοπίστηκαν %1$d ιχνηλάτες</item>
+    </plurals>
 </resources>

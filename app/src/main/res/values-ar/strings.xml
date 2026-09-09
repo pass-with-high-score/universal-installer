@@ -999,4 +999,16 @@
     <string name="setting_install_options_unprivileged_note">تتطلب الخيارات المتقدمة تفعيل وضع Shizuku أو Root أو Dhizuku.</string>
     <string name="sync_server_settings_sub">منفذ الخادم، المصادقة برمز PIN</string>
     <string name="sync_require_pin_off">بدون PIN</string>
+    <string name="setting_dex2oat_optimization">تحسين Dex2oat</string>
+    <string name="setting_dex2oat_optimization_sub">ترجمة كود الحزمة إلى كود الآلة (speed) بعد التثبيت عبر Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">جارٍ تحسين %1$s باستخدام Dex2oat…</string>
+    <string name="install_optimized_dex2oat">اكتمل تحسين Dex2oat لـ %1$s</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="zero">لم يتم اكتشاف أي أدوات تتبع (%1$d)</item>
+        <item quantity="one">تم اكتشاف أداة تتبع واحدة (%1$d)</item>
+        <item quantity="two">تم اكتشاف أداتي تتبع (%1$d)</item>
+        <item quantity="few">تم اكتشاف %1$d أدوات تتبع</item>
+        <item quantity="many">تم اكتشاف %1$d أداة تتبع</item>
+        <item quantity="other">تم اكتشاف %1$d أداة تتبع</item>
+    </plurals>
 </resources>

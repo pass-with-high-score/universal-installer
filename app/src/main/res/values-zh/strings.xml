@@ -999,4 +999,11 @@
     <string name="setting_install_options_unprivileged_note">高级选项需要启用 Shizuku、Root 或 Dhizuku 模式。</string>
     <string name="sync_server_settings_sub">服务器端口、PIN 码验证</string>
     <string name="sync_require_pin_off">无 PIN 码</string>
+    <string name="setting_dex2oat_optimization">Dex2oat 优化</string>
+    <string name="setting_dex2oat_optimization_sub">通过 Root/Shizuku 安装后将包代码编译为机器码 (speed)</string>
+    <string name="install_optimizing_dex2oat">正在使用 Dex2oat 优化 %1$s…</string>
+    <string name="install_optimized_dex2oat">%1$s 的 Dex2oat 优化已完成</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="other">检测到 %1$d 个追踪器</item>
+    </plurals>
 </resources>

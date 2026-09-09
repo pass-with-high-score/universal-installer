@@ -999,4 +999,14 @@
     <string name="setting_install_options_unprivileged_note">Розширені параметри потребують увімкнення режиму Shizuku, Root або Dhizuku.</string>
     <string name="sync_server_settings_sub">Порт сервера, автентифікація за PIN-кодом</string>
     <string name="sync_require_pin_off">Без PIN-коду</string>
+    <string name="setting_dex2oat_optimization">Оптимізація Dex2oat</string>
+    <string name="setting_dex2oat_optimization_sub">Компілювати код пакета в машинний код (speed) після встановлення через Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">Оптимізація %1$s за допомогою Dex2oat…</string>
+    <string name="install_optimized_dex2oat">Оптимізацію Dex2oat завершено для %1$s</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="one">Виявлено %1$d трекер</item>
+        <item quantity="few">Виявлено %1$d трекери</item>
+        <item quantity="many">Виявлено %1$d трекерів</item>
+        <item quantity="other">Виявлено %1$d трекера</item>
+    </plurals>
 </resources>

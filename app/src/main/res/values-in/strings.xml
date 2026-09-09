@@ -999,4 +999,11 @@
     <string name="setting_install_options_unprivileged_note">Opsi lanjutan memerlukan mode Shizuku, Root, atau Dhizuku diaktifkan.</string>
     <string name="sync_server_settings_sub">Port server, autentikasi kode PIN</string>
     <string name="sync_require_pin_off">Tanpa PIN</string>
+    <string name="setting_dex2oat_optimization">Optimasi Dex2oat</string>
+    <string name="setting_dex2oat_optimization_sub">Kompilasi kode paket ke kode mesin (speed) setelah instalasi via Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">Mengoptimalkan %1$s dengan Dex2oat…</string>
+    <string name="install_optimized_dex2oat">Optimasi Dex2oat selesai untuk %1$s</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="other">%1$d pelacak terdeteksi</item>
+    </plurals>
 </resources>

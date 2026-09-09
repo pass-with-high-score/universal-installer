@@ -999,4 +999,12 @@
   <string name="setting_install_options_unprivileged_note">उन्नत विकल्पों के लिए Shizuku, Root या Dhizuku मोड सक्षम होना आवश्यक है।</string>
   <string name="sync_server_settings_sub">सर्वर पोर्ट, पिन कोड प्रमाणीकरण</string>
   <string name="sync_require_pin_off">कोई पिन नहीं</string>
+  <string name="setting_dex2oat_optimization">Dex2oat अनुकूलन</string>
+  <string name="setting_dex2oat_optimization_sub">Root/Shizuku के माध्यम से इंस्टॉलेशन के बाद पैकेज कोड को मशीन कोड (speed) में कंपाइल करें</string>
+  <string name="install_optimizing_dex2oat">Dex2oat के साथ %1$s को अनुकूलित किया जा रहा है…</string>
+  <string name="install_optimized_dex2oat">%1$s के लिए Dex2oat अनुकूलन पूर्ण हुआ</string>
+  <plurals name="dialog_menu_trackers_found">
+    <item quantity="one">%1$d ट्रैकर मिला</item>
+    <item quantity="other">%1$d ट्रैकर मिले</item>
+  </plurals>
 </resources>

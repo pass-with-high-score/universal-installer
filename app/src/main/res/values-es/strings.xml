@@ -999,4 +999,13 @@
     <string name="setting_install_options_unprivileged_note">Las opciones avanzadas requieren habilitar el modo Shizuku, Root o Dhizuku.</string>
     <string name="sync_server_settings_sub">Puerto del servidor, autenticación por código PIN</string>
     <string name="sync_require_pin_off">Sin PIN</string>
+    <string name="setting_dex2oat_optimization">Optimización Dex2oat</string>
+    <string name="setting_dex2oat_optimization_sub">Compilar el código del paquete a código máquina (speed) tras la instalación mediante Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">Optimizando %1$s con Dex2oat…</string>
+    <string name="install_optimized_dex2oat">Optimización Dex2oat completada para %1$s</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="one">%1$d rastreador detectado</item>
+        <item quantity="many">%1$d rastreadores detectados</item>
+        <item quantity="other">%1$d rastreadores detectados</item>
+    </plurals>
 </resources>

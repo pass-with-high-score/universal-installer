@@ -975,4 +975,14 @@
     <string name="setting_install_options_unprivileged_note">Zaawansowane opcje wymagają włączenia trybu Shizuku, Root lub Dhizuku.</string>
     <string name="sync_server_settings_sub">Port serwera, uwierzytelnianie kodem PIN</string>
     <string name="sync_require_pin_off">Brak kodu PIN</string>
+    <string name="setting_dex2oat_optimization">Optymalizacja Dex2oat</string>
+    <string name="setting_dex2oat_optimization_sub">Kompiluj kod pakietu do kodu maszynowego (speed) po instalacji przez Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">Optymalizowanie %1$s za pomocą Dex2oat…</string>
+    <string name="install_optimized_dex2oat">Zakończono optymalizację Dex2oat dla %1$s</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="one">Wykryto %1$d tracker</item>
+        <item quantity="few">Wykryto %1$d trackery</item>
+        <item quantity="many">Wykryto %1$d trackerów</item>
+        <item quantity="other">Wykryto %1$d trackera</item>
+    </plurals>
 </resources>

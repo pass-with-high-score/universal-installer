@@ -999,4 +999,11 @@
     <string name="setting_install_options_unprivileged_note">고급 플래그를 사용하려면 Shizuku, Root 또는 Dhizuku 모드를 활성화해야 합니다.</string>
     <string name="sync_server_settings_sub">서버 포트, PIN 코드 인증</string>
     <string name="sync_require_pin_off">PIN 없음</string>
+    <string name="setting_dex2oat_optimization">Dex2oat 최적화</string>
+    <string name="setting_dex2oat_optimization_sub">Root/Shizuku를 통해 설치한 후 패키지 코드를 기계어(speed)로 컴파일합니다</string>
+    <string name="install_optimizing_dex2oat">Dex2oat로 %1$s 최적화 중…</string>
+    <string name="install_optimized_dex2oat">%1$s에 대한 Dex2oat 최적화 완료</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="other">%1$d개의 추적기 감지됨</item>
+    </plurals>
 </resources>

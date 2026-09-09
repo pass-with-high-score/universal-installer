@@ -999,4 +999,13 @@
     <string name="setting_install_options_unprivileged_note">Opțiunile avansate necesită activarea modului Shizuku, Root sau Dhizuku.</string>
     <string name="sync_server_settings_sub">Port server, autentificare cu cod PIN</string>
     <string name="sync_require_pin_off">Fără PIN</string>
+    <string name="setting_dex2oat_optimization">Optimizare Dex2oat</string>
+    <string name="setting_dex2oat_optimization_sub">Compilează codul pachetului în cod mașină (speed) după instalarea prin Root/Shizuku</string>
+    <string name="install_optimizing_dex2oat">Se optimizează %1$s cu Dex2oat…</string>
+    <string name="install_optimized_dex2oat">Optimizarea Dex2oat s-a finalizat pentru %1$s</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="one">S-a detectat %1$d urmăritor</item>
+        <item quantity="few">S-au detectat %1$d urmăritori</item>
+        <item quantity="other">S-au detectat %1$d de urmăritori</item>
+    </plurals>
 </resources>

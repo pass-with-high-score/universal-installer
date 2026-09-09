@@ -999,4 +999,12 @@
     <string name="setting_install_options_unprivileged_note">Erweiterte Flags erfordern die Aktivierung des Shizuku-, Root- oder Dhizuku-Modus.</string>
     <string name="sync_server_settings_sub">Server-Port, PIN-Code-Authentifizierung</string>
     <string name="sync_require_pin_off">Keine PIN</string>
+    <string name="setting_dex2oat_optimization">Dex2oat-Optimierung</string>
+    <string name="setting_dex2oat_optimization_sub">Paketcode nach Installation über Root/Shizuku in Maschinencode (speed) kompilieren</string>
+    <string name="install_optimizing_dex2oat">%1$s wird mit Dex2oat optimiert…</string>
+    <string name="install_optimized_dex2oat">Dex2oat-Optimierung für %1$s abgeschlossen</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="one">%1$d Tracker erkannt</item>
+        <item quantity="other">%1$d Tracker erkannt</item>
+    </plurals>
 </resources>

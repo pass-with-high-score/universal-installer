@@ -999,4 +999,11 @@
     <string name="setting_install_options_unprivileged_note">高度なフラグを使用するには、Shizuku、Root、またはDhizukuモードを有効にする必要があります。</string>
     <string name="sync_server_settings_sub">サーバーポート、PINコード認証</string>
     <string name="sync_require_pin_off">PINなし</string>
+    <string name="setting_dex2oat_optimization">Dex2oat 最適化</string>
+    <string name="setting_dex2oat_optimization_sub">Root/Shizuku 経由でのインストール後、パッケージコードをマシンコード (speed) にコンパイルします</string>
+    <string name="install_optimizing_dex2oat">%1$s を Dex2oat で最適化中…</string>
+    <string name="install_optimized_dex2oat">%1$s の Dex2oat 最適化が完了しました</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="other">%1$d 件のトラッカーを検出</item>
+    </plurals>
 </resources>

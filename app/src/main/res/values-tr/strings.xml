@@ -999,4 +999,12 @@
     <string name="setting_install_options_unprivileged_note">Gelişmiş seçenekler için Shizuku, Root veya Dhizuku modunun etkinleştirilmesi gerekir.</string>
     <string name="sync_server_settings_sub">Sunucu bağlantı noktası, PIN kodu kimlik doğrulaması</string>
     <string name="sync_require_pin_off">PIN yok</string>
+    <string name="setting_dex2oat_optimization">Dex2oat optimizasyonu</string>
+    <string name="setting_dex2oat_optimization_sub">Root/Shizuku ile yüklemeden sonra paket kodunu makine koduna (speed) derleyin</string>
+    <string name="install_optimizing_dex2oat">%1$s Dex2oat ile optimize ediliyor…</string>
+    <string name="install_optimized_dex2oat">%1$s için Dex2oat optimizasyonu tamamlandı</string>
+    <plurals name="dialog_menu_trackers_found">
+        <item quantity="one">%1$d izleyici tespit edildi</item>
+        <item quantity="other">%1$d izleyici tespit edildi</item>
+    </plurals>
 </resources>
