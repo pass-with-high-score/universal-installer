@@ -1,6 +1,6 @@
 <resources>
     <string name="onboarding_skip">Bỏ qua</string>
-    <string name="onboarding_next">Kế tiếp</string>
+    <string name="onboarding_next">Tiếp tục</string>
     <string name="onboarding_get_started">Bắt đầu</string>
     <string name="onboarding_restore_title">Khôi phục dữ liệu</string>
     <string name="onboarding_restore_desc">Chuyển từ thiết bị khác hoặc Obtainium? Bạn có thể khôi phục cài đặt, các ứng dụng đang theo dõi và token API ngay bây giờ.</string>
@@ -31,7 +31,7 @@
     <string name="permission_return_channel_name">Quay lại ứng dụng</string>
     <string name="permission_return_channel_desc">Thông báo quay lại ứng dụng sau khi cấp quyền trong cài đặt hệ thống.</string>
     <string name="permission_return_title">Đã cấp quyền</string>
-    <string name="permission_return_body">Nhấn để quay lại Trình cài đặt chung.</string>
+    <string name="permission_return_body">Nhấn để quay lại Universal Installer.</string>
     <string name="onboarding_analytics_title">Giúp sửa những chỗ hỏng</string>
     <string name="onboarding_analytics_desc">Việc cài ứng dụng chạy khác nhau trên mỗi máy, và chỉ khi ứng dụng báo về thì mới biết chỗ nào hỏng. Nó gửi kết quả cài đặt thành công hay thất bại và lỗi gì — không bao giờ gửi bạn đã cài ứng dụng nào.</string>
     <string name="onboarding_analytics_switch">Chia sẻ chẩn đoán ẩn danh</string>

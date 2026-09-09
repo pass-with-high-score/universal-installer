@@ -1,4 +1,4 @@
-<resources>    <string name="app_name">ユニバーサルインストーラー</string>
+<resources>    <string name="app_name">Universal Installer</string>
     <string name="tv_receive_from_phone">電話から受信</string>
     <string name="tv_receive_starting">受信機を起動中…</string>
     <string name="tv_receive_installing">%s をインストールしています…</string>
@@ -6,13 +6,13 @@
     <string name="tv_receive_installed_success">%s がインストールされました ✓</string>
     <string name="tv_receive_failed">失敗しました: %s</string>
     <string name="tv_receive_install">インストール</string>
-    <string name="tv_receive_dismiss">却下する</string>
+    <string name="tv_receive_dismiss">閉じる</string>
     <string name="tv_receive_allow_storage_title">ストレージへのアクセスを許可する</string>
     <string name="tv_receive_allow_storage_subtitle">このテレビに既にダウンロードされている APK を一覧表示するには</string>
     <string name="tv_receive_no_apks">ストレージに APK ファイルが見つかりません</string>
     <string name="tv_settings_title">設定</string>
-    <string name="tv_settings_section_about">について</string>
-    <string name="tv_settings_app_name">ユニバーサルインストーラー</string>
+    <string name="tv_settings_section_about">アプリについて</string>
+    <string name="tv_settings_app_name">Universal Installer</string>
     <string name="tv_settings_app_tagline">どこにでも何でもインストール</string>
     <string name="tv_settings_version">バージョン %s</string>
     <string name="tv_settings_section_install">インストール</string>
@@ -37,7 +37,7 @@
     <string name="tv_manage_action_uninstall">アンインストール</string>
     <string name="tv_manage_action_extract">APKを抽出する</string>
     <string name="tv_manage_action_settings">システム設定</string>
-    <string name="tv_manage_action_close">近い</string>
+    <string name="tv_manage_action_close">閉じる</string>
     <string name="tv_manage_extracting">抽出中... %d%%</string>
     <string name="tv_manage_search_placeholder">アプリを検索...</string>
     <string name="tv_manage_empty">アプリが見つかりませんでした</string>
@@ -49,12 +49,12 @@
     <string name="tv_common_size_bytes">%dB</string>
     <string name="tv_manage_version_prefix">v%s</string>
     <string name="install_storage_title">ストレージ</string>
-    <string name="install_storage_value">%1$s 無料 / %2$s</string>
+    <string name="install_storage_value">%1$s 空き / %2$s</string>
     <string name="tv_receive_local_files">ローカルダウンロード</string>
     <string name="tv_receive_grant_all_files">すべてのファイルへのアクセスを許可</string>
     <string name="tv_manage_storage_used">使用済みストレージ</string>
     <string name="tv_manage_type">タイプ</string>
-    <string name="tv_manage_system_app">システムアプリケーション</string>
+    <string name="tv_manage_system_app">システムアプリ</string>
     <string name="tv_manage_status">状態</string>
     <string name="tv_manage_status_disabled">無効</string>
     <string name="tv_manage_extracted_success">抽出済み ✓</string>

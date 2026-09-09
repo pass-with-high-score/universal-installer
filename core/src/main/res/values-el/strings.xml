@@ -1,5 +1,5 @@
-<resources>    <string name="onboarding_skip">Παραλείπω</string>
-    <string name="onboarding_next">Επόμενος</string>
+<resources>    <string name="onboarding_skip">Παράλειψη</string>
+    <string name="onboarding_next">Επόμενο</string>
     <string name="onboarding_get_started">Ξεκινήστε</string>
     <string name="onboarding_permission_granted">Χορηγήθηκε άδεια</string>
     <string name="onboarding_grant_permission">Χορήγηση άδειας</string>

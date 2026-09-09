@@ -12,7 +12,7 @@
     <string name="permission_return_channel_name">Повернутися до програми</string>
     <string name="permission_return_channel_desc">Сповіщення про повернення до програми після надання дозволу в налаштуваннях системи.</string>
     <string name="permission_return_title">Дозвіл надано</string>
-    <string name="permission_return_body">Натисніть, щоб повернутися до універсального інсталятора.</string>
+    <string name="permission_return_body">Натисніть, щоб повернутися до Universal Installer.</string>
     <string name="onboarding_analytics_title">Допоможіть виправити збої</string>
     <string name="onboarding_analytics_desc">Встановлення застосунків працює по-різному на кожному телефоні, і ми дізнаємося про збої, лише якщо застосунок повідомляє про них. Він надсилає, чи вдалося встановлення і що пішло не так, — але ніколи не надсилає, який застосунок ви встановили.</string>
     <string name="onboarding_analytics_switch">Надсилати анонімну діагностику</string>

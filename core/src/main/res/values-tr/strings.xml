@@ -1,10 +1,10 @@
-<resources>    <string name="onboarding_skip">Atlamak</string>
+<resources>    <string name="onboarding_skip">Atla</string>
     <string name="onboarding_next">Sonraki</string>
     <string name="onboarding_get_started">Başlayın</string>
     <string name="onboarding_permission_granted">İzin verildi</string>
     <string name="onboarding_grant_permission">İzin Ver</string>
     <string name="onboarding_page1_title">Herhangi Bir Paketi Yükleyin</string>
-    <string name="onboarding_page1_desc">APK, APKS, XAPK ve APKM formatları desteği. Bölünmüş AP\'ları kolaylıkla yükleyin.</string>
+    <string name="onboarding_page1_desc">APK, APKS, XAPK ve APKM formatları desteği. Bölünmüş APK\'ları kolaylıkla yükleyin.</string>
     <string name="onboarding_page2_title">Uygulamalarınızı Yönetin</string>
     <string name="onboarding_page2_desc">Yüklü uygulamalara göz atın, istenmeyen uygulamaları kaldırın ve cihazınızı zahmetsizce yönetin.</string>
     <string name="onboarding_page3_title">Kuruluma İzin Ver</string>
@@ -12,7 +12,7 @@
     <string name="permission_return_channel_name">Uygulamaya dön</string>
     <string name="permission_return_channel_desc">Sistem ayarlarında izin verildikten sonra uygulamaya dönme bildirimi.</string>
     <string name="permission_return_title">İzin verildi</string>
-    <string name="permission_return_body">Evrensel Yükleyiciye dönmek için dokunun.</string>
+    <string name="permission_return_body">Universal Installer\'a dönmek için dokunun.</string>
     <string name="onboarding_analytics_title">Bozulanları düzeltmeye yardım edin</string>
     <string name="onboarding_analytics_desc">Uygulama yükleme her telefonda farklı çalışır ve neyin başarısız olduğunu ancak uygulama bildirdiğinde öğreniriz. Bir yüklemenin başarılı olup olmadığını ve neyin ters gittiğini bildirir — hangi uygulamayı yüklediğinizi asla bildirmez.</string>
     <string name="onboarding_analytics_switch">Anonim tanılama verilerini paylaş</string>

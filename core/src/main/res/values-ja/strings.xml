@@ -1,5 +1,5 @@
 <resources>    <string name="onboarding_skip">スキップ</string>
-    <string name="onboarding_next">次</string>
+    <string name="onboarding_next">次へ</string>
     <string name="onboarding_get_started">始めましょう</string>
     <string name="onboarding_permission_granted">許可が与えられました</string>
     <string name="onboarding_grant_permission">許可を与える</string>
@@ -12,7 +12,7 @@
     <string name="permission_return_channel_name">アプリに戻る</string>
     <string name="permission_return_channel_desc">システム設定で権限を付与した後にアプリに戻るための通知。</string>
     <string name="permission_return_title">許可が与えられました</string>
-    <string name="permission_return_body">タップしてユニバーサル インストーラーに戻ります。</string>
+    <string name="permission_return_body">タップして Universal Installer に戻ります。</string>
     <string name="onboarding_analytics_title">不具合の修正に協力する</string>
     <string name="onboarding_analytics_desc">アプリのインストールは端末ごとに動作が異なり、何が失敗したかはアプリが知らせてくれて初めて分かります。インストールが成功したか、何が失敗したかを送信します。インストールしたアプリ名は一切送信しません。</string>
     <string name="onboarding_analytics_switch">匿名の診断データを共有</string>

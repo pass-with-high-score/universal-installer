@@ -1,7 +1,7 @@
-<resources>    <string name="onboarding_skip">건너뛰다</string>
+<resources>    <string name="onboarding_skip">건너뛰기</string>
     <string name="onboarding_next">다음</string>
     <string name="onboarding_get_started">시작하기</string>
-    <string name="onboarding_permission_granted">허가가 부여되었습니다</string>
+    <string name="onboarding_permission_granted">권한이 허용됨</string>
     <string name="onboarding_grant_permission">권한 부여</string>
     <string name="onboarding_page1_title">모든 패키지 설치</string>
     <string name="onboarding_page1_desc">APK, APKS, XAPK 및 APKM 형식을 지원합니다. 분할 APK를 쉽게 설치하세요.</string>

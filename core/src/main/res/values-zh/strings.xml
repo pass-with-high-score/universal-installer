@@ -1,8 +1,8 @@
 <resources>    <string name="onboarding_skip">跳过</string>
-    <string name="onboarding_next">下一个</string>
+    <string name="onboarding_next">下一步</string>
     <string name="onboarding_get_started">开始使用</string>
-    <string name="onboarding_permission_granted">已获得许可</string>
-    <string name="onboarding_grant_permission">授予许可</string>
+    <string name="onboarding_permission_granted">已授予权限</string>
+    <string name="onboarding_grant_permission">授予权限</string>
     <string name="onboarding_page1_title">安装任何软件包</string>
     <string name="onboarding_page1_desc">支持 APK、APKS、XAPK 和 APKM 格式。轻松安装拆分 APK。</string>
     <string name="onboarding_page2_title">管理您的应用程序</string>
