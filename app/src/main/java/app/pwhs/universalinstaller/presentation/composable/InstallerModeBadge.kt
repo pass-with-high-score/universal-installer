@@ -210,7 +210,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                         } else {
                             stringResource(R.string.installer_engine_default_desc)
                         },
-                        selected = effectiveMode == InstallMode.DEFAULT,
+                        selected = configuredMode == InstallMode.DEFAULT,
                         enabled = !isSystemInstallerFrozen,
                         dimmed = isSystemInstallerFrozen,
                         onClick = {
@@ -250,7 +250,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                             ShizukuState.UNSUPPORTED -> stringResource(R.string.setting_shizuku_unsupported)
                             else -> stringResource(R.string.installer_engine_shizuku_desc)
                         },
-                        selected = effectiveMode == InstallMode.SHIZUKU,
+                        selected = configuredMode == InstallMode.SHIZUKU,
                         enabled = shizukuSelectable,
                         onClick = {
                             settingViewModel.setInstallMode(InstallMode.SHIZUKU)
@@ -268,7 +268,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                                 DhizukuState.NOT_AUTHORIZED -> stringResource(R.string.setting_dhizuku_no_permission)
                                 else -> stringResource(R.string.installer_engine_dhizuku_desc)
                             },
-                            selected = effectiveMode == InstallMode.DHIZUKU,
+                            selected = configuredMode == InstallMode.DHIZUKU,
                             enabled = dhizukuSelectable,
                             dimmed = dhizukuDimmed,
                             onClick = {
@@ -285,7 +285,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                             rootReady -> stringResource(R.string.installer_engine_root_desc)
                             else -> stringResource(R.string.installer_engine_root_request)
                         },
-                        selected = effectiveMode == InstallMode.ROOT,
+                        selected = configuredMode == InstallMode.ROOT,
                         enabled = settingState.rootSupported,
                         dimmed = rootDimmed,
                         onClick = {
@@ -296,7 +296,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                     EngineOption(
                         title = stringResource(R.string.installer_mode_custom),
                         subtitle = stringResource(R.string.installer_engine_custom_desc),
-                        selected = effectiveMode == InstallMode.CUSTOM,
+                        selected = configuredMode == InstallMode.CUSTOM,
                         enabled = true,
                         onClick = {
                             settingViewModel.setInstallMode(InstallMode.CUSTOM)
@@ -307,7 +307,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                         title = stringResource(R.string.installer_mode_microg),
                         subtitle = if (microGAvailable) stringResource(R.string.installer_mode_microg_desc)
                             else stringResource(R.string.microg_not_installed),
-                        selected = effectiveMode == InstallMode.MICROG,
+                        selected = configuredMode == InstallMode.MICROG,
                         enabled = microGAvailable,
                         onClick = {
                             settingViewModel.setInstallMode(InstallMode.MICROG)

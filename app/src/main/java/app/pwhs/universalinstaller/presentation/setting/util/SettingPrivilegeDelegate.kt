@@ -114,6 +114,21 @@ class SettingPrivilegeDelegate(
                 _rootState.value = backendFactory.probeRootState()
             }
         }
+        scope.launch {
+            useDhizuku.collect { enabled ->
+                refreshDhizukuState()
+                if (enabled) {
+                    if (_dhizukuState.value != DhizukuState.READY) {
+                        kotlinx.coroutines.delay(400)
+                        refreshDhizukuState()
+                    }
+                    if (_dhizukuState.value != DhizukuState.READY) {
+                        kotlinx.coroutines.delay(800)
+                        refreshDhizukuState()
+                    }
+                }
+            }
+        }
         updateDefaultInstallerStatus()
     }
 
@@ -290,10 +305,13 @@ class SettingPrivilegeDelegate(
     }
 
     fun refreshDhizukuState() {
-        _dhizukuState.value = if (useDhizuku.value) {
-            DhizukuCompat.state(application)
-        } else {
-            DhizukuCompat.stateUnbound(application)
+        scope.launch(Dispatchers.IO) {
+            val state = if (useDhizuku.value) {
+                DhizukuCompat.state(application)
+            } else {
+                DhizukuCompat.stateUnbound(application)
+            }
+            _dhizukuState.value = state
         }
     }
 

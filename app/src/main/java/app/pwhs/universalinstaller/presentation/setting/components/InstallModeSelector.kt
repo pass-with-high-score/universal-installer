@@ -113,9 +113,9 @@ internal fun InstallModeSelector(
             modifier = Modifier.padding(bottom = 8.dp),
         )
 
-        val rootDimmed = effectiveMode != InstallMode.ROOT &&
+        val rootDimmed = currentMode != InstallMode.ROOT &&
             (rootState == RootState.NOT_ROOTED || rootState == RootState.UNAVAILABLE)
-        val dhizukuDimmed = effectiveMode != InstallMode.DHIZUKU &&
+        val dhizukuDimmed = currentMode != InstallMode.DHIZUKU &&
             (dhizukuState == DhizukuState.NOT_INSTALLED || dhizukuState == DhizukuState.UNSUPPORTED || dhizukuState == DhizukuState.PROFILE_OWNER_UNSUPPORTED)
 
         FlowRow(
@@ -127,7 +127,7 @@ internal fun InstallModeSelector(
                 val dim = (mode == InstallMode.ROOT && rootDimmed) ||
                     (mode == InstallMode.DHIZUKU && dhizukuDimmed) ||
                     (mode == InstallMode.DEFAULT && isSystemInstallerFrozen)
-                val selected = mode == effectiveMode
+                val selected = mode == currentMode
                 FilterChip(
                     selected = selected,
                     onClick = {
@@ -193,7 +193,7 @@ internal fun InstallModeSelector(
                 )
             }
         }
-        val statusText = when (effectiveMode) {
+        val statusText = when (currentMode) {
             InstallMode.DEFAULT -> if (isSystemInstallerFrozen) {
                 stringResource(R.string.system_installer_frozen_warning)
             } else if (!canInstallPackages) {
@@ -226,11 +226,11 @@ internal fun InstallModeSelector(
             InstallMode.CUSTOM -> stringResource(R.string.setting_install_mode_custom_sub)
             InstallMode.MICROG -> stringResource(R.string.installer_mode_microg_desc)
         }
-        val canRequestPermission = effectiveMode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED
+        val canRequestPermission = currentMode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED
         Text(
             text = statusText,
             style = MaterialTheme.typography.bodySmall,
-            color = if (canRequestPermission || (effectiveMode == InstallMode.DEFAULT && !canInstallPackages)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+            color = if (canRequestPermission || (currentMode == InstallMode.DEFAULT && !canInstallPackages)) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier
                 .padding(top = 8.dp)
                 .then(
