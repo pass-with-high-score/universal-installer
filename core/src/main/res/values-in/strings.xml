@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">tersisa ~%1$d dtk</string>
     <string name="transfer_eta_minutes_seconds">tersisa ~%1$d mnt %2$d dtk</string>
     <string name="transfer_eta_hours_minutes">tersisa ~%1$d jam %2$d mnt</string>
+    <string name="updates_filter_all">Semua</string>
+    <string name="updates_filter_installed">Terinstal</string>
+    <string name="updates_filter_updates">Pembaruan</string>
 </resources>

@@ -9,6 +9,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentPaste
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -21,14 +26,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.tv.material3.Button
 import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
+import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
@@ -43,13 +53,21 @@ fun TvAddAppDialog(
     onDismiss: () -> Unit,
 ) {
     var urlText by remember { mutableStateOf("") }
-    val focusRequester = remember { FocusRequester() }
+    val clipboardManager = LocalClipboardManager.current
+    val cancelFocus = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
-        runCatching { focusRequester.requestFocus() }
+        val clip = clipboardManager.getText()?.text?.trim().orEmpty()
+        if (clip.startsWith("http://", ignoreCase = true) || clip.startsWith("https://", ignoreCase = true)) {
+            urlText = clip
+        }
+        runCatching { cancelFocus.requestFocus() }
     }
 
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Surface(
             modifier = Modifier.widthIn(min = 440.dp, max = 600.dp),
             shape = RoundedCornerShape(28.dp),
@@ -70,9 +88,18 @@ fun TvAddAppDialog(
                 OutlinedTextField(
                     value = urlText,
                     onValueChange = { urlText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .focusRequester(focusRequester),
+                    modifier = Modifier.fillMaxWidth(),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Uri,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (urlText.isNotBlank()) {
+                                onAdd(urlText.trim())
+                            }
+                        }
+                    ),
                     textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.onSurface),
                     placeholder = {
                         Text(
@@ -80,6 +107,20 @@ fun TvAddAppDialog(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
+                    },
+                    trailingIcon = {
+                        val clip = clipboardManager.getText()?.text?.trim().orEmpty()
+                        if (clip.isNotBlank()) {
+                            IconButton(
+                                onClick = { urlText = clip }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.ContentPaste,
+                                    contentDescription = "Paste",
+                                    tint = MaterialTheme.colorScheme.primary,
+                                )
+                            }
+                        }
                     },
                     singleLine = true,
                     shape = RoundedCornerShape(12.dp),
@@ -134,7 +175,8 @@ fun TvAddAppDialog(
                         onClick = onDismiss,
                         modifier = Modifier
                             .weight(1f)
-                            .clip(btnShape),
+                            .clip(btnShape)
+                            .focusRequester(cancelFocus),
                         shape = ButtonDefaults.shape(btnShape),
                         colors = ButtonDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,

@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">rămase ~%1$d s</string>
     <string name="transfer_eta_minutes_seconds">rămase ~%1$d m %2$d s</string>
     <string name="transfer_eta_hours_minutes">rămase ~%1$d h %2$d m</string>
+    <string name="updates_filter_all">Toate</string>
+    <string name="updates_filter_installed">Instalate</string>
+    <string name="updates_filter_updates">Actualizări</string>
 </resources>

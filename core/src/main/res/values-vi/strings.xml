@@ -75,6 +75,9 @@
     <string name="updates_dialog_device_arch">Kiến trúc thiết bị: %1$s</string>
     <string name="updates_dialog_recommended">Khuyên dùng</string>
     <string name="updates_detail_choose_asset_btn">Chọn file tải về (%1$d file)</string>
+    <string name="updates_filter_all">Tất cả</string>
+    <string name="updates_filter_installed">Đã cài đặt</string>
+    <string name="updates_filter_updates">Bản cập nhật</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_install">Cài đặt</string>

@@ -42,6 +42,9 @@ data class UpdatesUiState(
     val updateCount: Int
         get() = trackedApps.count { it.hasUpdate }
 
+    val installedCount: Int
+        get() = trackedApps.count { it.isInstalled }
+
     val categories: List<String>
         get() = trackedApps.mapNotNull { it.category?.trim() }
             .filter { it.isNotBlank() }
@@ -57,6 +60,7 @@ data class UpdatesUiState(
 
                 val matchesCategory = when (selectedCategory) {
                     null -> true
+                    CATEGORY_INSTALLED -> app.isInstalled
                     CATEGORY_UPDATES -> app.hasUpdate
                     else -> app.category?.equals(selectedCategory, ignoreCase = true) == true
                 }
@@ -76,6 +80,7 @@ data class UpdatesUiState(
         }
 
     companion object {
+        const val CATEGORY_INSTALLED = "__INSTALLED_ONLY__"
         const val CATEGORY_UPDATES = "__UPDATES_ONLY__"
     }
 }

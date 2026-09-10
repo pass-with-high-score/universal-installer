@@ -188,24 +188,52 @@ fun UpdatesScreen(
                             FilterChip(
                                 selected = uiState.selectedCategory == null,
                                 onClick = { viewModel.onCategorySelected(null) },
-                                label = { Text("All") },
+                                label = { Text(stringResource(R.string.updates_filter_all)) },
                             )
                         }
 
-                        if (uiState.updateCount > 0) {
-                            item {
-                                FilterChip(
-                                    selected = uiState.selectedCategory == UpdatesUiState.CATEGORY_UPDATES,
-                                    onClick = {
-                                        if (uiState.selectedCategory == UpdatesUiState.CATEGORY_UPDATES) {
-                                            viewModel.onCategorySelected(null)
+                        item {
+                            FilterChip(
+                                selected = uiState.selectedCategory == UpdatesUiState.CATEGORY_INSTALLED,
+                                onClick = {
+                                    if (uiState.selectedCategory == UpdatesUiState.CATEGORY_INSTALLED) {
+                                        viewModel.onCategorySelected(null)
+                                    } else {
+                                        viewModel.onCategorySelected(UpdatesUiState.CATEGORY_INSTALLED)
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        if (uiState.installedCount > 0) {
+                                            "${stringResource(R.string.updates_filter_installed)} (${uiState.installedCount})"
                                         } else {
-                                            viewModel.onCategorySelected(UpdatesUiState.CATEGORY_UPDATES)
+                                            stringResource(R.string.updates_filter_installed)
                                         }
-                                    },
-                                    label = { Text("Updates (${uiState.updateCount})") },
-                                )
-                            }
+                                    )
+                                },
+                            )
+                        }
+
+                        item {
+                            FilterChip(
+                                selected = uiState.selectedCategory == UpdatesUiState.CATEGORY_UPDATES,
+                                onClick = {
+                                    if (uiState.selectedCategory == UpdatesUiState.CATEGORY_UPDATES) {
+                                        viewModel.onCategorySelected(null)
+                                    } else {
+                                        viewModel.onCategorySelected(UpdatesUiState.CATEGORY_UPDATES)
+                                    }
+                                },
+                                label = {
+                                    Text(
+                                        if (uiState.updateCount > 0) {
+                                            "${stringResource(R.string.updates_filter_updates)} (${uiState.updateCount})"
+                                        } else {
+                                            stringResource(R.string.updates_filter_updates)
+                                        }
+                                    )
+                                },
+                            )
                         }
 
                         items(uiState.categories) { category ->
@@ -241,7 +269,7 @@ fun UpdatesScreen(
                         )
                     }
                 } else if (uiState.filteredApps.isEmpty()) {
-                    // Search Empty State
+                    // Search / Filter Empty State
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
@@ -251,7 +279,11 @@ fun UpdatesScreen(
                         EmptyStateView(
                             icon = Icons.Rounded.SearchOff,
                             title = stringResource(R.string.updates_no_results_title),
-                            subtitle = stringResource(R.string.updates_no_results_subtitle, uiState.searchQuery),
+                            subtitle = if (uiState.searchQuery.isNotBlank()) {
+                                stringResource(R.string.updates_no_results_subtitle, uiState.searchQuery)
+                            } else {
+                                stringResource(R.string.updates_no_apps_subtitle)
+                            },
                         )
                     }
                 } else {

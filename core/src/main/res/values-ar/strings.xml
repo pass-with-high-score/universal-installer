@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">متبقي ~%1$d ث</string>
     <string name="transfer_eta_minutes_seconds">متبقي ~%1$d د %2$d ث</string>
     <string name="transfer_eta_hours_minutes">متبقي ~%1$d س %2$d د</string>
+    <string name="updates_filter_all">الكل</string>
+    <string name="updates_filter_installed">المثبتة</string>
+    <string name="updates_filter_updates">التحديثات</string>
 </resources>

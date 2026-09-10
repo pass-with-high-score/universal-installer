@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">залишилося ~%1$d с</string>
     <string name="transfer_eta_minutes_seconds">залишилося ~%1$d хв %2$d с</string>
     <string name="transfer_eta_hours_minutes">залишилося ~%1$d год %2$d хв</string>
+    <string name="updates_filter_all">Усі</string>
+    <string name="updates_filter_installed">Встановлені</string>
+    <string name="updates_filter_updates">Оновлення</string>
 </resources>

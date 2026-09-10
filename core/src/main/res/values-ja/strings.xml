@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">残り約 %1$d 秒</string>
     <string name="transfer_eta_minutes_seconds">残り約 %1$d 分 %2$d 秒</string>
     <string name="transfer_eta_hours_minutes">残り約 %1$d 時間 %2$d 分</string>
+    <string name="updates_filter_all">すべて</string>
+    <string name="updates_filter_installed">インストール済み</string>
+    <string name="updates_filter_updates">更新あり</string>
 </resources>

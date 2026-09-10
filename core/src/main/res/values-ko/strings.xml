@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">약 %1$d초 남음</string>
     <string name="transfer_eta_minutes_seconds">약 %1$d분 %2$d초 남음</string>
     <string name="transfer_eta_hours_minutes">약 %1$d시간 %2$d분 남음</string>
+    <string name="updates_filter_all">전체</string>
+    <string name="updates_filter_installed">설치됨</string>
+    <string name="updates_filter_updates">업데이트</string>
 </resources>

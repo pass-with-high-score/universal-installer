@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">απομένουν ~%1$d δευτ.</string>
     <string name="transfer_eta_minutes_seconds">απομένουν ~%1$d λεπ. %2$d δευτ.</string>
     <string name="transfer_eta_hours_minutes">απομένουν ~%1$d ώρες %2$d λεπ.</string>
+    <string name="updates_filter_all">Όλα</string>
+    <string name="updates_filter_installed">Εγκατεστημένα</string>
+    <string name="updates_filter_updates">Ενημερώσεις</string>
 </resources>

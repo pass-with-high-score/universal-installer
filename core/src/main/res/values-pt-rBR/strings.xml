@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">restam ~%1$d s</string>
     <string name="transfer_eta_minutes_seconds">restam ~%1$d min %2$d s</string>
     <string name="transfer_eta_hours_minutes">restam ~%1$d h %2$d min</string>
+    <string name="updates_filter_all">Todos</string>
+    <string name="updates_filter_installed">Instalados</string>
+    <string name="updates_filter_updates">Atualizações</string>
 </resources>

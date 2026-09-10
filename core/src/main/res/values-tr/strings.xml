@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">yaklaşık %1$d sn kaldı</string>
     <string name="transfer_eta_minutes_seconds">yaklaşık %1$d dk %2$d sn kaldı</string>
     <string name="transfer_eta_hours_minutes">yaklaşık %1$d sa %2$d dk kaldı</string>
+    <string name="updates_filter_all">Tümü</string>
+    <string name="updates_filter_installed">Yüklü</string>
+    <string name="updates_filter_updates">Güncellemeler</string>
 </resources>

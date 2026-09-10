@@ -79,6 +79,9 @@
     <string name="updates_dialog_device_arch">Device architecture: %1$s</string>
     <string name="updates_dialog_recommended">Recommended</string>
     <string name="updates_detail_choose_asset_btn">Choose File to Download (%1$d)</string>
+    <string name="updates_filter_all">All</string>
+    <string name="updates_filter_installed">Installed</string>
+    <string name="updates_filter_updates">Updates</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_install">Install</string>

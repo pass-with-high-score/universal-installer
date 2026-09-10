@@ -81,4 +81,7 @@
     <string name="transfer_eta_seconds">~%1$d से. शेष</string>
     <string name="transfer_eta_minutes_seconds">~%1$d मि. %2$d से. शेष</string>
     <string name="transfer_eta_hours_minutes">~%1$d घं. %2$d मि. शेष</string>
+    <string name="updates_filter_all">सभी</string>
+    <string name="updates_filter_installed">इंस्टॉल किए गए</string>
+    <string name="updates_filter_updates">अपडेट</string>
 </resources>
