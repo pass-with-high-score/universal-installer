@@ -33,6 +33,8 @@ data class TrackedAppEntity(
     val ignoredVersion: String? = null,
     val eTag: String? = null,
     val availableAssetsJson: String? = null,
+    val installedVersionRegex: String? = null,
+    val installedVersionMatchGroup: String? = null,
 ) {
     fun toDomain(): TrackedApp = TrackedApp(
         packageName = packageName,
@@ -62,6 +64,8 @@ data class TrackedAppEntity(
                 Json.decodeFromString<List<AssetArtifact>>(raw)
             }.getOrDefault(emptyList())
         } ?: emptyList(),
+        installedVersionRegex = installedVersionRegex,
+        installedVersionMatchGroup = installedVersionMatchGroup,
     )
 
     companion object {
@@ -95,6 +99,8 @@ data class TrackedAppEntity(
             } else {
                 null
             },
+            installedVersionRegex = domain.installedVersionRegex,
+            installedVersionMatchGroup = domain.installedVersionMatchGroup,
         )
     }
 }

@@ -38,6 +38,8 @@ data class UpdatesUiState(
     val codebergToken: String = "",
     val installedApps: List<InstalledAppItem> = emptyList(),
     val isLoadingInstalledApps: Boolean = false,
+    val checkingPackageNames: Set<String> = emptySet(),
+    val checkingProgress: Pair<Int, Int>? = null,
 ) {
     val updateCount: Int
         get() = trackedApps.count { it.hasUpdate }

@@ -24,6 +24,8 @@ data class TrackedAppBackupDto(
     val matchGroup: String? = null,
     val useReleaseTitleAsVersion: Boolean = false,
     val category: String? = null,
+    val installedVersionRegex: String? = null,
+    val installedVersionMatchGroup: String? = null,
 )
 
 @Serializable
@@ -54,6 +56,8 @@ object TrackedAppsBackupHelper {
                 matchGroup = app.matchGroup,
                 useReleaseTitleAsVersion = app.useReleaseTitleAsVersion,
                 category = app.category,
+                installedVersionRegex = app.installedVersionRegex,
+                installedVersionMatchGroup = app.installedVersionMatchGroup,
             )
         }
         val container = UniversalInstallerBackupContainer(
@@ -84,6 +88,8 @@ object TrackedAppsBackupHelper {
                         matchGroup = dto.matchGroup,
                         useReleaseTitleAsVersion = dto.useReleaseTitleAsVersion,
                         category = dto.category,
+                        installedVersionRegex = dto.installedVersionRegex,
+                        installedVersionMatchGroup = dto.installedVersionMatchGroup,
                     )
                 }
             }
@@ -196,6 +202,18 @@ object TrackedAppsBackupHelper {
                     val category = obj["category"]?.jsonPrimitive?.contentOrNull
                         ?: runCatching { obj["categories"]?.jsonArray?.firstOrNull()?.jsonPrimitive?.contentOrNull }.getOrNull()
 
+                    val installedVersionRegex = obj["installed_version_regex"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["installedVersionRegex"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["installed_version_extract_regex"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["installedVersionExtractionRegEx"]?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("installedVersionExtractionRegEx")?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("installedVersionRegex")?.jsonPrimitive?.contentOrNull
+
+                    val installedVersionMatchGroup = obj["installed_match_group"]?.jsonPrimitive?.contentOrNull
+                        ?: obj["installedMatchGroup"]?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("installedMatchGroupToUse")?.jsonPrimitive?.contentOrNull
+                        ?: additionalSettings?.get("installedMatchGroup")?.jsonPrimitive?.contentOrNull
+
                     results.add(
                         TrackedApp(
                             packageName = id.trim(),
@@ -210,6 +228,8 @@ object TrackedAppsBackupHelper {
                             matchGroup = matchGroup,
                             useReleaseTitleAsVersion = useReleaseTitle,
                             category = category,
+                            installedVersionRegex = installedVersionRegex,
+                            installedVersionMatchGroup = installedVersionMatchGroup,
                         )
                     )
                 }.onFailure { Timber.w(it, "Skipping malformed app in backup JSON") }

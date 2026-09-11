@@ -75,11 +75,50 @@ class TrackedAppTest {
         assertFalse(app.hasUpdate)
     }
 
+    @Test
+    fun hasUpdate_shizukuPlus_withInstalledVersionRegex_sameVersion_returnsFalse() {
+        val app = trackedApp(
+            currentVersionName = "Shizuku+ 13.6.0.r2499",
+            currentVersionCode = 2499L,
+            latestVersionName = "13.6.0.r2499",
+            installedVersionRegex = """[0-9]+\.[0-9]+\.[0-9]+\.r[0-9]+""",
+        )
+
+        assertFalse(app.hasUpdate)
+    }
+
+    @Test
+    fun hasUpdate_shizukuPlus_withInstalledVersionRegex_newerVersion_returnsTrue() {
+        val app = trackedApp(
+            currentVersionName = "Shizuku+ 13.6.0.r2499",
+            currentVersionCode = 2499L,
+            latestVersionName = "13.6.0.r2500",
+            installedVersionRegex = """[0-9]+\.[0-9]+\.[0-9]+\.r[0-9]+""",
+        )
+
+        assertTrue(app.hasUpdate)
+    }
+
+    @Test
+    fun hasUpdate_shizukuPlus_withCaptureGroup_sameVersion_returnsFalse() {
+        val app = trackedApp(
+            currentVersionName = "Shizuku+ 13.6.0.r2499",
+            currentVersionCode = 2499L,
+            latestVersionName = "13.6.0.r2499",
+            installedVersionRegex = """Shizuku\+\s*(.+)""",
+            installedVersionMatchGroup = "1",
+        )
+
+        assertFalse(app.hasUpdate)
+    }
+
     private fun trackedApp(
         currentVersionName: String,
         currentVersionCode: Long,
         latestVersionName: String,
         latestDownloadUrl: String? = "https://example.com/app.apk",
+        installedVersionRegex: String? = null,
+        installedVersionMatchGroup: String? = null,
     ) = TrackedApp(
         packageName = "com.nebula.karing",
         appName = "Karing",
@@ -89,5 +128,7 @@ class TrackedAppTest {
         currentVersionCode = currentVersionCode,
         latestVersionName = latestVersionName,
         latestDownloadUrl = latestDownloadUrl,
+        installedVersionRegex = installedVersionRegex,
+        installedVersionMatchGroup = installedVersionMatchGroup,
     )
 }

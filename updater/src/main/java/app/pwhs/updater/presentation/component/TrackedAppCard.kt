@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -57,6 +58,7 @@ fun TrackedAppCard(
     onUpdateClick: () -> Unit,
     onCheckClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    isChecking: Boolean = false,
     onEditCategoryClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
@@ -317,11 +319,21 @@ fun TrackedAppCard(
                     )
                 }
 
-                IconButton(onClick = onCheckClick) {
-                    Icon(
-                        imageVector = Icons.Rounded.Refresh,
-                        contentDescription = stringResource(R.string.updates_card_btn_check),
-                    )
+                IconButton(
+                    onClick = onCheckClick,
+                    enabled = !isChecking,
+                ) {
+                    if (isChecking) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = stringResource(R.string.updates_card_btn_check),
+                        )
+                    }
                 }
 
                 if (!app.isInstalled && !app.latestDownloadUrl.isNullOrBlank()) {

@@ -82,6 +82,31 @@
     <string name="updates_filter_all">All</string>
     <string name="updates_filter_installed">Installed</string>
     <string name="updates_filter_updates">Updates</string>
+    <string name="updates_config_saved">Configuration saved</string>
+    <string name="updates_checking_progress">Checking updates (%1$d/%2$d)…</string>
+    <string name="updates_check_completed_found">Check complete: %1$d update(s) available</string>
+    <string name="updates_check_completed_none">All tracked apps are up to date</string>
+    <string name="updates_check_single_found">Update available for %1$s: %2$s</string>
+    <string name="updates_check_single_none">%1$s is up to date</string>
+    <string name="updates_installed_version_regex_label">Installed Version RegEx (Optional)</string>
+    <string name="updates_installed_version_regex_placeholder">e.g. Shizuku\\+\s*(.+) or [0-9.]+</string>
+    <string name="updates_installed_match_group_label">Installed Match Group (Optional)</string>
+    <string name="updates_preview_installed_extracted">Preview extracted: %1$s</string>
+    <string name="updates_config_title">App Configuration</string>
+    <string name="updates_config_save_btn">Save Config</string>
+    <string name="updates_config_include_prereleases">Include Pre-releases (Beta)</string>
+    <string name="updates_config_use_release_title">Use Release Title as Version</string>
+    <string name="updates_config_use_release_title_desc">Extract from title instead of Git tag</string>
+    <string name="updates_config_asset_regex_label">Asset Regex Filter (Optional)</string>
+    <string name="updates_config_asset_regex_placeholder">e.g. .*-arm64.*\\.apk</string>
+    <string name="updates_config_version_regex_label">Version Extraction RegEx (Optional)</string>
+    <string name="updates_config_version_regex_placeholder">e.g. ^NeoPlayer(.+)$ or [0-9.]+</string>
+    <string name="updates_config_preview_extracted">Preview extracted: %1$s</string>
+    <string name="updates_config_match_group_label">Match Group to Use (Optional)</string>
+    <string name="updates_config_match_group_placeholder">e.g. 1 or $1 or $1.$2 (default: $1 or $0)</string>
+    <string name="updates_config_installed_match_group_placeholder">e.g. 1 or $1 (default: $1 or $0)</string>
+    <string name="updates_config_category_label">Category</string>
+    <string name="updates_config_category_placeholder">e.g. Tools, Social, Games</string>
 
     <!-- Bottom Navigation -->
     <string name="nav_install">Install</string>

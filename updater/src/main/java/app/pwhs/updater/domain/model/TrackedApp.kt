@@ -1,6 +1,7 @@
 package app.pwhs.updater.domain.model
 
 import app.pwhs.updater.domain.matcher.SemVerComparator
+import app.pwhs.updater.domain.matcher.VersionParser
 
 data class TrackedApp(
     val packageName: String,
@@ -26,9 +27,24 @@ data class TrackedApp(
     val ignoredVersion: String? = null,
     val eTag: String? = null,
     val availableAssets: List<AssetArtifact> = emptyList(),
+    val installedVersionRegex: String? = null,
+    val installedVersionMatchGroup: String? = null,
 ) {
     val isInstalled: Boolean
         get() = currentVersionName.isNotBlank() && !currentVersionName.equals("Not Installed", ignoreCase = true)
+
+    val effectiveCurrentVersionName: String
+        get() {
+            if (installedVersionRegex.isNullOrBlank() || !isInstalled) return currentVersionName
+            return VersionParser.extractVersion(
+                tagName = currentVersionName,
+                releaseTitle = null,
+                defaultVersion = currentVersionName,
+                versionRegex = installedVersionRegex,
+                matchGroup = installedVersionMatchGroup,
+                useReleaseTitleAsVersion = false,
+            )
+        }
 
     val isVersionIgnored: Boolean
         get() = !ignoredVersion.isNullOrBlank() && ignoredVersion.equals(latestVersionName, ignoreCase = true)
@@ -40,14 +56,14 @@ data class TrackedApp(
             if (latestDownloadUrl.isNullOrBlank()) return false // Fix #133: Release without APK cannot be updated
             if (isVersionIgnored) return false
             if (isLatestVersionNameBackedByCurrentVersionCode()) return false
-            return SemVerComparator.isNewer(currentVersionName, latestVersionName)
+            return SemVerComparator.isNewer(effectiveCurrentVersionName, latestVersionName)
         }
 
     private fun isLatestVersionNameBackedByCurrentVersionCode(): Boolean {
         if (currentVersionCode <= 0L || latestVersionName.isNullOrBlank()) return false
 
         val latest = latestVersionName.trim()
-        val currentName = currentVersionName.trim()
+        val currentName = effectiveCurrentVersionName.trim()
         val currentCode = currentVersionCode.toString()
         val prefix = "$currentName."
 

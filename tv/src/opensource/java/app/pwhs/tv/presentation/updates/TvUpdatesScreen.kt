@@ -57,6 +57,7 @@ import app.pwhs.tv.presentation.updates.components.TvUpdateAppRow
 import app.pwhs.tv.presentation.updates.components.TvUpdateDetailsPane
 import app.pwhs.tv.presentation.updates.components.TvUpdateFilterChip
 import app.pwhs.updater.domain.model.TrackedApp
+import app.pwhs.updater.presentation.UpdatesUiEvent
 import app.pwhs.updater.presentation.UpdatesViewModel
 import org.koin.androidx.compose.koinViewModel
 
@@ -74,6 +75,16 @@ fun TvUpdatesScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is UpdatesUiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
 
     var selectedFilter by remember { mutableStateOf(FilterTab.INSTALLED) }
     var focusedApp by remember { mutableStateOf<TrackedApp?>(null) }

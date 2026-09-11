@@ -29,10 +29,15 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 import androidx.datastore.preferences.core.edit
+import app.pwhs.core.R
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.updater.domain.seed.DefaultAppSeeder
+import app.pwhs.updater.presentation.util.InstallerUtils
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.receiveAsFlow
 
 class UpdatesViewModel(
     private val repository: AppUpdateRepository,
@@ -43,6 +48,9 @@ class UpdatesViewModel(
 
     private val _uiState = MutableStateFlow(UpdatesUiState())
     val uiState: StateFlow<UpdatesUiState> = _uiState.asStateFlow()
+
+    private val _events = Channel<UpdatesUiEvent>(Channel.BUFFERED)
+    val events: Flow<UpdatesUiEvent> = _events.receiveAsFlow()
 
     init {
         loadTrackedApps()
@@ -211,35 +219,77 @@ class UpdatesViewModel(
     fun checkAllUpdates() {
         if (_uiState.value.isChecking) return
         viewModelScope.launch {
-            _uiState.update { it.copy(isChecking = true, error = null) }
+            val apps = _uiState.value.trackedApps
+            if (apps.isEmpty()) return@launch
+            _uiState.update { it.copy(isChecking = true, error = null, checkingProgress = Pair(0, apps.size)) }
             try {
-                for (app in _uiState.value.trackedApps) {
+                apps.forEachIndexed { index, app ->
+                    _uiState.update {
+                        it.copy(
+                            checkingProgress = Pair(index + 1, apps.size),
+                            checkingPackageNames = setOf(app.packageName),
+                        )
+                    }
                     val token = getTokenForUrl(app.sourceUrl)
-                    repository.checkForUpdate(app.packageName, token)
+                    runCatching {
+                        repository.checkForUpdate(app.packageName, token)
+                    }.onFailure { err ->
+                        Timber.w(err, "Update check failed for ${app.packageName}")
+                    }
                 }
+                val freshApps = _uiState.value.trackedApps
+                val foundCount = freshApps.count { it.hasUpdate }
+                val message = if (foundCount > 0) {
+                    context.getString(R.string.updates_check_completed_found, foundCount)
+                } else {
+                    context.getString(R.string.updates_check_completed_none)
+                }
+                _events.send(UpdatesUiEvent.ShowToast(message))
             } catch (e: Exception) {
                 Timber.e(e, "Check all updates failed")
                 _uiState.update { it.copy(error = e.message ?: "Failed to check updates") }
             } finally {
-                _uiState.update { it.copy(isChecking = false) }
+                _uiState.update {
+                    it.copy(
+                        isChecking = false,
+                        checkingProgress = null,
+                        checkingPackageNames = emptySet(),
+                    )
+                }
             }
         }
     }
 
     fun checkSingleUpdate(packageName: String) {
         viewModelScope.launch {
-            _uiState.update { it.copy(isChecking = true) }
+            _uiState.update { it.copy(checkingPackageNames = it.checkingPackageNames + packageName) }
             try {
                 val app = _uiState.value.trackedApps.firstOrNull { it.packageName == packageName }
                 val token = app?.sourceUrl?.let { getTokenForUrl(it) }
                 repository.checkForUpdate(packageName, token)
+                val updatedApp = _uiState.value.trackedApps.firstOrNull { it.packageName == packageName }
+                val message = if (updatedApp?.hasUpdate == true) {
+                    context.getString(
+                        R.string.updates_check_single_found,
+                        updatedApp.appName,
+                        updatedApp.latestVersionName.orEmpty(),
+                    )
+                } else {
+                    context.getString(
+                        R.string.updates_check_single_none,
+                        updatedApp?.appName ?: packageName,
+                    )
+                }
+                _events.send(UpdatesUiEvent.ShowToast(message))
             } catch (e: Exception) {
                 Timber.e(e, "Check update failed for $packageName")
             } finally {
-                _uiState.update { it.copy(isChecking = false) }
+                _uiState.update { it.copy(checkingPackageNames = it.checkingPackageNames - packageName) }
             }
         }
     }
+
+    private val addTrackedAppUseCase = app.pwhs.updater.domain.usecase.AddTrackedAppUseCase(providers)
 
     fun addTrackedAppFromUrl(
         context: Context,
@@ -253,88 +303,25 @@ class UpdatesViewModel(
         val effectiveToken = apiToken?.takeIf { it.isNotBlank() } ?: getTokenForUrl(url)
         viewModelScope.launch {
             _uiState.update { it.copy(isAdding = true, error = null) }
-            try {
-                val provider = providers.firstOrNull { it.canHandle(url) }
-                    ?: throw IllegalArgumentException("No provider available for URL: $url")
-
-                val releaseResult = provider.fetchLatestRelease(
-                    url = url,
-                    includePrereleases = includePrereleases,
-                    apiToken = effectiveToken,
-                )
-
-                val release = releaseResult.getOrNull()
-                if (release == null) {
-                    _uiState.update { it.copy(isAdding = false, error = "Could not fetch release information") }
-                    return@launch
-                }
-
-                val bestAsset = SmartAbiMatcher.selectBestAsset(release.assets)
-                val rawRepoName = url.substringBefore('?').removeSuffix(".git").substringAfterLast('/')
-                val cleanAppName = rawRepoName.split('-', '_', '.').joinToString(" ") { word ->
-                    word.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
-                }
-
-                val pm = context.packageManager
-                val matchResult = if (!targetPackageName.isNullOrBlank()) {
-                    val pkgInfo = runCatching { pm.getPackageInfo(targetPackageName, 0) }.getOrNull()
-                    if (pkgInfo != null) {
-                        val vCode: Long = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                            pkgInfo.longVersionCode
-                        } else {
-                            @Suppress("DEPRECATION")
-                            pkgInfo.versionCode.toLong()
-                        }
-                        val appLabel = runCatching {
-                            pkgInfo.applicationInfo?.let { pm.getApplicationLabel(it).toString() }
-                        }.getOrNull() ?: cleanAppName
-                        InstalledAppMatcher.findMatch(pm, url, appLabel) ?: app.pwhs.updater.domain.matcher.InstalledAppMatchResult(
-                            packageName = targetPackageName,
-                            appName = appLabel,
-                            versionName = pkgInfo.versionName ?: "1.0",
-                            versionCode = vCode,
-                        )
-                    } else null
-                } else {
-                    InstalledAppMatcher.findMatch(
-                        pm = pm,
-                        repoUrl = url,
-                        candidateName = cleanAppName,
-                        assetNames = release.assets.map { it.name },
-                    )
-                }
-
-                val finalPkg = matchResult?.packageName ?: targetPackageName
-                    ?: "tracked.${rawRepoName.lowercase().replace(Regex("[^a-z0-9_]"), "_")}"
-                val finalAppName = matchResult?.appName ?: cleanAppName
-
-                val trackedApp = TrackedApp(
-                    packageName = finalPkg,
-                    appName = finalAppName,
-                    iconUrl = release.iconUrl,
-                    sourceType = UpdateSourceType.fromUrl(url),
-                    sourceUrl = url,
-                    currentVersionName = matchResult?.versionName ?: "Not Installed",
-                    currentVersionCode = matchResult?.versionCode ?: 0L,
-                    latestVersionName = release.versionName,
-                    latestReleaseTag = release.tagName,
-                    latestDownloadUrl = bestAsset?.downloadUrl,
-                    releaseNotes = release.releaseNotes,
-                    publishedAt = release.publishedAt,
-                    lastCheckedAt = System.currentTimeMillis(),
-                    includePrereleases = includePrereleases,
-                    category = category?.trim()?.takeIf { it.isNotBlank() },
-                    eTag = release.eTag,
-                    availableAssets = release.assets.filter { SmartAbiMatcher.isPackageAsset(it.name) }.ifEmpty { release.assets },
-                )
-
-                repository.saveTrackedApp(trackedApp)
-                _uiState.update { it.copy(isAdding = false, showAddDialog = false, showAppPickerDialog = false) }
-                onSuccess()
-            } catch (e: Exception) {
-                Timber.e(e, "Add tracked app failed for $url")
-                _uiState.update { it.copy(isAdding = false, error = e.message ?: "Failed to add app") }
-            }
+            val result = addTrackedAppUseCase.execute(
+                context = context,
+                url = url,
+                includePrereleases = includePrereleases,
+                effectiveToken = effectiveToken,
+                targetPackageName = targetPackageName,
+                category = category,
+            )
+            result.fold(
+                onSuccess = { trackedApp ->
+                    repository.saveTrackedApp(trackedApp)
+                    _uiState.update { it.copy(isAdding = false, showAddDialog = false, showAppPickerDialog = false) }
+                    onSuccess()
+                },
+                onFailure = { e ->
+                    Timber.e(e, "Add tracked app failed for $url")
+                    _uiState.update { it.copy(isAdding = false, error = e.message ?: "Failed to add app") }
+                },
+            )
         }
     }
 
@@ -385,9 +372,9 @@ class UpdatesViewModel(
                     onProgress = { written, total ->
                         val fraction = if (total > 0) (written.toFloat() / total).coerceIn(0f, 1f) else 0f
                         val text = if (total > 0) {
-                            "${formatBytes(written)} / ${formatBytes(total)}"
+                            "${InstallerUtils.formatBytes(written)} / ${InstallerUtils.formatBytes(total)}"
                         } else {
-                            formatBytes(written)
+                            InstallerUtils.formatBytes(written)
                         }
                         _uiState.update { it.copy(downloadProgress = fraction, downloadBytesText = text) }
                     },
@@ -395,13 +382,12 @@ class UpdatesViewModel(
 
                 val apkFile = downloadResult.getOrNull()
                 if (apkFile != null && apkFile.exists()) {
-                    // Verify APK metadata before installing
                     val metadataReader = ApkMetadataReader(context)
                     val metadata = metadataReader.readMetadata(Uri.fromFile(apkFile), isBundle = false)
                     if (metadata != null && metadata.packageName.isNotBlank()) {
                         Timber.i("Verified APK package: ${metadata.packageName} (v${metadata.versionName})")
                     }
-                    launchInstallerForFile(context, apkFile)
+                    InstallerUtils.launchInstallerForFile(context, apkFile)
                     onComplete?.invoke()
                 } else {
                     _uiState.update { it.copy(error = "Download failed") }
@@ -435,9 +421,9 @@ class UpdatesViewModel(
                         onProgress = { written, total ->
                             val fraction = if (total > 0) (written.toFloat() / total).coerceIn(0f, 1f) else 0f
                             val text = if (total > 0) {
-                                "${formatBytes(written)} / ${formatBytes(total)}"
+                                "${InstallerUtils.formatBytes(written)} / ${InstallerUtils.formatBytes(total)}"
                             } else {
-                                formatBytes(written)
+                                InstallerUtils.formatBytes(written)
                             }
                             _uiState.update { it.copy(downloadProgress = fraction, downloadBytesText = text) }
                         },
@@ -446,7 +432,7 @@ class UpdatesViewModel(
                     val apkFile = result.getOrNull()
                     if (apkFile != null && apkFile.exists()) {
                         withContext(Dispatchers.Main) {
-                            launchInstallerForFile(context, apkFile)
+                            InstallerUtils.launchInstallerForFile(context, apkFile)
                         }
                     }
                 } catch (e: Exception) {
@@ -455,33 +441,5 @@ class UpdatesViewModel(
             }
             _uiState.update { it.copy(isUpdatingAll = false, downloadingPackage = null, downloadProgress = 0f, downloadBytesText = null) }
         }
-    }
-
-    private fun formatBytes(bytes: Long): String {
-        if (bytes <= 0) return "0 B"
-        val units = arrayOf("B", "KB", "MB", "GB")
-        val digitGroups = (Math.log10(bytes.toDouble()) / Math.log10(1024.0)).toInt().coerceIn(0, units.size - 1)
-        val value = bytes / Math.pow(1024.0, digitGroups.toDouble())
-        return String.format(java.util.Locale.US, "%.1f %s", value, units[digitGroups])
-    }
-
-    private fun launchInstallerForFile(context: Context, file: File) {
-        val uri = runCatching {
-            FileProvider.getUriForFile(context, "${context.packageName}.fileprovider", file)
-        }.getOrElse { Uri.fromFile(file) }
-        val isTv = runCatching { Class.forName("app.pwhs.tv.presentation.install.TvDialogInstallActivity"); true }.getOrDefault(false)
-        val targetClass = if (isTv) "app.pwhs.tv.presentation.install.TvDialogInstallActivity"
-        else "app.pwhs.universalinstaller.presentation.install.DialogInstallActivity"
-
-        fun createIntent(className: String? = null) = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "application/vnd.android.package-archive")
-            className?.let { setClassName(context.packageName, it) }
-            clipData = ClipData.newRawUri("package", uri)
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-
-        runCatching { context.startActivity(createIntent(targetClass)) }
-            .recoverCatching { context.startActivity(createIntent()) }
-            .onFailure { e -> Timber.e(e, "Failed to launch installer for file: ${file.absolutePath}") }
     }
 }

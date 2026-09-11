@@ -1,8 +1,11 @@
 package app.pwhs.updater.presentation
 
 import android.content.Intent
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -113,6 +116,16 @@ fun UpdatesScreen(
     LaunchedEffect(uiState.error) {
         uiState.error?.let {
             snackbarHostState.showSnackbar(it)
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
+            when (event) {
+                is UpdatesUiEvent.ShowToast -> {
+                    Toast.makeText(context, event.message, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     }
 
@@ -252,6 +265,30 @@ fun UpdatesScreen(
                     }
                 }
 
+                if (uiState.isChecking && uiState.checkingProgress != null) {
+                    val (current, total) = uiState.checkingProgress!!
+                    val progress = if (total > 0) current.toFloat() / total.toFloat() else 0f
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = Spacing.L, vertical = Spacing.XS),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.updates_checking_progress, current, total),
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.primary,
+                        )
+                        Spacer(modifier = Modifier.height(Spacing.XS))
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(4.dp)
+                                .clip(MaterialTheme.shapes.small),
+                        )
+                    }
+                }
+
                 if (uiState.trackedApps.isEmpty()) {
                     // Empty State
                     Box(
@@ -306,6 +343,7 @@ fun UpdatesScreen(
                                 isDownloading = uiState.downloadingPackage == app.packageName,
                                 downloadProgress = uiState.downloadProgress,
                                 downloadBytesText = uiState.downloadBytesText,
+                                isChecking = uiState.checkingPackageNames.contains(app.packageName),
                                 onClick = {
                                     viewModel.selectAppForDetail(app)
                                 },

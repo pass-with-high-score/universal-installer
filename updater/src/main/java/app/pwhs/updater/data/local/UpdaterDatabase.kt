@@ -7,7 +7,7 @@ import androidx.room.RoomDatabase
 
 @Database(
     entities = [TrackedAppEntity::class],
-    version = 5,
+    version = 6,
     exportSchema = false,
 )
 abstract class UpdaterDatabase : RoomDatabase() {
@@ -30,6 +30,13 @@ abstract class UpdaterDatabase : RoomDatabase() {
             }
         }
 
+        private val MIGRATION_5_6 = object : androidx.room.migration.Migration(5, 6) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("ALTER TABLE tracked_apps ADD COLUMN installedVersionRegex TEXT DEFAULT NULL")
+                db.execSQL("ALTER TABLE tracked_apps ADD COLUMN installedVersionMatchGroup TEXT DEFAULT NULL")
+            }
+        }
+
         @Volatile
         private var INSTANCE: UpdaterDatabase? = null
 
@@ -40,7 +47,7 @@ abstract class UpdaterDatabase : RoomDatabase() {
                     UpdaterDatabase::class.java,
                     DATABASE_NAME,
                 )
-                    .addMigrations(MIGRATION_3_4, MIGRATION_4_5)
+                    .addMigrations(MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
                     .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
                 INSTANCE = instance
