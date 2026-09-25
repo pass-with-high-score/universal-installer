@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.widget.Toast
-import android.provider.OpenableColumns
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.*
@@ -30,6 +29,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.base.BaseActivity
+import app.pwhs.universalinstaller.presentation.install.util.PackageFileFilter
+import app.pwhs.universalinstaller.util.extension.getDisplayName
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -171,17 +172,24 @@ private fun SendToTvScreen(onBack: () -> Unit) {
     val onApkPicked: (Uri?) -> Unit = { uri ->
         val target = scanned
         if (uri != null && target != null) {
-            val name = queryDisplayName(context, uri)
-            currentFileName = name
-            uploading = true
-            uploadProgress = 0
-            uploadBytes = null
-            uploadSpeed = 0L
-            uploadEta = null
-            errorMessage = null
-            isSuccess = false
+            val name = context.contentResolver.getDisplayName(uri)
+            if (!PackageFileFilter.isSupportedPackage(context, uri, name)) {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.install_unsupported_file),
+                    Toast.LENGTH_LONG
+                ).show()
+            } else {
+                currentFileName = name
+                uploading = true
+                uploadProgress = 0
+                uploadBytes = null
+                uploadSpeed = 0L
+                uploadEta = null
+                errorMessage = null
+                isSuccess = false
 
-            scope.launch {
+                scope.launch {
                 val estimator = app.pwhs.core.util.TransferEstimator()
                 val result = TvUploadClient.upload(context, target, uri, name) { copied, total, pct ->
                     val est = estimator.update(copied, total)
@@ -202,6 +210,7 @@ private fun SendToTvScreen(onBack: () -> Unit) {
             }
         }
     }
+}
 
     val apkLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.OpenDocument(),
@@ -214,11 +223,11 @@ private fun SendToTvScreen(onBack: () -> Unit) {
 
     val safeLaunchApkPicker = {
         val launched = runCatching {
-            apkLauncher.launch(arrayOf("*/*"))
+            apkLauncher.launch(PackageFileFilter.PACKAGE_MIME_TYPES)
         }.isSuccess
         if (!launched) {
             val fallbackLaunched = runCatching {
-                fallbackApkLauncher.launch("*/*")
+                fallbackApkLauncher.launch("application/vnd.android.package-archive")
             }.isSuccess
             if (!fallbackLaunched) {
                 Toast.makeText(
@@ -479,13 +488,4 @@ private fun SendToTvScreen(onBack: () -> Unit) {
             }
         )
     }
-}
-
-private fun queryDisplayName(context: Context, uri: Uri): String {
-    runCatching {
-        context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)?.use {
-            if (it.moveToFirst()) return it.getString(0) ?: "app.apk"
-        }
-    }
-    return uri.lastPathSegment?.substringAfterLast('/') ?: "app.apk"
 }

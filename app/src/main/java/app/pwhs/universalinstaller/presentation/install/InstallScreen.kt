@@ -6,6 +6,7 @@ import android.widget.Toast
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.SecurityLevel
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.universalinstaller.presentation.install.util.PackageFileFilter
 import app.pwhs.universalinstaller.presentation.install.wear.WearApkSender
 import app.pwhs.universalinstaller.util.BiometricGate
 import kotlinx.coroutines.flow.map
@@ -378,10 +379,8 @@ private fun InstallUi(
                 val mimeType = context.contentResolver.getType(uri)?.lowercase()
                 val displayName = context.contentResolver.getDisplayName(uri)
                 val extension = displayName.substringAfterLast('.', "").lowercase()
-                val validExtensions = listOf("apk", "apks", "xapk", "apkm", "apk+", "zip")
-                val isApkMime = mimeType == "application/vnd.android.package-archive"
 
-                if (strictPickerMode && !isApkMime && extension !in validExtensions) {
+                if (!PackageFileFilter.isSupportedPackage(context, uri, displayName)) {
                     Toast.makeText(
                         context,
                         resource.getString(R.string.install_unsupported_file),
@@ -389,6 +388,7 @@ private fun InstallUi(
                     ).show()
                 } else {
                     Timber.d("Selected file: $uri, MIME type: $mimeType, strict: $strictPickerMode")
+                    val isApkMime = mimeType == "application/vnd.android.package-archive"
                     val apks = when {
                         (isApkMime || extension == "apk") -> SingletonApkSequence(
                             uri,
@@ -421,12 +421,13 @@ private fun InstallUi(
 
     val safeLaunchFilePicker: (Boolean) -> Unit = { strict ->
         strictPickerMode = strict
+        val mimes = if (strict) PackageFileFilter.PACKAGE_MIME_TYPES else arrayOf("*/*")
         val launched = runCatching {
-            filePickerLauncher.launch(arrayOf("*/*"))
+            filePickerLauncher.launch(mimes)
         }.isSuccess
         if (!launched) {
             val fallbackLaunched = runCatching {
-                fallbackFilePickerLauncher.launch("*/*")
+                fallbackFilePickerLauncher.launch(if (strict) "application/vnd.android.package-archive" else "*/*")
             }.isSuccess
             if (!fallbackLaunched) {
                 Toast.makeText(
