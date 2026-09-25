@@ -317,6 +317,7 @@ class DialogInstallActivity : FragmentActivity() {
 
             val finishAfterSuccess: (Boolean, String?) -> Unit = { keepApk, _ ->
                 val target = dialogTarget
+                target?.sessionId?.let { installNotifier.untrack(it) }
                 lifecycleScope.launch {
                     if (target?.deleteAfterInstall == true && !keepApk) {
                         target.apkUri?.let { SourceFileDeleter.deleteSourceFileAndWarn(context, it) }
@@ -363,7 +364,7 @@ class DialogInstallActivity : FragmentActivity() {
             val handoffInstall = {
                 val t = dialogTarget
                 val stage = uiState.dialogStage
-                if (t != null && (stage is DialogStage.Installing || stage is DialogStage.None)) {
+                if (t != null && stage is DialogStage.Installing) {
                     installNotifier.track(
                         sessionId = t.sessionId,
                         packageName = t.packageName,

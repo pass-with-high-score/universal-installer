@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -80,9 +81,19 @@ class InstallProgressNotifier(
 
     fun track(sessionId: UUID, packageName: String, appName: String, iconPath: String?) {
         if (tracked.containsKey(sessionId)) return
-        tracked[sessionId] = TrackedInstall(sessionId, packageName, appName, iconPath)
+        val entry = TrackedInstall(sessionId, packageName, appName, iconPath)
+        tracked[sessionId] = entry
         ensureObserverRunning()
         refreshProgressNotification()
+
+        scope.launch {
+            delay(STALE_TIMEOUT_MS)
+            val current = tracked[sessionId]
+            if (current != null && !current.sawInList) {
+                Timber.w("Stale tracked install for %s — auto-finishing after timeout", current.packageName)
+                finishTracked(current, success = true, errorText = null)
+            }
+        }
     }
 
     fun untrack(sessionId: UUID) {
@@ -186,7 +197,8 @@ class InstallProgressNotifier(
             .setCategory(NotificationCompat.CATEGORY_PROGRESS)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOnlyAlertOnce(true)
-            .setOngoing(true)
+            .setOngoing(false)
+            .setAutoCancel(true)
             .setSilent(true)
             .setProgress(args.max, args.progress, args.indeterminate)
             .setContentIntent(buildOpenAppIntent(newest.sessionId))

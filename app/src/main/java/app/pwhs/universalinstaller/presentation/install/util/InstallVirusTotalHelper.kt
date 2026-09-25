@@ -92,94 +92,106 @@ object InstallVirusTotalHelper {
             virusTotalNotifier.notifyHashing(fileName)
         }
 
-        if (isDirectUpload) {
-            onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
-        } else {
-            onProgress(VtResult(status = VtStatus.SCANNING))
-        }
-
-        val sha256 = current.sha256.ifBlank {
-            runCatching {
-                withContext(Dispatchers.IO) {
-                    context.contentResolver.openInputStream(uri)?.use { input ->
-                        virusTotalService.computeSha256(input)
-                    } ?: ""
-                }
-            }.getOrDefault("")
-        }
-
-        if (sha256.isBlank()) {
-            finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, "Could not hash file", sha256, onProgress)
-            return
-        }
-
-        onUpdateSha256(sha256)
-
-        if (!isDirectUpload) {
-            val hashResult = virusTotalService.checkFile(apiKey, sha256)
-            if (hashResult.status != VtStatus.NOT_FOUND) {
-                finishScan(context, virusTotalNotifier, scanNotifId, fileName, hashResult, sha256, onProgress)
-                return
-            }
-            onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
-            virusTotalNotifier.notifyUploading(scanNotifId, fileName, 0)
-        }
-
-        val tempFile = runCatching {
-            withContext(Dispatchers.IO) {
-                val ext = fileName.substringAfterLast('.', "apk").ifBlank { "apk" }
-                val f = File(context.cacheDir, "vt_${System.currentTimeMillis()}_upload.$ext")
-                context.contentResolver.openInputStream(uri)?.use { input ->
-                    f.outputStream().use { output -> input.copyTo(output) }
-                } ?: return@withContext null
-                f
-            }
-        }.getOrNull()
-
-        if (tempFile == null || !tempFile.exists()) {
-            finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, "Could not read file for upload", sha256, onProgress)
-            return
-        }
-
+        var scanFinished = false
         try {
-            onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
-            virusTotalNotifier.notifyUploading(scanNotifId, fileName, 0)
-
-            val uploadResult = virusTotalService.uploadFile(apiKey, tempFile) { pct ->
-                onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = pct))
-                virusTotalNotifier.notifyUploading(scanNotifId, fileName, pct)
+            if (isDirectUpload) {
+                onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
+            } else {
+                onProgress(VtResult(status = VtStatus.SCANNING))
             }
-            val analysisId = uploadResult.getOrElse { e ->
-                if (e is VirusTotalService.VtHttpException) {
-                    finishScan(
-                        context,
-                        virusTotalNotifier,
-                        scanNotifId,
-                        fileName,
-                        VtResult(status = e.vtStatus, errorMessage = e.message.orEmpty()),
-                        sha256,
-                        onProgress,
-                    )
-                } else {
-                    finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, e.message ?: "Upload failed", sha256, onProgress)
-                }
+
+            val sha256 = current.sha256.ifBlank {
+                runCatching {
+                    withContext(Dispatchers.IO) {
+                        context.contentResolver.openInputStream(uri)?.use { input ->
+                            virusTotalService.computeSha256(input)
+                        } ?: ""
+                    }
+                }.getOrDefault("")
+            }
+
+            if (sha256.isBlank()) {
+                scanFinished = true
+                finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, "Could not hash file", sha256, onProgress)
                 return
             }
 
-            onProgress(VtResult(status = VtStatus.QUEUED, analysisId = analysisId))
-            virusTotalNotifier.notifyQueued(scanNotifId, fileName)
+            onUpdateSha256(sha256)
 
-            val finalResult = virusTotalService.pollAnalysis(apiKey, analysisId) { status ->
-                onProgress(VtResult(status = status, analysisId = analysisId))
-                when (status) {
-                    VtStatus.ANALYZING -> virusTotalNotifier.notifyAnalyzing(scanNotifId, fileName)
-                    VtStatus.QUEUED -> virusTotalNotifier.notifyQueued(scanNotifId, fileName)
-                    else -> {}
+            if (!isDirectUpload) {
+                val hashResult = virusTotalService.checkFile(apiKey, sha256)
+                if (hashResult.status != VtStatus.NOT_FOUND) {
+                    scanFinished = true
+                    finishScan(context, virusTotalNotifier, scanNotifId, fileName, hashResult, sha256, onProgress)
+                    return
                 }
+                onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
+                virusTotalNotifier.notifyUploading(scanNotifId, fileName, 0)
             }
-            finishScan(context, virusTotalNotifier, scanNotifId, fileName, finalResult, sha256, onProgress)
+
+            val tempFile = runCatching {
+                withContext(Dispatchers.IO) {
+                    val ext = fileName.substringAfterLast('.', "apk").ifBlank { "apk" }
+                    val f = File(context.cacheDir, "vt_${System.currentTimeMillis()}_upload.$ext")
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        f.outputStream().use { output -> input.copyTo(output) }
+                    } ?: return@withContext null
+                    f
+                }
+            }.getOrNull()
+
+            if (tempFile == null || !tempFile.exists()) {
+                scanFinished = true
+                finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, "Could not read file for upload", sha256, onProgress)
+                return
+            }
+
+            try {
+                onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
+                virusTotalNotifier.notifyUploading(scanNotifId, fileName, 0)
+
+                val uploadResult = virusTotalService.uploadFile(apiKey, tempFile) { pct ->
+                    onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = pct))
+                    virusTotalNotifier.notifyUploading(scanNotifId, fileName, pct)
+                }
+                val analysisId = uploadResult.getOrElse { e ->
+                    scanFinished = true
+                    if (e is VirusTotalService.VtHttpException) {
+                        finishScan(
+                            context,
+                            virusTotalNotifier,
+                            scanNotifId,
+                            fileName,
+                            VtResult(status = e.vtStatus, errorMessage = e.message.orEmpty()),
+                            sha256,
+                            onProgress,
+                        )
+                    } else {
+                        finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, e.message ?: "Upload failed", sha256, onProgress)
+                    }
+                    return
+                }
+
+                onProgress(VtResult(status = VtStatus.QUEUED, analysisId = analysisId))
+                virusTotalNotifier.notifyQueued(scanNotifId, fileName)
+
+                val finalResult = virusTotalService.pollAnalysis(apiKey, analysisId) { status ->
+                    onProgress(VtResult(status = status, analysisId = analysisId))
+                    when (status) {
+                        VtStatus.ANALYZING -> virusTotalNotifier.notifyAnalyzing(scanNotifId, fileName)
+                        VtStatus.QUEUED -> virusTotalNotifier.notifyQueued(scanNotifId, fileName)
+                        else -> {}
+                    }
+                }
+                scanFinished = true
+                finishScan(context, virusTotalNotifier, scanNotifId, fileName, finalResult, sha256, onProgress)
+            } finally {
+                runCatching { tempFile.delete() }
+            }
         } finally {
-            runCatching { tempFile.delete() }
+            if (!scanFinished) {
+                virusTotalNotifier.cancel(scanNotifId)
+            }
         }
     }
 

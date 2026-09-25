@@ -23,6 +23,8 @@ class VirusTotalNotifier(private val context: Context) {
         ensureChannel()
     }
 
+    private val activeIds = java.util.concurrent.ConcurrentHashMap.newKeySet<Int>()
+
     fun notifyHashing(fileName: String): Int {
         if (!canPost()) return -1
         val id = nextId()
@@ -30,9 +32,10 @@ class VirusTotalNotifier(private val context: Context) {
             .setContentTitle(context.getString(R.string.vt_notif_hashing))
             .setContentText(fileName)
             .setProgress(0, 0, true)
-            .setOngoing(true)
+            .setOngoing(false)
             .build()
         post(id, n)
+        activeIds.add(id)
         return id
     }
 
@@ -43,10 +46,11 @@ class VirusTotalNotifier(private val context: Context) {
             .setContentTitle(context.getString(R.string.vt_notif_uploading, 0))
             .setContentText(fileName)
             .setProgress(100, 0, false)
-            .setOngoing(true)
+            .setOngoing(false)
             .setOnlyAlertOnce(true)
             .build()
         post(id, n)
+        activeIds.add(id)
         return id
     }
 
@@ -56,10 +60,11 @@ class VirusTotalNotifier(private val context: Context) {
             .setContentTitle(context.getString(R.string.vt_notif_uploading, percent))
             .setContentText(fileName)
             .setProgress(100, percent, false)
-            .setOngoing(true)
+            .setOngoing(false)
             .setOnlyAlertOnce(true)
             .build()
         post(id, n)
+        activeIds.add(id)
     }
 
     fun notifyQueued(id: Int, fileName: String) {
@@ -68,10 +73,11 @@ class VirusTotalNotifier(private val context: Context) {
             .setContentTitle(context.getString(R.string.vt_notif_queued))
             .setContentText(fileName)
             .setProgress(0, 0, true)
-            .setOngoing(true)
+            .setOngoing(false)
             .setOnlyAlertOnce(true)
             .build()
         post(id, n)
+        activeIds.add(id)
     }
 
     fun notifyAnalyzing(id: Int, fileName: String) {
@@ -80,14 +86,16 @@ class VirusTotalNotifier(private val context: Context) {
             .setContentTitle(context.getString(R.string.vt_notif_analyzing))
             .setContentText(fileName)
             .setProgress(0, 0, true)
-            .setOngoing(true)
+            .setOngoing(false)
             .setOnlyAlertOnce(true)
             .build()
         post(id, n)
+        activeIds.add(id)
     }
 
     fun notifyResult(id: Int, fileName: String, title: String, text: String, sha256: String = "") {
         if (!canPost() || id < 0) return
+        activeIds.remove(id)
         val builder = baseBuilder()
             .setContentTitle(title)
             .setContentText("$fileName · $text")
@@ -106,7 +114,13 @@ class VirusTotalNotifier(private val context: Context) {
 
     fun cancel(id: Int) {
         if (id < 0) return
+        activeIds.remove(id)
         manager.cancel(id)
+    }
+
+    fun cancelAll() {
+        activeIds.forEach { manager.cancel(it) }
+        activeIds.clear()
     }
 
     private fun baseBuilder(): NotificationCompat.Builder =

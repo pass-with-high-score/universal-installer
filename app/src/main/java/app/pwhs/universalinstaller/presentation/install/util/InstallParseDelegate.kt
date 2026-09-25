@@ -117,6 +117,8 @@ class InstallParseDelegate(
     }
 
     fun dismissPendingInstall() {
+        scanJob?.cancel()
+        virusTotalNotifier.cancelAll()
         trackerScanJob?.cancel()
         _pendingApkInfo.value = null
         pendingApkUris = null
@@ -158,6 +160,7 @@ class InstallParseDelegate(
     fun stopParsing() {
         _isLoading.value = false
         parseJob?.cancel()
+        scanJob?.cancel()
         trackerScanJob?.cancel()
     }
 
