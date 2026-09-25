@@ -285,8 +285,8 @@ abstract class BaseInstallController(
                     sessionDataRepository.updateSessionIsCancellable(session.id, isCancellable = false)
                 }
                 .launchIn(this)
+            val sessionData = sessionDataRepository.sessions.value.find { it.id == session.id }
             try {
-                val sessionData = sessionDataRepository.sessions.value.find { it.id == session.id }
                 when (val result = session.await()) {
                     Session.State.Succeeded -> {
                         reportInstallResult(TelemetryEvents.RESULT_SUCCESS, id = session.id)
@@ -344,14 +344,26 @@ abstract class BaseInstallController(
                 successHooks.remove(session.id)
                 throw e
             } catch (e: Exception) {
+                val isFrp = InstallErrorHelper.isFrpException(e)
+                val errorCode = if (isFrp) "INSTALL_FAILED_SECURITY_FRP" else "INSTALL_FAILED_INTERNAL_ERROR"
+                val errorType = if (isFrp) "security_frp" else "internal_error"
+                val errorReason = if (isFrp) "security_frp" else e.javaClass.simpleName
                 reportInstallResult(
                     TelemetryEvents.RESULT_FAILURE,
-                    errorCode = "INSTALL_FAILED_INTERNAL_ERROR",
-                    errorType = "internal_error",
-                    errorReason = e.javaClass.simpleName,
+                    errorCode = errorCode,
+                    errorType = errorType,
+                    errorReason = errorReason,
                     id = session.id,
                 )
-                handleError(e.message, session.id)
+                val userMessage = if (isFrp && context != null) {
+                    val title = context.getString(R.string.install_error_security_frp_title)
+                    val guidance = context.getString(R.string.install_error_security_frp_guidance)
+                    "$title\n$guidance"
+                } else {
+                    e.message
+                }
+                saveHistory(sessionData, success = false, errorMessage = userMessage)
+                handleError(userMessage, session.id)
                 Timber.e(e, "Session error")
             }
         }

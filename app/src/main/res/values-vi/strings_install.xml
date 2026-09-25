@@ -57,6 +57,8 @@
     <string name="install_error_timeout_guidance">Quá trình cài đặt mất quá nhiều thời gian và đã bị hủy. Nhấn Thử lại để thử lại.</string>
     <string name="install_error_unexpected_title">Lỗi không mong muốn</string>
     <string name="install_error_unexpected_guidance">Đã xảy ra lỗi không mong muốn: %s. Hãy thử khởi động lại ứng dụng hoặc thiết bị của bạn.</string>
+    <string name="install_error_security_frp_title">Cài đặt bị chặn bởi bảo mật thiết bị (FRP)</string>
+    <string name="install_error_security_frp_guidance">Android đang chặn cài đặt ứng dụng do thiết bị đang trong trạng thái Factory Reset Protection (FRP) hoặc chế độ thiết lập bảo mật. Vui lòng hoàn tất đăng nhập tài khoản / xác minh bảo mật trên thiết bị rồi thử lại.</string>
     <string name="install_error_failed_title">Cài đặt thất bại</string>
     <string name="install_error_unknown_guidance">Đã xảy ra một lỗi không xác định. Nhấn Thử lại để thử lại.</string>
     <string name="install_error_unknown_guidance_short">Đã xảy ra một lỗi không xác định.</string>

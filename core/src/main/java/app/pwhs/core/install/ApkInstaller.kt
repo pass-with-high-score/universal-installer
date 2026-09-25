@@ -244,6 +244,17 @@ class ApkInstaller(private val context: Context) {
         val pi = PendingIntent.getBroadcast(
             context, sessionId, Intent(action).setPackage(context.packageName), flags
         )
-        session.commit(pi.intentSender)
+        try {
+            session.commit(pi.intentSender)
+        } catch (e: SecurityException) {
+            runCatching { context.unregisterReceiver(receiver) }
+            val isFrp = e.message?.contains("FRP", ignoreCase = true) == true
+            val msg = if (isFrp) {
+                "Android is blocking package installation because the device is in Factory Reset Protection (FRP) mode or a restricted setup state."
+            } else {
+                e.message ?: "SecurityException during package commit"
+            }
+            if (cont.isActive) cont.resume(Result.Failure(msg))
+        }
     }
 }

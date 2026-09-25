@@ -195,6 +195,8 @@
     <string name="install_error_timeout_guidance">The installation took too long and was cancelled. Tap Retry to try again.</string>
     <string name="install_error_unexpected_title">Unexpected error</string>
     <string name="install_error_unexpected_guidance">An unexpected error occurred: %s. Try restarting the app or your device.</string>
+    <string name="install_error_security_frp_title">Installation blocked by device security (FRP)</string>
+    <string name="install_error_security_frp_guidance">Android is blocking package installation because the device is in Factory Reset Protection (FRP) or an active security setup state. Please complete your device account setup or security verification and try again.</string>
     <string name="install_error_failed_title">Installation failed</string>
     <string name="install_error_unknown_guidance">An unknown error occurred. Tap Retry to try again.</string>
     <string name="install_error_unknown_guidance_short">An unknown error occurred.</string>

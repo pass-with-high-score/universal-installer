@@ -58,9 +58,16 @@ class DefaultInstallController(
                 }
             }
         }
-        return packageInstaller.createSession(uris) {
-            this.name = name
-            confirmation = Confirmation.IMMEDIATE
+        return try {
+            packageInstaller.createSession(uris) {
+                this.name = name
+                confirmation = Confirmation.IMMEDIATE
+            }
+        } catch (e: SecurityException) {
+            if (app.pwhs.universalinstaller.presentation.install.InstallErrorHelper.isFrpException(e)) {
+                throw IllegalStateException("INSTALL_FAILED_SECURITY_FRP: ${e.message}", e)
+            }
+            throw e
         }
     }
 }

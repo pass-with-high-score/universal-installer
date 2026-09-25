@@ -215,7 +215,14 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
                 
                 // Use reflection for getIntentSender to avoid stub issues
                 val intentSender = receiver.javaClass.getMethod("getIntentSender").invoke(receiver) as android.content.IntentSender
-                session.commit(intentSender)
+                try {
+                    session.commit(intentSender)
+                } catch (e: SecurityException) {
+                    if (app.pwhs.universalinstaller.presentation.install.InstallErrorHelper.isFrpException(e)) {
+                        throw IllegalStateException("INSTALL_FAILED_SECURITY_FRP: ${e.message}", e)
+                    }
+                    throw e
+                }
             }
             "Session $sessionId committed for user $userId"
         }
