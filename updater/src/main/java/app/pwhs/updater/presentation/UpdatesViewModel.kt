@@ -19,7 +19,9 @@ import app.pwhs.updater.domain.model.TrackedApp
 import app.pwhs.updater.domain.model.UpdateSourceType
 import app.pwhs.updater.domain.provider.GitHubReleaseProvider
 import app.pwhs.updater.domain.provider.UpdateSourceProvider
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +30,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 import androidx.datastore.preferences.core.edit
 import app.pwhs.core.R
 import app.pwhs.core.data.local.SharedPrefsKeys
@@ -45,6 +48,9 @@ class UpdatesViewModel(
     private val context: Context,
     private val providers: List<UpdateSourceProvider> = listOf(GitHubReleaseProvider()),
 ) : ViewModel() {
+
+    private val downloadJobs = ConcurrentHashMap<String, Job>()
+    private var updateAllJob: Job? = null
 
     private val _uiState = MutableStateFlow(UpdatesUiState())
     val uiState: StateFlow<UpdatesUiState> = _uiState.asStateFlow()
@@ -193,37 +199,8 @@ class UpdatesViewModel(
     fun loadInstalledApps(context: Context) {
         viewModelScope.launch(Dispatchers.IO) {
             _uiState.update { it.copy(isLoadingInstalledApps = true) }
-            val pm = context.packageManager
             val trackedPkgSet = _uiState.value.trackedApps.map { it.packageName }.toSet()
-
-            val installedPackages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.getInstalledPackages(PackageManager.PackageInfoFlags.of(0))
-            } else {
-                pm.getInstalledPackages(0)
-            }
-
-            val appList = installedPackages.mapNotNull { pkg ->
-                val appInfo = pkg.applicationInfo ?: return@mapNotNull null
-                val isSystem = (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0
-                if (isSystem && pkg.packageName != "app.pwhs.universalinstaller") return@mapNotNull null
-
-                val appName = runCatching { pm.getApplicationLabel(appInfo).toString() }.getOrDefault(pkg.packageName)
-                val vCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    pkg.longVersionCode
-                } else {
-                    @Suppress("DEPRECATION")
-                    pkg.versionCode.toLong()
-                }
-
-                InstalledAppItem(
-                    packageName = pkg.packageName,
-                    appName = appName,
-                    versionName = pkg.versionName ?: "1.0",
-                    versionCode = vCode,
-                    isTracked = trackedPkgSet.contains(pkg.packageName),
-                )
-            }.sortedBy { it.appName.lowercase() }
-
+            val appList = app.pwhs.updater.presentation.util.InstalledAppsLoader.load(context, trackedPkgSet)
             _uiState.update { it.copy(installedApps = appList, isLoadingInstalledApps = false) }
         }
     }
@@ -365,6 +342,11 @@ class UpdatesViewModel(
         }
     }
 
+    fun cancelDownload(packageName: String) {
+        downloadJobs.remove(packageName)?.cancel()
+        _uiState.update { it.copy(downloadProgressMap = it.downloadProgressMap - packageName) }
+    }
+
     fun downloadAndInstall(
         context: Context,
         app: TrackedApp,
@@ -372,113 +354,138 @@ class UpdatesViewModel(
         onComplete: (() -> Unit)? = null,
     ) {
         val downloadUrl = app.latestDownloadUrl ?: return
+        if (downloadJobs[app.packageName]?.isActive == true) return
         val token = apiToken?.takeIf { it.isNotBlank() } ?: getTokenForUrl(app.sourceUrl)
-        viewModelScope.launch {
-            _uiState.update { it.copy(downloadingPackage = app.packageName, downloadProgress = 0f, downloadBytesText = null) }
+
+        val job = viewModelScope.launch {
+            _uiState.update {
+                it.copy(
+                    downloadProgressMap = it.downloadProgressMap + (app.packageName to AppDownloadProgress(packageName = app.packageName))
+                )
+            }
             try {
                 val downloadResult = downloader.downloadApk(
                     downloadUrl = downloadUrl,
                     packageName = app.packageName,
                     versionName = app.latestVersionName ?: "latest",
                     apiToken = token,
-                    onProgress = { written, total ->
+                    onProgress = { written, total, speed, eta ->
                         val fraction = if (total > 0) (written.toFloat() / total).coerceIn(0f, 1f) else 0f
-                        val text = if (total > 0) {
-                            "${InstallerUtils.formatBytes(written)} / ${InstallerUtils.formatBytes(total)}"
-                        } else {
-                            InstallerUtils.formatBytes(written)
+                        val progress = AppDownloadProgress(
+                            packageName = app.packageName,
+                            progress = fraction,
+                            bytesDownloaded = written,
+                            totalBytes = total,
+                            speedBytesPerSec = speed,
+                            etaSeconds = eta,
+                        )
+                        _uiState.update {
+                            it.copy(downloadProgressMap = it.downloadProgressMap + (app.packageName to progress))
                         }
-                        _uiState.update { it.copy(downloadProgress = fraction, downloadBytesText = text) }
                     },
                 )
 
                 val apkFile = downloadResult.getOrNull()
                 if (apkFile != null && apkFile.exists()) {
-                    val metadataReader = ApkMetadataReader(context)
-                    val metadata = metadataReader.readMetadata(Uri.fromFile(apkFile), isBundle = false)
-                    if (metadata != null && metadata.packageName.isNotBlank()) {
-                        Timber.i("Verified APK package: ${metadata.packageName} (v${metadata.versionName})")
-                        val realPkg = metadata.packageName
-                        val realName = metadata.appName.ifBlank { app.appName }
-                        if (app.packageName != realPkg) {
-                            repository.removeTrackedApp(app.packageName)
-                            val updatedApp = app.copy(
-                                packageName = realPkg,
-                                appName = realName,
-                            )
-                            repository.saveTrackedApp(updatedApp)
-                        } else if (app.appName != realName) {
-                            val updatedApp = app.copy(appName = realName)
-                            repository.saveTrackedApp(updatedApp)
-                        }
-                    }
-                    InstallerUtils.launchInstallerForFile(context, apkFile)
-                    onComplete?.invoke()
+                    handleDownloadedApk(context, app, apkFile, onComplete)
                 } else {
                     _uiState.update { it.copy(error = "Download failed") }
                 }
+            } catch (e: CancellationException) {
+                // User cancelled or replaced job; clean up state silently
             } catch (e: Exception) {
                 Timber.e(e, "Download and install failed for ${app.packageName}")
                 _uiState.update { it.copy(error = e.message ?: "Download failed") }
             } finally {
-                _uiState.update { it.copy(downloadingPackage = null, downloadProgress = 0f, downloadBytesText = null) }
+                downloadJobs.remove(app.packageName)
+                _uiState.update { it.copy(downloadProgressMap = it.downloadProgressMap - app.packageName) }
             }
         }
+        downloadJobs[app.packageName] = job
     }
 
     fun updateAll(context: Context, apiToken: String? = null) {
         val appsToUpdate = _uiState.value.trackedApps.filter { it.hasUpdate && !it.latestDownloadUrl.isNullOrBlank() }
         if (appsToUpdate.isEmpty() || _uiState.value.isUpdatingAll) return
 
-        viewModelScope.launch {
+        updateAllJob?.cancel()
+        updateAllJob = viewModelScope.launch {
             _uiState.update { it.copy(isUpdatingAll = true) }
-            for (app in appsToUpdate) {
-                val downloadUrl = app.latestDownloadUrl ?: continue
-                val token = apiToken?.takeIf { it.isNotBlank() } ?: getTokenForUrl(app.sourceUrl)
-                _uiState.update { it.copy(downloadingPackage = app.packageName, downloadProgress = 0f, downloadBytesText = null) }
-
-                try {
-                    val result = downloader.downloadApk(
-                        downloadUrl = downloadUrl,
-                        packageName = app.packageName,
-                        versionName = app.latestVersionName ?: "latest",
-                        apiToken = token,
-                        onProgress = { written, total ->
-                            val fraction = if (total > 0) (written.toFloat() / total).coerceIn(0f, 1f) else 0f
-                            val text = if (total > 0) {
-                                "${InstallerUtils.formatBytes(written)} / ${InstallerUtils.formatBytes(total)}"
-                            } else {
-                                InstallerUtils.formatBytes(written)
-                            }
-                            _uiState.update { it.copy(downloadProgress = fraction, downloadBytesText = text) }
-                        },
-                    )
-
-                    val apkFile = result.getOrNull()
-                    if (apkFile != null && apkFile.exists()) {
-                        val metadataReader = ApkMetadataReader(context)
-                        val metadata = metadataReader.readMetadata(Uri.fromFile(apkFile), isBundle = false)
-                        if (metadata != null && metadata.packageName.isNotBlank()) {
-                            val realPkg = metadata.packageName
-                            val realName = metadata.appName.ifBlank { app.appName }
-                            if (app.packageName != realPkg) {
-                                repository.removeTrackedApp(app.packageName)
-                                val updatedApp = app.copy(packageName = realPkg, appName = realName)
-                                repository.saveTrackedApp(updatedApp)
-                            } else if (app.appName != realName) {
-                                val updatedApp = app.copy(appName = realName)
-                                repository.saveTrackedApp(updatedApp)
-                            }
-                        }
-                        withContext(Dispatchers.Main) {
-                            InstallerUtils.launchInstallerForFile(context, apkFile)
-                        }
+            try {
+                for (app in appsToUpdate) {
+                    val downloadUrl = app.latestDownloadUrl ?: continue
+                    val token = apiToken?.takeIf { it.isNotBlank() } ?: getTokenForUrl(app.sourceUrl)
+                    _uiState.update {
+                        it.copy(
+                            downloadProgressMap = it.downloadProgressMap + (app.packageName to AppDownloadProgress(packageName = app.packageName))
+                        )
                     }
-                } catch (e: Exception) {
-                    Timber.e(e, "Batch update failed for ${app.packageName}")
+
+                    try {
+                        val result = downloader.downloadApk(
+                            downloadUrl = downloadUrl,
+                            packageName = app.packageName,
+                            versionName = app.latestVersionName ?: "latest",
+                            apiToken = token,
+                            onProgress = { written, total, speed, eta ->
+                                val fraction = if (total > 0) (written.toFloat() / total).coerceIn(0f, 1f) else 0f
+                                val progress = AppDownloadProgress(
+                                    packageName = app.packageName,
+                                    progress = fraction,
+                                    bytesDownloaded = written,
+                                    totalBytes = total,
+                                    speedBytesPerSec = speed,
+                                    etaSeconds = eta,
+                                )
+                                _uiState.update {
+                                    it.copy(downloadProgressMap = it.downloadProgressMap + (app.packageName to progress))
+                                }
+                            },
+                        )
+
+                        val apkFile = result.getOrNull()
+                        if (apkFile != null && apkFile.exists()) {
+                            handleDownloadedApk(context, app, apkFile)
+                        }
+                    } catch (e: CancellationException) {
+                        throw e
+                    } catch (e: Exception) {
+                        Timber.e(e, "Batch update failed for ${app.packageName}")
+                    } finally {
+                        _uiState.update { it.copy(downloadProgressMap = it.downloadProgressMap - app.packageName) }
+                    }
                 }
+            } catch (e: CancellationException) {
+                // Batch update cancelled
+            } finally {
+                _uiState.update { it.copy(isUpdatingAll = false) }
             }
-            _uiState.update { it.copy(isUpdatingAll = false, downloadingPackage = null, downloadProgress = 0f, downloadBytesText = null) }
+        }
+    }
+
+    private suspend fun handleDownloadedApk(
+        context: Context,
+        app: TrackedApp,
+        apkFile: File,
+        onComplete: (() -> Unit)? = null,
+    ) {
+        val metadataReader = ApkMetadataReader(context)
+        val metadata = metadataReader.readMetadata(Uri.fromFile(apkFile), isBundle = false)
+        if (metadata != null && metadata.packageName.isNotBlank()) {
+            val realPkg = metadata.packageName
+            val realName = metadata.appName.ifBlank { app.appName }
+            if (app.packageName != realPkg) {
+                repository.removeTrackedApp(app.packageName)
+                val updatedApp = app.copy(packageName = realPkg, appName = realName)
+                repository.saveTrackedApp(updatedApp)
+            } else if (app.appName != realName) {
+                val updatedApp = app.copy(appName = realName)
+                repository.saveTrackedApp(updatedApp)
+            }
+        }
+        withContext(Dispatchers.Main) {
+            InstallerUtils.launchInstallerForFile(context, apkFile)
+            onComplete?.invoke()
         }
     }
 }

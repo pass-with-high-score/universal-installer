@@ -391,12 +391,13 @@ fun TvUpdatesScreen(
                     } else {
                         val firstPackage = filteredApps.firstOrNull()?.packageName
                         items(filteredApps, key = { it.packageName }) { app ->
+                            val downloadInfo = uiState.downloadProgressMap[app.packageName]
                             TvUpdateAppRow(
                                 app = app,
                                 isSelected = { focusedApp?.packageName == app.packageName },
-                                isDownloading = uiState.downloadingPackage == app.packageName,
-                                downloadProgress = uiState.downloadProgress,
-                                downloadBytesText = uiState.downloadBytesText,
+                                isDownloading = downloadInfo != null,
+                                downloadProgress = downloadInfo?.progress ?: 0f,
+                                downloadBytesText = downloadInfo?.bytesText,
                                 focusRequester = if (app.packageName == firstPackage) firstRowFocus else null,
                                 onFocus = { focusedApp = app },
                                 onClick = {
@@ -418,7 +419,7 @@ fun TvUpdatesScreen(
             TvUpdateDetailsPane(
                 app = focusedApp,
                 isChecking = uiState.isChecking,
-                isDownloading = uiState.downloadingPackage == focusedApp?.packageName,
+                isDownloading = focusedApp?.let { uiState.downloadProgressMap.containsKey(it.packageName) } == true,
                 onUpdateOrInstall = { app ->
                     if (app.availableAssets.size > 1) {
                         appForFilePicker = app

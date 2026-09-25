@@ -17,15 +17,31 @@ data class InstalledAppItem(
     val isTracked: Boolean = false,
 )
 
+data class AppDownloadProgress(
+    val packageName: String,
+    val progress: Float = 0f,
+    val bytesDownloaded: Long = 0L,
+    val totalBytes: Long = 0L,
+    val speedBytesPerSec: Long = 0L,
+    val etaSeconds: Long? = null,
+) {
+    val bytesText: String
+        get() = if (totalBytes > 0) {
+            "${app.pwhs.updater.presentation.util.InstallerUtils.formatBytes(bytesDownloaded)} / ${app.pwhs.updater.presentation.util.InstallerUtils.formatBytes(totalBytes)}"
+        } else if (bytesDownloaded > 0) {
+            app.pwhs.updater.presentation.util.InstallerUtils.formatBytes(bytesDownloaded)
+        } else {
+            ""
+        }
+}
+
 data class UpdatesUiState(
     val trackedApps: List<TrackedApp> = emptyList(),
     val isLoading: Boolean = true,
     val isChecking: Boolean = false,
     val isAdding: Boolean = false,
     val isUpdatingAll: Boolean = false,
-    val downloadingPackage: String? = null,
-    val downloadProgress: Float = 0f,
-    val downloadBytesText: String? = null,
+    val downloadProgressMap: Map<String, AppDownloadProgress> = emptyMap(),
     val searchQuery: String = "",
     val selectedCategory: String? = null,
     val sortOption: AppSortOption = AppSortOption.UPDATES_FIRST,
@@ -42,6 +58,15 @@ data class UpdatesUiState(
     val checkingPackageNames: Set<String> = emptySet(),
     val checkingProgress: Pair<Int, Int>? = null,
 ) {
+    val downloadingPackage: String?
+        get() = downloadProgressMap.keys.firstOrNull()
+
+    val downloadProgress: Float
+        get() = downloadProgressMap.values.firstOrNull()?.progress ?: 0f
+
+    val downloadBytesText: String?
+        get() = downloadProgressMap.values.firstOrNull()?.bytesText
+
     val updateCount: Int
         get() = trackedApps.count { it.hasUpdate }
 

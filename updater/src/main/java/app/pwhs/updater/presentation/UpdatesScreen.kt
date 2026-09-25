@@ -361,9 +361,7 @@ fun UpdatesScreen(
                         ) { app ->
                             TrackedAppCard(
                                 app = app,
-                                isDownloading = uiState.downloadingPackage == app.packageName,
-                                downloadProgress = uiState.downloadProgress,
-                                downloadBytesText = uiState.downloadBytesText,
+                                downloadInfo = uiState.downloadProgressMap[app.packageName],
                                 isChecking = uiState.checkingPackageNames.contains(app.packageName),
                                 onClick = {
                                     viewModel.selectAppForDetail(app)
@@ -374,6 +372,9 @@ fun UpdatesScreen(
                                     } else {
                                         viewModel.downloadAndInstall(context, app)
                                     }
+                                },
+                                onCancelDownloadClick = {
+                                    viewModel.cancelDownload(app.packageName)
                                 },
                                 onCheckClick = {
                                     viewModel.checkSingleUpdate(app.packageName)

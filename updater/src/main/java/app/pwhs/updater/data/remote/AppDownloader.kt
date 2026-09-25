@@ -14,7 +14,11 @@ import io.ktor.http.contentLength
 import io.ktor.http.isSuccess
 import io.ktor.utils.io.ByteReadChannel
 import io.ktor.utils.io.readAvailable
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -41,15 +45,15 @@ class AppDownloader(
         packageName: String,
         versionName: String,
         apiToken: String? = null,
-        onProgress: (bytesDownloaded: Long, totalBytes: Long) -> Unit = { _, _ -> },
+        onProgress: (bytesDownloaded: Long, totalBytes: Long, speedBytesPerSec: Long, etaSeconds: Long?) -> Unit = { _, _, _, _ -> },
     ): Result<File> = withContext(Dispatchers.IO) {
-        try {
-            val downloadDir = updatesDownloadDir()
-            var outputFile = File(
-                downloadDir,
-                uniqueFileName(downloadDir, fallbackFileName(packageName, versionName)),
-            )
+        val downloadDir = updatesDownloadDir()
+        var outputFile = File(
+            downloadDir,
+            uniqueFileName(downloadDir, fallbackFileName(packageName, versionName)),
+        )
 
+        try {
             client.prepareGet(downloadUrl) {
                 header("User-Agent", "UniversalInstaller-AppUpdater")
                 if (!apiToken.isNullOrBlank()) {
@@ -75,10 +79,11 @@ class AppDownloader(
                 var downloadedBytes = 0L
                 val buffer = ByteArray(16 * 1024) // 16KB chunk buffer
                 var lastReportTime = 0L
+                val estimator = app.pwhs.core.util.TransferEstimator()
 
                 outputFile.parentFile?.mkdirs()
                 FileOutputStream(outputFile).use { output ->
-                    while (!channel.isClosedForRead) {
+                    while (!channel.isClosedForRead && currentCoroutineContext().isActive) {
                         val bytesRead = channel.readAvailable(buffer, 0, buffer.size)
                         if (bytesRead <= 0) break
 
@@ -87,28 +92,42 @@ class AppDownloader(
 
                         val now = System.currentTimeMillis()
                         if (
-                            now - lastReportTime >= 50L ||
+                            now - lastReportTime >= 250L ||
                             channel.isClosedForRead ||
                             (totalBytes > 0 && downloadedBytes >= totalBytes)
                         ) {
                             lastReportTime = now
-                            onProgress(downloadedBytes, totalBytes)
+                            val estimate = estimator.update(downloadedBytes, totalBytes)
+                            onProgress(downloadedBytes, totalBytes, estimate.speedBytesPerSec, estimate.etaSeconds)
                         }
                     }
                     output.flush()
                 }
 
+                currentCoroutineContext().ensureActive()
+
                 // Final 100% progress callback
-                onProgress(downloadedBytes, if (totalBytes > 0) totalBytes else downloadedBytes)
+                val finalEstimate = estimator.update(downloadedBytes, totalBytes)
+                onProgress(
+                    downloadedBytes,
+                    if (totalBytes > 0) totalBytes else downloadedBytes,
+                    finalEstimate.speedBytesPerSec,
+                    0L,
+                )
             }
 
             if (outputFile.exists() && outputFile.length() > 0) {
                 MediaScannerConnection.scanFile(context, arrayOf(outputFile.absolutePath), null, null)
                 Result.success(outputFile)
             } else {
+                outputFile.delete()
                 Result.failure(IllegalStateException("Downloaded file is empty"))
             }
+        } catch (e: kotlinx.coroutines.CancellationException) {
+            outputFile.delete()
+            throw e
         } catch (e: Exception) {
+            outputFile.delete()
             Timber.e(e, "Error downloading APK from $downloadUrl")
             Result.failure(e)
         }

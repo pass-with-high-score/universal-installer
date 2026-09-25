@@ -19,6 +19,7 @@ import app.pwhs.core.ui.component.verticalScrollbar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Label
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.ExpandLess
@@ -27,12 +28,18 @@ import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.SystemUpdate
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.ui.platform.LocalContext
+import app.pwhs.core.util.TransferFormatter
+import app.pwhs.updater.presentation.AppDownloadProgress
+import app.pwhs.updater.presentation.util.InstallerUtils
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -55,17 +62,17 @@ import app.pwhs.updater.domain.model.TrackedApp
 @Composable
 fun TrackedAppCard(
     app: TrackedApp,
-    isDownloading: Boolean,
-    downloadProgress: Float,
-    downloadBytesText: String? = null,
+    downloadInfo: AppDownloadProgress? = null,
     onClick: () -> Unit = {},
     onUpdateClick: () -> Unit,
     onCheckClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onCancelDownloadClick: (() -> Unit)? = null,
     isChecking: Boolean = false,
     onEditCategoryClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
+    val isDownloading = downloadInfo != null
     var expandedNotes by remember { mutableStateOf(false) }
 
     OutlinedCard(
@@ -213,7 +220,13 @@ fun TrackedAppCard(
             }
 
             // Download Progress Bar
-            if (isDownloading) {
+            if (downloadInfo != null) {
+                val progress = downloadInfo.progress
+                val bytesDownloaded = downloadInfo.bytesDownloaded
+                val totalBytes = downloadInfo.totalBytes
+                val speedBytesPerSec = downloadInfo.speedBytesPerSec
+                val etaSeconds = downloadInfo.etaSeconds
+
                 Spacer(modifier = Modifier.height(Spacing.M))
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Row(
@@ -221,28 +234,50 @@ fun TrackedAppCard(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
+                        val sizeText = if (totalBytes > 0) {
+                            "${InstallerUtils.formatBytes(bytesDownloaded)} / ${InstallerUtils.formatBytes(totalBytes)}"
+                        } else if (bytesDownloaded > 0) {
+                            InstallerUtils.formatBytes(bytesDownloaded)
+                        } else {
+                            stringResource(R.string.updates_card_downloading)
+                        }
+                        val speedStr = TransferFormatter.formatSpeed(speedBytesPerSec)
+                        val leftText = if (speedStr.isNotEmpty()) "$sizeText • $speedStr" else sizeText
+
                         Text(
-                            text = if (!downloadBytesText.isNullOrBlank()) {
-                                downloadBytesText
-                            } else {
-                                stringResource(R.string.updates_card_downloading)
-                            },
+                            text = leftText,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 1,
+                            softWrap = false,
+                            modifier = Modifier
+                                .weight(1f, fill = false)
+                                .basicMarquee(),
                         )
-                        if (downloadProgress > 0f) {
+
+                        val percent = if (totalBytes > 0) (progress * 100).toInt() else null
+                        val etaStr = TransferFormatter.formatEta(LocalContext.current, etaSeconds)
+                        val rightText = when {
+                            percent != null && etaStr != null -> "$percent% ($etaStr)"
+                            percent != null -> "$percent%"
+                            etaStr != null -> etaStr
+                            else -> ""
+                        }
+
+                        if (rightText.isNotEmpty()) {
+                            Spacer(modifier = Modifier.width(Spacing.S))
                             Text(
-                                text = "${(downloadProgress * 100).toInt()}%",
+                                text = rightText,
                                 style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Bold,
+                                fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
                     Spacer(modifier = Modifier.height(Spacing.XS))
-                    if (downloadProgress > 0f) {
+                    if (progress > 0f) {
                         LinearProgressIndicator(
-                            progress = { downloadProgress },
+                            progress = { progress },
                             modifier = Modifier.fillMaxWidth(),
                         )
                     } else {
@@ -347,11 +382,28 @@ fun TrackedAppCard(
                     }
                 }
 
-                if (!app.isInstalled && !app.latestDownloadUrl.isNullOrBlank()) {
+                if (isDownloading) {
+                    Spacer(modifier = Modifier.width(Spacing.S))
+                    OutlinedButton(
+                        onClick = { onCancelDownloadClick?.invoke() },
+                        shape = MaterialTheme.shapes.medium,
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = MaterialTheme.colorScheme.error,
+                        ),
+                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.5f)),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Close,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(text = stringResource(android.R.string.cancel))
+                    }
+                } else if (!app.isInstalled && !app.latestDownloadUrl.isNullOrBlank()) {
                     Spacer(modifier = Modifier.width(Spacing.S))
                     Button(
                         onClick = onUpdateClick,
-                        enabled = !isDownloading,
                         shape = MaterialTheme.shapes.medium,
                     ) {
                         Icon(
@@ -366,7 +418,6 @@ fun TrackedAppCard(
                     Spacer(modifier = Modifier.width(Spacing.S))
                     Button(
                         onClick = onUpdateClick,
-                        enabled = !isDownloading,
                         shape = MaterialTheme.shapes.medium,
                     ) {
                         Icon(
