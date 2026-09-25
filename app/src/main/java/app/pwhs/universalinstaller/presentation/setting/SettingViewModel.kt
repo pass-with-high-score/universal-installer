@@ -250,6 +250,7 @@ class SettingViewModel(
     // ── Privilege Delegates ─────────────────────────────────────────────────
 
     fun setInstallMode(mode: InstallMode) = privilegeDelegate.setInstallMode(mode)
+    fun updateShizukuState() = privilegeDelegate.updateShizukuState()
     fun setUseShizuku(enabled: Boolean) = privilegeDelegate.setUseShizuku(enabled)
     fun setUseRoot(enabled: Boolean) = privilegeDelegate.setUseRoot(enabled)
     fun retryRoot() = privilegeDelegate.retryRoot()

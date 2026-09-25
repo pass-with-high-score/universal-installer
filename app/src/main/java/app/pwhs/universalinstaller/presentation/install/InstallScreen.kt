@@ -65,6 +65,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.composable.SessionCard
+import app.pwhs.universalinstaller.presentation.install.components.ShizukuPromoBanner
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import org.koin.androidx.compose.koinViewModel
 import ru.solrudev.ackpine.splits.ApkSplits.validate
@@ -771,6 +772,7 @@ private fun InstallUi(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             item(key = "storage") { StorageCard() }
+            item(key = "shizuku_promo") { ShizukuPromoBanner() }
 
             if (uiState.obbCopyState !is ObbCopyState.Idle) {
                 item(key = "obb_copy") {

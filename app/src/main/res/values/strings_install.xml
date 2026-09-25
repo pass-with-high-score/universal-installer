@@ -348,4 +348,13 @@
     <string name="insufficient_storage_dialog_title">Insufficient Storage Space</string>
     <string name="insufficient_storage_dialog_message">Your device does not have enough free internal storage to install this package. Required space: %1$s, Available: %2$s. Please free up space and try again.</string>
     <string name="insufficient_storage_dialog_clean_up">Free Up Space</string>
+    <string name="shizuku_promo_title">Boost Install Success Rate</string>
+    <string name="shizuku_promo_badge_recommended">Recommended</string>
+    <string name="shizuku_promo_desc_no_perm">Shizuku is running. Connect now to enable seamless background installs without system prompts.</string>
+    <string name="shizuku_promo_desc_not_running">Shizuku is installed. Start the service to achieve higher install success and bypass system restrictions.</string>
+    <string name="shizuku_promo_desc_not_installed">Install via Shizuku for a 58.7% higher success rate, seamless background installs, and fewer conflict errors.</string>
+    <string name="shizuku_promo_action_connect">Connect</string>
+    <string name="shizuku_promo_action_open">Open Shizuku</string>
+    <string name="shizuku_promo_action_learn_more">Get Shizuku</string>
+    <string name="shizuku_promo_dismiss">Dismiss</string>
 </resources>

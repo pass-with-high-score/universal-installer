@@ -17,6 +17,7 @@ object PreferencesKeys {
     val STRICT_VIRUSTOTAL_CHECK = booleanPreferencesKey("strict_virustotal_check")
     val SECURITY_LEVEL = stringPreferencesKey("security_level")
     val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
+    val DISMISS_SHIZUKU_PROMO_BANNER = booleanPreferencesKey("dismiss_shizuku_promo_banner")
 
     /** Open the app automatically after a successful install (with a 3-second cancellable countdown). */
     val AUTO_OPEN_AFTER_INSTALL = booleanPreferencesKey("auto_open_after_install")

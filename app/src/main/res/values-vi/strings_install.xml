@@ -347,4 +347,13 @@
     <string name="insufficient_storage_dialog_clean_up">Dọn dẹp bộ nhớ</string>
     <string name="dialog_success_keep_apk">Giữ APK</string>
     <string name="dialog_success_keep_apk_desc">Không xoá tệp nguồn sau khi cài đặt</string>
+    <string name="shizuku_promo_title">Tăng tỉ lệ cài đặt thành công</string>
+    <string name="shizuku_promo_badge_recommended">Khuyến nghị</string>
+    <string name="shizuku_promo_desc_no_perm">Shizuku đang chạy. Kết nối ngay để cài đặt ngầm mượt mà và không bị gián đoạn bởi popup hệ thống.</string>
+    <string name="shizuku_promo_desc_not_running">Đã cài đặt Shizuku. Khởi động dịch vụ để cài đặt ổn định hơn và vượt qua giới hạn hệ thống.</string>
+    <string name="shizuku_promo_desc_not_installed">Cài đặt qua Shizuku giúp tăng tỉ lệ thành công lên 58.7%, hỗ trợ cài đặt ngầm và giảm thiểu lỗi xung đột.</string>
+    <string name="shizuku_promo_action_connect">Kết nối</string>
+    <string name="shizuku_promo_action_open">Mở Shizuku</string>
+    <string name="shizuku_promo_action_learn_more">Cài đặt Shizuku</string>
+    <string name="shizuku_promo_dismiss">Bỏ qua</string>
 </resources>
