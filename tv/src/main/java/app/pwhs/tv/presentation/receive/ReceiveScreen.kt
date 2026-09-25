@@ -8,7 +8,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
@@ -210,11 +212,7 @@ fun ReceiveScreen(
                             onReceiveFromPhone = { currentTab = InstallTab.Receive },
                             onGrantPermission = {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                                    val intent = Intent(
-                                        Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                                        Uri.parse("package:${context.packageName}")
-                                    )
-                                    settingsLauncher.launch(intent)
+                                    requestAllFilesAccessPermission(context, settingsLauncher)
                                 } else {
                                     readPerm?.let { permLauncher.launch(it) }
                                 }
@@ -237,6 +235,38 @@ fun ReceiveScreen(
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp)
         )
     }
+}
+
+private fun requestAllFilesAccessPermission(
+    context: Context,
+    settingsLauncher: ActivityResultLauncher<Intent>
+) {
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) return
+
+    val packageUri = Uri.parse("package:${context.packageName}")
+    val candidates = listOf(
+        // 1. App-specific Manage All Files Access (Standard Android 11+)
+        Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION, packageUri),
+        // 2. Generic Manage All Files Access list (Android TV without package URI support)
+        Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION),
+        // 3. Application Details Settings
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri),
+        // 4. Main Settings screen
+        Intent(Settings.ACTION_SETTINGS),
+    )
+
+    for (intent in candidates) {
+        val launched = runCatching {
+            settingsLauncher.launch(intent)
+        }.isSuccess
+        if (launched) return
+    }
+
+    Toast.makeText(
+        context,
+        context.getString(R.string.tv_error_cannot_open_settings),
+        Toast.LENGTH_LONG
+    ).show()
 }
 
 private fun openUnknownSources(context: Context) {

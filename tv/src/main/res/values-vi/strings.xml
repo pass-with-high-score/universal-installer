@@ -177,4 +177,5 @@
     <string name="tv_updates_add_url_hint">URL GitHub / GitLab / Direct APK</string>
     <string name="tv_updates_add_submit">Thêm</string>
     <string name="tv_updates_add_cancel">Hủy</string>
+    <string name="tv_error_cannot_open_settings">Không thể mở cài đặt hệ thống trên thiết bị này</string>
 </resources>
