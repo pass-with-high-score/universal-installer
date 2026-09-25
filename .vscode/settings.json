@@ -1,0 +1,35 @@
+{
+    // Exclude heavy directories from file watchers to prevent high CPU / RAM lag
+    "files.watcherExclude": {
+        "**/.git/objects/**": true,
+        "**/.git/subtree-cache/**": true,
+        "**/node_modules/*/**": true,
+        "**/.hg/store/**": true,
+        "**/.gradle/**": true,
+        "**/build/**": true,
+        "**/.idea/**": true,
+        "**/.kotlin/**": true,
+        "**/android-re-workspace/**": true,
+        "**/.gemini/**": true,
+        "**/.agents/**": true,
+        "**/fastlane/screenshots/**": true,
+        "**/fastlane/test_output/**": true,
+        "**/dist/**": true,
+        "**/.externalNativeBuild/**": true,
+        "**/.cxx/**": true
+    },
+    // Exclude from global search & indexing
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/build": true,
+        "**/.gradle": true,
+        "**/.idea": true,
+        "**/.kotlin": true,
+        "**/android-re-workspace": true,
+        "**/.gemini": true,
+        "**/fastlane/screenshots": true,
+        "**/fastlane/test_output": true,
+        "**/dist": true
+    },
+    "search.followSymlinks": false
+}
