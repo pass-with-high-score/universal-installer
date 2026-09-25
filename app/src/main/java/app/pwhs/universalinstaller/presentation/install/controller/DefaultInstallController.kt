@@ -23,6 +23,7 @@ class DefaultInstallController(
 ) : BaseInstallController(context, packageInstaller, sessionDataRepository, historyDao) {
 
     override val telemetryMethod = "default"
+    override val requiresInstallPermission: Boolean get() = true
 
     override suspend fun createSession(
         uris: List<Uri>,

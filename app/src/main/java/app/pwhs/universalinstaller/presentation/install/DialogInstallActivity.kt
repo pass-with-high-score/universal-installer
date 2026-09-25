@@ -24,9 +24,11 @@ import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.lifecycleScope
+import app.pwhs.universalinstaller.presentation.install.util.InstallSessionManager
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.domain.AppThemePreset
 import app.pwhs.core.domain.ThemeMode
@@ -97,9 +99,12 @@ class DialogInstallActivity : FragmentActivity() {
         }
     }
 
-    private fun canInstallPackages(): Boolean =
+    private fun canInstallPackages(
+        prefs: Preferences?,
+        profileId: String? = null,
+    ): Boolean = !InstallSessionManager.requiresInstallPermission(this, prefs, profileId) ||
         Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
-            packageManager.canRequestPackageInstalls()
+        packageManager.canRequestPackageInstalls()
 
     private fun openInstallPermissionSettings() {
         PermissionMonitor.start(this) { packageManager.canRequestPackageInstalls() }
@@ -408,7 +413,7 @@ class DialogInstallActivity : FragmentActivity() {
                 keepApk = keepApk,
                 onKeepApkChanged = { keepApk = it },
                 strictVirusTotalCheck = strictVirusTotalCheck,
-                canInstallPackages = ::canInstallPackages,
+                canInstallPackages = { canInstallPackages(prefs, uiState.selectedProfileId) },
                 viewModel = viewModel,
                 onOpenInstallPermissionSettings = ::openInstallPermissionSettings,
                 onProceedInstall = proceedInstall,

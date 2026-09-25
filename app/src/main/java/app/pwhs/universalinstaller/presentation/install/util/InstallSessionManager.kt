@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.graphics.drawable.BitmapDrawable
 import android.os.Build
 import androidx.core.graphics.createBitmap
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import app.pwhs.core.data.local.dataStore
@@ -174,6 +175,70 @@ object InstallSessionManager {
     } catch (t: Throwable) {
         Timber.w(t, "Shizuku readiness probe failed")
         false
+    }
+
+    /**
+     * Determines whether the active install backend requires the `REQUEST_INSTALL_PACKAGES`
+     * permission on Android 8.0+. Privileged backends (Shizuku, Root, Dhizuku, Custom, MicroG)
+     * do not require this permission.
+     */
+    fun requiresInstallPermission(
+        context: Context,
+        prefs: Preferences?,
+        profileId: String? = null,
+    ): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return false
+        if (prefs == null) return !context.packageManager.canRequestPackageInstalls()
+
+        val profiles = ProfileManager.parseProfiles(prefs[PreferencesKeys.INSTALLER_PROFILES])
+        val profile = profiles.find { it.id == profileId }
+
+        val preferredBackend = profile?.preferredBackend
+        if (preferredBackend != null) {
+            when (preferredBackend) {
+                "Custom" -> return false
+                "MicroG", "microG" -> if (app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context)) return false
+                "Root" -> return false
+                "Shizuku" -> if (isShizukuReadyForInstall()) return false
+                "Dhizuku" -> if (DhizukuCompat.isReady(context)) return false
+                "Default" -> return true
+            }
+        }
+
+        val useMicroG = prefs[PreferencesKeys.USE_MICROG] ?: false
+        if (useMicroG && app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context)) {
+            return false
+        }
+
+        val useCustomAuthorizer = prefs[PreferencesKeys.USE_CUSTOM_AUTHORIZER] ?: false
+        if (useCustomAuthorizer) {
+            return false
+        }
+
+        val useRoot = prefs[PreferencesKeys.USE_ROOT] ?: false
+        val spoofRoot = prefs[PreferencesKeys.ROOT_SET_INSTALL_SOURCE] ?: false
+        if (useRoot || spoofRoot) {
+            return false
+        }
+
+        val useShizuku = prefs[PreferencesKeys.USE_SHIZUKU] ?: false
+        val spoofShizuku = prefs[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] ?: false
+        if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) {
+            return false
+        }
+
+        val useDhizuku = prefs[PreferencesKeys.USE_DHIZUKU] ?: false
+        if (useDhizuku && DhizukuCompat.isReady(context)) {
+            return false
+        }
+
+        if (SystemInstallerManager.isSystemPackageInstallerDisabled(context)) {
+            if (isShizukuReadyForInstall()) return false
+            if (useRoot) return false
+            if (DhizukuCompat.isReady(context)) return false
+        }
+
+        return true
     }
 
     suspend fun uninstallConflictingApp(

@@ -53,6 +53,12 @@ abstract class BaseInstallController(
      */
     protected abstract val telemetryMethod: String
 
+    /**
+     * Whether this installer backend relies on the system package installer service and
+     * requires the `REQUEST_INSTALL_PACKAGES` permission on Android 8.0+.
+     */
+    open val requiresInstallPermission: Boolean get() = false
+
     private val sessionStartTimes = mutableMapOf<UUID, Long>()
     private val sessionFileTypes = mutableMapOf<UUID, String>()
     private val sessionFileSizes = mutableMapOf<UUID, Long>()
