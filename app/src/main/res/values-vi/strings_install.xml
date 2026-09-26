@@ -88,6 +88,10 @@
     <string name="vt_notif_result_error">Quét VirusTotal thất bại</string>
     <string name="install_storage_title">Bộ nhớ</string>
     <string name="install_storage_value">Trống %1$s / %2$s</string>
+    <string name="install_storage_clear_cache">Dọn cache</string>
+    <string name="install_storage_clear_cache_with_size">Dọn cache (%1$s)</string>
+    <string name="install_storage_cache_cleared">Đã dọn dẹp cache (giải phóng %1$s)</string>
+    <string name="install_storage_cache_empty">Bộ nhớ cache đang trống</string>
     <string name="install_no_splits_error">Không thể phân tích gói. Tệp có thể bị hỏng, bị cắt ngắn hoặc không tương thích với thiết bị này.</string>
     <string name="source_tab_local">Cục bộ</string>
     <string name="source_tab_download">Tải xuống</string>

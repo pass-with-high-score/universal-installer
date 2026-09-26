@@ -20,6 +20,10 @@
     <string name="install_ui_auto_confirm_sub">Start installing as soon as the card appears, without waiting for you to tap Install</string>
     <string name="install_storage_title">Storage</string>
     <string name="install_storage_value">%1$s free / %2$s</string>
+    <string name="install_storage_clear_cache">Clear cache</string>
+    <string name="install_storage_clear_cache_with_size">Clear cache (%1$s)</string>
+    <string name="install_storage_cache_cleared">Cache cleared (%1$s freed)</string>
+    <string name="install_storage_cache_empty">Cache is already clean</string>
     <string name="install_sessions_header">Sessions</string>
     <string name="install_history_header">History</string>
     <string name="install_history_clear">Clear</string>
