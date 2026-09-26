@@ -68,11 +68,21 @@ class SettingPrivilegeDelegate(
     )
     val rootState: StateFlow<RootState> = _rootState.asStateFlow()
 
-    private val _isDefaultInstaller = MutableStateFlow(false)
-    val isDefaultInstaller: StateFlow<Boolean> = _isDefaultInstaller.asStateFlow()
+    private var pendingCombinedMode = false
 
-    private val _isDefaultUninstaller = MutableStateFlow(false)
-    val isDefaultUninstaller: StateFlow<Boolean> = _isDefaultUninstaller.asStateFlow()
+    private val defaultRoleDelegate = SettingDefaultRoleDelegate(
+        application = application,
+        scope = scope,
+        backendFactory = backendFactory,
+        shizukuState = { _shizukuState.value },
+        rootState = { _rootState.value },
+        updateShizukuState = { updateShizukuState() },
+        requestShizukuPermission = { requestShizukuPermission() },
+        emitEvent = emitEvent,
+    )
+
+    val isDefaultInstaller: StateFlow<Boolean> = defaultRoleDelegate.isDefaultInstaller
+    val isDefaultUninstaller: StateFlow<Boolean> = defaultRoleDelegate.isDefaultUninstaller
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
         Timber.d("Shizuku binder received")
@@ -94,14 +104,17 @@ class SettingPrivilegeDelegate(
                 app.pwhs.core.telemetry.AnalyticsHelper.logShizukuStatusChanged(app.pwhs.core.telemetry.TelemetryEvents.SHIZUKU_CONNECTED)
                 scope.launch {
                     dataStore.edit { prefs ->
+                        val keepDhizuku = pendingCombinedMode || (prefs[PreferencesKeys.USE_DHIZUKU] ?: false)
                         prefs[PreferencesKeys.USE_ROOT] = false
-                        prefs[PreferencesKeys.USE_DHIZUKU] = false
                         prefs[PreferencesKeys.USE_CUSTOM_AUTHORIZER] = false
                         prefs[PreferencesKeys.USE_MICROG] = false
                         prefs[PreferencesKeys.USE_SHIZUKU] = true
+                        prefs[PreferencesKeys.USE_DHIZUKU] = keepDhizuku
+                        pendingCombinedMode = false
                     }
                 }
             } else {
+                pendingCombinedMode = false
                 app.pwhs.core.telemetry.AnalyticsHelper.logShizukuStatusChanged(app.pwhs.core.telemetry.TelemetryEvents.SHIZUKU_PERMISSION_DENIED)
                 emitEvent(R.string.setting_shizuku_permission_denied)
             }
@@ -133,8 +146,8 @@ class SettingPrivilegeDelegate(
                 }
             }
         }
-        updateDefaultInstallerStatus()
-        updateDefaultUninstallerStatus()
+        defaultRoleDelegate.updateDefaultInstallerStatus()
+        defaultRoleDelegate.updateDefaultUninstallerStatus()
     }
 
     fun cleanUp() {
@@ -172,6 +185,9 @@ class SettingPrivilegeDelegate(
             }
             InstallMode.DHIZUKU -> {
                 setUseDhizuku(true)
+            }
+            InstallMode.SHIZUKU_DHIZUKU -> {
+                setUseShizukuAndDhizuku()
             }
             InstallMode.ROOT -> scope.launch {
                 val state = backendFactory.requestRoot()
@@ -212,6 +228,7 @@ class SettingPrivilegeDelegate(
     }
 
     fun setUseShizuku(enabled: Boolean) {
+        pendingCombinedMode = false
         if (!enabled) {
             scope.launch {
                 dataStore.edit { prefs -> prefs[PreferencesKeys.USE_SHIZUKU] = false }
@@ -272,6 +289,7 @@ class SettingPrivilegeDelegate(
     }
 
     fun setUseDhizuku(enabled: Boolean) {
+        pendingCombinedMode = false
         if (!enabled) {
             scope.launch {
                 dataStore.edit { prefs -> prefs[PreferencesKeys.USE_DHIZUKU] = false }
@@ -287,19 +305,56 @@ class SettingPrivilegeDelegate(
             DhizukuState.PROFILE_OWNER_UNSUPPORTED -> emitEvent(R.string.setting_dhizuku_profile_owner_unsupported)
             DhizukuState.NOT_AUTHORIZED -> DhizukuCompat.requestPermission(application) { granted ->
                 _dhizukuState.value = if (granted) DhizukuState.READY else DhizukuState.NOT_AUTHORIZED
-                if (granted) commitDhizukuMode() else emitEvent(R.string.setting_dhizuku_denied)
+                if (granted) commitDhizukuMode(keepShizuku = false) else emitEvent(R.string.setting_dhizuku_denied)
             }
-            DhizukuState.READY -> commitDhizukuMode()
+            DhizukuState.READY -> commitDhizukuMode(keepShizuku = false)
         }
     }
 
-    private fun commitDhizukuMode() = scope.launch {
+    private fun commitDhizukuMode(keepShizuku: Boolean = false) = scope.launch {
         dataStore.edit { p ->
-            p[PreferencesKeys.USE_SHIZUKU] = false
             p[PreferencesKeys.USE_ROOT] = false
             p[PreferencesKeys.USE_CUSTOM_AUTHORIZER] = false
             p[PreferencesKeys.USE_MICROG] = false
             p[PreferencesKeys.USE_DHIZUKU] = true
+            p[PreferencesKeys.USE_SHIZUKU] = keepShizuku
+        }
+    }
+
+    fun setUseShizukuAndDhizuku() {
+        pendingCombinedMode = true
+        val dState = DhizukuCompat.state(application)
+        _dhizukuState.value = dState
+        updateShizukuState()
+        val sState = _shizukuState.value
+
+        if (dState == DhizukuState.UNSUPPORTED && sState == ShizukuState.UNSUPPORTED) {
+            emitEvent(R.string.setting_shizuku_unsupported)
+            return
+        }
+        if (dState == DhizukuState.PROFILE_OWNER_UNSUPPORTED && sState != ShizukuState.READY) {
+            emitEvent(R.string.setting_dhizuku_profile_owner_unsupported)
+        }
+
+        if (dState == DhizukuState.NOT_AUTHORIZED) {
+            DhizukuCompat.requestPermission(application) { granted ->
+                _dhizukuState.value = if (granted) DhizukuState.READY else DhizukuState.NOT_AUTHORIZED
+                if (granted) {
+                    commitDhizukuMode(keepShizuku = true)
+                } else {
+                    emitEvent(R.string.setting_dhizuku_denied)
+                }
+            }
+        }
+
+        if (sState == ShizukuState.NO_PERMISSION) {
+            requestShizukuPermission()
+        }
+
+        if (dState == DhizukuState.READY || sState == ShizukuState.READY) {
+            commitDhizukuMode(keepShizuku = true)
+        } else if (dState == DhizukuState.NOT_RUNNING && sState == ShizukuState.NOT_RUNNING) {
+            emitEvent(R.string.setting_shizuku_dhizuku_not_running)
         }
     }
 
@@ -339,147 +394,8 @@ class SettingPrivilegeDelegate(
         }
     }
 
-    fun toggleDefaultInstaller(enabled: Boolean) {
-        scope.launch(Dispatchers.IO) {
-            updateShizukuState()
-            val prefs = dataStore.data.first()
-            val useRoot = prefs[PreferencesKeys.USE_ROOT] ?: false
-            val shizukuReady = _shizukuState.value == ShizukuState.READY
-            val rootReady = if (useRoot) {
-                if (_rootState.value == RootState.READY) true
-                else backendFactory.requestRoot().also { _rootState.value = it } == RootState.READY
-            } else _rootState.value == RootState.READY
-
-            val method = if (useRoot && rootReady) "root" else if (shizukuReady) "shizuku" else "none"
-
-            if (!shizukuReady && !rootReady) {
-                reportDefaultInstaller("none", enabled, TelemetryEvents.RESULT_BLOCKED)
-                when {
-                    _shizukuState.value == ShizukuState.NO_PERMISSION && !useRoot -> requestShizukuPermission()
-                    _shizukuState.value == ShizukuState.NOT_RUNNING && !useRoot -> emitEvent(R.string.setting_shizuku_start_service_hint)
-                    else -> emitEvent(R.string.setting_default_installer_needs_backend)
-                }
-                return@launch
-            }
-
-            val component = defaultInstallerComponent()
-            val result = if (useRoot && rootReady) {
-                backendFactory.setDefaultInstallerViaRoot(application, component, enabled)
-            } else {
-                app.pwhs.universalinstaller.util.ShizukuDefaultInstaller.setDefaultInstaller(component, enabled)
-            }
-            result
-                .onSuccess {
-                    reportDefaultInstaller(method, enabled, TelemetryEvents.RESULT_SUCCESS)
-                    updateDefaultInstallerStatus()
-                    emitEvent(
-                        if (enabled) R.string.setting_default_installer_enabled
-                        else R.string.setting_default_installer_disabled,
-                    )
-                }
-                .onFailure { e ->
-                    Timber.e(e, "Failed to toggle default installer")
-                    reportDefaultInstaller(method, enabled, TelemetryEvents.RESULT_FAILURE)
-                    emitEvent(R.string.setting_default_installer_failed)
-                }
-        }
-    }
-
-    private fun reportDefaultInstaller(method: String, enabled: Boolean, result: String) {
-        Telemetry.event(
-            TelemetryEvents.DEFAULT_INSTALLER_SET,
-            TelemetryEvents.PARAM_METHOD to method,
-            TelemetryEvents.PARAM_ENABLED to enabled,
-            TelemetryEvents.PARAM_RESULT to result,
-        )
-        val action = if (result == TelemetryEvents.RESULT_SUCCESS) {
-            app.pwhs.core.telemetry.TelemetryEvents.DEFAULT_INSTALLER_SET_SUCCESS
-        } else {
-            app.pwhs.core.telemetry.TelemetryEvents.DEFAULT_INSTALLER_CANCELLED
-        }
-        app.pwhs.core.telemetry.AnalyticsHelper.logDefaultInstallerAction(action)
-        app.pwhs.core.telemetry.AnalyticsHelper.updateIsDefaultInstaller(enabled && result == TelemetryEvents.RESULT_SUCCESS)
-    }
-
-    private fun defaultInstallerComponent(): ComponentName =
-        ComponentName(
-            application,
-            "app.pwhs.universalinstaller.presentation.install.DialogInstallActivity",
-        )
-
-    fun updateDefaultInstallerStatus() {
-        scope.launch(Dispatchers.IO) {
-            val probe = Intent(Intent.ACTION_VIEW).apply {
-                addCategory(Intent.CATEGORY_DEFAULT)
-                setDataAndType(
-                    android.net.Uri.parse("content://storage/emulated/0/test.apk"),
-                    "application/vnd.android.package-archive",
-                )
-            }
-            val resolved = try {
-                application.packageManager.resolveActivity(probe, PackageManager.MATCH_DEFAULT_ONLY)
-            } catch (t: Throwable) {
-                Timber.w(t, "resolveActivity failed")
-                null
-            }
-            _isDefaultInstaller.value = resolved?.activityInfo?.packageName == application.packageName
-        }
-    }
-
-    fun toggleDefaultUninstaller(enabled: Boolean) {
-        scope.launch(Dispatchers.IO) {
-            updateShizukuState()
-            val prefs = dataStore.data.first()
-            val useRoot = prefs[PreferencesKeys.USE_ROOT] ?: false
-            val shizukuReady = _shizukuState.value == ShizukuState.READY
-            val rootReady = if (useRoot) {
-                if (_rootState.value == RootState.READY) true
-                else backendFactory.requestRoot().also { _rootState.value = it } == RootState.READY
-            } else _rootState.value == RootState.READY
-
-            if (!shizukuReady && !rootReady) {
-                when {
-                    _shizukuState.value == ShizukuState.NO_PERMISSION && !useRoot -> requestShizukuPermission()
-                    _shizukuState.value == ShizukuState.NOT_RUNNING && !useRoot -> emitEvent(R.string.setting_shizuku_start_service_hint)
-                    else -> emitEvent(R.string.setting_default_uninstaller_needs_backend)
-                }
-                return@launch
-            }
-
-            val component = defaultUninstallerComponent()
-            val result = if (useRoot && rootReady) {
-                backendFactory.setDefaultUninstallerViaRoot(application, component, enabled)
-            } else {
-                app.pwhs.universalinstaller.util.ShizukuDefaultInstaller.setDefaultUninstaller(component, enabled)
-            }
-            result
-                .onSuccess {
-                    updateDefaultUninstallerStatus()
-                    emitEvent(
-                        if (enabled) R.string.setting_default_uninstaller_enabled
-                        else R.string.setting_default_uninstaller_disabled,
-                    )
-                }
-                .onFailure { e ->
-                    Timber.e(e, "Failed to toggle default uninstaller")
-                    emitEvent(R.string.setting_default_uninstaller_failed)
-                }
-        }
-    }
-
-    private fun defaultUninstallerComponent(): ComponentName =
-        ComponentName(application, "app.pwhs.universalinstaller.presentation.manage.uninstall.DialogUninstallActivity")
-
-    fun updateDefaultUninstallerStatus() {
-        scope.launch(Dispatchers.IO) {
-            val uri = android.net.Uri.parse("package:app.pwhs.universalinstaller.test")
-            val pDelete = Intent(Intent.ACTION_DELETE).apply { addCategory(Intent.CATEGORY_DEFAULT); data = uri }
-            val pUninstall = Intent(Intent.ACTION_UNINSTALL_PACKAGE).apply { addCategory(Intent.CATEGORY_DEFAULT); data = uri }
-            val pm = application.packageManager
-            val rDelete = runCatching { pm.resolveActivity(pDelete, PackageManager.MATCH_DEFAULT_ONLY) }.getOrNull()
-            val rUninstall = runCatching { pm.resolveActivity(pUninstall, PackageManager.MATCH_DEFAULT_ONLY) }.getOrNull()
-            val pkg = application.packageName
-            _isDefaultUninstaller.value = rDelete?.activityInfo?.packageName == pkg || rUninstall?.activityInfo?.packageName == pkg
-        }
-    }
+    fun toggleDefaultInstaller(enabled: Boolean) = defaultRoleDelegate.toggleDefaultInstaller(enabled)
+    fun updateDefaultInstallerStatus() = defaultRoleDelegate.updateDefaultInstallerStatus()
+    fun toggleDefaultUninstaller(enabled: Boolean) = defaultRoleDelegate.toggleDefaultUninstaller(enabled)
+    fun updateDefaultUninstallerStatus() = defaultRoleDelegate.updateDefaultUninstallerStatus()
 }

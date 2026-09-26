@@ -159,6 +159,7 @@
     <string name="install_optimized_dex2oat">Dex2oat optimization complete for %1$s</string>
     <string name="installer_mode_shizuku" translatable="false">Shizuku</string>
     <string name="installer_mode_dhizuku" translatable="false">Dhizuku</string>
+    <string name="installer_mode_shizuku_dhizuku" translatable="false">Shizuku + Dhizuku</string>
     <string name="installer_mode_root" translatable="false">Root</string>
     <string name="installer_mode_package_installer">Package Installer</string>
     <string name="installer_mode_using">Using %s</string>
@@ -166,6 +167,7 @@
     <string name="installer_engine_default_desc">Standard Android package installer</string>
     <string name="installer_engine_shizuku_desc">Install silently via the Shizuku service</string>
     <string name="installer_engine_dhizuku_desc">Install silently via Device Owner</string>
+    <string name="installer_engine_shizuku_dhizuku_desc">Use Shizuku with Dhizuku fallback when service is stopped</string>
     <string name="installer_engine_root_desc">Install with root (su)</string>
     <string name="installer_engine_root_request">Tap to grant root access</string>
     <string name="installer_engine_root_unsupported">Not available on this build</string>

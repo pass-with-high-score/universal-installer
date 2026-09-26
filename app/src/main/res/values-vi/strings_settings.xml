@@ -184,6 +184,8 @@
     <string name="setting_install_mode_title">Chế độ cài đặt</string>
     <string name="setting_install_mode_default">Mặc định</string>
     <string name="setting_install_mode_shizuku">Shizuku</string>
+    <string name="setting_install_mode_dhizuku" translatable="false">Dhizuku</string>
+    <string name="setting_install_mode_shizuku_dhizuku" translatable="false">Shizuku + Dhizuku</string>
     <string name="setting_use_dhizuku_title">Dùng Dhizuku thay thế</string>
     <string name="setting_dhizuku_unsupported">Dhizuku cần Android 8.0 trở lên</string>
     <string name="setting_dhizuku_not_installed">Thiết bị chưa cài Dhizuku</string>
@@ -192,6 +194,10 @@
     <string name="setting_dhizuku_profile_owner_unsupported">Dhizuku đang hoạt động với quyền Profile Owner. Cài đặt im lặng yêu cầu quyền Device Owner.</string>
     <string name="setting_dhizuku_denied">Dhizuku đã từ chối yêu cầu cấp quyền</string>
     <string name="setting_dhizuku_ready">Sẵn sàng — cài im lặng. Lưu ý Dhizuku chỉ hỗ trợ \"Cho phép hạ cấp\"; các tuỳ chọn cài đặt khác chỉ áp dụng cho Shizuku và Root.</string>
+    <string name="setting_shizuku_dhizuku_not_running">Cả Shizuku và Dhizuku đều chưa chạy</string>
+    <string name="setting_shizuku_dhizuku_ready">Sẵn sàng — đang dùng Shizuku (Dhizuku dự phòng)</string>
+    <string name="setting_shizuku_dhizuku_ready_dhizuku_active">Shizuku chưa chạy — đang dùng Dhizuku dự phòng</string>
+    <string name="setting_shizuku_dhizuku_no_permission">Nhấn để cấp quyền cho Shizuku và Dhizuku</string>
     <string name="setting_install_mode_root">Root</string>
     <string name="setting_install_mode_custom">Tùy chỉnh</string>
     <string name="setting_install_mode_default_sub">Trình cài đặt của Android — sẽ hỏi bạn xác nhận từng ứng dụng</string>

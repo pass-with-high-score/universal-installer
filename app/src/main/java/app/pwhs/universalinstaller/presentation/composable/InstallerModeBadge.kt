@@ -19,6 +19,7 @@ import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material3.AlertDialog
@@ -137,6 +138,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
         InstallMode.ROOT -> stringResource(R.string.installer_mode_root)
         InstallMode.SHIZUKU -> stringResource(R.string.installer_mode_shizuku)
         InstallMode.DHIZUKU -> stringResource(R.string.installer_mode_dhizuku)
+        InstallMode.SHIZUKU_DHIZUKU -> stringResource(R.string.installer_mode_shizuku_dhizuku)
         InstallMode.DEFAULT -> stringResource(R.string.installer_mode_package_installer)
     }
     val icon = when (effectiveMode) {
@@ -145,6 +147,7 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
         InstallMode.ROOT -> Icons.Rounded.Key
         InstallMode.SHIZUKU -> Icons.Rounded.AdminPanelSettings
         InstallMode.DHIZUKU -> Icons.Rounded.Shield
+        InstallMode.SHIZUKU_DHIZUKU -> Icons.Rounded.Security
         InstallMode.DEFAULT -> Icons.Rounded.Android
     }
     val privileged = effectiveMode != InstallMode.DEFAULT
@@ -273,6 +276,16 @@ fun InstallerModeBadge(modifier: Modifier = Modifier) {
                             dimmed = dhizukuDimmed,
                             onClick = {
                                 settingViewModel.setInstallMode(InstallMode.DHIZUKU)
+                                showPicker = false
+                            },
+                        )
+                        EngineOption(
+                            title = stringResource(R.string.installer_mode_shizuku_dhizuku),
+                            subtitle = stringResource(R.string.installer_engine_shizuku_dhizuku_desc),
+                            selected = configuredMode == InstallMode.SHIZUKU_DHIZUKU,
+                            enabled = dhizukuSelectable || shizukuSelectable,
+                            onClick = {
+                                settingViewModel.setInstallMode(InstallMode.SHIZUKU_DHIZUKU)
                                 showPicker = false
                             },
                         )

@@ -70,6 +70,12 @@ object InstallSessionManager {
                 "Dhizuku" -> dhizukuController?.let {
                     if (DhizukuCompat.isReady(context)) return it
                 }
+                "Shizuku + Dhizuku" -> {
+                    if (isShizukuReadyForInstall()) return shizukuController
+                    dhizukuController?.let {
+                        if (DhizukuCompat.isReady(context)) return it
+                    }
+                }
                 "Default" -> return defaultController
             }
         }

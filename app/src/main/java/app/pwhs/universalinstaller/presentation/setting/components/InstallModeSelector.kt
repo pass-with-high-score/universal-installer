@@ -18,6 +18,7 @@ import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Android
 import androidx.compose.material.icons.rounded.CloudDownload
 import androidx.compose.material.icons.rounded.Key
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -96,7 +97,10 @@ internal fun InstallModeSelector(
         buildList {
             add(InstallMode.DEFAULT)
             add(InstallMode.SHIZUKU)
-            if (dhizukuSupported) add(InstallMode.DHIZUKU)
+            if (dhizukuSupported) {
+                add(InstallMode.DHIZUKU)
+                add(InstallMode.SHIZUKU_DHIZUKU)
+            }
             if (rootSupported) add(InstallMode.ROOT)
             add(InstallMode.CUSTOM)
             add(InstallMode.MICROG)
@@ -117,6 +121,8 @@ internal fun InstallModeSelector(
             (rootState == RootState.NOT_ROOTED || rootState == RootState.UNAVAILABLE)
         val dhizukuDimmed = currentMode != InstallMode.DHIZUKU &&
             (dhizukuState == DhizukuState.NOT_INSTALLED || dhizukuState == DhizukuState.UNSUPPORTED || dhizukuState == DhizukuState.PROFILE_OWNER_UNSUPPORTED)
+        val shizukuDhizukuDimmed = currentMode != InstallMode.SHIZUKU_DHIZUKU &&
+            dhizukuDimmed && (shizukuState == ShizukuState.NOT_INSTALLED || shizukuState == ShizukuState.UNSUPPORTED)
         val microGDimmed = currentMode != InstallMode.MICROG && !microGSupported
 
         FlowRow(
@@ -127,6 +133,7 @@ internal fun InstallModeSelector(
             options.forEach { mode ->
                 val dim = (mode == InstallMode.ROOT && rootDimmed) ||
                     (mode == InstallMode.DHIZUKU && dhizukuDimmed) ||
+                    (mode == InstallMode.SHIZUKU_DHIZUKU && shizukuDhizukuDimmed) ||
                     (mode == InstallMode.MICROG && microGDimmed) ||
                     (mode == InstallMode.DEFAULT && isSystemInstallerFrozen)
                 val selected = mode == currentMode
@@ -155,7 +162,7 @@ internal fun InstallModeSelector(
                                 }
                             }
                             onModeChange(InstallMode.DEFAULT)
-                        } else if (mode != currentMode || (mode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED)) {
+                        } else if (mode != currentMode || (mode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED) || (mode == InstallMode.SHIZUKU_DHIZUKU && (dhizukuState == DhizukuState.NOT_AUTHORIZED || shizukuState == ShizukuState.NO_PERMISSION))) {
                             onModeChange(mode)
                         }
                     },
@@ -165,6 +172,7 @@ internal fun InstallModeSelector(
                                 InstallMode.DEFAULT -> stringResource(R.string.setting_install_mode_default)
                                 InstallMode.SHIZUKU -> stringResource(R.string.setting_install_mode_shizuku)
                                 InstallMode.DHIZUKU -> stringResource(R.string.setting_install_mode_dhizuku)
+                                InstallMode.SHIZUKU_DHIZUKU -> stringResource(R.string.setting_install_mode_shizuku_dhizuku)
                                 InstallMode.ROOT -> stringResource(R.string.setting_install_mode_root)
                                 InstallMode.CUSTOM -> stringResource(R.string.setting_install_mode_custom)
                                 InstallMode.MICROG -> stringResource(R.string.installer_mode_microg)
@@ -177,6 +185,7 @@ internal fun InstallModeSelector(
                                 InstallMode.DEFAULT -> Icons.Rounded.Android
                                 InstallMode.SHIZUKU -> Icons.Rounded.Key
                                 InstallMode.DHIZUKU -> Icons.Rounded.AdminPanelSettings
+                                InstallMode.SHIZUKU_DHIZUKU -> Icons.Rounded.Security
                                 InstallMode.ROOT -> Icons.Rounded.Shield
                                 InstallMode.CUSTOM -> Icons.Rounded.Terminal
                                 InstallMode.MICROG -> Icons.Rounded.CloudDownload
@@ -218,6 +227,15 @@ internal fun InstallModeSelector(
                 DhizukuState.NOT_AUTHORIZED -> stringResource(R.string.setting_dhizuku_no_permission)
                 DhizukuState.READY -> stringResource(R.string.setting_dhizuku_ready)
             }
+            InstallMode.SHIZUKU_DHIZUKU -> when {
+                shizukuState == ShizukuState.READY -> stringResource(R.string.setting_shizuku_dhizuku_ready)
+                dhizukuState == DhizukuState.READY -> stringResource(R.string.setting_shizuku_dhizuku_ready_dhizuku_active)
+                shizukuState == ShizukuState.NO_PERMISSION || dhizukuState == DhizukuState.NOT_AUTHORIZED -> stringResource(R.string.setting_shizuku_dhizuku_no_permission)
+                shizukuState == ShizukuState.NOT_RUNNING && dhizukuState == DhizukuState.NOT_RUNNING -> stringResource(R.string.setting_shizuku_dhizuku_not_running)
+                shizukuState == ShizukuState.NOT_RUNNING -> stringResource(R.string.setting_shizuku_not_running)
+                dhizukuState == DhizukuState.NOT_RUNNING -> stringResource(R.string.setting_dhizuku_not_running)
+                else -> stringResource(R.string.setting_shizuku_dhizuku_not_running)
+            }
             InstallMode.ROOT -> when (rootState) {
                 RootState.UNAVAILABLE -> "Unavailable"
                 RootState.UNKNOWN -> "Checking..."
@@ -232,7 +250,8 @@ internal fun InstallModeSelector(
                 stringResource(R.string.microg_not_installed)
             }
         }
-        val canRequestPermission = currentMode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED
+        val canRequestPermission = (currentMode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED) ||
+            (currentMode == InstallMode.SHIZUKU_DHIZUKU && (dhizukuState == DhizukuState.NOT_AUTHORIZED || shizukuState == ShizukuState.NO_PERMISSION))
         Text(
             text = statusText,
             style = MaterialTheme.typography.bodySmall,
@@ -240,7 +259,7 @@ internal fun InstallModeSelector(
             modifier = Modifier
                 .padding(top = 8.dp)
                 .then(
-                    if (canRequestPermission) Modifier.clickable { onModeChange(InstallMode.DHIZUKU) }
+                    if (canRequestPermission) Modifier.clickable { onModeChange(currentMode) }
                     else if (effectiveMode == InstallMode.DEFAULT && !canInstallPackages) Modifier.clickable {
                         runCatching {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
