@@ -27,9 +27,10 @@ import ru.solrudev.ackpine.uninstaller.createSession
 import timber.log.Timber
 
 data class UninstallOptions(
-    val useShizuku: Boolean,
-    val keepData: Boolean,
-    val allUsers: Boolean,
+    val useShizuku: Boolean = false,
+    val useRoot: Boolean = false,
+    val keepData: Boolean = false,
+    val allUsers: Boolean = false,
 )
 
 object ManageUninstallHelper {
@@ -38,13 +39,16 @@ object ManageUninstallHelper {
         return try {
             val prefs = context.dataStore.data.first()
             val useShizuku = prefs[PreferencesKeys.USE_SHIZUKU] ?: false
+            val useRoot = prefs[PreferencesKeys.USE_ROOT] ?: false
+            val isPrivileged = useShizuku || useRoot
             UninstallOptions(
                 useShizuku = useShizuku,
-                keepData = useShizuku && (prefs[PreferencesKeys.SHIZUKU_UNINSTALL_KEEP_DATA] ?: false),
-                allUsers = useShizuku && (prefs[PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS] ?: false),
+                useRoot = useRoot,
+                keepData = isPrivileged && (prefs[PreferencesKeys.SHIZUKU_UNINSTALL_KEEP_DATA] ?: false),
+                allUsers = isPrivileged && (prefs[PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS] ?: false),
             )
         } catch (_: Exception) {
-            UninstallOptions(useShizuku = false, keepData = false, allUsers = false)
+            UninstallOptions(useShizuku = false, useRoot = false, keepData = false, allUsers = false)
         }
     }
 
@@ -174,12 +178,18 @@ object ManageUninstallHelper {
         opts: UninstallOptions,
         packageUninstaller: PackageUninstaller,
         uninstallLogDao: UninstallLogDao,
+        backendFactory: InstallerBackendFactory? = null,
     ): Boolean {
-        return try {
+        try {
             val session = packageUninstaller.createSession(packageName) {
                 confirmation = Confirmation.IMMEDIATE
                 if (opts.useShizuku) {
                     shizuku {
+                        keepData = opts.keepData
+                        allUsers = opts.allUsers
+                    }
+                } else if (opts.useRoot) {
+                    libsu {
                         keepData = opts.keepData
                         allUsers = opts.allUsers
                     }
@@ -189,19 +199,49 @@ object ManageUninstallHelper {
                 Session.State.Succeeded -> {
                     Timber.d("Uninstalled $packageName successfully")
                     saveLog(uninstallLogDao, packageName, appName, success = true, errorMessage = null)
-                    true
+                    return true
                 }
                 is Session.State.Failed -> {
                     val reason = result.failure.message?.takeIf { it.isNotBlank() }
                         ?: "Uninstall failed (no reason reported)"
-                    Timber.e("Failed to uninstall $packageName — $reason")
-                    saveLog(uninstallLogDao, packageName, appName, success = false, errorMessage = reason)
-                    false
+                    Timber.w("Ackpine uninstall failed for $packageName: $reason. Trying privileged shell fallback...")
+                    return fallbackPrivilegedUninstall(packageName, appName, opts, backendFactory, uninstallLogDao, reason)
                 }
             }
         } catch (e: Exception) {
-            Timber.e(e, "Error uninstalling $packageName")
-            saveLog(uninstallLogDao, packageName, appName, success = false, errorMessage = e.message ?: e::class.java.simpleName)
+            Timber.w(e, "Ackpine session error for $packageName. Trying privileged shell fallback...")
+            return fallbackPrivilegedUninstall(packageName, appName, opts, backendFactory, uninstallLogDao, e.message ?: "Exception")
+        }
+    }
+
+    private suspend fun fallbackPrivilegedUninstall(
+        packageName: String,
+        appName: String,
+        opts: UninstallOptions,
+        backendFactory: InstallerBackendFactory?,
+        uninstallLogDao: UninstallLogDao,
+        previousError: String,
+    ): Boolean {
+        if (!opts.useRoot && !opts.useShizuku) {
+            saveLog(uninstallLogDao, packageName, appName, success = false, errorMessage = previousError)
+            return false
+        }
+        val shellResult = if (opts.useRoot && backendFactory != null) {
+            backendFactory.uninstallPackageViaRoot(packageName, opts.keepData, opts.allUsers)
+        } else if (opts.useShizuku) {
+            ShizukuShellExecutor.uninstallPackage(packageName, opts.keepData, opts.allUsers)
+        } else {
+            Result.failure(IllegalStateException("No privileged backend available"))
+        }
+
+        return if (shellResult.isSuccess) {
+            Timber.d("Privileged shell fallback uninstalled $packageName successfully")
+            saveLog(uninstallLogDao, packageName, appName, success = true, errorMessage = null)
+            true
+        } else {
+            val err = shellResult.exceptionOrNull()?.message ?: previousError
+            Timber.e("Privileged shell fallback failed for $packageName: $err")
+            saveLog(uninstallLogDao, packageName, appName, success = false, errorMessage = err)
             false
         }
     }

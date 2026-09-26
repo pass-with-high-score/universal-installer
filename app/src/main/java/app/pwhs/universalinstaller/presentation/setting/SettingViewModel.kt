@@ -167,6 +167,7 @@ class SettingViewModel(
                 requestUpdateOwnership = prefs[PreferencesKeys.SHIZUKU_REQUEST_UPDATE_OWNERSHIP] ?: false,
                 uninstallKeepData = prefs[PreferencesKeys.SHIZUKU_UNINSTALL_KEEP_DATA] ?: false,
                 uninstallAllUsers = prefs[PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS] ?: false,
+                uninstallDeleteSystemApp = prefs[PreferencesKeys.PRIVILEGED_UNINSTALL_DELETE_SYSTEM_APP] ?: false,
                 dex2oatOptimization = prefs[PreferencesKeys.DEX2OAT_OPTIMIZATION] ?: false,
             )
         },
@@ -227,6 +228,7 @@ class SettingViewModel(
         privilegeDelegate.useCustomAuthorizer,
         privilegeDelegate.customAuthorizerCommand,
         privilegeDelegate.useMicroG,
+        privilegeDelegate.isDefaultUninstaller,
     ) { flows ->
         SettingUiStateBuilder.build(application, backendFactory, flows)
     }.stateIn(
@@ -259,6 +261,7 @@ class SettingViewModel(
     fun setPrivilegedOption(option: PrivilegedOption, enabled: Boolean) = privilegeDelegate.setPrivilegedOption(option, enabled)
     fun setInstallerPackageName(packageName: String) = privilegeDelegate.setInstallerPackageName(packageName)
     fun toggleDefaultInstaller(enabled: Boolean) = privilegeDelegate.toggleDefaultInstaller(enabled)
+    fun toggleDefaultUninstaller(enabled: Boolean) = privilegeDelegate.toggleDefaultUninstaller(enabled)
     val useCustomAuthorizer: StateFlow<Boolean> = privilegeDelegate.useCustomAuthorizer
     val customAuthorizerCommand: StateFlow<String> = privilegeDelegate.customAuthorizerCommand
     fun setCustomAuthorizerCommand(command: String) = privilegeDelegate.setCustomAuthorizerCommand(command)

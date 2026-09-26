@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_title_uninstall">Gỡ cài đặt</string>
+    <string name="uninstaller_dialog_label">Trình gỡ cài đặt gói</string>
     <string name="uninstall">Gỡ cài đặt</string>
     <string name="uninstall_notif_channel_name">Tiến trình gỡ cài đặt</string>
     <string name="uninstall_notif_channel_description">Hiển thị tiến trình khi các ứng dụng đang được gỡ cài đặt</string>
@@ -191,4 +192,11 @@
     <string name="backup_restore_summary_title">Dữ liệu tìm thấy trong bản sao lưu</string>
     <string name="backup_restore_items_to_restore">Chọn các mục cần khôi phục:</string>
     <string name="backup_restore_action">Khôi phục ngay</string>
+    <string name="uninstall_app_title">Gỡ cài đặt ứng dụng</string>
+    <string name="uninstall_option_keep_data">Giữ lại dữ liệu</string>
+    <string name="uninstall_option_keep_data_desc">Dữ liệu và bộ nhớ đệm ứng dụng sẽ được giữ lại</string>
+    <string name="uninstall_option_all_users">Cho tất cả người dùng</string>
+    <string name="uninstall_option_all_users_desc">Gỡ cài đặt ứng dụng cho tất cả người dùng trên thiết bị</string>
+    <string name="uninstall_option_delete_system_app">Xóa ứng dụng hệ thống</string>
+    <string name="uninstall_option_delete_system_app_desc">Cho phép xóa ứng dụng hệ thống cho người dùng hiện tại</string>
 </resources>

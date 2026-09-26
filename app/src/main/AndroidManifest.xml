@@ -160,6 +160,32 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".presentation.manage.uninstall.DialogUninstallActivity"
+            android:autoRemoveFromRecents="true"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:label="@string/uninstaller_dialog_label"
+            android:launchMode="singleInstance"
+            android:noHistory="true"
+            android:taskAffinity=""
+            android:theme="@style/Theme.UniversalInstaller.Dialog">
+
+            <!-- Concise intent filter for uninstallation requests:
+                 Handles standard ACTION_UNINSTALL_PACKAGE and ACTION_DELETE with package: URI
+                 as well as ACTION_UNINSTALL_PACKAGE with package name extra. -->
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+                <action android:name="android.intent.action.DELETE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="package" />
+            </intent-filter>
+            <intent-filter android:priority="999">
+                <action android:name="android.intent.action.UNINSTALL_PACKAGE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".presentation.manage.ManageActivity"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />

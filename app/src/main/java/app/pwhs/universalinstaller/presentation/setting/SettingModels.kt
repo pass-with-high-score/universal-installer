@@ -157,6 +157,7 @@ data class ShizukuOptions(
     val requestUpdateOwnership: Boolean = false,
     val uninstallKeepData: Boolean = false,
     val uninstallAllUsers: Boolean = false,
+    val uninstallDeleteSystemApp: Boolean = false,
     val dex2oatOptimization: Boolean = false,
 )
 
@@ -208,6 +209,7 @@ data class SettingUiState(
     val installerProfiles: List<InstallerProfile> = emptyList(),
     val appProfileMapping: Map<String, String> = emptyMap(),
     val isDefaultInstaller: Boolean = false,
+    val isDefaultUninstaller: Boolean = false,
     val selectedLanguage: String = "",
     val useCustomAuthorizer: Boolean = false,
     val customAuthorizerCommand: String = "",

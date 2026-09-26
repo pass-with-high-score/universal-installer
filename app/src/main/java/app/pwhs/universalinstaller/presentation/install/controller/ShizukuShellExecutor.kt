@@ -123,6 +123,23 @@ object ShizukuShellExecutor {
         runShell(packageName, "cmd package compile -m speed -f $packageName", successToken = null, timeoutSeconds = 120)
 
     /**
+     * Uninstalls package via Shizuku shell with optional privileged flags.
+     */
+    suspend fun uninstallPackage(
+        packageName: String,
+        keepData: Boolean,
+        allUsers: Boolean,
+    ): Result<String> {
+        val cmd = buildString {
+            append("pm uninstall ")
+            if (keepData) append("-k ")
+            if (!allUsers) append("--user 0 ")
+            append(packageName)
+        }
+        return runShell(packageName, cmd, successToken = "Success")
+    }
+
+    /**
      * Single-shot shell. [successToken] gates "did the command actually do the thing" beyond
      * the exit code — `pm` is notorious for printing soft failures ("Failure [...]") with
      * exit 0. Pass `null` for commands like `am force-stop` that have no output on success.

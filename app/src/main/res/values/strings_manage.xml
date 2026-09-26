@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="screen_title_uninstall">Manage apps</string>
+    <string name="uninstaller_dialog_label">Package Uninstaller</string>
     <string name="extract_action">Extract</string>
     <string name="extract_done">Saved to %1$s</string>
     <string name="extract_done_action_open">Open folder</string>
@@ -191,4 +192,11 @@
     <string name="backup_restore_summary_title">Backup Content Found</string>
     <string name="backup_restore_items_to_restore">Select items to restore:</string>
     <string name="backup_restore_action">Restore Now</string>
+    <string name="uninstall_app_title">Uninstall App</string>
+    <string name="uninstall_option_keep_data">Keep Data</string>
+    <string name="uninstall_option_keep_data_desc">App data and cache will be retained</string>
+    <string name="uninstall_option_all_users">For All Users</string>
+    <string name="uninstall_option_all_users_desc">Uninstall this app for all users on this device</string>
+    <string name="uninstall_option_delete_system_app">Delete SystemApp</string>
+    <string name="uninstall_option_delete_system_app_desc">Allow deleting system apps for current user</string>
 </resources>

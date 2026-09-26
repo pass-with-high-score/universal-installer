@@ -245,6 +245,17 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
         }
     }
 
+    override suspend fun setDefaultUninstallerViaRoot(
+        context: Context,
+        component: ComponentName,
+        lock: Boolean,
+    ): Result<Unit> = withContext(Dispatchers.IO) {
+        runCatching {
+            val service = obtainPrivilegedService(context.applicationContext as Application)
+            service.setDefaultUninstaller(component, lock)
+        }
+    }
+
     private suspend fun obtainPrivilegedService(application: Application): IPrivilegedService {
         privilegedService?.let { cached ->
             // pingBinder catches the case where the root process was killed since last use.
@@ -284,6 +295,20 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
                 }
             }
         }
+    }
+
+    override suspend fun uninstallPackageViaRoot(
+        packageName: String,
+        keepData: Boolean,
+        allUsers: Boolean,
+    ): Result<String> {
+        val cmd = buildString {
+            append("pm uninstall ")
+            if (keepData) append("-k ")
+            if (!allUsers) append("--user 0 ")
+            append(packageName)
+        }
+        return runRootShell(packageName, cmd, successToken = "Success")
     }
 
     private suspend fun runRootShell(

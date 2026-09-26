@@ -42,5 +42,17 @@ class PrivilegedRootService : RootService() {
                 hasSystemLevelPermission = true,
             )
         }
+
+        override fun setDefaultUninstaller(component: ComponentName, lock: Boolean) {
+            val pmBinder = ServiceManager.getService("package")
+                ?: error("system_service 'package' returned null in root process")
+            val iPm = IPackageManager.Stub.asInterface(pmBinder)
+            app.pwhs.universalinstaller.util.DefaultUninstallerLogic.setDefaultUninstaller(
+                iPackageManager = iPm,
+                component = component,
+                lock = lock,
+                hasSystemLevelPermission = true,
+            )
+        }
     }
 }

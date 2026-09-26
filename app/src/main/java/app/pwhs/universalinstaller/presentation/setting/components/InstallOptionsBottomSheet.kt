@@ -221,8 +221,8 @@ fun InstallOptionsBottomSheet(
                 onInstallerChange = onInstallerPackageChanged,
             )
 
-            // Uninstall flags are genuinely Shizuku-only
-            if (uiState.useShizuku) {
+            // Uninstall flags for Shizuku and Root
+            if (uiState.useShizuku || uiState.useRoot) {
                 OptionGroupHeader(stringResource(R.string.setting_shizuku_options_uninstall_group))
                 OptionSwitch(
                     title = stringResource(R.string.setting_shizuku_uninstall_keep_data),
@@ -235,6 +235,12 @@ fun InstallOptionsBottomSheet(
                     subtitle = stringResource(R.string.setting_shizuku_uninstall_all_users_sub),
                     checked = uiState.shizukuOptions.uninstallAllUsers,
                     onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.SHIZUKU_UNINSTALL_ALL_USERS, it) },
+                )
+                OptionSwitch(
+                    title = stringResource(R.string.uninstall_option_delete_system_app),
+                    subtitle = stringResource(R.string.uninstall_option_delete_system_app_desc),
+                    checked = uiState.shizukuOptions.uninstallDeleteSystemApp,
+                    onCheckedChange = { onShizukuOptionChanged(PreferencesKeys.PRIVILEGED_UNINSTALL_DELETE_SYSTEM_APP, it) },
                 )
             }
         }

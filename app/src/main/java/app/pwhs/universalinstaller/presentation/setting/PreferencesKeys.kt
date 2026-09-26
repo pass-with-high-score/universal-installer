@@ -67,9 +67,10 @@ object PreferencesKeys {
     val SHIZUKU_ENABLE_ROLLBACK = booleanPreferencesKey("shizuku_enable_rollback")
     val SHIZUKU_REQUEST_UPDATE_OWNERSHIP = booleanPreferencesKey("shizuku_request_update_ownership")
 
-    // Shizuku uninstall options (pm uninstall -k / --user all)
+    // Shizuku & Root uninstall options (pm uninstall -k / --user all / delete system app)
     val SHIZUKU_UNINSTALL_KEEP_DATA = booleanPreferencesKey("shizuku_uninstall_keep_data")
     val SHIZUKU_UNINSTALL_ALL_USERS = booleanPreferencesKey("shizuku_uninstall_all_users")
+    val PRIVILEGED_UNINSTALL_DELETE_SYSTEM_APP = booleanPreferencesKey("privileged_uninstall_delete_system_app")
 
     // Post-install optimization (cmd package compile -m speed)
     val DEX2OAT_OPTIMIZATION = booleanPreferencesKey("dex2oat_optimization_after_install")

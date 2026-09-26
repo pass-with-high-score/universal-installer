@@ -170,6 +170,12 @@
     <string name="setting_default_installer_enabled">Universal Installer hiện là trình cài đặt mặc định</string>
     <string name="setting_default_installer_disabled">Đã khôi phục trình cài đặt hệ thống</string>
     <string name="setting_default_installer_failed">Thay đổi trình cài đặt mặc định thất bại</string>
+    <string name="setting_default_uninstaller_title">Đặt làm trình gỡ cài đặt mặc định</string>
+    <string name="setting_default_uninstaller_subtitle">Đặt Universal Installer làm trình xử lý gỡ cài đặt mặc định (yêu cầu Shizuku hoặc Root)</string>
+    <string name="setting_default_uninstaller_needs_backend">Hãy bật Shizuku hoặc Root trước để thay đổi trình gỡ cài đặt mặc định</string>
+    <string name="setting_default_uninstaller_enabled">Universal Installer hiện là trình gỡ cài đặt mặc định</string>
+    <string name="setting_default_uninstaller_disabled">Đã hủy ưu tiên trình gỡ cài đặt mặc định</string>
+    <string name="setting_default_uninstaller_failed">Thay đổi trình gỡ cài đặt mặc định thất bại</string>
     <string name="setting_section_profiles">Hồ sơ trình cài đặt</string>
     <string name="setting_profiles_title">Hồ sơ</string>
     <string name="setting_profiles_subtitle">Lưu và tái sử dụng các cấu hình cài đặt</string>

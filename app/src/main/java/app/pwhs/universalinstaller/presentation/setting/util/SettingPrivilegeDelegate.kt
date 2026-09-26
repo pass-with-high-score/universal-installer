@@ -24,6 +24,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -69,6 +70,9 @@ class SettingPrivilegeDelegate(
 
     private val _isDefaultInstaller = MutableStateFlow(false)
     val isDefaultInstaller: StateFlow<Boolean> = _isDefaultInstaller.asStateFlow()
+
+    private val _isDefaultUninstaller = MutableStateFlow(false)
+    val isDefaultUninstaller: StateFlow<Boolean> = _isDefaultUninstaller.asStateFlow()
 
     private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
         Timber.d("Shizuku binder received")
@@ -130,6 +134,7 @@ class SettingPrivilegeDelegate(
             }
         }
         updateDefaultInstallerStatus()
+        updateDefaultUninstallerStatus()
     }
 
     fun cleanUp() {
@@ -335,28 +340,33 @@ class SettingPrivilegeDelegate(
     }
 
     fun toggleDefaultInstaller(enabled: Boolean) {
-        updateShizukuState()
-        val shizukuReady = _shizukuState.value == ShizukuState.READY
-        val rootReady = _rootState.value == RootState.READY
-
-        if (!shizukuReady && !rootReady) {
-            reportDefaultInstaller("none", enabled, TelemetryEvents.RESULT_BLOCKED)
-            when (_shizukuState.value) {
-                ShizukuState.NO_PERMISSION -> requestShizukuPermission()
-                ShizukuState.NOT_RUNNING -> emitEvent(R.string.setting_shizuku_start_service_hint)
-                else -> emitEvent(R.string.setting_default_installer_needs_backend)
-            }
-            return
-        }
-
-        val component = defaultInstallerComponent()
-        val method = if (shizukuReady) "shizuku" else "root"
         scope.launch(Dispatchers.IO) {
-            val result = if (shizukuReady) {
-                app.pwhs.universalinstaller.util.ShizukuDefaultInstaller
-                    .setDefaultInstaller(component, enabled)
-            } else {
+            updateShizukuState()
+            val prefs = dataStore.data.first()
+            val useRoot = prefs[PreferencesKeys.USE_ROOT] ?: false
+            val shizukuReady = _shizukuState.value == ShizukuState.READY
+            val rootReady = if (useRoot) {
+                if (_rootState.value == RootState.READY) true
+                else backendFactory.requestRoot().also { _rootState.value = it } == RootState.READY
+            } else _rootState.value == RootState.READY
+
+            val method = if (useRoot && rootReady) "root" else if (shizukuReady) "shizuku" else "none"
+
+            if (!shizukuReady && !rootReady) {
+                reportDefaultInstaller("none", enabled, TelemetryEvents.RESULT_BLOCKED)
+                when {
+                    _shizukuState.value == ShizukuState.NO_PERMISSION && !useRoot -> requestShizukuPermission()
+                    _shizukuState.value == ShizukuState.NOT_RUNNING && !useRoot -> emitEvent(R.string.setting_shizuku_start_service_hint)
+                    else -> emitEvent(R.string.setting_default_installer_needs_backend)
+                }
+                return@launch
+            }
+
+            val component = defaultInstallerComponent()
+            val result = if (useRoot && rootReady) {
                 backendFactory.setDefaultInstallerViaRoot(application, component, enabled)
+            } else {
+                app.pwhs.universalinstaller.util.ShizukuDefaultInstaller.setDefaultInstaller(component, enabled)
             }
             result
                 .onSuccess {
@@ -413,6 +423,63 @@ class SettingPrivilegeDelegate(
                 null
             }
             _isDefaultInstaller.value = resolved?.activityInfo?.packageName == application.packageName
+        }
+    }
+
+    fun toggleDefaultUninstaller(enabled: Boolean) {
+        scope.launch(Dispatchers.IO) {
+            updateShizukuState()
+            val prefs = dataStore.data.first()
+            val useRoot = prefs[PreferencesKeys.USE_ROOT] ?: false
+            val shizukuReady = _shizukuState.value == ShizukuState.READY
+            val rootReady = if (useRoot) {
+                if (_rootState.value == RootState.READY) true
+                else backendFactory.requestRoot().also { _rootState.value = it } == RootState.READY
+            } else _rootState.value == RootState.READY
+
+            if (!shizukuReady && !rootReady) {
+                when {
+                    _shizukuState.value == ShizukuState.NO_PERMISSION && !useRoot -> requestShizukuPermission()
+                    _shizukuState.value == ShizukuState.NOT_RUNNING && !useRoot -> emitEvent(R.string.setting_shizuku_start_service_hint)
+                    else -> emitEvent(R.string.setting_default_uninstaller_needs_backend)
+                }
+                return@launch
+            }
+
+            val component = defaultUninstallerComponent()
+            val result = if (useRoot && rootReady) {
+                backendFactory.setDefaultUninstallerViaRoot(application, component, enabled)
+            } else {
+                app.pwhs.universalinstaller.util.ShizukuDefaultInstaller.setDefaultUninstaller(component, enabled)
+            }
+            result
+                .onSuccess {
+                    updateDefaultUninstallerStatus()
+                    emitEvent(
+                        if (enabled) R.string.setting_default_uninstaller_enabled
+                        else R.string.setting_default_uninstaller_disabled,
+                    )
+                }
+                .onFailure { e ->
+                    Timber.e(e, "Failed to toggle default uninstaller")
+                    emitEvent(R.string.setting_default_uninstaller_failed)
+                }
+        }
+    }
+
+    private fun defaultUninstallerComponent(): ComponentName =
+        ComponentName(application, "app.pwhs.universalinstaller.presentation.manage.uninstall.DialogUninstallActivity")
+
+    fun updateDefaultUninstallerStatus() {
+        scope.launch(Dispatchers.IO) {
+            val uri = android.net.Uri.parse("package:app.pwhs.universalinstaller.test")
+            val pDelete = Intent(Intent.ACTION_DELETE).apply { addCategory(Intent.CATEGORY_DEFAULT); data = uri }
+            val pUninstall = Intent(Intent.ACTION_UNINSTALL_PACKAGE).apply { addCategory(Intent.CATEGORY_DEFAULT); data = uri }
+            val pm = application.packageManager
+            val rDelete = runCatching { pm.resolveActivity(pDelete, PackageManager.MATCH_DEFAULT_ONLY) }.getOrNull()
+            val rUninstall = runCatching { pm.resolveActivity(pUninstall, PackageManager.MATCH_DEFAULT_ONLY) }.getOrNull()
+            val pkg = application.packageName
+            _isDefaultUninstaller.value = rDelete?.activityInfo?.packageName == pkg || rUninstall?.activityInfo?.packageName == pkg
         }
     }
 }

@@ -39,4 +39,24 @@ object ShizukuDefaultInstaller {
                 DefaultInstallerLogic.setDefaultInstaller(iPm, component, lock, hasSystemLevel)
             }
         }
+
+    suspend fun setDefaultUninstaller(component: ComponentName, lock: Boolean): Result<Unit> =
+        withContext(Dispatchers.IO) {
+            runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    HiddenApiBypass.addHiddenApiExemptions(
+                        "Landroid/content/pm/IPackageManager",
+                        "Landroid/content/pm/ParceledListSlice",
+                        "Landroid/content/pm/BaseParceledListSlice"
+                    )
+                }
+                val packageBinder = SystemServiceHelper.getSystemService("package")
+                    ?: error("system_service 'package' returned null binder")
+                val iPm: IPackageManager = IPackageManager.Stub.asInterface(
+                    ShizukuBinderWrapper(packageBinder),
+                )
+                val hasSystemLevel = runCatching { Shizuku.getUid() == 0 }.getOrDefault(false)
+                DefaultUninstallerLogic.setDefaultUninstaller(iPm, component, lock, hasSystemLevel)
+            }
+        }
 }

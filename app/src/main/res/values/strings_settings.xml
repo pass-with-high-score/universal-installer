@@ -86,6 +86,12 @@
     <string name="setting_default_installer_enabled">Universal Installer is now the default</string>
     <string name="setting_default_installer_disabled">System installer restored</string>
     <string name="setting_default_installer_failed">Failed to change default installer</string>
+    <string name="setting_default_uninstaller_title">Set as default uninstaller</string>
+    <string name="setting_default_uninstaller_subtitle">Set Universal Installer as default handler for uninstalls (requires Shizuku or Root)</string>
+    <string name="setting_default_uninstaller_needs_backend">Enable Shizuku or Root first to change the default uninstaller</string>
+    <string name="setting_default_uninstaller_enabled">Universal Installer is now the default uninstaller</string>
+    <string name="setting_default_uninstaller_disabled">Default uninstaller preference cleared</string>
+    <string name="setting_default_uninstaller_failed">Failed to change default uninstaller</string>
     <string name="setting_shizuku_options_install_group">Install</string>
     <string name="setting_shizuku_options_uninstall_group">Uninstall</string>
     <string name="setting_shizuku_uninstall_keep_data">Keep app data</string>

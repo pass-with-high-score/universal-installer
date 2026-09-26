@@ -117,6 +117,26 @@ interface InstallerBackendFactory {
         component: android.content.ComponentName,
         lock: Boolean,
     ): Result<Unit>
+
+    /**
+     * Toggles preferred-activity registration via libsu RootService so [component] becomes
+     * the default package uninstaller.
+     */
+    suspend fun setDefaultUninstallerViaRoot(
+        context: android.content.Context,
+        component: android.content.ComponentName,
+        lock: Boolean,
+    ): Result<Unit>
+
+    /**
+     * Shell-out wrapper for general package uninstallation via root shell.
+     * Used when privileged flags (-k, --all-users) are requested or as a fallback.
+     */
+    suspend fun uninstallPackageViaRoot(
+        packageName: String,
+        keepData: Boolean,
+        allUsers: Boolean,
+    ): Result<String>
 }
 
 enum class SystemAppMethod {
