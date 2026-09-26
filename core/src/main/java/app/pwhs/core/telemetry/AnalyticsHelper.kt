@@ -190,6 +190,33 @@ object AnalyticsHelper {
         )
     }
 
+    fun logManageFilterChanged(filterName: String, isSelected: Boolean) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_MANAGE_FILTER_CHANGED,
+            TelemetryEvents.PARAM_FILTER_NAME to filterName,
+            TelemetryEvents.PARAM_STATUS to if (isSelected) TelemetryEvents.STATUS_GRANTED else "unselected"
+        )
+    }
+
+    fun logManageSortChanged(sortAxis: String, direction: String) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_MANAGE_SORT_CHANGED,
+            TelemetryEvents.PARAM_SORT_AXIS to sortAxis,
+            TelemetryEvents.PARAM_DIRECTION to direction
+        )
+    }
+
+    fun logManageGroupChanged(groupBy: String) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_MANAGE_GROUP_CHANGED,
+            TelemetryEvents.PARAM_GROUP_BY to groupBy
+        )
+    }
+
+    fun logManageFiltersReset() {
+        Telemetry.event(TelemetryEvents.EVENT_MANAGE_FILTERS_RESET)
+    }
+
     // ── Giai đoạn 4: Đánh giá & Giữ chân ──────────────────────────────────
     fun logReviewPromptTriggered(triggerReason: String, totalSuccessfulInstalls: Int) {
         Telemetry.event(

@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.presentation.manage
 
+import android.content.Intent
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -7,6 +8,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.sync.SyncActivity
 import app.pwhs.universalinstaller.presentation.manage.BatchExtractState
 import app.pwhs.universalinstaller.presentation.manage.ExtractMode
 import app.pwhs.universalinstaller.presentation.manage.ExtractState
@@ -80,10 +82,15 @@ internal fun ManageSnackbars(
                         }
                     }
                     ExtractMode.Server -> {
-                        snackbarHostState.showSnackbar(
-                            message = "Added $fileName to server",
+                        val result = snackbarHostState.showSnackbar(
+                            message = resource.getString(R.string.manage_action_added_to_server, fileName),
+                            actionLabel = resource.getString(R.string.manage_action_open_sync),
                             withDismissAction = true,
                         )
+                        if (result == SnackbarResult.ActionPerformed) {
+                            val intent = Intent(context, SyncActivity::class.java)
+                            context.startActivity(intent)
+                        }
                     }
                     ExtractMode.Reinstall -> {
                         val installUri = if (s.uri.scheme == "file") {

@@ -151,9 +151,9 @@
     <string name="uninstall_system_proceed_user_only">Proceed with regular apps</string>
     <string name="manage_filter_blocked">Blocked</string>
     <string name="manage_blocked_badge">Blocked</string>
-    <string name="manage_action_unblock">Allow installing again</string>
+    <string name="manage_action_unblock">Unblock install</string>
     <string name="manage_unblocked_toast">%1$s is no longer blocked.</string>
-    <string name="manage_action_block">Block from installing</string>
+    <string name="manage_action_block">Block install</string>
     <string name="manage_blocked_toast">%1$s is now blocked. Manage the list in Settings → Blocked packages.</string>
     <string name="uninstall_search_hint">Search apps…</string>
     <string name="uninstall_filter_reset">Reset</string>
@@ -171,6 +171,10 @@
     <string name="manage_action_reinstall">Reinstall</string>
     <string name="manage_action_check_vt">Check VirusTotal</string>
     <string name="manage_action_installer_source">Installed by %1$s</string>
+    <string name="manage_action_add_to_server">Sync &amp; Share</string>
+    <string name="manage_action_add_to_server_sub">Share on local Wi-Fi</string>
+    <string name="manage_action_added_to_server">Added %s to Sync &amp; Share</string>
+    <string name="manage_action_open_sync">Open Sync</string>
     <string name="backup_export_sheet_title">Export Backup</string>
     <string name="backup_export_sheet_subtitle">Select the items you want to include in the backup file.</string>
     <string name="backup_include_settings">App Settings &amp; Profiles</string>

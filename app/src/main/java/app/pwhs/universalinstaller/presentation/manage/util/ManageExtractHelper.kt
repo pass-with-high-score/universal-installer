@@ -8,6 +8,7 @@ import androidx.documentfile.provider.DocumentFile
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.install.ApkExtractor
 import app.pwhs.universalinstaller.domain.model.InstalledApp
+import app.pwhs.universalinstaller.util.CustomTabsHelper
 import app.pwhs.universalinstaller.presentation.manage.BatchExtractState
 import app.pwhs.universalinstaller.presentation.manage.ExtractMode
 import app.pwhs.universalinstaller.presentation.manage.ExtractState
@@ -38,11 +39,10 @@ object ManageExtractHelper {
                 val sha256 = digest.digest().joinToString("") { "%02x".format(it) }
 
                 withContext(Dispatchers.Main) {
-                    val intent = Intent(
-                        Intent.ACTION_VIEW,
-                        Uri.parse("https://www.virustotal.com/gui/file/$sha256/detection"),
-                    ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    runCatching { context.startActivity(intent) }
+                    CustomTabsHelper.openUrl(
+                        context,
+                        "https://www.virustotal.com/gui/file/$sha256/detection",
+                    )
                 }
             }
         } catch (e: Exception) {

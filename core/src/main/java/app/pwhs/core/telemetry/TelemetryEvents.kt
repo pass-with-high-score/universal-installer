@@ -85,10 +85,18 @@ object TelemetryEvents {
     const val EVENT_CACHE_CLEAN_STARTED = "cache_clean_started"
     const val EVENT_DEFAULT_INSTALLER_ACTION = "default_installer_action"
     const val EVENT_SHIZUKU_STATUS_CHANGED = "shizuku_status_changed"
+    const val EVENT_MANAGE_FILTER_CHANGED = "manage_filter_changed"
+    const val EVENT_MANAGE_SORT_CHANGED = "manage_sort_changed"
+    const val EVENT_MANAGE_GROUP_CHANGED = "manage_group_changed"
+    const val EVENT_MANAGE_FILTERS_RESET = "manage_filters_reset"
 
     const val PARAM_ACTION_TYPE = "action_type"
     const val PARAM_CACHE_SIZE_MB = "cache_size_mb"
     const val PARAM_ACTION = "action"
+    const val PARAM_FILTER_NAME = "filter_name"
+    const val PARAM_SORT_AXIS = "sort_axis"
+    const val PARAM_DIRECTION = "direction"
+    const val PARAM_GROUP_BY = "group_by"
 
     const val ACTION_BACKUP_APK = "backup_apk"
     const val ACTION_EXTRACT_SPLITS = "extract_splits"

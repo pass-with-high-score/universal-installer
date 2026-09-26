@@ -3,6 +3,7 @@ compileSdk = "37"
 minSdk = "24"
 targetSdk = "36"
 baselineProfileMinSdk = "28"
+browser = "1.8.0"
 agp = "9.1.0"
 core = "2.3.0"
 coreVersion = "3.5.4"
@@ -48,6 +49,7 @@ playServicesWearable = "20.0.1"
 playServicesCodeScanner = "16.1.0"
 
 [libraries]
+androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 bottom-sheet = { module = "io.github.raamcosta.compose-destinations:bottom-sheet", version.ref = "core" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

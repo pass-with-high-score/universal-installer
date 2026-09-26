@@ -168,6 +168,10 @@
     <string name="manage_action_reinstall">Cài lại</string>
     <string name="manage_action_check_vt">Kiểm tra VirusTotal</string>
     <string name="manage_action_installer_source">Được cài bởi %1$s</string>
+    <string name="manage_action_add_to_server">Sync &amp; Share</string>
+    <string name="manage_action_add_to_server_sub">Chia sẻ qua Wi-Fi</string>
+    <string name="manage_action_added_to_server">Đã thêm %s vào Sync &amp; Share</string>
+    <string name="manage_action_open_sync">Mở Sync</string>
     <string name="backup_output_path_default">Mặc định (Download/UniversalInstaller/Extracted)</string>
     <string name="backup_output_path_internal_storage">Bộ nhớ trong</string>
     <string name="backup_output_path_selected_folder">Thư mục đã chọn</string>

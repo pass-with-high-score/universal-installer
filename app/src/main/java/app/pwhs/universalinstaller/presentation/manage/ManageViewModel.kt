@@ -21,6 +21,7 @@ import app.pwhs.universalinstaller.presentation.manage.util.ManageFilterHelper
 import app.pwhs.universalinstaller.presentation.manage.util.ManagePrivilegedActionHelper
 import app.pwhs.universalinstaller.presentation.manage.util.ManageUninstallHelper
 import app.pwhs.universalinstaller.presentation.manage.util.ManageUsageStatsHelper
+import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.universalinstaller.telemetry.TelemetryEvents
 import kotlinx.coroutines.Dispatchers
@@ -80,7 +81,7 @@ class ManageViewModel(
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), ManageUiState())
 
     init {
-        _usageAccess.value = hasUsageAccess()
+        refreshUsageAccess()
         viewModelScope.launch {
             val savedPrefs = ManageFilterHelper.loadFilterPreferences(application)
             _sortBy.value = savedPrefs.sortBy
@@ -110,6 +111,7 @@ class ManageViewModel(
     }
 
     fun scanVirusTotal(context: android.content.Context, app: InstalledApp) {
+        AnalyticsHelper.logAppManagementAction("scan_virustotal")
         viewModelScope.launch { ManageExtractHelper.scanVirusTotal(context, app) }
     }
 
@@ -135,7 +137,7 @@ class ManageViewModel(
             ExtractMode.Reinstall -> app.pwhs.core.telemetry.TelemetryEvents.ACTION_EXTRACT_SPLITS
             else -> null
         }
-        actionType?.let { app.pwhs.core.telemetry.AnalyticsHelper.logAppManagementAction(it) }
+        actionType?.let { AnalyticsHelper.logAppManagementAction(it) }
         extractJob?.cancel()
         _extractState.value = ExtractState.Running(packageName, appName, 0L, 1L, mode)
         extractJob = viewModelScope.launch {
@@ -280,22 +282,20 @@ class ManageViewModel(
     // ── Filter & Search ─────────────────────────────────────────────────────
 
     fun setSort(sortBy: UninstallSortBy) {
-        if (_sortBy.value == sortBy) {
-            _sortDirection.value =
-                if (_sortDirection.value == SortDirection.Asc) SortDirection.Desc else SortDirection.Asc
+        val newDirection = if (_sortBy.value == sortBy) {
+            if (_sortDirection.value == SortDirection.Asc) SortDirection.Desc else SortDirection.Asc
         } else {
-            _sortBy.value = sortBy
-            _sortDirection.value = if (sortBy == UninstallSortBy.Name) SortDirection.Asc else SortDirection.Desc
+            if (sortBy == UninstallSortBy.Name) SortDirection.Asc else SortDirection.Desc
         }
+        _sortBy.value = sortBy
+        _sortDirection.value = newDirection
+        AnalyticsHelper.logManageSortChanged(sortBy.name.lowercase(), newDirection.name.lowercase())
         persistFilterSheetState()
     }
 
     fun refreshUsageAccess() {
-        _usageAccess.value = hasUsageAccess()
+        _usageAccess.value = ManageUsageStatsHelper.hasUsageAccess(application)
     }
-
-    private fun hasUsageAccess(): Boolean =
-        ManageUsageStatsHelper.hasUsageAccess(application)
 
     private fun persistFilterSheetState() {
         viewModelScope.launch {
@@ -311,14 +311,17 @@ class ManageViewModel(
 
     fun toggleAppFilter(filter: AppFilter) {
         val current = _appFilter.value
-        val next = if (filter in current) current - filter else current + filter
+        val isAdding = filter !in current
+        val next = if (isAdding) current + filter else current - filter
         if (next.isEmpty()) return
         _appFilter.value = next
+        AnalyticsHelper.logManageFilterChanged(filter.name.lowercase(), isAdding)
         persistFilterSheetState()
     }
 
     fun setGroupBy(groupBy: GroupBy) {
         _groupBy.value = groupBy
+        AnalyticsHelper.logManageGroupChanged(groupBy.name.lowercase())
         persistFilterSheetState()
     }
 
@@ -327,15 +330,15 @@ class ManageViewModel(
         _sortDirection.value = SortDirection.Asc
         _groupBy.value = GroupBy.None
         _appFilter.value = setOf(AppFilter.User)
+        AnalyticsHelper.logManageFiltersReset()
         persistFilterSheetState()
     }
 
     // ── Selection & Blacklist ───────────────────────────────────────────────
 
     fun toggleSelection(packageName: String) {
-        _selectedPackages.value = _selectedPackages.value.toMutableSet().apply {
-            if (contains(packageName)) remove(packageName) else add(packageName)
-        }
+        val current = _selectedPackages.value
+        _selectedPackages.value = if (packageName in current) current - packageName else current + packageName
     }
 
     fun clearSelection() {
@@ -405,7 +408,7 @@ class ManageViewModel(
 
     fun uninstallApp(packageName: String) {
         Telemetry.feature(TelemetryEvents.FEATURE_UNINSTALL)
-        app.pwhs.core.telemetry.AnalyticsHelper.logAppManagementAction(app.pwhs.core.telemetry.TelemetryEvents.ACTION_UNINSTALL_APP)
+        AnalyticsHelper.logAppManagementAction(app.pwhs.core.telemetry.TelemetryEvents.ACTION_UNINSTALL_APP)
         val app = _apps.value.firstOrNull { it.packageName == packageName }
         if (app != null && app.isSystemApp) {
             viewModelScope.launch {
@@ -458,9 +461,8 @@ class ManageViewModel(
         }
     }
 
-    fun dismissSystemAppPrompt() {
-        _systemAppPrompt.value = null
-    }
+    fun dismissSystemAppPrompt() { _systemAppPrompt.value = null }
+    fun refreshApps() = loadInstalledApps(isRefresh = true)
 
     private suspend fun runBatchUninstall(packages: List<String>) {
         ManageUninstallHelper.runBatchUninstall(
@@ -474,10 +476,6 @@ class ManageViewModel(
                 _apps.value = _apps.value.filter { it.packageName != removedPkg }
             }
         )
-    }
-
-    fun refreshApps() {
-        loadInstalledApps(isRefresh = true)
     }
 
     private fun loadInstalledApps(isRefresh: Boolean = false) {
