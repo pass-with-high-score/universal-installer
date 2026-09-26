@@ -198,6 +198,12 @@ class SettingPreferencesDelegate(
         }
     }
 
+    fun setAutoApproveBlockTrackers(enabled: Boolean) {
+        scope.launch {
+            dataStore.edit { it[PreferencesKeys.AUTO_APPROVE_BLOCK_TRACKERS] = enabled }
+        }
+    }
+
     fun toggleAutoApprovePackage(packageName: String, approved: Boolean) {
         scope.launch {
             dataStore.edit { prefs ->

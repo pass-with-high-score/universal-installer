@@ -227,6 +227,7 @@
     <string name="dialog_risk_action_uninstall_existing">Gỡ ứng dụng hiện có</string>
     <string name="dialog_risk_action_view_report">Xem báo cáo VirusTotal</string>
     <string name="dialog_risk_vt_unscanned">Chưa quét VirusTotal</string>
+    <string name="dialog_risk_trackers_detected">Exodus Privacy đã phát hiện %1$d trình theo dõi trong gói cài đặt này.</string>
     <string name="scan_virustotal_btn">Quét VirusTotal</string>
     <string name="skip_and_install_btn">Bỏ qua &amp; Cài đặt</string>
     <string name="scanning_progress">Đang quét…</string>

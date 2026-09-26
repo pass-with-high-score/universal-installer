@@ -127,6 +127,12 @@ object PreferencesKeys {
      */
     val AUTO_APPROVE_PACKAGES = stringSetPreferencesKey("auto_approve_packages")
 
+    /**
+     * Whether to block auto-install and ask for manual confirmation when Exodus Privacy
+     * detects trackers in the APK.
+     */
+    val AUTO_APPROVE_BLOCK_TRACKERS = booleanPreferencesKey("auto_approve_block_trackers")
+
     /** Whether to show the "Download" tab in the source picker on the main screen. */
     val SHOW_DOWNLOAD_TAB = booleanPreferencesKey("show_download_tab")
 

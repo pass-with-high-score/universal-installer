@@ -84,11 +84,13 @@ fun InstallUiScreen(
         autoConfirm = uiState.autoConfirmExternalInstall,
         autoApprove = uiState.autoApproveCallerApps,
         autoApproveCount = uiState.autoApproveCount,
+        autoApproveBlockTrackers = uiState.autoApproveBlockTrackers,
         showDownloadTab = uiState.showDownloadTab,
         onModeChange = viewModel::setExternalOpenMode,
         onStyleChange = viewModel::setInstallUiStyle,
         onAutoConfirmChange = viewModel::setAutoConfirmExternalInstall,
         onAutoApproveChange = viewModel::setAutoApproveEnabled,
+        onAutoApproveBlockTrackersChange = viewModel::setAutoApproveBlockTrackers,
         onShowDownloadTabChange = viewModel::setShowDownloadTab,
         onBack = { (context as? android.app.Activity)?.finish() },
     )
@@ -103,11 +105,13 @@ private fun InstallUiContent(
     autoConfirm: Boolean = false,
     autoApprove: Boolean = false,
     autoApproveCount: Int = 0,
+    autoApproveBlockTrackers: Boolean = false,
     showDownloadTab: Boolean = true,
     onModeChange: (ExternalOpenMode) -> Unit = {},
     onStyleChange: (InstallUiStyle) -> Unit = {},
     onAutoConfirmChange: (Boolean) -> Unit = {},
     onAutoApproveChange: (Boolean) -> Unit = {},
+    onAutoApproveBlockTrackersChange: (Boolean) -> Unit = {},
     onShowDownloadTabChange: (Boolean) -> Unit = {},
     onBack: () -> Unit = {},
 ) {
@@ -235,6 +239,12 @@ private fun InstallUiContent(
                                 )
                             },
                         colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    SwitchRow(
+                        title = stringResource(R.string.setting_auto_approve_block_trackers_title),
+                        description = stringResource(R.string.setting_auto_approve_block_trackers_subtitle),
+                        checked = autoApproveBlockTrackers,
+                        onCheckedChange = onAutoApproveBlockTrackersChange,
                     )
                 }
             }

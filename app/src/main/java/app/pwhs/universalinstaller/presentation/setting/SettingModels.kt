@@ -203,6 +203,7 @@ data class SettingUiState(
     val autoConfirmExternalInstall: Boolean = false,
     val autoApproveCallerApps: Boolean = false,
     val autoApproveCount: Int = 0,
+    val autoApproveBlockTrackers: Boolean = false,
     val showDownloadTab: Boolean = true,
     val extractorOutputPath: String = "",
     val extractorFilenameTemplate: String = "{name}-{version}",

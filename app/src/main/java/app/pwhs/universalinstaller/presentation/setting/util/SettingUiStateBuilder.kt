@@ -41,6 +41,7 @@ object SettingUiStateBuilder {
         val autoConfirm = interfaceFlags[2]
         val showDownload = interfaceFlags[3]
         val autoApprove = interfaceFlags.getOrElse(5) { false }
+        val autoApproveBlockTrackers = interfaceFlags.getOrElse(6) { false }
         @Suppress("UNCHECKED_CAST")
         val extractorAndProfiles = flows[12] as List<String>
         val extractorPath = extractorAndProfiles[0]
@@ -90,6 +91,7 @@ object SettingUiStateBuilder {
             autoConfirmExternalInstall = autoConfirm,
             autoApproveCallerApps = autoApprove,
             autoApproveCount = autoApproveCount,
+            autoApproveBlockTrackers = autoApproveBlockTrackers,
             showDownloadTab = showDownload,
             extractorOutputPath = extractorPath,
             extractorFilenameTemplate = extractorTemplate,

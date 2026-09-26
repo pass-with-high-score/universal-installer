@@ -18,6 +18,7 @@ import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Key
 import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -72,6 +73,9 @@ sealed interface InstallRisk {
 
     /** Strict mode: APK was not scanned by VirusTotal. */
     data object VtUnscanned : InstallRisk
+
+    /** Exodus Privacy detected trackers in the APK. */
+    data class TrackersDetected(val count: Int) : InstallRisk
 }
 
 /**
@@ -85,7 +89,11 @@ fun isDowngrade(apkInfo: ApkInfo): Boolean {
     return installedCode > 0 && apkInfo.versionCode < installedCode
 }
 
-fun detectInstallRisks(apkInfo: ApkInfo, strictVirusTotal: Boolean = false): List<InstallRisk> {
+fun detectInstallRisks(
+    apkInfo: ApkInfo,
+    strictVirusTotal: Boolean = false,
+    blockOnTrackers: Boolean = false,
+): List<InstallRisk> {
     val risks = mutableListOf<InstallRisk>()
     if (isDowngrade(apkInfo)) {
         risks += InstallRisk.Downgrade(
@@ -96,6 +104,9 @@ fun detectInstallRisks(apkInfo: ApkInfo, strictVirusTotal: Boolean = false): Lis
     // Only `true` counts. `null` means the check couldn't run and must not raise an alarm.
     if (apkInfo.signatureMismatch == true) {
         risks += InstallRisk.SignatureMismatch(apkInfo.packageName)
+    }
+    if (blockOnTrackers && apkInfo.trackers.isNotEmpty()) {
+        risks += InstallRisk.TrackersDetected(apkInfo.trackers.size)
     }
     when (val status = apkInfo.vtResult?.status) {
         VtStatus.MALICIOUS -> risks += InstallRisk.VtMalicious(apkInfo.vtResult.malicious, apkInfo.sha256)
@@ -206,6 +217,8 @@ private fun RiskCard(
             stringResource(R.string.dialog_risk_vt_suspicious, risk.engineCount)
         is InstallRisk.VtUnscanned -> Icons.Rounded.Warning to
             stringResource(R.string.dialog_risk_vt_unscanned)
+        is InstallRisk.TrackersDetected -> Icons.Rounded.Shield to
+            stringResource(R.string.dialog_risk_trackers_detected, risk.count)
     }
     Surface(
         shape = MaterialTheme.shapes.large,
@@ -296,7 +309,7 @@ private fun RiskAction(
         }
         // Downgrade is consented to right here and carried into the session; unscanned has no
         // action beyond running the scan, which the install screen already offers.
-        is InstallRisk.Downgrade, InstallRisk.VtUnscanned -> return
+        is InstallRisk.Downgrade, InstallRisk.VtUnscanned, is InstallRisk.TrackersDetected -> return
     }
 
     Spacer(modifier = Modifier.height(4.dp))

@@ -105,6 +105,8 @@ fun DialogInstallContent(
     keepApk: Boolean = false,
     onKeepApkChanged: (Boolean) -> Unit = {},
     strictVirusTotalCheck: Boolean,
+    blockOnTrackers: Boolean = false,
+    autoBlockedRisks: List<InstallRisk> = emptyList(),
     canInstallPackages: () -> Boolean,
     viewModel: InstallViewModel,
     onOpenInstallPermissionSettings: () -> Unit,
@@ -116,10 +118,16 @@ fun DialogInstallContent(
     val context = LocalContext.current
     var pendingRisks by remember { mutableStateOf<List<InstallRisk>>(emptyList()) }
 
+    LaunchedEffect(autoBlockedRisks) {
+        if (autoBlockedRisks.isNotEmpty() && pendingRisks.isEmpty()) {
+            pendingRisks = autoBlockedRisks
+        }
+    }
+
     val handleInstallTap = {
         val info = uiState.pendingApkInfo
         val risks = if (info != null) {
-            detectInstallRisks(info, strictVirusTotalCheck)
+            detectInstallRisks(info, strictVirusTotalCheck, blockOnTrackers)
         } else {
             emptyList()
         }

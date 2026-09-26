@@ -212,6 +212,8 @@
     <string name="setting_blacklist_count">%1$d blocked</string>
     <string name="setting_auto_approve_title">Auto-approve from selected apps</string>
     <string name="setting_auto_approve_subtitle">Install requests from chosen apps proceed automatically via Shizuku or Root without confirmation prompts</string>
+    <string name="setting_auto_approve_block_trackers_title">Block auto-install when trackers found</string>
+    <string name="setting_auto_approve_block_trackers_subtitle">Prevent unprompted installation and require manual review if Exodus Privacy detects trackers</string>
     <string name="setting_auto_approve_apps_title">Approved applications</string>
     <string name="setting_auto_approve_count">%1$d approved</string>
     <string name="setting_auto_approve_none">None selected</string>

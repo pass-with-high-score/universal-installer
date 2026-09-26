@@ -75,6 +75,8 @@
     <string name="setting_blacklist_count">Đã chặn %1$d</string>
     <string name="setting_auto_approve_title">Tự động phê duyệt từ ứng dụng đã chọn</string>
     <string name="setting_auto_approve_subtitle">Tự động cài đặt yêu cầu từ các ứng dụng được chọn qua Shizuku hoặc Root mà không cần hỏi</string>
+    <string name="setting_auto_approve_block_trackers_title">Chặn tự động cài đặt khi có trình theo dõi</string>
+    <string name="setting_auto_approve_block_trackers_subtitle">Ngăn cài đặt tự động và yêu cầu xem xét thủ công nếu Exodus Privacy phát hiện thấy tracker</string>
     <string name="setting_auto_approve_apps_title">Ứng dụng được phê duyệt</string>
     <string name="setting_auto_approve_count">%1$d ứng dụng đã chọn</string>
     <string name="setting_auto_approve_none">Chưa chọn ứng dụng nào</string>

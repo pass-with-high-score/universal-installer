@@ -304,6 +304,7 @@
     <string name="dialog_risk_action_uninstall_existing">Uninstall existing app</string>
     <string name="dialog_risk_action_view_report">View VirusTotal report</string>
     <string name="dialog_risk_vt_unscanned">VirusTotal scan not completed</string>
+    <string name="dialog_risk_trackers_detected">Exodus Privacy detected %1$d tracker(s) in this package.</string>
     <string name="scan_virustotal_btn">Scan VirusTotal</string>
     <string name="skip_and_install_btn">Skip &amp; Install</string>
     <string name="scanning_progress">Scanning…</string>

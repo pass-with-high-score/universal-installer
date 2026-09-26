@@ -212,6 +212,7 @@ class SettingViewModel(
                 prefs[PreferencesKeys.SHOW_DOWNLOAD_TAB] ?: true,
                 prefs[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] ?: false,
                 prefs[PreferencesKeys.AUTO_APPROVE_CALLER_APPS] ?: false,
+                prefs[PreferencesKeys.AUTO_APPROVE_BLOCK_TRACKERS] ?: false,
             )
         },
         dataStore.data.map { prefs ->
@@ -284,6 +285,8 @@ class SettingViewModel(
     fun setDialogInstallMode(enabled: Boolean) = preferencesDelegate.setDialogInstallMode(enabled)
     fun setAutoConfirmExternalInstall(enabled: Boolean) = preferencesDelegate.setAutoConfirmExternalInstall(enabled)
     fun setAutoApproveEnabled(enabled: Boolean) = preferencesDelegate.setAutoApproveEnabled(enabled)
+    fun setAutoApproveBlockTrackers(enabled: Boolean) =
+        preferencesDelegate.setAutoApproveBlockTrackers(enabled)
     fun toggleAutoApprovePackage(packageName: String, approved: Boolean) =
         preferencesDelegate.toggleAutoApprovePackage(packageName, approved)
     fun setAutoApprovePackages(packages: Set<String>) = preferencesDelegate.setAutoApprovePackages(packages)
