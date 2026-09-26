@@ -80,50 +80,54 @@ object InstallSessionManager {
             }
         }
 
+        val priorityList = app.pwhs.universalinstaller.domain.model.InstallBackend.parsePriorityList(
+            prefs?.get(PreferencesKeys.INSTALL_BACKEND_PRIORITY)
+        )
         val useMicroG = prefs?.get(PreferencesKeys.USE_MICROG) ?: false
-        if (useMicroG && microGController != null) {
-            if (app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context)) {
-                return microGController
-            }
-            Timber.w("microG selected but companion not available — falling back to default installer")
-        }
-
         val useCustomAuthorizer = prefs?.get(PreferencesKeys.USE_CUSTOM_AUTHORIZER) ?: false
-        if (useCustomAuthorizer && customController != null) {
-            return customController
-        }
-
         val useRoot = prefs?.get(PreferencesKeys.USE_ROOT) ?: false
         val spoofRoot = prefs?.get(PreferencesKeys.ROOT_SET_INSTALL_SOURCE) ?: false
-
-        if ((useRoot || spoofRoot) && rootController != null) {
-            val state = backendFactory.probeRootState()
-            val finalState = if (state == RootState.READY) state
-            else if (state == RootState.UNKNOWN || state == RootState.DENIED) backendFactory.requestRoot()
-            else state
-
-            if (finalState == RootState.READY) {
-                return rootController
-            }
-            Timber.w("Root prioritized (useRoot=$useRoot, spoof=$spoofRoot) but root probe=$state, request=$finalState — falling back")
-        }
-
         val useShizuku = prefs?.get(PreferencesKeys.USE_SHIZUKU) ?: false
         val spoofShizuku = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
-
-        if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) {
-            return shizukuController
-        }
-
-        if (useShizuku || spoofShizuku) {
-            Timber.w("Shizuku prioritized but not ready — falling back to default installer")
-        }
-
         val useDhizuku = prefs?.get(PreferencesKeys.USE_DHIZUKU) ?: false
-        if (useDhizuku) {
-            val controller = dhizukuController
-            if (controller != null && DhizukuCompat.isReady(context)) return controller
-            Timber.w("Dhizuku selected but not ready — falling back to default installer")
+
+        for (backend in priorityList) {
+            when (backend) {
+                app.pwhs.universalinstaller.domain.model.InstallBackend.SHIZUKU -> {
+                    if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) {
+                        return shizukuController
+                    }
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.DHIZUKU -> {
+                    if (useDhizuku && dhizukuController != null && DhizukuCompat.isReady(context)) {
+                        return dhizukuController
+                    }
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.ROOT -> {
+                    if ((useRoot || spoofRoot) && rootController != null) {
+                        val state = backendFactory.probeRootState()
+                        val finalState = if (state == RootState.READY) state
+                        else if (state == RootState.UNKNOWN || state == RootState.DENIED) backendFactory.requestRoot()
+                        else state
+                        if (finalState == RootState.READY) return rootController
+                    }
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.CUSTOM -> {
+                    if (useCustomAuthorizer && customController != null) {
+                        return customController
+                    }
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.MICROG -> {
+                    if (useMicroG && microGController != null && app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context)) {
+                        return microGController
+                    }
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.DEFAULT -> {
+                    if (!SystemInstallerManager.isSystemPackageInstallerDisabled(context)) {
+                        return defaultController
+                    }
+                }
+            }
         }
 
         // Fallback when system package installer is frozen:
@@ -211,31 +215,40 @@ object InstallSessionManager {
             }
         }
 
+        val priorityList = app.pwhs.universalinstaller.domain.model.InstallBackend.parsePriorityList(
+            prefs[PreferencesKeys.INSTALL_BACKEND_PRIORITY]
+        )
         val useMicroG = prefs[PreferencesKeys.USE_MICROG] ?: false
-        if (useMicroG && app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context)) {
-            return false
-        }
-
         val useCustomAuthorizer = prefs[PreferencesKeys.USE_CUSTOM_AUTHORIZER] ?: false
-        if (useCustomAuthorizer) {
-            return false
-        }
-
         val useRoot = prefs[PreferencesKeys.USE_ROOT] ?: false
         val spoofRoot = prefs[PreferencesKeys.ROOT_SET_INSTALL_SOURCE] ?: false
-        if (useRoot || spoofRoot) {
-            return false
-        }
-
         val useShizuku = prefs[PreferencesKeys.USE_SHIZUKU] ?: false
         val spoofShizuku = prefs[PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE] ?: false
-        if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) {
-            return false
-        }
-
         val useDhizuku = prefs[PreferencesKeys.USE_DHIZUKU] ?: false
-        if (useDhizuku && DhizukuCompat.isReady(context)) {
-            return false
+
+        for (backend in priorityList) {
+            when (backend) {
+                app.pwhs.universalinstaller.domain.model.InstallBackend.SHIZUKU -> {
+                    if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) return false
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.DHIZUKU -> {
+                    if (useDhizuku && DhizukuCompat.isReady(context)) return false
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.ROOT -> {
+                    if (useRoot || spoofRoot) return false
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.CUSTOM -> {
+                    if (useCustomAuthorizer) return false
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.MICROG -> {
+                    if (useMicroG && app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context)) return false
+                }
+                app.pwhs.universalinstaller.domain.model.InstallBackend.DEFAULT -> {
+                    if (!SystemInstallerManager.isSystemPackageInstallerDisabled(context)) {
+                        return true
+                    }
+                }
+            }
         }
 
         if (SystemInstallerManager.isSystemPackageInstallerDisabled(context)) {

@@ -113,6 +113,18 @@ class SettingViewModel(
         emitEvent = { emitEvent(it) },
     )
 
+    private val priorityDelegate = app.pwhs.universalinstaller.presentation.setting.util.SettingPriorityDelegate(
+        application = application,
+        scope = viewModelScope,
+        backendFactory = backendFactory,
+        shizukuState = { privilegeDelegate.shizukuState.value },
+        updateShizukuState = { privilegeDelegate.updateShizukuState() },
+        requestShizukuPermission = { privilegeDelegate.requestShizukuPermission() },
+        updateDhizukuState = { privilegeDelegate.updateDhizukuState(it) },
+        updateRootState = { privilegeDelegate.updateRootState(it) },
+        emitEvent = { emitEvent(it) },
+    )
+
     private val preferencesDelegate = SettingPreferencesDelegate(
         application = application,
         scope = viewModelScope,
@@ -230,6 +242,7 @@ class SettingViewModel(
         privilegeDelegate.customAuthorizerCommand,
         privilegeDelegate.useMicroG,
         privilegeDelegate.isDefaultUninstaller,
+        priorityDelegate.backendPriority,
     ) { flows ->
         SettingUiStateBuilder.build(application, backendFactory, flows)
     }.stateIn(
@@ -315,4 +328,14 @@ class SettingViewModel(
         LocaleHelper.setAppLanguage(application, tag)
         _selectedLanguage.value = tag
     }
+
+    // ── Install Priority Delegates ──────────────────────────────────────────
+
+    val backendPriority: StateFlow<List<app.pwhs.universalinstaller.domain.model.InstallBackend>> = priorityDelegate.backendPriority
+    fun moveBackendPriority(fromIndex: Int, toIndex: Int) = priorityDelegate.moveBackendPriority(fromIndex, toIndex)
+    fun resetBackendPriority() = priorityDelegate.resetBackendPriority()
+    fun setBackendEnabled(backend: app.pwhs.universalinstaller.domain.model.InstallBackend, enabled: Boolean) =
+        priorityDelegate.setBackendEnabled(backend, enabled)
+    fun promoteBackendToTop(backend: app.pwhs.universalinstaller.domain.model.InstallBackend) =
+        priorityDelegate.promoteToTop(backend)
 }

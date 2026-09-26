@@ -55,6 +55,14 @@
     <string name="setting_install_mode_custom">Custom</string>
     <string name="setting_install_mode_default_sub">Android\'s own installer — it asks you to confirm each app</string>
     <string name="setting_install_mode_custom_sub">Install via custom shell or authorizer command</string>
+    <string name="setting_install_priority_title">Install engine priority</string>
+    <string name="setting_install_priority_subtitle">Engines are tried in this order; falls back to the next if unavailable</string>
+    <string name="setting_install_priority_reset">Reset order</string>
+    <string name="setting_install_priority_up">Move up</string>
+    <string name="setting_install_priority_down">Move down</string>
+    <string name="setting_install_priority_ready">Ready</string>
+    <string name="setting_install_priority_unavailable">Unavailable</string>
+    <string name="setting_install_priority_fallback">Fallback</string>
     <string name="setting_custom_authorizer_title">Custom Authorizer</string>
     <string name="setting_custom_authorizer_subtitle">Configure custom shell or binary to authorize installations</string>
     <string name="setting_custom_authorizer_configure">Configure</string>

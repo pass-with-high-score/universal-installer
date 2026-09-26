@@ -86,7 +86,6 @@ enum class InstallMode {
     DEFAULT,
     SHIZUKU,
     DHIZUKU,
-    SHIZUKU_DHIZUKU,
     ROOT,
     CUSTOM,
     MICROG;
@@ -100,7 +99,6 @@ enum class InstallMode {
             useMicroG: Boolean = false,
         ): InstallMode = when {
             useCustomAuthorizer -> CUSTOM
-            useShizuku && useDhizuku -> SHIZUKU_DHIZUKU
             useDhizuku -> DHIZUKU
             useRoot -> ROOT
             useShizuku -> SHIZUKU
@@ -120,10 +118,6 @@ enum class InstallMode {
                 configuredMode == MICROG && isMicroGAvailable -> MICROG
                 configuredMode == CUSTOM -> CUSTOM
                 configuredMode == ROOT && rootState == RootState.READY -> ROOT
-                configuredMode == SHIZUKU_DHIZUKU -> when {
-                    shizukuState == ShizukuState.READY || dhizukuState == app.pwhs.universalinstaller.util.DhizukuState.READY -> SHIZUKU_DHIZUKU
-                    else -> DEFAULT
-                }
                 configuredMode == SHIZUKU && shizukuState == ShizukuState.READY -> SHIZUKU
                 configuredMode == DHIZUKU && dhizukuState == app.pwhs.universalinstaller.util.DhizukuState.READY -> DHIZUKU
                 configuredMode == DEFAULT && !isSystemInstallerFrozen -> DEFAULT
@@ -221,6 +215,7 @@ data class SettingUiState(
     val useCustomAuthorizer: Boolean = false,
     val customAuthorizerCommand: String = "",
     val useMicroG: Boolean = false,
+    val backendPriority: List<app.pwhs.universalinstaller.domain.model.InstallBackend> = app.pwhs.universalinstaller.domain.model.InstallBackend.DEFAULT_ORDER,
     /**
      * True when the device has at least one biometric or device-credential enrolled.
      * Used to inform the user that the toggles will be no-ops until they

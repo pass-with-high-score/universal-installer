@@ -53,37 +53,30 @@ internal fun LazyListScope.InstallSection(
     onCustomAuthorizerCommandChange: (String) -> Unit = {},
     onTestCustomAuthorizerCommand: suspend (String) -> Result<String> = { Result.success("") },
     onOpenInstallOptions: () -> Unit = {},
+    onMoveBackendPriority: (Int, Int) -> Unit = { _, _ -> },
+    onResetBackendPriority: () -> Unit = {},
+    onSetBackendEnabled: (app.pwhs.universalinstaller.domain.model.InstallBackend, Boolean) -> Unit = { _, _ -> },
 ) {
     if (matchesQuery(q, installLabels)) item {
         SettingsSection(title = stringResource(R.string.setting_section_installation), icon = Icons.Rounded.SettingsApplications) {
             // Group headers only while unfiltered: a header whose items were all
             // searched away is a label over nothing. Same rule the divider below uses.
             if (q.isBlank()) OptionGroupHeader(stringResource(R.string.setting_group_installing))
-            SearchableItem(q, stringResource(R.string.setting_install_mode_title), "shizuku dhizuku root default custom microg") {
-                val currentMode = InstallMode.from(
-                    useShizuku = uiState.useShizuku,
-                    useRoot = uiState.useRoot,
-                    useDhizuku = useDhizuku,
-                    useCustomAuthorizer = uiState.useCustomAuthorizer,
-                    useMicroG = uiState.useMicroG,
-                )
-                InstallModeSelector(
-                    currentMode = currentMode,
-                    shizukuState = uiState.shizukuState,
-                    rootSupported = uiState.rootSupported,
-                    rootState = uiState.rootState,
-                    dhizukuSupported = DhizukuCompat.isSupported,
+            SearchableItem(
+                q,
+                stringResource(R.string.setting_install_priority_title),
+                "shizuku dhizuku root default custom microg priority engine mode " + stringResource(R.string.setting_install_mode_title),
+            ) {
+                app.pwhs.universalinstaller.presentation.setting.components.InstallPriorityList(
+                    uiState = uiState,
                     dhizukuState = dhizukuState,
-                    microGSupported = app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context),
-                    onModeChange = onInstallModeChanged,
+                    useDhizuku = useDhizuku,
+                    onMovePriority = onMoveBackendPriority,
+                    onResetPriority = onResetBackendPriority,
+                    onToggleBackend = onSetBackendEnabled,
+                    onCustomAuthorizerCommandChange = onCustomAuthorizerCommandChange,
+                    onTestCustomAuthorizerCommand = onTestCustomAuthorizerCommand,
                 )
-                if (currentMode == InstallMode.CUSTOM) {
-                    CustomAuthorizerCard(
-                        command = uiState.customAuthorizerCommand,
-                        onCommandChange = onCustomAuthorizerCommandChange,
-                        onTestCommand = onTestCustomAuthorizerCommand,
-                    )
-                }
                 if (uiState.rootSupported && uiState.useRoot && uiState.rootState == RootState.DENIED) {
                     ListItem(
                         headlineContent = { Text(stringResource(R.string.setting_retry_root)) },

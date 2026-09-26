@@ -122,15 +122,9 @@ fun SettingScreen(
         onCustomAuthorizerCommandChange = viewModel::setCustomAuthorizerCommand,
         onTestCustomAuthorizerCommand = viewModel::testCustomAuthorizerCommand,
         onReplayTutorial = {
-            // Reuse MainActivity's onboarding route rather than clearing ONBOARDING_COMPLETED:
-            // clearing it would also re-show the tour on the next cold start, which nobody asked
-            // for. This shows it once, on demand.
             context.startActivity(
                 android.content.Intent(context, app.pwhs.universalinstaller.MainActivity::class.java)
-                    .putExtra(
-                        app.pwhs.universalinstaller.presentation.splash.SplashActivity.EXTRA_SHOW_ONBOARDING,
-                        true,
-                    )
+                    .putExtra(app.pwhs.universalinstaller.presentation.splash.SplashActivity.EXTRA_SHOW_ONBOARDING, true)
             )
         },
         onShizukuInstallerChanged = viewModel::setShizukuInstallerPackageName,
@@ -154,6 +148,9 @@ fun SettingScreen(
         },
         analyticsEnabled = analyticsEnabled,
         onAnalyticsEnabledChanged = viewModel::setAnalyticsEnabled,
+        onMoveBackendPriority = viewModel::moveBackendPriority,
+        onResetBackendPriority = viewModel::resetBackendPriority,
+        onSetBackendEnabled = viewModel::setBackendEnabled,
     )
 }
 
@@ -198,6 +195,9 @@ private fun SettingUi(
     onProfilesClick: () -> Unit = {},
     analyticsEnabled: Boolean = true,
     onAnalyticsEnabledChanged: (Boolean) -> Unit = {},
+    onMoveBackendPriority: (Int, Int) -> Unit = { _, _ -> },
+    onResetBackendPriority: () -> Unit = {},
+    onSetBackendEnabled: (app.pwhs.universalinstaller.domain.model.InstallBackend, Boolean) -> Unit = { _, _ -> },
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val backupViewModel: BackupViewModel = koinViewModel()
@@ -339,16 +339,10 @@ private fun SettingUi(
                     androidx.compose.foundation.layout.Box(modifier = Modifier.fillMaxSize())
                 } else {
                     LazyColumn(
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentPadding = PaddingValues(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 8.dp,
-                    bottom = navBarPadding + 16.dp
-                ),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-            ) {
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = navBarPadding + 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
                 // ── Installation Section ─────────────────────
                 InstallSection(
                     q = q,
@@ -367,6 +361,9 @@ private fun SettingUi(
                     onCustomAuthorizerCommandChange = onCustomAuthorizerCommandChange,
                     onTestCustomAuthorizerCommand = onTestCustomAuthorizerCommand,
                     onOpenInstallOptions = { showInstallOptionsSheet = true },
+                    onMoveBackendPriority = onMoveBackendPriority,
+                    onResetBackendPriority = onResetBackendPriority,
+                    onSetBackendEnabled = onSetBackendEnabled,
                 )
 
                 // ── Profiles Section ─────────────────────────

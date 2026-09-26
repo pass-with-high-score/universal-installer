@@ -33,7 +33,8 @@ import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Shield
-import androidx.compose.material.icons.rounded.Terminal
+import app.pwhs.universalinstaller.domain.model.BackendIcon
+import app.pwhs.universalinstaller.domain.model.InstallBackend
 import app.pwhs.universalinstaller.util.DhizukuCompat
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -300,7 +301,6 @@ private fun ProfileEditUi(
                         add("Shizuku")
                         if (DhizukuCompat.isSupported) {
                             add("Dhizuku")
-                            add("Shizuku + Dhizuku")
                         }
                         if (rootSupported) add("Root")
                         add("Custom")
@@ -325,7 +325,6 @@ private fun ProfileEditUi(
                                                 "Default" -> stringResource(R.string.setting_install_mode_default)
                                                 "Shizuku" -> stringResource(R.string.setting_install_mode_shizuku)
                                                 "Dhizuku" -> stringResource(R.string.setting_install_mode_dhizuku)
-                                                "Shizuku + Dhizuku" -> stringResource(R.string.setting_install_mode_shizuku_dhizuku)
                                                 "Root" -> stringResource(R.string.setting_install_mode_root)
                                                 "MicroG" -> stringResource(R.string.installer_mode_microg)
                                                 else -> stringResource(R.string.setting_install_mode_custom)
@@ -333,17 +332,16 @@ private fun ProfileEditUi(
                                         )
                                     },
                                     leadingIcon = {
-                                        Icon(
-                                            imageVector = when (b) {
-                                                "Default" -> Icons.Rounded.Android
-                                                "Shizuku" -> Icons.Rounded.Key
-                                                "Dhizuku" -> Icons.Rounded.AdminPanelSettings
-                                                "Shizuku + Dhizuku" -> Icons.Rounded.Security
-                                                "Root" -> Icons.Rounded.Shield
-                                                "MicroG" -> Icons.Rounded.CloudDownload
-                                                else -> Icons.Rounded.Terminal
-                                            },
-                                            contentDescription = null,
+                                        val installBackend = when (b) {
+                                            "Default" -> InstallBackend.DEFAULT
+                                            "Shizuku" -> InstallBackend.SHIZUKU
+                                            "Dhizuku" -> InstallBackend.DHIZUKU
+                                            "Root" -> InstallBackend.ROOT
+                                            "MicroG" -> InstallBackend.MICROG
+                                            else -> InstallBackend.CUSTOM
+                                        }
+                                        BackendIcon(
+                                            backend = installBackend,
                                             modifier = Modifier.size(FilterChipDefaults.IconSize),
                                         )
                                     },

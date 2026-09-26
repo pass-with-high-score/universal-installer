@@ -201,7 +201,14 @@
     <string name="setting_install_mode_root">Root</string>
     <string name="setting_install_mode_custom">Tùy chỉnh</string>
     <string name="setting_install_mode_default_sub">Trình cài đặt của Android — sẽ hỏi bạn xác nhận từng ứng dụng</string>
-    <string name="setting_install_mode_custom_sub">Cài đặt qua lệnh shell hoặc authorizer tùy chỉnh</string>
+    <string name="setting_install_priority_title">Độ ưu tiên cài đặt</string>
+    <string name="setting_install_priority_subtitle">Thử lần lượt theo thứ tự ưu tiên; tự động chuyển sang phương thức tiếp theo nếu không sẵn sàng</string>
+    <string name="setting_install_priority_reset">Đặt lại thứ tự</string>
+    <string name="setting_install_priority_up">Tăng ưu tiên</string>
+    <string name="setting_install_priority_down">Giảm ưu tiên</string>
+    <string name="setting_install_priority_ready">Sẵn sàng</string>
+    <string name="setting_install_priority_unavailable">Chưa sẵn sàng</string>
+    <string name="setting_install_priority_fallback">Dự phòng</string>
     <string name="setting_custom_authorizer_title">Trình cấp quyền tùy chỉnh</string>
     <string name="setting_custom_authorizer_subtitle">Cấu hình lệnh shell hoặc binary để cấp quyền cài đặt</string>
     <string name="setting_custom_authorizer_configure">Cấu hình</string>

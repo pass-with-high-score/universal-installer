@@ -68,8 +68,6 @@ class SettingPrivilegeDelegate(
     )
     val rootState: StateFlow<RootState> = _rootState.asStateFlow()
 
-    private var pendingCombinedMode = false
-
     private val defaultRoleDelegate = SettingDefaultRoleDelegate(
         application = application,
         scope = scope,
@@ -104,17 +102,15 @@ class SettingPrivilegeDelegate(
                 app.pwhs.core.telemetry.AnalyticsHelper.logShizukuStatusChanged(app.pwhs.core.telemetry.TelemetryEvents.SHIZUKU_CONNECTED)
                 scope.launch {
                     dataStore.edit { prefs ->
-                        val keepDhizuku = pendingCombinedMode || (prefs[PreferencesKeys.USE_DHIZUKU] ?: false)
+                        val keepDhizuku = prefs[PreferencesKeys.USE_DHIZUKU] ?: false
                         prefs[PreferencesKeys.USE_ROOT] = false
                         prefs[PreferencesKeys.USE_CUSTOM_AUTHORIZER] = false
                         prefs[PreferencesKeys.USE_MICROG] = false
                         prefs[PreferencesKeys.USE_SHIZUKU] = true
                         prefs[PreferencesKeys.USE_DHIZUKU] = keepDhizuku
-                        pendingCombinedMode = false
                     }
                 }
             } else {
-                pendingCombinedMode = false
                 app.pwhs.core.telemetry.AnalyticsHelper.logShizukuStatusChanged(app.pwhs.core.telemetry.TelemetryEvents.SHIZUKU_PERMISSION_DENIED)
                 emitEvent(R.string.setting_shizuku_permission_denied)
             }
@@ -186,9 +182,6 @@ class SettingPrivilegeDelegate(
             InstallMode.DHIZUKU -> {
                 setUseDhizuku(true)
             }
-            InstallMode.SHIZUKU_DHIZUKU -> {
-                setUseShizukuAndDhizuku()
-            }
             InstallMode.ROOT -> scope.launch {
                 val state = backendFactory.requestRoot()
                 _rootState.value = state
@@ -228,7 +221,6 @@ class SettingPrivilegeDelegate(
     }
 
     fun setUseShizuku(enabled: Boolean) {
-        pendingCombinedMode = false
         if (!enabled) {
             scope.launch {
                 dataStore.edit { prefs -> prefs[PreferencesKeys.USE_SHIZUKU] = false }
@@ -253,13 +245,21 @@ class SettingPrivilegeDelegate(
         }
     }
 
-    private fun requestShizukuPermission() {
+    fun requestShizukuPermission() {
         try {
             Shizuku.requestPermission(SHIZUKU_PERMISSION_REQ_CODE)
         } catch (t: Throwable) {
             Timber.w(t, "Shizuku.requestPermission threw")
             emitEvent(R.string.setting_shizuku_start_service_hint)
         }
+    }
+
+    fun updateDhizukuState(state: DhizukuState) {
+        _dhizukuState.value = state
+    }
+
+    fun updateRootState(state: RootState) {
+        _rootState.value = state
     }
 
     fun setUseRoot(enabled: Boolean) {
@@ -289,7 +289,6 @@ class SettingPrivilegeDelegate(
     }
 
     fun setUseDhizuku(enabled: Boolean) {
-        pendingCombinedMode = false
         if (!enabled) {
             scope.launch {
                 dataStore.edit { prefs -> prefs[PreferencesKeys.USE_DHIZUKU] = false }
@@ -305,56 +304,18 @@ class SettingPrivilegeDelegate(
             DhizukuState.PROFILE_OWNER_UNSUPPORTED -> emitEvent(R.string.setting_dhizuku_profile_owner_unsupported)
             DhizukuState.NOT_AUTHORIZED -> DhizukuCompat.requestPermission(application) { granted ->
                 _dhizukuState.value = if (granted) DhizukuState.READY else DhizukuState.NOT_AUTHORIZED
-                if (granted) commitDhizukuMode(keepShizuku = false) else emitEvent(R.string.setting_dhizuku_denied)
+                if (granted) commitDhizukuMode() else emitEvent(R.string.setting_dhizuku_denied)
             }
-            DhizukuState.READY -> commitDhizukuMode(keepShizuku = false)
+            DhizukuState.READY -> commitDhizukuMode()
         }
     }
 
-    private fun commitDhizukuMode(keepShizuku: Boolean = false) = scope.launch {
+    private fun commitDhizukuMode() = scope.launch {
         dataStore.edit { p ->
             p[PreferencesKeys.USE_ROOT] = false
             p[PreferencesKeys.USE_CUSTOM_AUTHORIZER] = false
             p[PreferencesKeys.USE_MICROG] = false
             p[PreferencesKeys.USE_DHIZUKU] = true
-            p[PreferencesKeys.USE_SHIZUKU] = keepShizuku
-        }
-    }
-
-    fun setUseShizukuAndDhizuku() {
-        pendingCombinedMode = true
-        val dState = DhizukuCompat.state(application)
-        _dhizukuState.value = dState
-        updateShizukuState()
-        val sState = _shizukuState.value
-
-        if (dState == DhizukuState.UNSUPPORTED && sState == ShizukuState.UNSUPPORTED) {
-            emitEvent(R.string.setting_shizuku_unsupported)
-            return
-        }
-        if (dState == DhizukuState.PROFILE_OWNER_UNSUPPORTED && sState != ShizukuState.READY) {
-            emitEvent(R.string.setting_dhizuku_profile_owner_unsupported)
-        }
-
-        if (dState == DhizukuState.NOT_AUTHORIZED) {
-            DhizukuCompat.requestPermission(application) { granted ->
-                _dhizukuState.value = if (granted) DhizukuState.READY else DhizukuState.NOT_AUTHORIZED
-                if (granted) {
-                    commitDhizukuMode(keepShizuku = true)
-                } else {
-                    emitEvent(R.string.setting_dhizuku_denied)
-                }
-            }
-        }
-
-        if (sState == ShizukuState.NO_PERMISSION) {
-            requestShizukuPermission()
-        }
-
-        if (dState == DhizukuState.READY || sState == ShizukuState.READY) {
-            commitDhizukuMode(keepShizuku = true)
-        } else if (dState == DhizukuState.NOT_RUNNING && sState == ShizukuState.NOT_RUNNING) {
-            emitEvent(R.string.setting_shizuku_dhizuku_not_running)
         }
     }
 
