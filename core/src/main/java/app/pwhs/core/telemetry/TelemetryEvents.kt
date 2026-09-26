@@ -84,11 +84,14 @@ object TelemetryEvents {
     const val EVENT_APP_MANAGEMENT_ACTION = "app_management_action"
     const val EVENT_CACHE_CLEAN_STARTED = "cache_clean_started"
     const val EVENT_DEFAULT_INSTALLER_ACTION = "default_installer_action"
-    const val EVENT_SHIZUKU_STATUS_CHANGED = "shizuku_status_changed"
+    const val EVENT_PRIVILEGED_SERVICE_STATUS_CHANGED = "privileged_service_status_changed"
+    /** @deprecated Kept as an alias for compatibility with older callers. */
+    const val EVENT_SHIZUKU_STATUS_CHANGED = EVENT_PRIVILEGED_SERVICE_STATUS_CHANGED
 
     const val PARAM_ACTION_TYPE = "action_type"
     const val PARAM_CACHE_SIZE_MB = "cache_size_mb"
     const val PARAM_ACTION = "action"
+    const val PARAM_BACKEND = "backend"
 
     const val ACTION_BACKUP_APK = "backup_apk"
     const val ACTION_EXTRACT_SPLITS = "extract_splits"
@@ -99,6 +102,10 @@ object TelemetryEvents {
     const val DEFAULT_INSTALLER_PROMPT_SHOWN = "prompt_shown"
     const val DEFAULT_INSTALLER_SET_SUCCESS = "set_success"
     const val DEFAULT_INSTALLER_CANCELLED = "cancelled"
+
+    const val BACKEND_AUTO = "auto"
+    const val BACKEND_PORTER = "porter"
+    const val BACKEND_SHIZUKU = "shizuku"
 
     const val SHIZUKU_CONNECTED = "connected"
     const val SHIZUKU_PERMISSION_DENIED = "permission_denied"

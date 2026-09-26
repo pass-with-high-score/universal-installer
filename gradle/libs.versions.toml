@@ -26,6 +26,7 @@ coroutines = "1.11.0"
 zxingEmbedded = "4.3.0"
 room = "2.8.4"
 shizuku = "13.1.5"
+porter = "0.1.0"
 dhizuku = "2.6.0"
 rikka-stub = "4.4.0"
 benchmark = "1.5.0-rc02"
@@ -123,15 +124,16 @@ androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro
 androidx-test-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version = "2.4.0" }
 
+# Shizuku API/provider — still used by the TV module
 shizuku-api = { module = "dev.rikka.shizuku:api", version.ref = "shizuku" }
 shizuku-provider = { module = "dev.rikka.shizuku:provider", version.ref = "shizuku" }
+
+porter-client = { module = "com.github.d4rken-org.porter-api:client", version.ref = "porter" }
 rikka-stub = { module = "dev.rikka.hidden:stub", version.ref = "rikka-stub" }
 
 # topjohnwu libsu — only pulled into the `full` flavor. Used directly for
 # `Shell.getCachedShell()?.close()` recovery and for `Shell.isAppGrantedRoot()` probing.
 libsu-core = { module = "com.github.topjohnwu.libsu:core", version.ref = "libsu" }
-# libsu RootService — bound service running as UID 0 so we can call hidden IPackageManager
-# methods (addPreferredActivity etc.) that the app process can't reach even with shell auth.
 libsu-service = { module = "com.github.topjohnwu.libsu:service", version.ref = "libsu" }
 
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin-bom" }
@@ -196,4 +198,3 @@ ackpine-libsu = [
     "ackpine-libsu",
     "ackpine-libsu-ktx",
 ]
-

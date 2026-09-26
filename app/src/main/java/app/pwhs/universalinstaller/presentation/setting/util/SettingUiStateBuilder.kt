@@ -17,6 +17,7 @@ import app.pwhs.universalinstaller.util.BiometricGate
 
 object SettingUiStateBuilder {
 
+    /** Builds the immutable settings UI state from the combined preference flows. */
     fun build(
         application: Application,
         backendFactory: InstallerBackendFactory,
@@ -53,6 +54,10 @@ object SettingUiStateBuilder {
         val useCustomAuthorizer = flows.getOrNull(15) as? Boolean ?: false
         val customAuthorizerCommand = flows.getOrNull(16) as? String ?: ""
         val useMicroG = flows.getOrNull(17) as? Boolean ?: false
+        val privilegedServiceBackend = flows.getOrNull(18) as? app.pwhs.universalinstaller.presentation.setting.PrivilegedServiceBackend
+            ?: app.pwhs.universalinstaller.presentation.setting.PrivilegedServiceBackend.AUTO
+        val activePrivilegedServiceBackend = flows.getOrNull(19) as? app.pwhs.universalinstaller.presentation.setting.PrivilegedServiceBackend
+            ?: app.pwhs.universalinstaller.presentation.setting.PrivilegedServiceBackend.AUTO
 
         val versionName = try {
             application.packageManager
@@ -99,6 +104,8 @@ object SettingUiStateBuilder {
             useCustomAuthorizer = useCustomAuthorizer,
             customAuthorizerCommand = customAuthorizerCommand,
             useMicroG = useMicroG,
+            privilegedServiceBackend = privilegedServiceBackend,
+            activePrivilegedServiceBackend = activePrivilegedServiceBackend,
         )
     }
 }

@@ -66,6 +66,14 @@
     <string name="setting_custom_authorizer_err_not_authorizer">\'%1$s\' is not an authorizer (use su, ksu, rish, sh, etc.)</string>
     <string name="setting_custom_authorizer_err_missing_placeholder">Missing {command} placeholder for %1$s flag</string>
     <string name="setting_custom_authorizer_reset_default">Reset to default</string>
+    <string name="setting_privileged_service_title">Privileged service</string>
+    <string name="setting_privileged_service_subtitle">Selected: %1$s · Active: %2$s. Restart the app after changing this setting.</string>
+    <string name="setting_privileged_service_auto">Automatic</string>
+    <string name="setting_privileged_service_porter">Porter</string>
+    <string name="setting_privileged_service_shizuku">Shizuku</string>
+    <string name="setting_privileged_service_restart_required">Privileged service saved. Force-stop Universal Installer and reopen it for the change to take effect.</string>
+    <string name="setting_privileged_service_save_failed">Could not save the privileged service selection.</string>
+
     <string name="setting_shizuku_not_installed">Shizuku not installed</string>
     <string name="setting_shizuku_not_running">Shizuku installed but not running</string>
     <string name="setting_shizuku_unsupported">Shizuku version too old (pre-v11)</string>
@@ -73,7 +81,9 @@
     <string name="setting_shizuku_ready">Silent install without prompts</string>
     <string name="setting_shizuku_permission_denied">Shizuku permission was denied</string>
     <string name="setting_shizuku_start_service_hint">Open the Shizuku app and start the service first</string>
-    <string name="setting_shizuku_install_hint">Install Shizuku from Play Store to use this backend</string>
+    <string name="setting_shizuku_install_hint">Install Shizuku to use this backend</string>
+    <string name="setting_porter_install_hint">Install Porter to use this backend</string>
+    <string name="setting_porter_start_service_hint">Open Porter and start its service first</string>
     <string name="setting_delete_apk_title">Delete APK after install</string>
     <string name="setting_auto_open_title">Open app after install</string>
     <string name="setting_auto_open_subtitle">Launch the installed app from the success screen — with a 3-second cancellable countdown</string>
@@ -81,8 +91,8 @@
     <string name="setting_show_download_tab_title">Show Download Tab</string>
     <string name="setting_show_download_tab_subtitle">Show the Download tab on the main screen for remote APK installs</string>
     <string name="setting_default_installer_title">Set as default installer</string>
-    <string name="setting_default_installer_subtitle">Disable system installer to always use Universal Installer for APK files (requires Shizuku or Root)</string>
-    <string name="setting_default_installer_needs_backend">Enable Shizuku or Root first to change the default installer</string>
+    <string name="setting_default_installer_subtitle">Disable system installer to always use Universal Installer for APK files (requires Shizuku, Porter, or Root)</string>
+    <string name="setting_default_installer_needs_backend">Enable Shizuku, Porter, or Root first to change the default installer</string>
     <string name="setting_default_installer_enabled">Universal Installer is now the default</string>
     <string name="setting_default_installer_disabled">System installer restored</string>
     <string name="setting_default_installer_failed">Failed to change default installer</string>
@@ -133,8 +143,8 @@
     <string name="help_replay_tutorial">Replay the tutorial</string>
     <string name="help_replay_tutorial_sub">Show the intro screens again from the start</string>
     <string name="help_intro">Short answers to the settings that most often surprise people. Tap a topic to open it.</string>
-    <string name="help_modes_title">Install modes: Package Installer, Shizuku, Root</string>
-    <string name="help_modes_body">Package Installer is the default and needs no setup, but Android shows its own confirmation for every install. Shizuku and Root install silently and unlock the extra options below — Shizuku needs the Shizuku app running, Root needs a rooted device. Dhizuku is a third option, shown as its own switch: it also installs silently and survives a reboot without being restarted, but it must be set as device owner, which requires a device with no accounts signed in, and it supports only \&quot;Allow downgrade\&quot;. Options that need a privileged backend do nothing while you are on Package Installer.</string>
+    <string name="help_modes_title">Install modes: Package Installer, Shizuku/Porter, Root</string>
+    <string name="help_modes_body">Package Installer is the default and needs no setup, but Android shows its own confirmation for every install. Shizuku, Porter, and Root install silently and unlock the extra options below — Shizuku needs the Shizuku app running; Porter needs the Porter service running; Root needs a rooted device. Dhizuku is a third option, shown as its own switch: it also installs silently and survives a reboot without being restarted, but it must be set as device owner, which requires a device with no accounts signed in, and it supports only \&quot;Allow downgrade\&quot;. Options that need a privileged backend do nothing while you are on Package Installer.</string>
     <string name="help_conflict_title">\&quot;Already installed\&quot; errors: which switch actually helps</string>
     <string name="help_conflict_body">Three different problems produce a similar-looking error. Installing an older version needs \&quot;Allow downgrade\&quot; — \&quot;Replace existing\&quot; does not cover it. A normal update needs \&quot;Replace existing\&quot;, which is on by default. And if the installed app was signed with a different key, no option helps: it has to be uninstalled first and its data is lost.</string>
     <string name="help_profiles_title">Installer profiles</string>
@@ -144,7 +154,7 @@
     <string name="help_delete_title">Delete APK after installation</string>
     <string name="help_delete_body">Works for files you pick inside the app. When another app hands the APK over — most file managers do — it usually shares it in a way that gives no permission to delete it, and you will get a message saying so. Deleting it from that file manager is the way around it.</string>
     <string name="help_source_title">Changing the installation source</string>
-    <string name="help_source_body">Needs Shizuku or Root; on Package Installer the setting is ignored. It changes the installer this app is recorded under, which is what most app-info screens show. It cannot change who started the install, and it does not make the Play Store treat an app as installed from Play.</string>
+    <string name="help_source_body">Needs Shizuku, Porter, or Root; on Package Installer the setting is ignored. It changes the installer this app is recorded under, which is what most app-info screens show. It cannot change who started the install, and it does not make the Play Store treat an app as installed from Play.</string>
     <string name="setting_section_about">About</string>
     <string name="setting_about_app_name" translatable="false">Universal Installer</string>
     <string name="setting_github_title" translatable="false">GitHub</string>
@@ -196,7 +206,7 @@
     <string name="diagnostics_cancel">Cancel</string>
     <string name="setting_section_install_options">Install options</string>
     <string name="setting_install_options_subtitle">Privileged flags, downgrade, permissions, install source</string>
-    <string name="setting_install_options_unprivileged_note">Advanced flags require Shizuku, Root, or Dhizuku mode to be enabled.</string>
+    <string name="setting_install_options_unprivileged_note">Advanced flags require Shizuku, Porter, Root, or Dhizuku mode to be enabled.</string>
     <string name="setting_install_options_dhizuku_note">Dhizuku only supports &quot;Allow downgrade&quot;. The rest apply when you switch back to Shizuku or Root.</string>
     <string name="setting_blacklist_title">Blocked packages</string>
     <string name="setting_blacklist_subtitle">Packages that will never be installed. Useful for apps that keep reinstalling themselves.</string>
@@ -205,7 +215,7 @@
     <string name="setting_blacklist_remove">Unblock</string>
     <string name="setting_blacklist_count">%1$d blocked</string>
     <string name="setting_auto_approve_title">Auto-approve from selected apps</string>
-    <string name="setting_auto_approve_subtitle">Install requests from chosen apps proceed automatically via Shizuku or Root without confirmation prompts</string>
+    <string name="setting_auto_approve_subtitle">Install requests from chosen apps proceed automatically via Shizuku, Porter, or Root without confirmation prompts</string>
     <string name="setting_auto_approve_apps_title">Approved applications</string>
     <string name="setting_auto_approve_count">%1$d approved</string>
     <string name="setting_auto_approve_none">None selected</string>
@@ -214,7 +224,7 @@
     <string name="setting_auto_approve_search_hint">Search installed apps…</string>
     <string name="setting_auto_approve_preset_header">Popular sources</string>
     <string name="setting_auto_approve_all_apps_header">Installed applications</string>
-    <string name="setting_auto_approve_notice">Silent auto-installation requires Root, Shizuku, or Dhizuku. Packages carrying safety risks (such as downgrades or signature conflicts) will still ask for manual confirmation.</string>
+    <string name="setting_auto_approve_notice">Silent auto-installation requires Root, Shizuku, Porter, or Dhizuku. Packages carrying safety risks (such as downgrades or signature conflicts) will still ask for manual confirmation.</string>
     <string name="setting_auto_approve_add_custom">Add custom package name</string>
     <string name="setting_auto_approve_custom_dialog_title">Add application</string>
     <string name="setting_auto_approve_custom_dialog_hint">e.g. org.fdroid.fdroid</string>
@@ -282,9 +292,9 @@
     <string name="parental_guidance_card_subtitle">How to prevent children from uninstalling the app or bypassing security</string>
     <string name="parental_guidance_card_btn">View Guide</string>
     <string name="parental_guidance_dialog_title">Comprehensive Parental Protection</string>
-    <string name="parental_guidance_dialog_content">To ensure children cannot bypass Universal Installer:\n\n1. Prevent Uninstallation:\nAndroid allows uninstallation via system Settings. Use your phone\'s built-in App Lock (Samsung Secure Folder / App Lock, Xiaomi App Lock) or Google Family Link to lock the \"Settings\" app.\n\n2. Prevent Alternate Installers:\nUse the \"Freeze System Package Installer\" option below (requires Shizuku or Root) so that other apps (browsers, file managers) cannot trigger the system installer.\n\n3. Revoke Permissions:\nUse \"Revoke other apps\' install permissions\" below to ensure only Universal Installer can install packages.</string>
+    <string name="parental_guidance_dialog_content">To ensure children cannot bypass Universal Installer:\n\n1. Prevent Uninstallation:\nAndroid allows uninstallation via system Settings. Use your phone\'s built-in App Lock (Samsung Secure Folder / App Lock, Xiaomi App Lock) or Google Family Link to lock the \"Settings\" app.\n\n2. Prevent Alternate Installers:\nUse the \"Freeze System Package Installer\" option below (requires Shizuku, Porter, or Root) so that other apps (browsers, file managers) cannot trigger the system installer.\n\n3. Revoke Permissions:\nUse \"Revoke other apps\' install permissions\" below to ensure only Universal Installer can install packages.</string>
     <string name="setting_security_group_privileged">Advanced Protection (Shizuku / Root)</string>
-    <string name="setting_security_privileged_not_running">Shizuku or Root is required to enable these options</string>
+    <string name="setting_security_privileged_not_running">Shizuku, Porter, or Root is required to enable these options</string>
     <string name="setting_disable_system_installer_title">Freeze System Package Installer</string>
     <string name="setting_disable_system_installer_subtitle">Disables Android\'s default package installer to prevent bypassing via other apps</string>
     <string name="setting_disable_system_installer_toast_disabled">System installer has been frozen</string>

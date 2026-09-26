@@ -24,7 +24,7 @@
     <string name="manage_action_enable">Enable</string>
     <string name="manage_action_enable_done">Enabled %1$s</string>
     <string name="manage_action_enable_failed">Enable failed: %1$s</string>
-    <string name="manage_privileged_unavailable">Shizuku or Root not ready</string>
+    <string name="manage_privileged_unavailable">Shizuku, Porter, or Root not ready</string>
     <string name="manage_batch_action_force_stop">Force stop</string>
     <string name="manage_batch_action_disable">Disable</string>
     <string name="manage_batch_action_clear_data">Clear data</string>
@@ -144,9 +144,9 @@
     <string name="uninstall_system_method_skip_sub">Uninstall only the regular apps in this selection.</string>
     <string name="uninstall_system_continue">Continue</string>
     <string name="uninstall_system_privileged_required_title">Privileged access required</string>
-    <string name="uninstall_system_privileged_required_body_single">%s is a system app. Enable Shizuku or Root in Settings to remove it.</string>
-    <string name="uninstall_system_privileged_required_body_batch">%1$d system app(s) in this selection cannot be removed without Shizuku or Root. Proceed with the remaining %2$d regular apps?</string>
-    <string name="uninstall_system_privileged_required_body_batch_only_system">%d system app(s) selected. Enable Shizuku or Root in Settings to remove them.</string>
+    <string name="uninstall_system_privileged_required_body_single">%s is a system app. Enable Shizuku, Porter, or Root in Settings to remove it.</string>
+    <string name="uninstall_system_privileged_required_body_batch">%1$d system app(s) in this selection cannot be removed without Shizuku, Porter, or Root. Proceed with the remaining %2$d regular apps?</string>
+    <string name="uninstall_system_privileged_required_body_batch_only_system">%d system app(s) selected. Enable Shizuku, Porter, or Root in Settings to remove them.</string>
     <string name="uninstall_system_proceed_user_only">Proceed with regular apps</string>
     <string name="manage_filter_blocked">Blocked</string>
     <string name="manage_blocked_badge">Blocked</string>

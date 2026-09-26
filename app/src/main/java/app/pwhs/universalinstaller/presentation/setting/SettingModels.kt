@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.presentation.setting
 
+import app.pwhs.universalinstaller.R
 import app.pwhs.core.domain.AppThemePreset
 import app.pwhs.core.domain.ThemeMode
 import app.pwhs.universalinstaller.domain.model.InstallerProfile
@@ -70,6 +71,20 @@ fun RootOptions.asCommon() = CommonInstallOptions(
     requestUpdateOwnership = requestUpdateOwnership,
     dex2oatOptimization = dex2oatOptimization,
 )
+
+enum class PrivilegedServiceBackend(val labelKey: Int) {
+    AUTO(R.string.setting_privileged_service_auto),
+    PORTER(R.string.setting_privileged_service_porter),
+    SHIZUKU(R.string.setting_privileged_service_shizuku);
+
+    companion object {
+        /**
+         * Parses the persisted backend selection, falling back to automatic selection.
+         */
+        fun from(stored: String?): PrivilegedServiceBackend =
+            entries.firstOrNull { it.name == stored } ?: AUTO
+    }
+}
 
 enum class SecurityLevel {
     Normal,
@@ -190,6 +205,8 @@ data class SettingUiState(
     val autoOpenAfterInstall: Boolean = false,
     val shizukuState: ShizukuState = ShizukuState.NOT_INSTALLED,
     val shizukuAvailable: Boolean = false,
+    val privilegedServiceBackend: PrivilegedServiceBackend = PrivilegedServiceBackend.AUTO,
+    val activePrivilegedServiceBackend: PrivilegedServiceBackend = PrivilegedServiceBackend.AUTO,
     val shizukuOptions: ShizukuOptions = ShizukuOptions(),
     val rootSupported: Boolean = false,
     val rootState: RootState = RootState.UNAVAILABLE,

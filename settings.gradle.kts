@@ -20,6 +20,7 @@ dependencyResolutionManagement {
             url = uri("https://jitpack.io")
             content {
                 includeGroup("com.github.topjohnwu.libsu")
+                includeGroup("com.github.d4rken-org.porter-api")
             }
         }
     }

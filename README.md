@@ -60,7 +60,8 @@
 ## Key Features
 
 - **⚡ Flexible Installation Backends**:
-  - Standard system installer, **Shizuku**, and **Root (libsu)**.
+  - Standard system installer, **Shizuku/Porter**, and **Root (libsu)**.
+  - Shizuku-compatible privileged service selection: **Automatic**, **Porter**, or **Shizuku**; changes take effect after a full app force-stop/restart.
   - Silent install and uninstall without prompts.
   - Privileged controls: allow downgrade, bypass minimum SDK restrictions, grant permissions, install for all users, and spoof installer package names (Google Play, F-Droid, Aurora Store, Amazon, etc.).
 
@@ -93,7 +94,7 @@
 ## Tech Stack
 
 - **UI**: [Jetpack Compose](https://developer.android.com/jetpack/compose), [Wear Compose](https://developer.android.com/training/wearables/compose), Material 3
-- **Installer Engine**: [Ackpine](https://ackpine.solrudev.ru/) & [Shizuku](https://shizuku.rikka.app/)
+- **Installer Engine**: [Ackpine](https://ackpine.solrudev.ru/) & the Shizuku-compatible **Porter/Shizuku** service layer
 - **Networking**: [Ktor](https://ktor.io/)
 - **Storage & Async**: [Room](https://developer.android.com/training/data-storage/room), [DataStore](https://developer.android.com/topic/libraries/architecture/datastore), [WorkManager](https://developer.android.com/topic/libraries/architecture/workmanager)
 - **Dependency Injection**: [Koin](https://insert-koin.io/)
@@ -112,7 +113,7 @@
 
 ---
 
-## Building from Source
+## Building from Source.
 
 ### Prerequisites
 - Android Studio Ladybug or newer

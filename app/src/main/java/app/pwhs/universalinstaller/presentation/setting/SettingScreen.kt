@@ -76,6 +76,9 @@ import app.pwhs.universalinstaller.presentation.setting.sections.BackupSection
 import app.pwhs.universalinstaller.presentation.setting.backup.BackupSheetsHost
 import app.pwhs.universalinstaller.presentation.setting.backup.BackupViewModel
 import app.pwhs.universalinstaller.presentation.setting.components.*
+/**
+ * Renders the settings screen and wires setting actions to the view model.
+ */
 @Composable
 fun SettingScreen(
     modifier: Modifier = Modifier,
@@ -106,6 +109,7 @@ fun SettingScreen(
         modifier = modifier,
         uiState = uiState,
         onInstallModeChanged = viewModel::setInstallMode,
+        onPrivilegedServiceBackendChanged = viewModel::setPrivilegedServiceBackend,
         onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
         securityLevel = securityLevel,
         externalOpenMode = externalOpenMode,
@@ -156,12 +160,16 @@ fun SettingScreen(
     )
 }
 
+/**
+ * Renders the settings content, including the privileged-service selector.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun SettingUi(
     modifier: Modifier = Modifier,
     uiState: SettingUiState = SettingUiState(),
     onInstallModeChanged: (InstallMode) -> Unit = {},
+    onPrivilegedServiceBackendChanged: (PrivilegedServiceBackend) -> Unit = {},
     onVirusTotalKeyChanged: (String) -> Unit = {},
     securityLevel: SecurityLevel = SecurityLevel.Normal,
     externalOpenMode: ExternalOpenMode = ExternalOpenMode.Dialog,
@@ -280,7 +288,7 @@ private fun SettingUi(
             // full list renders when search is empty.
             val installLabels = listOf(
                 stringResource(R.string.setting_use_dhizuku_title), "dhizuku",
-                stringResource(R.string.setting_install_mode_title), "shizuku", "root", "default",
+                stringResource(R.string.setting_install_mode_title), "shizuku", "porter", "privileged service", "root", "default",
                 stringResource(R.string.setting_section_install_options),
                 "downgrade", "replace", "permission", "test", "bypass", "source", "rollback",
                 stringResource(R.string.setting_delete_apk_title),
@@ -355,6 +363,7 @@ private fun SettingUi(
                     useDhizuku = useDhizuku,
                     context = context,
                     onInstallModeChanged = onInstallModeChanged,
+                    onPrivilegedServiceBackendChanged = onPrivilegedServiceBackendChanged,
                     onUseDhizukuChanged = onUseDhizukuChanged,
                     onRootRetry = onRootRetry,
                     onDeleteApkChanged = onDeleteApkChanged,

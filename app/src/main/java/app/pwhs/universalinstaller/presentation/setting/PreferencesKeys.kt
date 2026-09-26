@@ -11,6 +11,8 @@ object PreferencesKeys {
     val AMOLED_MODE = booleanPreferencesKey("amoled_mode")
     val THEME_PRESET = stringPreferencesKey("theme_preset")
     val USE_SHIZUKU = booleanPreferencesKey("use_shizuku")
+    /** Porter/Shizuku service selection. Values: AUTO, PORTER, SHIZUKU. */
+    val PRIVILEGED_SERVICE_BACKEND = stringPreferencesKey("privileged_service_backend")
     val USE_ROOT = booleanPreferencesKey("use_root")
     val INSTALL_USER_ID = intPreferencesKey("install_user_id")
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")

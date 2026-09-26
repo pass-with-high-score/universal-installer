@@ -126,6 +126,8 @@ class SettingViewModel(
 
     val dhizukuState: StateFlow<DhizukuState> = privilegeDelegate.dhizukuState
     val useDhizuku: StateFlow<Boolean> = privilegeDelegate.useDhizuku
+    val privilegedServiceBackend: StateFlow<PrivilegedServiceBackend> = privilegeDelegate.privilegedServiceBackend
+    val activePrivilegedServiceBackend: StateFlow<PrivilegedServiceBackend> = privilegeDelegate.activePrivilegedServiceBackend
     val securityLevel: StateFlow<SecurityLevel> = preferencesDelegate.securityLevel
     val externalOpenMode: StateFlow<ExternalOpenMode> = preferencesDelegate.externalOpenMode
     val installUiStyle: StateFlow<InstallUiStyle> = preferencesDelegate.installUiStyle
@@ -227,6 +229,8 @@ class SettingViewModel(
         privilegeDelegate.useCustomAuthorizer,
         privilegeDelegate.customAuthorizerCommand,
         privilegeDelegate.useMicroG,
+        privilegeDelegate.privilegedServiceBackend,
+        privilegeDelegate.activePrivilegedServiceBackend,
     ) { flows ->
         SettingUiStateBuilder.build(application, backendFactory, flows)
     }.stateIn(
@@ -249,9 +253,12 @@ class SettingViewModel(
 
     // ── Privilege Delegates ─────────────────────────────────────────────────
 
+    /** Changes the installer mode used for package installation. */
     fun setInstallMode(mode: InstallMode) = privilegeDelegate.setInstallMode(mode)
     fun updateShizukuState() = privilegeDelegate.updateShizukuState()
     fun setUseShizuku(enabled: Boolean) = privilegeDelegate.setUseShizuku(enabled)
+    /** Selects the privileged service backend for the next process launch. */
+    fun setPrivilegedServiceBackend(backend: PrivilegedServiceBackend) = privilegeDelegate.setPrivilegedServiceBackend(backend)
     fun setUseRoot(enabled: Boolean) = privilegeDelegate.setUseRoot(enabled)
     fun retryRoot() = privilegeDelegate.retryRoot()
     fun setUseDhizuku(enabled: Boolean) = privilegeDelegate.setUseDhizuku(enabled)
