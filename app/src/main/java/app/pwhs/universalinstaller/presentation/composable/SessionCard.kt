@@ -62,6 +62,7 @@ fun SessionCard(
      *  out at all — the card stayed for good (issue #93). */
     onDismiss: () -> Unit = {},
     onOpenShizuku: (() -> Unit)? = null,
+    onFallbackInstall: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val errorText = sessionData.error.resolve(context)
@@ -188,6 +189,16 @@ fun SessionCard(
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.SemiBold,
                         )
+                    }
+                }
+                if (onFallbackInstall != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Button(
+                        onClick = onFallbackInstall,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        Text(stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer"))
                     }
                 }
                 Spacer(Modifier.height(12.dp))

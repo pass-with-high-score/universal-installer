@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.wearos.presentation.detail
 
 import android.content.Intent
 import android.provider.Settings
+import app.pwhs.core.util.PermissionSettingsHelper
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -69,13 +70,7 @@ fun ApkDetailScreen(
 }
 
 private fun openUnknownSourcesSettings(context: android.content.Context) {
-    val intent = Intent(
-        Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-        "package:${context.packageName}".toUri(),
-    )
-    if (intent.resolveActivity(context.packageManager) != null) {
-        context.startActivity(intent)
-    }
+    PermissionSettingsHelper.openInstallPermission(context)
 }
 
 @Composable

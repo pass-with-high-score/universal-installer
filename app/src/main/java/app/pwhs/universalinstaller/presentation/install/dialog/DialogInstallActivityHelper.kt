@@ -9,6 +9,7 @@ import android.provider.Settings
 import androidx.datastore.preferences.core.Preferences
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
 import app.pwhs.core.util.PermissionMonitor
+import app.pwhs.core.util.PermissionSettingsHelper
 import app.pwhs.universalinstaller.presentation.install.util.InstallSessionManager
 import app.pwhs.core.data.local.dataStore
 import kotlinx.coroutines.CoroutineScope
@@ -43,18 +44,7 @@ object DialogInstallActivityHelper {
 
     fun openInstallPermissionSettings(activity: Activity) {
         PermissionMonitor.start(activity) { activity.packageManager.canRequestPackageInstalls() }
-        runCatching {
-            activity.startActivity(
-                Intent(
-                    Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                    Uri.parse("package:${activity.packageName}"),
-                ),
-            )
-        }.recoverCatching {
-            activity.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
-        }.recoverCatching {
-            activity.startActivity(Intent(Settings.ACTION_SETTINGS))
-        }
+        PermissionSettingsHelper.openInstallPermission(activity)
     }
 
     suspend fun readInstallUiStyle(context: Context): app.pwhs.universalinstaller.domain.model.InstallUiStyle =

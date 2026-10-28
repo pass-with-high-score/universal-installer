@@ -118,4 +118,8 @@
 
     <!-- Web Link Helper -->
     <string name="error_cannot_open_link_copied">Không thể mở liên kết. Đã sao chép vào bộ nhớ tạm</string>
+
+    <!-- Permission Settings Fallback -->
+    <string name="error_cannot_open_settings">Không thể tự động mở Cài đặt. Vui lòng mở Cài đặt trên máy &gt; Ứng dụng &gt; Universal Installer để cấp quyền.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Tùy chọn nhà phát triển chưa được mở khóa. Vui lòng vào Cài đặt &gt; Giới thiệu điện thoại và nhấn 7 lần vào Số hiệu bản dựng.</string>
 </resources>

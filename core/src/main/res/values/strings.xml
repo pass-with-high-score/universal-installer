@@ -122,4 +122,8 @@
 
     <!-- Web Link Helper -->
     <string name="error_cannot_open_link_copied">Unable to open link. Copied to clipboard</string>
+
+    <!-- Permission Settings Fallback -->
+    <string name="error_cannot_open_settings">Unable to open system settings. Please open Settings manually &gt; Apps &gt; Universal Installer to grant permission.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Developer options not unlocked. Please open Settings &gt; About phone, and tap Build number 7 times.</string>
 </resources>

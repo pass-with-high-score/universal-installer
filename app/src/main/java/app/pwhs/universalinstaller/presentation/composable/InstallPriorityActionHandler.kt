@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
+import app.pwhs.core.util.PermissionSettingsHelper
 import app.pwhs.core.util.openUriSafely
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.InstallBackend
@@ -43,15 +44,7 @@ internal fun handleBackendSelection(
                     context.getString(R.string.permission_install_prompt_required),
                     Toast.LENGTH_LONG
                 ).show()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    runCatching {
-                        val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                            data = Uri.parse("package:${context.packageName}")
-                            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        }
-                        context.startActivity(intent)
-                    }
-                }
+                PermissionSettingsHelper.openInstallPermission(context)
             }
             settingViewModel.promoteBackendToTop(InstallBackend.DEFAULT)
             settingViewModel.setInstallMode(InstallMode.DEFAULT)

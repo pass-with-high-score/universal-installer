@@ -189,9 +189,11 @@ object Diagnostics {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             withContext(Dispatchers.Main) {
-                context.startActivity(
-                    Intent.createChooser(intent, context.getString(R.string.diagnostics_share))
-                )
+                runCatching {
+                    context.startActivity(
+                        Intent.createChooser(intent, context.getString(R.string.diagnostics_share))
+                    )
+                }
             }
         } catch (e: Exception) {
             Log.e(TAG, "Failed to share diagnostics file, falling back to text", e)
@@ -202,9 +204,11 @@ object Diagnostics {
                 putExtra(Intent.EXTRA_TEXT, report)
             }
             withContext(Dispatchers.Main) {
-                context.startActivity(
-                    Intent.createChooser(intent, context.getString(R.string.diagnostics_share))
-                )
+                runCatching {
+                    context.startActivity(
+                        Intent.createChooser(intent, context.getString(R.string.diagnostics_share))
+                    )
+                }
             }
         }
     }

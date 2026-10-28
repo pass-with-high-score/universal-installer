@@ -10,6 +10,7 @@ import app.pwhs.core.data.local.dataStore
 import app.pwhs.universalinstaller.presentation.install.util.PackageFileFilter
 import app.pwhs.universalinstaller.presentation.install.wear.WearApkSender
 import app.pwhs.universalinstaller.util.BiometricGate
+import app.pwhs.universalinstaller.util.SystemIntentInstaller
 import kotlinx.coroutines.flow.map
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -888,6 +889,7 @@ private fun InstallUi(
                 ) { session ->
                     val sessionProgress =
                         uiState.sessionsProgress.find { it.id == session.id }
+                    val fallbackUri = session.originalUri ?: session.uris.firstOrNull() ?: session.filePath?.let { Uri.fromFile(java.io.File(it)) }
                     SessionCard(
                         sessionData = session,
                         sessionProgress = sessionProgress,
@@ -896,6 +898,21 @@ private fun InstallUi(
                         onDismiss = { onDismissSession(session.id) },
                         onOpenShizuku = {
                             context.startActivity(Intent(context, SettingActivity::class.java))
+                        },
+                        onFallbackInstall = fallbackUri?.let { apkUri ->
+                            {
+                                val intent = SystemIntentInstaller.createInstallIntent(context, apkUri)
+                                val launched = runCatching { context.startActivity(intent) }
+                                    .onFailure { timber.log.Timber.e(it, "Failed to launch system installer fallback") }
+                                    .isSuccess
+                                if (!launched) {
+                                    Toast.makeText(
+                                        context,
+                                        context.getString(R.string.dialog_fallback_install_unavailable),
+                                        Toast.LENGTH_SHORT,
+                                    ).show()
+                                }
+                            }
                         },
                         modifier = Modifier.animateItem(),
                     )

@@ -168,8 +168,10 @@ fun TrackedAppDetailBottomSheet(
                 if (app.isInstalled) {
                     FilledTonalButton(
                         onClick = {
-                            val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                            if (intent != null) context.startActivity(intent)
+                            runCatching {
+                                val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+                                if (intent != null) context.startActivity(intent)
+                            }
                         },
                         modifier = Modifier.weight(1f),
                         shape = MaterialTheme.shapes.medium,
@@ -194,11 +196,13 @@ fun TrackedAppDetailBottomSheet(
 
                 OutlinedButton(
                     onClick = {
-                        val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                            type = "text/plain"
-                            putExtra(Intent.EXTRA_TEXT, app.sourceUrl)
+                        runCatching {
+                            val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                                type = "text/plain"
+                                putExtra(Intent.EXTRA_TEXT, app.sourceUrl)
+                            }
+                            context.startActivity(Intent.createChooser(sendIntent, "Share App Link"))
                         }
-                        context.startActivity(Intent.createChooser(sendIntent, "Share App Link"))
                     },
                     shape = MaterialTheme.shapes.medium,
                 ) {

@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.widget.Toast
+import app.pwhs.core.util.PermissionSettingsHelper
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -151,15 +152,7 @@ internal fun InstallModeSelector(
                                 context.getString(R.string.permission_install_prompt_required),
                                 Toast.LENGTH_LONG
                             ).show()
-                            runCatching {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                    val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                                        data = Uri.parse("package:${context.packageName}")
-                                        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                    }
-                                    context.startActivity(intent)
-                                }
-                            }
+                            PermissionSettingsHelper.openInstallPermission(context)
                             onModeChange(InstallMode.DEFAULT)
                         } else if (mode != currentMode || (mode == InstallMode.DHIZUKU && dhizukuState == DhizukuState.NOT_AUTHORIZED)) {
                             onModeChange(mode)
@@ -251,15 +244,7 @@ internal fun InstallModeSelector(
                 .then(
                     if (canRequestPermission) Modifier.clickable { onModeChange(currentMode) }
                     else if (effectiveMode == InstallMode.DEFAULT && !canInstallPackages) Modifier.clickable {
-                        runCatching {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                                val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                                    data = Uri.parse("package:${context.packageName}")
-                                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                                }
-                                context.startActivity(intent)
-                            }
-                        }
+                        PermissionSettingsHelper.openInstallPermission(context)
                     }
                     else Modifier
                 ),

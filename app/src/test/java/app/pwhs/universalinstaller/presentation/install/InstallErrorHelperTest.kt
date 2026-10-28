@@ -63,6 +63,21 @@ class InstallErrorHelperTest {
         org.junit.Assert.assertTrue(InstallErrorHelper.shouldSuggestShizuku("SecurityException: User 0 cannot install"))
         org.junit.Assert.assertTrue(InstallErrorHelper.shouldSuggestShizuku("INSTALL_FAILED_INTERNAL_ERROR"))
         org.junit.Assert.assertTrue(InstallErrorHelper.shouldSuggestShizuku("STATUS_FAILURE_SECURITY"))
+        org.junit.Assert.assertTrue(InstallErrorHelper.shouldSuggestShizuku("INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION"))
+        org.junit.Assert.assertTrue(InstallErrorHelper.shouldSuggestShizuku("ColorOS isolation restriction"))
         org.junit.Assert.assertFalse(InstallErrorHelper.shouldSuggestShizuku("INSTALL_FAILED_INSUFFICIENT_STORAGE"))
+    }
+
+    @Test
+    fun `isIsolationViolationMessage detects HyperOS and ColorOS restrictions`() {
+        org.junit.Assert.assertTrue(InstallErrorHelper.isIsolationViolationMessage("INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION"))
+        org.junit.Assert.assertTrue(InstallErrorHelper.isIsolationViolationMessage("coloros isolation"))
+        org.junit.Assert.assertFalse(InstallErrorHelper.isIsolationViolationMessage("INSTALL_FAILED_VERSION_DOWNGRADE"))
+    }
+
+    @Test
+    fun `extractErrorCode detects hyperos isolation violation`() {
+        val failure = InstallFailure.Generic("INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION: commit failed")
+        assertEquals("INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION", InstallErrorHelper.extractErrorCode(failure))
     }
 }

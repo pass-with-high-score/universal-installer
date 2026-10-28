@@ -173,8 +173,20 @@ object InstallErrorHelper {
         return isFrpMessage(failure.message.orEmpty())
     }
 
+    fun isIsolationViolationMessage(message: String?): Boolean {
+        val upper = message.orEmpty().uppercase()
+        return "ISOLATION_VIOLATION" in upper ||
+                "HYPEROS" in upper ||
+                "COLOROS" in upper
+    }
+
     private fun isMiuiSuspect(failure: InstallFailure): Boolean {
         if (isFrpFailure(failure)) return false
+        val msg = failure.message.orEmpty()
+        if (isIsolationViolationMessage(msg)) return true
+        if (failure is InstallFailure.Exceptional && isIsolationViolationMessage(failure.exception.message)) {
+            return true
+        }
         return when (failure) {
             is InstallFailure.Aborted,
             is InstallFailure.Blocked,
@@ -219,6 +231,7 @@ object InstallErrorHelper {
         val upper = message.orEmpty().uppercase()
         return isSecurityMessage(upper) ||
                 isInternalErrorMessage(upper) ||
+                isIsolationViolationMessage(upper) ||
                 "STATUS_FAILURE" in upper ||
                 "INSTALL_FAILED_INTERNAL_ERROR" in upper ||
                 "USER_RESTRICTED" in upper ||
@@ -252,6 +265,12 @@ object InstallErrorHelper {
             return ErrorInfo(
                 title = context.getString(R.string.install_error_security_title),
                 guidance = context.getString(R.string.install_error_security_guidance),
+            )
+        }
+        if (isIsolationViolationMessage(msg) || (failure is InstallFailure.Exceptional && isIsolationViolationMessage(failure.exception.message))) {
+            return ErrorInfo(
+                title = context.getString(R.string.install_error_blocked_title),
+                guidance = msg.ifEmpty { failure.message.orEmpty() },
             )
         }
         if (isInternalErrorMessage(msg)) {
@@ -338,6 +357,12 @@ object InstallErrorHelper {
                 guidance = context.getString(R.string.install_error_security_guidance),
             )
         }
+        if (isIsolationViolationMessage(message)) {
+            return ErrorInfo(
+                title = context.getString(R.string.install_error_blocked_title),
+                guidance = message.orEmpty(),
+            )
+        }
         if (isInternalErrorMessage(message)) {
             return ErrorInfo(
                 title = context.getString(R.string.install_error_internal_title),
@@ -415,6 +440,11 @@ object InstallErrorHelper {
         if (isSecurityMessage(rawMessage)) {
             return "INSTALL_FAILED_SECURITY_EXCEPTION"
         }
+        if (isIsolationViolationMessage(rawMessage)) {
+            val match = PM_ERROR_CODE_REGEX.find(rawMessage)
+            if (match != null) return match.groupValues[1]
+            return "INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION"
+        }
         val match = PM_ERROR_CODE_REGEX.find(rawMessage)
         if (match != null) {
             return match.groupValues[1]
@@ -458,6 +488,8 @@ object InstallErrorHelper {
         val upperCode = errorCode.uppercase()
         val rawMessage = failure.message.orEmpty().uppercase()
         return when {
+            isIsolationViolationMessage(upperCode) || isIsolationViolationMessage(rawMessage) ->
+                "os_blocked"
             isMissingSplitMessage(upperCode) || isMissingSplitMessage(rawMessage) ->
                 "missing_split"
             isSecurityMessage(upperCode) || isSecurityMessage(rawMessage) ->

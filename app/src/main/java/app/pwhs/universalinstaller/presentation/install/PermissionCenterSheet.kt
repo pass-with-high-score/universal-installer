@@ -9,6 +9,8 @@ import android.os.Build
 import android.os.Environment
 import android.os.Process
 import android.provider.Settings
+import android.widget.Toast
+import app.pwhs.core.util.PermissionSettingsHelper
 import android.app.Activity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -275,10 +277,24 @@ internal fun PermissionCenterSheet(
                                                 granted
                                             }
                                         }
-                                        runCatching {
-                                            settingsLauncher.launch(intent)
-                                        }.recoverCatching {
-                                            settingsLauncher.launch(Intent(Settings.ACTION_SETTINGS))
+                                        val intents = if (item.kind == PermKind.Install) {
+                                            PermissionSettingsHelper.getInstallPermissionIntents(context)
+                                        } else {
+                                            listOf(intent, Intent(Settings.ACTION_SETTINGS))
+                                        }
+                                        var launched = false
+                                        for (targetIntent in intents) {
+                                            if (runCatching { settingsLauncher.launch(targetIntent) }.isSuccess) {
+                                                launched = true
+                                                break
+                                            }
+                                        }
+                                        if (!launched) {
+                                            Toast.makeText(
+                                                context,
+                                                context.getString(app.pwhs.core.R.string.error_cannot_open_settings),
+                                                Toast.LENGTH_LONG,
+                                            ).show()
                                         }
                                     }
                                 }

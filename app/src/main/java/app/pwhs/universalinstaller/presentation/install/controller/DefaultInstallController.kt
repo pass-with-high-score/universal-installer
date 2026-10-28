@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.install.controller
 import android.content.Context
 import android.net.Uri
 import android.widget.Toast
+import app.pwhs.core.util.PermissionSettingsHelper
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
@@ -49,13 +50,7 @@ class DefaultInstallController(
                     context.getString(R.string.permission_install_prompt_required),
                     Toast.LENGTH_LONG
                 ).show()
-                runCatching {
-                    val intent = android.content.Intent(android.provider.Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                        data = Uri.parse("package:${context.packageName}")
-                        addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                    }
-                    context.startActivity(intent)
-                }
+                PermissionSettingsHelper.openInstallPermission(context)
             }
         }
         return try {

@@ -62,6 +62,7 @@ import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.core.telemetry.TelemetryEvents
 import app.pwhs.core.util.DeviceCompat
 import app.pwhs.core.util.PermissionMonitor
+import app.pwhs.core.util.PermissionSettingsHelper
 import app.pwhs.core.util.openUriSafely
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -162,11 +163,9 @@ fun OnboardingScreen(
                     title = stringResource(R.string.onboarding_xiaomi_title),
                     description = stringResource(R.string.onboarding_xiaomi_desc),
                     badgeType = OnboardingBadgeType.XIAOMI,
-                    actionLabel = developerOptions?.let {
-                        stringResource(R.string.onboarding_xiaomi_open_developer_options)
-                    },
+                    actionLabel = stringResource(R.string.onboarding_xiaomi_open_developer_options),
                     actionIcon = Icons.Rounded.Tune,
-                    onAction = developerOptions?.let { intent -> { context.startActivity(intent) } },
+                    onAction = { PermissionSettingsHelper.openDeveloperOptions(context) },
                 )
             )
         }
@@ -321,13 +320,6 @@ fun OnboardingScreen(
                                 permissionName = TelemetryEvents.PERM_INSTALL_UNKNOWN_APPS,
                                 source = TelemetryEvents.SOURCE_ONBOARDING
                             )
-                            val pkg = context.packageName.takeIf { it.isNotBlank() }
-                                ?: context.applicationContext?.packageName?.takeIf { it.isNotBlank() }
-                            val intent = Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES).apply {
-                                if (!pkg.isNullOrBlank()) {
-                                    data = Uri.parse("package:$pkg")
-                                }
-                            }
                             if (activity != null) {
                                 PermissionMonitor.start(activity) {
                                     val granted = context.packageManager.canRequestPackageInstalls()
@@ -340,17 +332,7 @@ fun OnboardingScreen(
                                     granted
                                 }
                             }
-                            try {
-                                context.startActivity(intent)
-                            } catch (_: ActivityNotFoundException) {
-                                try {
-                                    context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS))
-                                } catch (_: ActivityNotFoundException) {
-                                    runCatching {
-                                        context.startActivity(Intent(Settings.ACTION_SETTINGS))
-                                    }
-                                }
-                            }
+                            PermissionSettingsHelper.openInstallPermission(context)
                         }
                     },
                 )
