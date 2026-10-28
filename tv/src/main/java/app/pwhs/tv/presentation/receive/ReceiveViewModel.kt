@@ -43,6 +43,7 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     private val installer = ApkInstaller(context)
     private val rootInstaller = RootInstaller(context)
     private val shizukuInstaller = ShizukuInstaller(context)
+    private val networkDownloader = app.pwhs.core.network.NetworkApkDownloader(context)
 
     val status: StateFlow<ReceiverStatus> = TvReceiverState.status
     val connectedClient: StateFlow<ConnectedClient?> = TvReceiverState.connectedClient
@@ -129,6 +130,57 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
         TvReceiverState.updateConnectedClient(null)
         TvReceiverState.emitReceivingProgress(null)
         TvReceiver.restart(context)
+    }
+
+    private val _isDownloadingUrl = MutableStateFlow(false)
+    val isDownloadingUrl: StateFlow<Boolean> = _isDownloadingUrl.asStateFlow()
+
+    fun downloadFromUrl(url: String) {
+        if (_isDownloadingUrl.value) return
+        viewModelScope.launch {
+            _isDownloadingUrl.value = true
+            _installResult.value = null
+            TvReceiverState.emitReceivingProgress(
+                ReceivingProgress(bytesReceived = 0L, totalBytes = 1L)
+            )
+            val result = withContext(Dispatchers.IO) {
+                networkDownloader.download(url) { progress ->
+                    val total = progress.totalBytes.takeIf { it > 0 } ?: 0L
+                    TvReceiverState.emitReceivingProgress(
+                        ReceivingProgress(
+                            bytesReceived = progress.bytesDownloaded,
+                            totalBytes = total,
+                            speedBytesPerSec = progress.speedBytesPerSec,
+                            etaSeconds = progress.etaSeconds,
+                        )
+                    )
+                }
+            }
+            TvReceiverState.emitReceivingProgress(null)
+            _isDownloadingUrl.value = false
+
+            when (result) {
+                is app.pwhs.core.network.DownloadResult.Success -> {
+                    val meta = metadataReader.readMetadata(
+                        Uri.fromFile(result.file),
+                        result.fileName.isBundleName()
+                    )
+                    val received = ReceivedApk(
+                        path = result.file.absolutePath,
+                        fileName = result.fileName,
+                        sizeBytes = result.totalBytes,
+                        metadata = meta
+                    )
+                    _pendingApk.value = received
+                }
+                is app.pwhs.core.network.DownloadResult.Error -> {
+                    _installResult.value = InstallOutcome.Failure("Download", result.message)
+                }
+                app.pwhs.core.network.DownloadResult.Cancelled -> {
+                    // Cancelled
+                }
+            }
+        }
     }
 
     /** True once a scan has been kicked off, so tab revisits don't redundantly re-scan. */

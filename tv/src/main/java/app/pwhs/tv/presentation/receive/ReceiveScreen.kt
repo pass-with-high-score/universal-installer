@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.Link
 import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,13 +50,14 @@ import androidx.tv.material3.Text
 import app.pwhs.core.util.StorageUtil
 import app.pwhs.tv.R
 import app.pwhs.tv.presentation.components.TvInstallerModeBadge
+import app.pwhs.tv.presentation.receive.components.DownloadUrlContent
 import app.pwhs.tv.presentation.receive.components.InstallStatusOverlay
 import app.pwhs.tv.presentation.receive.components.LocalFilesContent
 import app.pwhs.tv.presentation.receive.components.ReceiveContent
 import app.pwhs.tv.presentation.receive.components.SidebarTab
 import app.pwhs.tv.presentation.receive.components.TvStorageCard
 
-private enum class InstallTab { Receive, LocalFiles }
+private enum class InstallTab { Receive, DownloadUrl, LocalFiles }
 
 @Composable
 fun ReceiveScreen(
@@ -100,7 +102,10 @@ fun ReceiveScreen(
     ) { hasStorage = checkStoragePermission() }
 
     LaunchedEffect(pending) {
-        if (pending != null) currentTab = InstallTab.Receive
+        val p = pending
+        if (p != null) {
+            selectedApk = TvApkItem.Received(p)
+        }
     }
     
     LaunchedEffect(hasStorage) {
@@ -140,7 +145,7 @@ fun ReceiveScreen(
             // ── Left Pane: Sidebar Navigation ────────────────────────────────────
             Column(
                 modifier = Modifier
-                    .weight(0.35f)
+                    .weight(0.38f)
                     .fillMaxHeight()
                     .padding(vertical = 32.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -166,6 +171,13 @@ fun ReceiveScreen(
                 )
 
                 SidebarTab(
+                    selected = currentTab == InstallTab.DownloadUrl,
+                    label = stringResource(R.string.tv_tab_download_url),
+                    icon = Icons.Rounded.Link,
+                    onClick = { currentTab = InstallTab.DownloadUrl }
+                )
+
+                SidebarTab(
                     selected = currentTab == InstallTab.LocalFiles,
                     label = stringResource(R.string.tv_receive_local_files),
                     icon = Icons.Rounded.Folder,
@@ -182,7 +194,7 @@ fun ReceiveScreen(
             // ── Right Pane: Dynamic Content Area ─────────────────────────────────
             Box(
                 modifier = Modifier
-                    .weight(0.70f)
+                    .weight(0.62f)
                     .fillMaxHeight()
                     .padding(vertical = 24.dp)
             ) {
@@ -201,8 +213,19 @@ fun ReceiveScreen(
                             installFocus = installFocus,
                             onInstall = { selectedApk = TvApkItem.Received(it) },
                             onDismissPending = { viewModel.dismissPending() },
-                            onDisconnectClient = { viewModel.disconnect() }
+                            onDisconnectClient = { viewModel.disconnect() },
+                            onOpenUrlDownload = { currentTab = InstallTab.DownloadUrl }
                         )
+                        InstallTab.DownloadUrl -> {
+                            val isDownloadingUrl by viewModel.isDownloadingUrl.collectAsState()
+                            DownloadUrlContent(
+                                isDownloading = isDownloadingUrl,
+                                receivingProgress = receivingProgress,
+                                onDownload = { url ->
+                                    viewModel.downloadFromUrl(url)
+                                }
+                            )
+                        }
                         InstallTab.LocalFiles -> LocalFilesContent(
                             hasStorage = hasStorage,
                             isScanning = isScanning,

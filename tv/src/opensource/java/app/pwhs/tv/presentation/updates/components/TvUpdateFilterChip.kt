@@ -27,7 +27,7 @@ fun TvUpdateFilterChip(
     Button(
         onClick = onClick,
         shape = ButtonDefaults.shape(shape),
-        scale = ButtonDefaults.scale(focusedScale = 1.05f),
+        scale = app.pwhs.tv.TvButtonNoScale,
         colors = ButtonDefaults.colors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
             contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,

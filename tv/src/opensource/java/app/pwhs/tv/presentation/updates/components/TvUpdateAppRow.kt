@@ -33,6 +33,7 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import app.pwhs.tv.R
+import app.pwhs.tv.TvNoScale
 import app.pwhs.tv.rememberAppIcon
 import app.pwhs.updater.domain.model.TrackedApp
 import coil3.compose.AsyncImage
@@ -41,7 +42,7 @@ import coil3.compose.AsyncImage
 @Composable
 fun TvUpdateAppRow(
     app: TrackedApp,
-    isSelected: () -> Boolean,
+    isSelected: Boolean,
     isDownloading: Boolean,
     downloadProgress: Float,
     downloadBytesText: String?,
@@ -57,15 +58,14 @@ fun TvUpdateAppRow(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .clip(shape)
             .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
             .onFocusChanged { if (it.isFocused) onFocus() },
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
+        scale = TvNoScale,
         shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = Color.Transparent,
             focusedContainerColor = MaterialTheme.colorScheme.onSurface,
-            contentColor = if (isSelected()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
+            contentColor = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             focusedContentColor = MaterialTheme.colorScheme.surface,
         ),
     ) {

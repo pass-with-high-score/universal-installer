@@ -43,12 +43,18 @@ class NetworkApkDownloader(private val context: Context) {
         var targetFile: File? = null
 
         try {
-            val (finalConn, discoveredName) = openRedirectConnection(url)
+            val normalizedUrl = normalizeUrlOrShortcode(url.trim())
+            val (finalConn, discoveredName) = openRedirectConnection(normalizedUrl)
             connection = finalConn
 
             val responseCode = connection.responseCode
             if (responseCode !in 200..299) {
-                return@withContext DownloadResult.Error("HTTP Error: $responseCode ${connection.responseMessage}")
+                return@withContext DownloadResult.Error("HTTP $responseCode ${connection.responseMessage ?: ""}".trim())
+            }
+
+            val contentType = connection.contentType.orEmpty().lowercase()
+            if (contentType.contains("text/html") || contentType.contains("application/xhtml+xml")) {
+                return@withContext DownloadResult.Error("Web page detected instead of APK. Please use a direct download link.")
             }
 
             val totalBytes = connection.contentLengthLong
@@ -112,7 +118,8 @@ class NetworkApkDownloader(private val context: Context) {
             )
         } catch (e: Throwable) {
             targetFile?.delete()
-            DownloadResult.Error(e.localizedMessage ?: "Download failed", e)
+            val friendlyMsg = toFriendlyErrorMessage(e)
+            DownloadResult.Error(friendlyMsg, e)
         } finally {
             runCatching { inputStream?.close() }
             runCatching { outputStream?.close() }
@@ -189,5 +196,29 @@ class NetworkApkDownloader(private val context: Context) {
         return runCatching {
             context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty().ifEmpty { "1.0.0" }
         }.getOrDefault("1.0.0")
+    }
+
+    private fun normalizeUrlOrShortcode(raw: String): String {
+        val trimmed = raw.trim()
+        if (trimmed.isNotEmpty() && trimmed.all { it.isDigit() }) {
+            return "https://aftv.news/$trimmed"
+        }
+        return when {
+            trimmed.startsWith("http://", ignoreCase = true) || trimmed.startsWith("https://", ignoreCase = true) -> trimmed
+            else -> "https://$trimmed"
+        }
+    }
+
+    private fun toFriendlyErrorMessage(throwable: Throwable): String {
+        val msg = throwable.message.orEmpty()
+        return when {
+            throwable is java.net.UnknownHostException -> "Server not found. Check network connection or URL."
+            throwable is java.net.SocketTimeoutException -> "Connection timed out. Server is taking too long to respond."
+            throwable is javax.net.ssl.SSLHandshakeException || msg.contains("Trust anchor", ignoreCase = true) ->
+                "SSL certificate error. The server uses an untrusted or outdated certificate."
+            msg.contains("ENOSPC", ignoreCase = true) || msg.contains("No space left", ignoreCase = true) ->
+                "Insufficient storage space on device."
+            else -> throwable.localizedMessage ?: "Download failed"
+        }
     }
 }

@@ -28,6 +28,7 @@ class ApkReceiverServer(
             session.method == Method.GET && session.uri == "/disconnect" -> handleDisconnect(session)
             session.method == Method.GET && session.uri == "/logo.png" -> serveLogo()
             session.method == Method.POST && session.uri == "/upload" -> handleUpload(session)
+            session.method == Method.POST && session.uri == "/url" -> handleRemoteUrl(session)
             else -> newFixedLengthResponse(Response.Status.NOT_FOUND, MIME_PLAINTEXT, "Not found")
         }
     }
@@ -147,6 +148,81 @@ class ApkReceiverServer(
             Log.e(TAG, "Upload failed", t)
             TvReceiverState.emitReceivingProgress(null)
             newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Upload failed: ${t.message}")
+        }
+    }
+
+    private fun handleRemoteUrl(session: IHTTPSession): Response {
+        recordClient(session)
+        val files = HashMap<String, String>()
+        val urlParam = runCatching {
+            session.parseBody(files)
+            session.parameters["url"]?.firstOrNull()?.trim()
+                ?: files["postData"]?.let { body ->
+                    Regex(""""url"\s*:\s*"([^"]+)"""").find(body)?.groupValues?.get(1)?.trim()
+                }
+        }.getOrNull()
+
+        if (urlParam.isNullOrBlank()) {
+            return newFixedLengthResponse(Response.Status.BAD_REQUEST, MIME_PLAINTEXT, "Missing 'url' parameter")
+        }
+
+        TvReceiverState.emitReceivingProgress(
+            ReceivingProgress(bytesReceived = 0L, totalBytes = 1L)
+        )
+
+        val downloader = app.pwhs.core.network.NetworkApkDownloader(context)
+        return try {
+            val result = kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
+                downloader.download(urlParam) { progress ->
+                    val total = progress.totalBytes.takeIf { it > 0 } ?: 0L
+                    TvReceiverState.emitReceivingProgress(
+                        ReceivingProgress(
+                            bytesReceived = progress.bytesDownloaded,
+                            totalBytes = total,
+                            speedBytesPerSec = progress.speedBytesPerSec,
+                            etaSeconds = progress.etaSeconds,
+                        )
+                    )
+                }
+            }
+
+            when (result) {
+                is app.pwhs.core.network.DownloadResult.Success -> {
+                    TvReceiverState.emitReceivingProgress(null)
+                    TvReceiverState.emitReceived(
+                        ReceivedApk(
+                            path = result.file.absolutePath,
+                            fileName = result.fileName,
+                            sizeBytes = result.totalBytes,
+                        )
+                    )
+                    newFixedLengthResponse(
+                        Response.Status.OK,
+                        "application/json",
+                        """{"status":"ok","fileName":"${result.fileName}"}"""
+                    )
+                }
+                is app.pwhs.core.network.DownloadResult.Error -> {
+                    TvReceiverState.emitReceivingProgress(null)
+                    newFixedLengthResponse(
+                        Response.Status.BAD_REQUEST,
+                        MIME_PLAINTEXT,
+                        result.message
+                    )
+                }
+                app.pwhs.core.network.DownloadResult.Cancelled -> {
+                    TvReceiverState.emitReceivingProgress(null)
+                    newFixedLengthResponse(
+                        Response.Status.BAD_REQUEST,
+                        MIME_PLAINTEXT,
+                        "Download cancelled"
+                    )
+                }
+            }
+        } catch (t: Throwable) {
+            Log.e(TAG, "Remote URL download failed", t)
+            TvReceiverState.emitReceivingProgress(null)
+            newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Error: ${t.message}")
         }
     }
 

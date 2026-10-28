@@ -224,6 +224,7 @@ fun ApkPermissionsPane(
         ) {
             Button(
                 onClick = onInstall,
+                scale = app.pwhs.tv.TvButtonNoScale,
                 modifier = Modifier
                     .weight(1.3f)
                     .height(48.dp)
@@ -250,6 +251,7 @@ fun ApkPermissionsPane(
 
             Button(
                 onClick = onBack,
+                scale = app.pwhs.tv.TvButtonNoScale,
                 modifier = Modifier
                     .weight(1f)
                     .height(48.dp)

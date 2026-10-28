@@ -188,6 +188,11 @@
         <h1>Send to TV</h1>
         <p class="subtitle">Install an app directly on your TV<br>without typing URLs</p>
         
+        <div style="display: flex; background: rgba(255,255,255,0.06); border-radius: 12px; padding: 4px; margin-bottom: 24px;">
+            <button type="button" id="tabUploadBtn" style="flex: 1; padding: 10px; margin: 0; border-radius: 8px; background: var(--primary); box-shadow: none; font-size: 14px;">Upload File</button>
+            <button type="button" id="tabUrlBtn" style="flex: 1; padding: 10px; margin: 0; border-radius: 8px; background: transparent; box-shadow: none; font-size: 14px; color: var(--text-muted);">From Link / Code</button>
+        </div>
+
         <form id="uploadForm">
             <div class="upload-area" id="dropZone">
                 <input type="file" id="fileInput" name="apk" accept=".apk,.apks,.xapk,.apkm" required>
@@ -217,6 +222,23 @@
             
             <button type="submit" id="submitBtn" disabled>Send App Now</button>
             <button type="button" id="disconnectBtn" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #EF4444; margin-top: 12px; box-shadow: none;">Disconnect from TV</button>
+        </form>
+
+        <form id="urlForm" style="display: none;">
+            <div style="text-align: left; margin-bottom: 16px;">
+                <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 8px; color: var(--text-main);">APK URL or Shortcode</label>
+                <input type="text" id="urlInput" placeholder="https://... or code (e.g. 71893)" style="width: 100%; padding: 14px 16px; border-radius: 12px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; font-size: 15px; outline: none; font-family: inherit;">
+                <span style="display: block; font-size: 12px; color: var(--text-muted); margin-top: 6px;">Supports direct APK/XAPK links or AFTVnews shortcodes.</span>
+            </div>
+            
+            <div class="progress-container" id="urlProgressContainer">
+                <div class="progress-header">
+                    <span class="progress-pct-big" id="urlProgressStatus">Downloading…</span>
+                </div>
+                <div class="progress-text"><span>TV is downloading the package</span></div>
+            </div>
+
+            <button type="submit" id="urlSubmitBtn">Download on TV</button>
         </form>
         
         <div class="success-state" id="successState">
@@ -340,6 +362,63 @@
             
             xhr.open('POST', '/upload', true);
             xhr.send(formData);
+        });
+
+        // Tab switching
+        const tabUploadBtn = document.getElementById('tabUploadBtn');
+        const tabUrlBtn = document.getElementById('tabUrlBtn');
+        const urlForm = document.getElementById('urlForm');
+        const urlInput = document.getElementById('urlInput');
+        const urlSubmitBtn = document.getElementById('urlSubmitBtn');
+        const urlProgressContainer = document.getElementById('urlProgressContainer');
+
+        tabUploadBtn.addEventListener('click', () => {
+            tabUploadBtn.style.background = 'var(--primary)';
+            tabUploadBtn.style.color = '#fff';
+            tabUrlBtn.style.background = 'transparent';
+            tabUrlBtn.style.color = 'var(--text-muted)';
+            form.style.display = 'block';
+            urlForm.style.display = 'none';
+        });
+
+        tabUrlBtn.addEventListener('click', () => {
+            tabUrlBtn.style.background = 'var(--primary)';
+            tabUrlBtn.style.color = '#fff';
+            tabUploadBtn.style.background = 'transparent';
+            tabUploadBtn.style.color = 'var(--text-muted)';
+            form.style.display = 'none';
+            urlForm.style.display = 'block';
+        });
+
+        urlForm.addEventListener('submit', e => {
+            e.preventDefault();
+            const link = urlInput.value.trim();
+            if (!link) return;
+
+            urlSubmitBtn.disabled = true;
+            urlProgressContainer.classList.add('active');
+
+            fetch('/url', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: link })
+            })
+            .then(res => {
+                if (res.ok) {
+                    urlForm.style.display = 'none';
+                    successState.classList.add('active');
+                    document.querySelector('h1').style.display = 'none';
+                    document.querySelector('p.subtitle').style.display = 'none';
+                    document.querySelector('.icon').style.display = 'none';
+                } else {
+                    return res.text().then(t => { throw new Error(t); });
+                }
+            })
+            .catch(err => {
+                alert('Download failed: ' + err.message);
+                urlSubmitBtn.disabled = false;
+                urlProgressContainer.classList.remove('active');
+            });
         });
 
         // Disconnect button

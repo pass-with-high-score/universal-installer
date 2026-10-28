@@ -43,6 +43,7 @@ import androidx.tv.material3.OutlinedButton
 import androidx.tv.material3.OutlinedButtonDefaults
 import androidx.tv.material3.Text
 import app.pwhs.tv.R
+import app.pwhs.tv.TvButtonNoScale
 import app.pwhs.tv.rememberAppIcon
 import app.pwhs.updater.domain.model.TrackedApp
 import coil3.compose.AsyncImage
@@ -201,6 +202,7 @@ fun TvUpdateDetailsPane(
 
                 Button(
                     onClick = { onUpdateOrInstall(app) },
+                    scale = TvButtonNoScale,
                     enabled = !isDownloading && (app.hasUpdate || !app.isInstalled || !app.latestDownloadUrl.isNullOrBlank()),
                     modifier = Modifier
                         .weight(1f)
@@ -236,6 +238,7 @@ fun TvUpdateDetailsPane(
 
                 OutlinedButton(
                     onClick = { onCheckUpdate(app) },
+                    scale = TvButtonNoScale,
                     enabled = !isChecking,
                     modifier = Modifier
                         .weight(1f)
@@ -278,6 +281,7 @@ fun TvUpdateDetailsPane(
                 if (app.hasUpdate && !app.latestVersionName.isNullOrBlank()) {
                     OutlinedButton(
                         onClick = { onIgnoreVersion(app) },
+                        scale = TvButtonNoScale,
                         modifier = Modifier
                             .weight(1f)
                             .height(44.dp)
@@ -310,6 +314,7 @@ fun TvUpdateDetailsPane(
 
                 OutlinedButton(
                     onClick = { onRemove(app) },
+                    scale = TvButtonNoScale,
                     modifier = Modifier
                         .weight(1f)
                         .height(44.dp)

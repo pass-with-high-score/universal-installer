@@ -157,6 +157,17 @@ is_connected() {
     adb devices | grep -F "$TARGET" | grep -q "device"
 }
 
+# Function to ping TV IP reliably across macOS and Linux
+ping_tv() {
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS ping -W is in milliseconds
+        ping -c 1 -W 1000 "$IP" > /dev/null 2>&1
+    else
+        # Linux ping -W is in seconds
+        ping -c 1 -W 1 "$IP" > /dev/null 2>&1
+    fi
+}
+
 # Initial connect attempt
 echo -e "\n${CYAN}🚀 Đang kết nối tới $TARGET...${NC}"
 adb connect "$TARGET"
@@ -165,11 +176,12 @@ echo -e "\n${GREEN}👀 Bắt đầu lắng nghe và tự động kết nối l�
 
 was_connected=false
 last_check_time=0
+last_keepalive_time=0
 
 while true; do
     current_time=$(date +%s)
 
-    # Periodic connection watchdog check
+    # Periodic connection watchdog check (every 3 seconds)
     if (( current_time - last_check_time >= 3 )); then
         last_check_time=$current_time
         if is_connected; then
@@ -179,6 +191,12 @@ while true; do
                 start_scrcpy
                 print_remote_help
             fi
+
+            # Send keepalive ping to Android TV every 15s to keep wireless ADB socket open on Xiaomi TV
+            if (( current_time - last_keepalive_time >= 15 )); then
+                last_keepalive_time=$current_time
+                adb -s "$TARGET" shell ":" > /dev/null 2>&1 &
+            fi
         else
             if [ "$was_connected" = true ]; then
                 echo -e "\n[$(date '+%H:%M:%S')] ${RED}⚠️  Mất kết nối với TV ($TARGET)!${NC}"
@@ -187,9 +205,9 @@ while true; do
                 stop_scrcpy
             fi
 
-            # Try pinging the IP first
-            if ping -c 1 -W 1 "$IP" > /dev/null 2>&1; then
-                echo -e "[$(date '+%H:%M:%S')] ${CYAN}📡 Đã thấy TV trong mạng, đang kết nối lại ADB...${NC}"
+            # Try connecting if reachable via ping OR directly attempt adb connect
+            if ping_tv || (( current_time % 6 == 0 )); then
+                echo -e "[$(date '+%H:%M:%S')] ${CYAN}📡 Đang thử kết nối lại ADB tới $TARGET...${NC}"
                 adb connect "$TARGET" > /dev/null 2>&1
                 sleep 1
                 if is_connected; then
@@ -202,49 +220,55 @@ while true; do
         fi
     fi
 
-    # Read user keystrokes for TV Remote (2s timeout aligns with watchdog check)
-    IFS= read -rsn1 -t 2 char
-    read_status=$?
+    # Read user keystrokes for TV Remote if terminal is interactive
+    if [ -t 0 ]; then
+        IFS= read -rsn1 -t 2 char
+        read_status=$?
 
-    if [ $read_status -eq 0 ]; then
-        if [ "$was_connected" = false ]; then
-            echo -ne "\r\033[K${YELLOW}⚠️  Chưa kết nối với TV ($TARGET), phím chưa được gửi...${NC}"
-            continue
+        if [ $read_status -eq 0 ]; then
+            if [ "$was_connected" = false ]; then
+                echo -ne "\r\033[K${YELLOW}⚠️  Chưa kết nối với TV ($TARGET), phím chưa được gửi...${NC}"
+                continue
+            fi
+
+            case "$char" in
+                $'\x1b')
+                    # Bash 3.2 on macOS does not support fractional timeouts like -t 0.05
+                    IFS= read -rsn2 -t 1 rest
+                    case "$rest" in
+                        "[A") send_key 19 "⬆️  LÊN (Up)" ;;
+                        "[B") send_key 20 "⬇️  XUỐNG (Down)" ;;
+                        "[D") send_key 21 "⬅️  TRÁI (Left)" ;;
+                        "[C") send_key 22 "➡️  PHẢI (Right)" ;;
+                        *)    send_key 4  "🔙 QUAY LẠI (Back)" ;;
+                    esac
+                    ;;
+                "")
+                    send_key 23 "🔘 CHỌN (OK/Enter)"
+                    ;;
+                " ")
+                    send_key 23 "🔘 CHỌN (Space)"
+                    ;;
+                $'\x7f'|$'\x08'|[bB])
+                    send_key 4  "🔙 QUAY LẠI (Back)"
+                    ;;
+                [wW]) send_key 19 "⬆️  LÊN (W)" ;;
+                [sS]) send_key 20 "⬇️  XUỐNG (S)" ;;
+                [aA]) send_key 21 "⬅️  TRÁI (A)" ;;
+                [dD]) send_key 22 "➡️  PHẢI (D)" ;;
+                [hH]) send_key 3  "🏠 TRANG CHỦ (Home)" ;;
+                [mM]) send_key 82 "📋 MENU" ;;
+                [pP]) send_key 26 "⚡ NGUỒN (Power)" ;;
+                "+"|"=") send_key 24 "🔊 TĂNG ÂM LƯỢNG (+)" ;;
+                "-") send_key 25 "🔉 GIẢM ÂM LƯỢNG (-)" ;;
+                [qQ])
+                    echo -e "\n${YELLOW}Đang thoát...${NC}"
+                    cleanup
+                    ;;
+            esac
         fi
-
-        case "$char" in
-            $'\x1b')
-                IFS= read -rsn2 -t 0.05 rest
-                case "$rest" in
-                    "[A") send_key 19 "⬆️  LÊN (Up)" ;;
-                    "[B") send_key 20 "⬇️  XUỐNG (Down)" ;;
-                    "[D") send_key 21 "⬅️  TRÁI (Left)" ;;
-                    "[C") send_key 22 "➡️  PHẢI (Right)" ;;
-                    *)    send_key 4  "🔙 QUAY LẠI (Back)" ;;
-                esac
-                ;;
-            "")
-                send_key 23 "🔘 CHỌN (OK/Enter)"
-                ;;
-            " ")
-                send_key 23 "🔘 CHỌN (Space)"
-                ;;
-            $'\x7f'|$'\x08'|[bB])
-                send_key 4  "🔙 QUAY LẠI (Back)"
-                ;;
-            [wW]) send_key 19 "⬆️  LÊN (W)" ;;
-            [sS]) send_key 20 "⬇️  XUỐNG (S)" ;;
-            [aA]) send_key 21 "⬅️  TRÁI (A)" ;;
-            [dD]) send_key 22 "➡️  PHẢI (D)" ;;
-            [hH]) send_key 3  "🏠 TRANG CHỦ (Home)" ;;
-            [mM]) send_key 82 "📋 MENU" ;;
-            [pP]) send_key 26 "⚡ NGUỒN (Power)" ;;
-            "+"|"=") send_key 24 "🔊 TĂNG ÂM LƯỢNG (+)" ;;
-            "-") send_key 25 "🔉 GIẢM ÂM LƯỢNG (-)" ;;
-            [qQ])
-                echo -e "\n${YELLOW}Đang thoát...${NC}"
-                cleanup
-                ;;
-        esac
+    else
+        # Non-interactive mode (e.g. background process or redirected input)
+        sleep 2
     fi
 done

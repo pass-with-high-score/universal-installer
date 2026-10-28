@@ -196,6 +196,7 @@ fun ApkOverviewPane(
         ) {
             Button(
                 onClick = onInstall,
+                scale = app.pwhs.tv.TvButtonNoScale,
                 modifier = Modifier
                     .weight(1.3f)
                     .height(48.dp)
@@ -223,6 +224,7 @@ fun ApkOverviewPane(
 
             Button(
                 onClick = onShowPermissions,
+                scale = app.pwhs.tv.TvButtonNoScale,
                 modifier = Modifier
                     .weight(1.1f)
                     .height(48.dp)
@@ -258,6 +260,7 @@ fun ApkOverviewPane(
 
             Button(
                 onClick = onDismiss,
+                scale = app.pwhs.tv.TvButtonNoScale,
                 modifier = Modifier
                     .weight(1f)
                     .height(48.dp)
@@ -286,6 +289,7 @@ fun ApkOverviewPane(
             Spacer(Modifier.height(10.dp))
             Button(
                 onClick = onDelete,
+                scale = app.pwhs.tv.TvButtonNoScale,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(44.dp)

@@ -26,6 +26,20 @@
     <string name="tv_receive_device_connected_title">Device Connected</string>
     <string name="tv_receive_device_connected_subtitle">Select or drop an APK file on your device to send it to this TV</string>
     <string name="tv_receive_btn_disconnect">Disconnect</string>
+    <string name="tv_receive_card_url_download_title">Download from URL / Code</string>
+    <string name="tv_receive_card_url_download_subtitle">Download and install directly from web link or shortcode</string>
+    <string name="tv_tab_download_url">Link / Code</string>
+    <string name="tv_url_download_dialog_title">Download from Link or Code</string>
+    <string name="tv_url_download_dialog_desc">Enter a direct APK download link (https://…) or an AFTVnews shortcode (e.g. 71893).</string>
+    <string name="tv_url_download_placeholder">https://… or code (e.g. 71893)</string>
+    <string name="tv_url_download_shortcode_hint">Shortcode detected (resolves via aftv.news)</string>
+    <string name="tv_url_download_url_hint">Web link detected</string>
+    <string name="tv_url_download_paste">Paste</string>
+    <string name="tv_url_download_clear">Clear</string>
+    <string name="tv_url_download_clear_history">Clear history</string>
+    <string name="tv_url_download_recent">Recent</string>
+    <string name="tv_url_download_btn">Download</string>
+    <string name="tv_url_download_in_progress">Downloading…</string>
 
     <!-- TV Settings Screen -->
     <string name="tv_settings_title">Settings</string>
@@ -50,6 +64,25 @@
     <string name="tv_settings_section_project">Project</string>
     <string name="tv_settings_open_source_title">Open source</string>
     <string name="tv_settings_scan_to_view">Scan to view the project</string>
+    <string name="tv_settings_section_community">Community &amp; Support</string>
+    <string name="tv_settings_section_feedback">Feedback &amp; Rating</string>
+    <string name="tv_settings_rate_title">Rate on Google Play</string>
+    <string name="tv_settings_rate_subtitle">Leave a 5-star review to support development</string>
+    <string name="tv_settings_telegram_title" translatable="false">Telegram</string>
+    <string name="tv_settings_telegram_subtitle">Join discussion, updates and community support</string>
+    <string name="tv_settings_github_title" translatable="false">GitHub</string>
+    <string name="tv_settings_github_subtitle">View source code, report issues, star project</string>
+    <string name="tv_settings_website_title">Official Website</string>
+    <string name="tv_settings_website_subtitle">Visit universal-installer.pwhs.app</string>
+    <string name="tv_settings_sponsor_title">Sponsor Project</string>
+    <string name="tv_settings_sponsor_subtitle">Support open source development</string>
+    <string name="tv_settings_privacy_title">Privacy Policy</string>
+    <string name="tv_settings_privacy_subtitle">We respect your privacy. No tracking.</string>
+    <string name="tv_settings_license_title">License</string>
+    <string name="tv_settings_license_subtitle">GNU General Public License v3.0</string>
+    <string name="tv_settings_open_on_tv">Open on TV</string>
+    <string name="tv_settings_scan_qr_hint">Scan with your phone camera to open</string>
+    <string name="tv_settings_cpu_arch">CPU Architecture</string>
 
     <!-- TV Manage Screen -->
     <string name="tv_manage_title">Installed apps</string>

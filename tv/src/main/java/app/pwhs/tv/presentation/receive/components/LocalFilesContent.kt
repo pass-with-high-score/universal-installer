@@ -25,6 +25,7 @@ import androidx.compose.material.icons.rounded.Folder
 import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,6 +48,8 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import app.pwhs.core.domain.ApkFile
 import app.pwhs.tv.R
+import app.pwhs.tv.TvButtonNoScale
+import app.pwhs.tv.TvNoScale
 import app.pwhs.tv.formatSize
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -72,8 +75,8 @@ fun LocalFilesContent(
                 val shape = CircleShape
                 Button(
                     onClick = onGrantPermission,
+                    scale = TvButtonNoScale,
                     shape = ButtonDefaults.shape(shape),
-                    modifier = Modifier.clip(shape)
                 ) {
                     Text(stringResource(R.string.tv_receive_grant_all_files))
                 }
@@ -102,8 +105,8 @@ fun LocalFilesContent(
                     val shape = CircleShape
                     Button(
                         onClick = onRescan,
+                        scale = TvButtonNoScale,
                         shape = ButtonDefaults.shape(shape),
-                        modifier = Modifier.clip(shape),
                         colors = ButtonDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = MaterialTheme.colorScheme.onSurface,
@@ -115,8 +118,8 @@ fun LocalFilesContent(
                     }
                     Button(
                         onClick = onReceiveFromPhone,
+                        scale = TvButtonNoScale,
                         shape = ButtonDefaults.shape(shape),
-                        modifier = Modifier.clip(shape),
                     ) {
                         Icon(Icons.Rounded.PhoneAndroid, contentDescription = null, modifier = Modifier.size(22.dp))
                         Spacer(Modifier.width(8.dp))
@@ -150,10 +153,8 @@ fun ApkWideItem(apk: ApkFile, onClick: () -> Unit) {
     val shape = RoundedCornerShape(16.dp)
     Surface(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
+        modifier = Modifier.fillMaxWidth(),
+        scale = TvNoScale,
         shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
@@ -167,9 +168,10 @@ fun ApkWideItem(apk: ApkFile, onClick: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             val icon = meta?.icon
-            if (icon != null) {
+            val imageBitmap = remember(icon) { icon?.asImageBitmap() }
+            if (imageBitmap != null) {
                 Image(
-                    bitmap = icon.asImageBitmap(),
+                    bitmap = imageBitmap,
                     contentDescription = null,
                     modifier = Modifier.size(64.dp).clip(RoundedCornerShape(12.dp))
                 )

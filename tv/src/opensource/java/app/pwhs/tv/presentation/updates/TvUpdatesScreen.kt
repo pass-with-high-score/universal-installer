@@ -236,11 +236,11 @@ fun TvUpdatesScreen(
                                 }
                             }
                         },
+                        scale = app.pwhs.tv.TvButtonNoScale,
                         enabled = updatesToRun.isNotEmpty() && !uiState.isUpdatingAll,
                         modifier = Modifier
                             .weight(1f)
-                            .height(44.dp)
-                            .clip(updateAllBtnShape),
+                            .height(44.dp),
                         shape = ButtonDefaults.shape(updateAllBtnShape),
                         colors = ButtonDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.primary,
@@ -263,6 +263,7 @@ fun TvUpdatesScreen(
 
                     OutlinedButton(
                         onClick = { viewModel.checkAllUpdates() },
+                        scale = app.pwhs.tv.TvButtonNoScale,
                         enabled = !uiState.isChecking,
                         modifier = Modifier
                             .weight(1f)
@@ -318,6 +319,7 @@ fun TvUpdatesScreen(
                     // Import Button
                     OutlinedButton(
                         onClick = { importLauncher.launch("*/*") },
+                        scale = app.pwhs.tv.TvButtonNoScale,
                         modifier = Modifier
                             .height(40.dp)
                             .clip(actionBtnShape),
@@ -341,6 +343,7 @@ fun TvUpdatesScreen(
                     // Add App Button
                     OutlinedButton(
                         onClick = { showAddDialog = true },
+                        scale = app.pwhs.tv.TvButtonNoScale,
                         modifier = Modifier
                             .height(40.dp)
                             .clip(actionBtnShape),
@@ -394,7 +397,7 @@ fun TvUpdatesScreen(
                             val downloadInfo = uiState.downloadProgressMap[app.packageName]
                             TvUpdateAppRow(
                                 app = app,
-                                isSelected = { focusedApp?.packageName == app.packageName },
+                                isSelected = focusedApp?.packageName == app.packageName,
                                 isDownloading = downloadInfo != null,
                                 downloadProgress = downloadInfo?.progress ?: 0f,
                                 downloadBytesText = downloadInfo?.bytesText,

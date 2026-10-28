@@ -1,9 +1,10 @@
 package app.pwhs.tv.presentation.manage.components
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.ui.text.style.TextOverflow
+import app.pwhs.tv.rememberAppIcon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -66,104 +67,171 @@ fun AppDetailsPane(
         modifier = modifier
             .fillMaxHeight()
             .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 48.dp, vertical = 48.dp)
+            .padding(horizontal = 40.dp, vertical = 28.dp)
     ) {
-        AnimatedContent(
-            targetState = focusedApp,
-            transitionSpec = { fadeIn() togetherWith fadeOut() },
-            label = "detailTransition"
-        ) { app ->
-            if (app != null && !isLoading) {
-                Column(
+        val app = focusedApp
+        if (app != null && !isLoading) {
+            val appIcon = rememberAppIcon(app.packageName, sizePx = 160)
+
+            // ── Fixed Top Header (Never pushed out of view) ─────────────────
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(rememberScrollState())
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.Center
                 ) {
+                    if (appIcon != null) {
+                        Image(
+                            bitmap = appIcon,
+                            contentDescription = null,
+                            modifier = Modifier.fillMaxSize().padding(6.dp)
+                        )
+                    } else {
+                        Text(
+                            text = app.appName.take(1).uppercase(),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                Spacer(Modifier.width(16.dp))
+
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = app.appName,
-                        style = MaterialTheme.typography.displaySmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onBackground,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
-
-                    Spacer(Modifier.height(12.dp))
-
+                    Spacer(Modifier.height(2.dp))
                     Text(
-                        text = stringResource(R.string.tv_manage_version_prefix, app.versionName),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.85f)
+                        text = "${stringResource(R.string.tv_manage_version_prefix, app.versionName)} • ${formatSize(context, app.sizeBytes)}",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium
                     )
                     Text(
                         text = app.packageName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
+                }
+            }
 
-                    Spacer(Modifier.height(24.dp))
+            Spacer(Modifier.height(20.dp))
 
-                    InfoBlock(
-                        label = stringResource(R.string.tv_manage_storage_used),
-                        value = formatSize(context, app.sizeBytes)
-                    )
-                    if (app.isSystemApp) {
-                        InfoBlock(
-                            label = stringResource(R.string.tv_manage_type),
-                            value = stringResource(R.string.tv_manage_system_app)
-                        )
-                    }
-                    if (!app.enabled) {
-                        InfoBlock(
-                            label = stringResource(R.string.tv_manage_status),
-                            value = stringResource(R.string.tv_manage_status_disabled)
-                        )
-                    }
-
-                    Spacer(Modifier.height(32.dp))
-
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        ActionItem(label = stringResource(R.string.tv_manage_action_open)) {
-                            onOpen(app)
+            // ── Scrollable Actions & Extra Metadata ─────────────────────────
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (app.isSystemApp || !app.enabled) {
+                    item {
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            if (app.isSystemApp) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        stringResource(R.string.tv_manage_system_app),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                            if (!app.enabled) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(MaterialTheme.colorScheme.errorContainer)
+                                        .padding(horizontal = 10.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        stringResource(R.string.tv_manage_status_disabled),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                }
+                            }
                         }
+                    }
+                }
 
-                        if (rootAvailable) {
-                            ActionItem(label = stringResource(R.string.tv_manage_action_force_stop)) {
-                                onForceStop(app)
-                            }
-                            ActionItem(
-                                label = stringResource(
-                                    if (app.enabled) R.string.tv_manage_action_disable
-                                    else R.string.tv_manage_action_enable
-                                )
-                            ) {
-                                onToggleEnabled(app)
-                            }
-                            ActionItem(
-                                label = stringResource(R.string.tv_manage_action_clear_data),
-                                destructive = true,
-                            ) {
-                                onClearData(app)
-                            }
+                item {
+                    ActionItem(label = stringResource(R.string.tv_manage_action_open)) {
+                        onOpen(app)
+                    }
+                }
+
+                if (rootAvailable) {
+                    item {
+                        ActionItem(label = stringResource(R.string.tv_manage_action_force_stop)) {
+                            onForceStop(app)
                         }
-
+                    }
+                    item {
                         ActionItem(
-                            label = stringResource(R.string.tv_manage_action_uninstall),
+                            label = stringResource(
+                                if (app.enabled) R.string.tv_manage_action_disable
+                                else R.string.tv_manage_action_enable
+                            )
+                        ) {
+                            onToggleEnabled(app)
+                        }
+                    }
+                    item {
+                        ActionItem(
+                            label = stringResource(R.string.tv_manage_action_clear_data),
                             destructive = true,
                         ) {
-                            onUninstall(app)
-                        }
-
-                        ActionItem(label = stringResource(R.string.tv_manage_action_extract)) {
-                            onExtract(app)
-                        }
-
-                        ActionItem(label = stringResource(R.string.tv_manage_action_settings)) {
-                            onOpenSettings(app)
+                            onClearData(app)
                         }
                     }
-
-                    Spacer(Modifier.height(64.dp))
                 }
-            } else {
+
+                item {
+                    ActionItem(
+                        label = stringResource(R.string.tv_manage_action_uninstall),
+                        destructive = true,
+                    ) {
+                        onUninstall(app)
+                    }
+                }
+
+                item {
+                    ActionItem(label = stringResource(R.string.tv_manage_action_extract)) {
+                        onExtract(app)
+                    }
+                }
+
+                item {
+                    ActionItem(label = stringResource(R.string.tv_manage_action_settings)) {
+                        onOpenSettings(app)
+                    }
+                }
+
+                item {
+                    Spacer(Modifier.height(32.dp))
+                }
+            }
+        } else {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     when {
                         isLoading -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -200,7 +268,6 @@ fun AppDetailsPane(
             }
         }
     }
-}
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -218,9 +285,8 @@ fun ActionItem(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .height(56.dp)
-            .clip(shape),
-        scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f),
+            .height(56.dp),
+        scale = app.pwhs.tv.TvNoScale,
         shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.06f),
@@ -280,7 +346,7 @@ fun DetailEmptyState(
         if (actionLabel != null) {
             Spacer(Modifier.height(24.dp))
             val shape = CircleShape
-            Button(onClick = onAction, shape = ButtonDefaults.shape(shape), modifier = Modifier.clip(shape)) {
+            Button(onClick = onAction, scale = app.pwhs.tv.TvButtonNoScale, shape = ButtonDefaults.shape(shape)) {
                 Text(actionLabel)
             }
         }

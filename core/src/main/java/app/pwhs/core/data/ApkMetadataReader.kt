@@ -77,25 +77,37 @@ class ApkMetadataReader(private val context: Context) {
     }
 
     private fun readSingleApkMetadata(uri: Uri, isBundle: Boolean = false): PackageMetadata? {
-        val tempFile = File(context.cacheDir, "temp_metadata_${System.currentTimeMillis()}.apk")
-        try {
-            context.contentResolver.openInputStream(uri)?.use { input ->
-                tempFile.outputStream().use { output -> input.copyTo(output) }
-            } ?: return null
+        val directFile = if (uri.scheme == "file" && !uri.path.isNullOrBlank()) File(uri.path!!) else null
+        val targetFile = if (directFile != null && directFile.exists() && directFile.canRead()) {
+            directFile
+        } else {
+            val tempFile = File(context.cacheDir, "temp_metadata_${System.currentTimeMillis()}.apk")
+            try {
+                context.contentResolver.openInputStream(uri)?.use { input ->
+                    tempFile.outputStream().use { output -> input.copyTo(output) }
+                } ?: return null
+                tempFile
+            } catch (_: Exception) {
+                tempFile.delete()
+                return null
+            }
+        }
+        val isTemp = targetFile != directFile
 
+        try {
             val pm = context.packageManager
             val flags = PackageManager.GET_PERMISSIONS
             val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                pm.getPackageArchiveInfo(tempFile.absolutePath, PackageManager.PackageInfoFlags.of(flags.toLong()))
+                pm.getPackageArchiveInfo(targetFile.absolutePath, PackageManager.PackageInfoFlags.of(flags.toLong()))
             } else {
                 @Suppress("DEPRECATION")
-                pm.getPackageArchiveInfo(tempFile.absolutePath, flags)
+                pm.getPackageArchiveInfo(targetFile.absolutePath, flags)
             } ?: return null
             val appInfo = pi.applicationInfo ?: return null
             
             // Important: set source paths so loadIcon/loadLabel work correctly
-            appInfo.sourceDir = tempFile.absolutePath
-            appInfo.publicSourceDir = tempFile.absolutePath
+            appInfo.sourceDir = targetFile.absolutePath
+            appInfo.publicSourceDir = targetFile.absolutePath
 
             val requestedPerms = pi.requestedPermissions?.toList().orEmpty()
 
@@ -104,7 +116,7 @@ class ApkMetadataReader(private val context: Context) {
                 appName = appInfo.loadLabel(pm).toString(),
                 versionName = pi.versionName ?: "",
                 versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pi.longVersionCode else pi.versionCode.toLong(),
-                icon = appInfo.loadIcon(pm).toBitmap(512, 512),
+                icon = appInfo.loadIcon(pm).toBitmap(192, 192),
                 isBundle = isBundle,
                 minSdk = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) appInfo.minSdkVersion else 0,
                 targetSdk = appInfo.targetSdkVersion,
@@ -113,7 +125,9 @@ class ApkMetadataReader(private val context: Context) {
         } catch (e: Exception) {
             return null
         } finally {
-            tempFile.delete()
+            if (isTemp) {
+                targetFile.delete()
+            }
         }
     }
 }

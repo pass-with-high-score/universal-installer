@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
@@ -32,6 +33,7 @@ import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import app.pwhs.core.util.StorageStats
 import app.pwhs.tv.R
+import app.pwhs.tv.TvNoScale
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -44,9 +46,8 @@ fun SidebarTab(
     val shape = RoundedCornerShape(12.dp)
     Surface(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(shape),
+        scale = TvNoScale,
+        modifier = Modifier.fillMaxWidth(),
         shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else Color.Transparent,
@@ -56,12 +57,18 @@ fun SidebarTab(
         )
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier.padding(horizontal = 14.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
-            Spacer(Modifier.width(16.dp))
-            Text(label, style = MaterialTheme.typography.titleMedium, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
+            Icon(icon, contentDescription = null, modifier = Modifier.size(22.dp))
+            Spacer(Modifier.width(12.dp))
+            Text(
+                label,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
         }
     }
 }

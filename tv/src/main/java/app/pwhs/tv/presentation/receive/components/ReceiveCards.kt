@@ -18,6 +18,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Link
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +42,7 @@ import androidx.tv.material3.ButtonDefaults
 import androidx.tv.material3.ClickableSurfaceDefaults
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
+import androidx.tv.material3.LocalContentColor
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
@@ -49,6 +52,8 @@ import app.pwhs.core.receiver.ReceivedApk
 import app.pwhs.core.receiver.ReceivingProgress
 import app.pwhs.core.receiver.ReceiverStatus
 import app.pwhs.tv.R
+import app.pwhs.tv.TvButtonNoScale
+import app.pwhs.tv.TvNoScale
 import app.pwhs.tv.formatSize
 import app.pwhs.tv.ui.components.QrCode
 
@@ -62,7 +67,8 @@ fun ReceiveContent(
     installFocus: FocusRequester,
     onInstall: (ReceivedApk) -> Unit,
     onDismissPending: () -> Unit,
-    onDisconnectClient: () -> Unit
+    onDisconnectClient: () -> Unit,
+    onOpenUrlDownload: () -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
         if (pending != null) {
@@ -115,6 +121,39 @@ fun ReceiveContent(
                             NoNetworkState()
                         } else {
                             CenteredHeroCard(url = s.url, ip = s.ip, port = s.port)
+                            Spacer(Modifier.height(14.dp))
+                            Surface(
+                                onClick = onOpenUrlDownload,
+                                scale = TvNoScale,
+                                shape = ClickableSurfaceDefaults.shape(RoundedCornerShape(16.dp)),
+                                colors = ClickableSurfaceDefaults.colors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f),
+                                    focusedContainerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onSurface,
+                                    focusedContentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
+                                modifier = Modifier.widthIn(max = 440.dp).fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Icon(Icons.Rounded.Link, contentDescription = null, modifier = Modifier.size(22.dp))
+                                    Spacer(Modifier.width(14.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            stringResource(R.string.tv_receive_card_url_download_title),
+                                            style = MaterialTheme.typography.titleSmall,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(
+                                            stringResource(R.string.tv_receive_card_url_download_subtitle),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = LocalContentColor.current.copy(alpha = 0.8f)
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                     ReceiverStatus.Stopped -> {
@@ -149,9 +188,8 @@ fun HeroPendingCard(
     LaunchedEffect(Unit) { runCatching { installFocus.requestFocus() } }
     Surface(
         onClick = onInstall,
-        modifier = Modifier
-            .width(600.dp)
-            .clip(shape),
+        scale = TvNoScale,
+        modifier = Modifier.width(600.dp),
         shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -162,9 +200,10 @@ fun HeroPendingCard(
     ) {
         Row(Modifier.padding(32.dp), verticalAlignment = Alignment.CenterVertically) {
             val icon = meta?.icon
-            if (icon != null) {
+            val imageBitmap = remember(icon) { icon?.asImageBitmap() }
+            if (imageBitmap != null) {
                 Image(
-                    bitmap = icon.asImageBitmap(),
+                    bitmap = imageBitmap,
                     contentDescription = null,
                     modifier = Modifier.size(120.dp).clip(RoundedCornerShape(20.dp))
                 )
@@ -188,19 +227,18 @@ fun HeroPendingCard(
                     val btnShape = CircleShape
                     Button(
                         onClick = onInstall,
+                        scale = TvButtonNoScale,
                         modifier = Modifier
                             .focusRequester(installFocus)
-                            .weight(1f)
-                            .clip(btnShape),
+                            .weight(1f),
                         shape = ButtonDefaults.shape(btnShape)
                     ) {
                         Text(if (isInstalling) stringResource(R.string.tv_receive_installing_plain) else stringResource(R.string.tv_receive_install), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
                     }
                     Button(
                         onClick = onDismiss,
-                        modifier = Modifier
-                            .weight(1f)
-                            .clip(btnShape),
+                        scale = TvButtonNoScale,
+                        modifier = Modifier.weight(1f),
                         shape = ButtonDefaults.shape(btnShape),
                         colors = ButtonDefaults.colors(
                             containerColor = MaterialTheme.colorScheme.secondaryContainer,

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -32,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +44,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
@@ -69,6 +73,8 @@ fun ManageScreen(
     var confirm by remember { mutableStateOf<ConfirmAction?>(null) }
     val context = LocalContext.current
 
+    val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
     val firstRowFocus = remember { FocusRequester() }
     var didRequestFocus by remember { mutableStateOf(false) }
 
@@ -76,6 +82,31 @@ fun ManageScreen(
         ActivityResultContracts.StartActivityForResult()
     ) {
         viewModel.refresh()
+    }
+
+    fun scrollToTopAndFocus() {
+        coroutineScope.launch {
+            listState.scrollToItem(0)
+            focusedApp = uiState.filteredApps.firstOrNull()
+            delay(50)
+            runCatching { firstRowFocus.requestFocus() }
+        }
+    }
+
+    var lastSortBy by remember { mutableStateOf(uiState.sortBy) }
+    var lastFilter by remember { mutableStateOf(uiState.filter) }
+
+    LaunchedEffect(uiState.sortBy, uiState.filter) {
+        if (uiState.sortBy != lastSortBy || uiState.filter != lastFilter) {
+            lastSortBy = uiState.sortBy
+            lastFilter = uiState.filter
+            if (uiState.filteredApps.isNotEmpty()) {
+                listState.scrollToItem(0)
+                focusedApp = uiState.filteredApps.firstOrNull()
+                delay(50)
+                runCatching { firstRowFocus.requestFocus() }
+            }
+        }
     }
 
     LaunchedEffect(uiState.filteredApps, uiState.isLoading) {
@@ -117,20 +148,23 @@ fun ManageScreen(
                     .weight(1.1f)
                     .fillMaxHeight()
                     .background(MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 32.dp, vertical = 40.dp)
+                    .padding(horizontal = 24.dp, vertical = 20.dp)
             ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
                         text = stringResource(R.string.tv_manage_title),
-                        style = MaterialTheme.typography.displaySmall,
+                        style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onSurface,
-                        fontWeight = FontWeight.SemiBold
+                        fontWeight = FontWeight.Bold
                     )
-                    Spacer(Modifier.height(8.dp))
                     TvInstallerModeBadge()
                 }
                 
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height(12.dp))
 
                 // Search Bar
                 Row(
@@ -141,17 +175,17 @@ fun ManageScreen(
                     OutlinedTextField(
                         value = uiState.searchQuery,
                         onValueChange = { viewModel.setSearchQuery(it) },
-                        modifier = Modifier.weight(1f).height(60.dp),
-                        textStyle = MaterialTheme.typography.titleSmall,
-                        placeholder = { Text(stringResource(R.string.tv_manage_search_placeholder), style = MaterialTheme.typography.titleSmall) },
-                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(24.dp)) },
+                        modifier = Modifier.weight(1f).height(54.dp),
+                        textStyle = MaterialTheme.typography.bodyLarge,
+                        placeholder = { Text(stringResource(R.string.tv_manage_search_placeholder), style = MaterialTheme.typography.bodyLarge) },
+                        leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(22.dp)) },
                         shape = RoundedCornerShape(12.dp),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedContainerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
-                            unfocusedContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f),
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
                             focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f),
+                            unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f),
                             focusedLeadingIconColor = MaterialTheme.colorScheme.primary,
                             focusedTextColor = MaterialTheme.colorScheme.onSurface,
                             unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
@@ -161,51 +195,78 @@ fun ManageScreen(
                     )
                 }
                 
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(10.dp))
                 
-                // Filter chips
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Filters and Sort in one or two compact rows
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     SmallFilterChip(
                         selected = uiState.filter == AppFilter.User,
                         label = stringResource(R.string.tv_manage_filter_user),
-                        onClick = { viewModel.setFilter(AppFilter.User) }
+                        onClick = {
+                            viewModel.setFilter(AppFilter.User)
+                            scrollToTopAndFocus()
+                        }
                     )
                     SmallFilterChip(
                         selected = uiState.filter == AppFilter.System,
                         label = stringResource(R.string.tv_manage_filter_system),
-                        onClick = { viewModel.setFilter(AppFilter.System) }
+                        onClick = {
+                            viewModel.setFilter(AppFilter.System)
+                            scrollToTopAndFocus()
+                        }
                     )
                     SmallFilterChip(
                         selected = uiState.filter == AppFilter.Disabled,
                         label = stringResource(R.string.tv_manage_filter_disabled),
-                        onClick = { viewModel.setFilter(AppFilter.Disabled) }
+                        onClick = {
+                            viewModel.setFilter(AppFilter.Disabled)
+                            scrollToTopAndFocus()
+                        }
                     )
                 }
 
-                Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(8.dp))
                 
                 // Sort chips
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
                     SmallFilterChip(
                         selected = uiState.sortBy == SortBy.Name,
                         label = stringResource(R.string.tv_manage_sort_name),
-                        onClick = { viewModel.setSortBy(SortBy.Name) }
+                        onClick = {
+                            viewModel.setSortBy(SortBy.Name)
+                            scrollToTopAndFocus()
+                        }
                     )
                     SmallFilterChip(
                         selected = uiState.sortBy == SortBy.Size,
                         label = stringResource(R.string.tv_manage_sort_size),
-                        onClick = { viewModel.setSortBy(SortBy.Size) }
+                        onClick = {
+                            viewModel.setSortBy(SortBy.Size)
+                            scrollToTopAndFocus()
+                        }
                     )
                     SmallFilterChip(
                         selected = uiState.sortBy == SortBy.Date,
                         label = stringResource(R.string.tv_manage_sort_date),
-                        onClick = { viewModel.setSortBy(SortBy.Date) }
+                        onClick = {
+                            viewModel.setSortBy(SortBy.Date)
+                            scrollToTopAndFocus()
+                        }
                     )
                 }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(12.dp))
 
                 LazyColumn(
+                    state = listState,
                     modifier = Modifier
                         .fillMaxSize()
                         .focusRestorer()
@@ -233,7 +294,7 @@ fun ManageScreen(
                         items(uiState.filteredApps, key = { it.packageName }) { app ->
                             AppListRow(
                                 app = app,
-                                isSelected = { focusedApp?.packageName == app.packageName },
+                                isSelected = focusedApp?.packageName == app.packageName,
                                 focusRequester = if (app.packageName == firstPackage) firstRowFocus else null,
                                 onFocus = { focusedApp = app }
                             )
@@ -250,9 +311,10 @@ fun ManageScreen(
                 searchQuery = uiState.searchQuery,
                 onOpen = { app ->
                     runCatching {
-                        context.packageManager.getLaunchIntentForPackage(app.packageName)?.let { intent ->
-                            context.startActivity(intent)
-                        }
+                        val pm = context.packageManager
+                        val intent = pm.getLeanbackLaunchIntentForPackage(app.packageName)
+                            ?: pm.getLaunchIntentForPackage(app.packageName)
+                        intent?.let { context.startActivity(it) }
                     }
                 },
                 onForceStop = { app -> viewModel.forceStop(app) },

@@ -7,6 +7,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
@@ -28,16 +29,21 @@ fun SmallFilterChip(selected: Boolean, label: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
         shape = ButtonDefaults.shape(shape),
-        scale = ButtonDefaults.scale(focusedScale = 1.05f),
+        scale = app.pwhs.tv.TvButtonNoScale,
         colors = ButtonDefaults.colors(
             containerColor = if (selected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
             contentColor = if (selected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
             focusedContainerColor = MaterialTheme.colorScheme.primary,
             focusedContentColor = MaterialTheme.colorScheme.onPrimary
         ),
-        modifier = Modifier.height(48.dp).clip(shape)
+        modifier = Modifier.height(38.dp).clip(shape),
+        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 0.dp)
     ) {
-        Text(label, style = MaterialTheme.typography.titleSmall)
+        Text(
+            label,
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = if (selected) androidx.compose.ui.text.font.FontWeight.Bold else androidx.compose.ui.text.font.FontWeight.Medium
+        )
     }
 }
 

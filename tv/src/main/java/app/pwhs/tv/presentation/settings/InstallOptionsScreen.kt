@@ -51,7 +51,7 @@ fun InstallOptionsScreen(onBack: () -> Unit) {
         context.dataStore.updateData { it.toMutablePreferences().apply { this[key] = value } }
     }
     LazyColumn(Modifier.fillMaxSize().padding(horizontal = 48.dp), contentPadding = PaddingValues(32.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Surface(onClick = onBack, scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f)) { Icon(Icons.Default.ArrowBack, "Back") } }
+        item { Surface(onClick = onBack, scale = app.pwhs.tv.TvNoScale) { Icon(Icons.Default.ArrowBack, "Back") } }
         item { Text("Install options", style = MaterialTheme.typography.displaySmall) }
         item { Text("These options are stored separately for Shizuku and Root.", style = MaterialTheme.typography.bodyLarge) }
         item { Text("Shizuku", style = MaterialTheme.typography.headlineSmall) }
@@ -93,7 +93,7 @@ private fun OptionRow(label: String, checked: Boolean, enabled: Boolean, onClick
         }
     }
     if (enabled) {
-        Surface(onClick = onClick, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)), scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f), colors = colors) { content() }
+        Surface(onClick = onClick, modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)), scale = app.pwhs.tv.TvNoScale, colors = colors) { content() }
     } else {
         Surface(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp))) { content() }
     }

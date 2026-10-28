@@ -74,6 +74,7 @@ fun ConfirmDeleteDialog(
                     val btnShape = RoundedCornerShape(14.dp)
                     Button(
                         onClick = onConfirm,
+                        scale = app.pwhs.tv.TvButtonNoScale,
                         modifier = Modifier
                             .weight(1f)
                             .clip(btnShape),
@@ -91,6 +92,7 @@ fun ConfirmDeleteDialog(
                     }
                     Button(
                         onClick = onCancel,
+                        scale = app.pwhs.tv.TvButtonNoScale,
                         modifier = Modifier
                             .weight(1f)
                             .clip(btnShape)

@@ -81,7 +81,7 @@ fun LanguageScreen(onBack: () -> Unit) {
                 modifier = Modifier
                     .clip(shape)
                     .focusRequester(backFocus),
-                scale = ClickableSurfaceDefaults.scale(focusedScale = 1.05f),
+                scale = app.pwhs.tv.TvNoScale,
                 shape = ClickableSurfaceDefaults.shape(shape),
                 colors = ClickableSurfaceDefaults.colors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
@@ -122,7 +122,7 @@ fun LanguageScreen(onBack: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape),
-                scale = ClickableSurfaceDefaults.scale(focusedScale = 1.02f),
+                scale = app.pwhs.tv.TvNoScale,
                 shape = ClickableSurfaceDefaults.shape(shape),
                 colors = ClickableSurfaceDefaults.colors(
                     containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
