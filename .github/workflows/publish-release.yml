@@ -25,6 +25,63 @@ jobs:
       - name: Set Version Name
         run: echo "VERSION_NAME=${{ github.ref_name }}" >> $GITHUB_ENV
 
+      # Determine which form factors were bumped compared to the previous git tag.
+      # This mirrors fastlane/Fastfile's smart_deploy logic so we only build and
+      # attach release artifacts for modules that actually changed in this release.
+      - name: Detect module version changes
+        id: detect_changes
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -z "$PREV_TAG" ]; then
+            CURRENT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            PREV_TAG=$(git tag -l --sort=-v:refname 'v*' 2>/dev/null | grep -v "^$CURRENT_TAG$" | head -n 1 || echo "")
+          fi
+          echo "Previous git tag: $PREV_TAG"
+
+          get_vc() {
+            grep -E "versionCode\s*=" "$1" | head -n 1 | awk -F"=" '{gsub(/[^0-9]/, "", $2); print $2}'
+          }
+          get_prev_vc() {
+            if [ -n "$PREV_TAG" ]; then
+              git show "$PREV_TAG:$1" 2>/dev/null | grep -E "versionCode\s*=" | head -n 1 | awk -F"=" '{gsub(/[^0-9]/, "", $2); print $2}' || echo "0"
+            else
+              echo "0"
+            fi
+          }
+
+          APP_VC=$(get_vc "app/build.gradle.kts")
+          APP_PREV_VC=$(get_prev_vc "app/build.gradle.kts")
+          TV_VC=$(get_vc "tv/build.gradle.kts")
+          TV_PREV_VC=$(get_prev_vc "tv/build.gradle.kts")
+          WEAR_VC=$(get_vc "wearos/build.gradle.kts")
+          WEAR_PREV_VC=$(get_prev_vc "wearos/build.gradle.kts")
+
+          APP_CHANGED=false
+          TV_CHANGED=false
+          WEAR_CHANGED=false
+
+          if [ "$APP_VC" != "$APP_PREV_VC" ] || [ -z "$PREV_TAG" ]; then
+            APP_CHANGED=true
+          fi
+          if [ "$TV_VC" != "$TV_PREV_VC" ] && [ -n "$PREV_TAG" ]; then
+            TV_CHANGED=true
+          fi
+          if [ "$WEAR_VC" != "$WEAR_PREV_VC" ] && [ -n "$PREV_TAG" ]; then
+            WEAR_CHANGED=true
+          fi
+
+          if [ "$APP_CHANGED" = "false" ] && [ "$TV_CHANGED" = "false" ] && [ "$WEAR_CHANGED" = "false" ]; then
+            APP_CHANGED=true
+          fi
+
+          echo "📱 Phone versionCode: last=$APP_PREV_VC now=$APP_VC (changed: $APP_CHANGED)"
+          echo "📺 TV versionCode: last=$TV_PREV_VC now=$TV_VC (changed: $TV_CHANGED)"
+          echo "⌚ WearOS versionCode: last=$WEAR_PREV_VC now=$WEAR_VC (changed: $WEAR_CHANGED)"
+
+          echo "APP_CHANGED=$APP_CHANGED" >> $GITHUB_ENV
+          echo "TV_CHANGED=$TV_CHANGED" >> $GITHUB_ENV
+          echo "WEAR_CHANGED=$WEAR_CHANGED" >> $GITHUB_ENV
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -91,10 +148,12 @@ jobs:
       - name: Keep the store bundle for the release
         run: |
           mkdir -p dist
-          cp app/build/outputs/bundle/playRelease/app-play-release.aab dist/ || \
-            echo "::warning::no play bundle to attach to the release"
-          cp tv/build/outputs/bundle/playRelease/tv-play-release.aab dist/ || \
-            echo "::warning::no TV play bundle to attach to the release"
+          if [ "$APP_CHANGED" = "true" ] && [ -f app/build/outputs/bundle/playRelease/app-play-release.aab ]; then
+            cp app/build/outputs/bundle/playRelease/app-play-release.aab dist/
+          fi
+          if [ "$TV_CHANGED" = "true" ] && [ -f tv/build/outputs/bundle/playRelease/tv-play-release.aab ]; then
+            cp tv/build/outputs/bundle/playRelease/tv-play-release.aab dist/
+          fi
 
       # F-Droid rebuilds the opensource APK from a plain checkout and requires it to match the
       # one published here byte for byte. A checkout has no google-services.json, so leaving
@@ -113,11 +172,23 @@ jobs:
       # Crashlytics. That is the build F-Droid reproduces and the one people sideload.
       #
       # The AAB attached to the release is the `play` one the fastlane lanes already built, so the
-      # release carries a copy of exactly what went to the store. An AAB cannot be sideloaded, so
-      # the flavor difference costs installers nothing — but it does mean the release page hosts a
-      # bundle containing Analytics and Crashlytics.
+      # release carries a copy of exactly what went to the store.
+      #
+      # Only build tasks for modules that have actual version bumps in this release.
       - name: Build release APK & AAB
-        run: ./gradlew :app:assembleOpensourceRelease :tv:assembleOpensourceRelease :wearos:assembleRelease :wearos:bundleRelease
+        run: |
+          GRADLE_TASKS=""
+          if [ "$APP_CHANGED" = "true" ]; then
+            GRADLE_TASKS="$GRADLE_TASKS :app:assembleOpensourceRelease"
+          fi
+          if [ "$TV_CHANGED" = "true" ]; then
+            GRADLE_TASKS="$GRADLE_TASKS :tv:assembleOpensourceRelease"
+          fi
+          if [ "$WEAR_CHANGED" = "true" ]; then
+            GRADLE_TASKS="$GRADLE_TASKS :wearos:assembleRelease :wearos:bundleRelease"
+          fi
+          echo "Executing tasks: $GRADLE_TASKS"
+          ./gradlew $GRADLE_TASKS
 
       # The flavor dimension renamed this to app-opensource-release.apk, but two downstream
       # consumers key off the old name: F-Droid's recipe pins `binary:` to app-release.apk for
@@ -125,23 +196,40 @@ jobs:
       # (the release also carries tv-release.apk). Rename back rather than break both.
       - name: Restore the published artifact name
         run: |
-          mv app/build/outputs/apk/opensource/release/app-opensource-release.apk \
-             app/build/outputs/apk/opensource/release/app-release.apk
-          mv tv/build/outputs/apk/opensource/release/tv-opensource-release.apk \
-             tv/build/outputs/apk/opensource/release/tv-release.apk
+          if [ "$APP_CHANGED" = "true" ] && [ -f app/build/outputs/apk/opensource/release/app-opensource-release.apk ]; then
+            mv app/build/outputs/apk/opensource/release/app-opensource-release.apk \
+               app/build/outputs/apk/opensource/release/app-release.apk
+          fi
+          if [ "$TV_CHANGED" = "true" ] && [ -f tv/build/outputs/apk/opensource/release/tv-opensource-release.apk ]; then
+            mv tv/build/outputs/apk/opensource/release/tv-opensource-release.apk \
+               tv/build/outputs/apk/opensource/release/tv-release.apk
+          fi
+
+      # Collect only the artifacts that were built for the changed modules
+      - name: Collect release artifacts
+        run: |
+          mkdir -p release_artifacts
+          if [ "$APP_CHANGED" = "true" ]; then
+            [ -f app/build/outputs/apk/opensource/release/app-release.apk ] && cp app/build/outputs/apk/opensource/release/app-release.apk release_artifacts/
+            [ -f dist/app-play-release.aab ] && cp dist/app-play-release.aab release_artifacts/
+          fi
+          if [ "$TV_CHANGED" = "true" ]; then
+            [ -f tv/build/outputs/apk/opensource/release/tv-release.apk ] && cp tv/build/outputs/apk/opensource/release/tv-release.apk release_artifacts/
+            [ -f dist/tv-play-release.aab ] && cp dist/tv-play-release.aab release_artifacts/
+          fi
+          if [ "$WEAR_CHANGED" = "true" ]; then
+            [ -f wearos/build/outputs/apk/release/wearos-release.apk ] && cp wearos/build/outputs/apk/release/wearos-release.apk release_artifacts/
+            [ -f wearos/build/outputs/bundle/release/wearos-release.aab ] && cp wearos/build/outputs/bundle/release/wearos-release.aab release_artifacts/
+          fi
+          echo "Collected artifacts for release:"
+          ls -la release_artifacts/
 
       # Artifacts
       - name: Upload release AAB & APK
         uses: actions/upload-artifact@v4
         with:
           name: release-build
-          path: |
-            dist/app-play-release.aab
-            app/build/outputs/apk/opensource/release/app-release.apk
-            dist/tv-play-release.aab
-            tv/build/outputs/apk/opensource/release/tv-release.apk
-            wearos/build/outputs/bundle/release/wearos-release.aab
-            wearos/build/outputs/apk/release/wearos-release.apk
+          path: release_artifacts/*
           retention-days: 30
 
       - name: Create GitHub Release
@@ -151,11 +239,5 @@ jobs:
           name: ${{ env.VERSION_NAME }}
           draft: false
           prerelease: false
-          files: |
-            app/build/outputs/apk/opensource/release/app-release.apk
-            dist/app-play-release.aab
-            tv/build/outputs/apk/opensource/release/tv-release.apk
-            dist/tv-play-release.aab
-            wearos/build/outputs/apk/release/wearos-release.apk
-            wearos/build/outputs/bundle/release/wearos-release.aab
+          files: release_artifacts/*
           token: ${{ secrets.GITHUB_TOKEN }}
