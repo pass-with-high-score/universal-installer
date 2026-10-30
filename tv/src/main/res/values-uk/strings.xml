@@ -171,5 +171,10 @@
     <string name="tv_updates_add_submit">Додати</string>
     <string name="tv_updates_add_cancel">Скасувати</string>
     <string name="tv_error_cannot_open_settings">Не вдалося відкрити налаштування системи на цьому пристрої</string>
+    <string name="found_chip_older">Старе</string>
+    <string name="found_chip_update">Оновлення</string>
+    <string name="found_chip_installed">Встановлено</string>
+    <string name="found_chip_new">Нове</string>
+    <string name="dialog_chip_downgrade">Зниження версії</string>
 </resources>
     

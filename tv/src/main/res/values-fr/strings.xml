@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">Ajouter</string>
     <string name="tv_updates_add_cancel">Annuler</string>
     <string name="tv_error_cannot_open_settings">Impossible d\'ouvrir les paramètres système sur cet appareil</string>
+    <string name="found_chip_older">Plus ancien</string>
+    <string name="found_chip_update">Mettre à jour</string>
+    <string name="found_chip_installed">Installé</string>
+    <string name="found_chip_new">Nouveau</string>
+    <string name="dialog_chip_downgrade">Rétrograder</string>
 </resources>

@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">Tambah</string>
     <string name="tv_updates_add_cancel">Batal</string>
     <string name="tv_error_cannot_open_settings">Tidak dapat membuka setelan sistem di perangkat ini</string>
+    <string name="found_chip_older">Lebih lama</string>
+    <string name="found_chip_update">Perbarui</string>
+    <string name="found_chip_installed">Terinstal</string>
+    <string name="found_chip_new">Baru</string>
+    <string name="dialog_chip_downgrade">Turunkan versi</string>
 </resources>

@@ -47,6 +47,9 @@ fun ApkOverviewPane(
     size: Long,
     minSdk: Int,
     targetSdk: Int,
+    versionCode: Long = 0L,
+    installedVersion: String? = null,
+    installedVersionCode: Long? = null,
     isBundle: Boolean,
     isInstalling: Boolean,
     hasDelete: Boolean,
@@ -59,6 +62,10 @@ fun ApkOverviewPane(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+
+    val isUpdate = installedVersionCode != null && versionCode > installedVersionCode
+    val isDowngrade = installedVersionCode != null && versionCode < installedVersionCode
+    val isSame = installedVersionCode != null && versionCode == installedVersionCode
 
     Column(
         modifier = modifier
@@ -125,6 +132,64 @@ fun ApkOverviewPane(
                             )
                         }
                     }
+
+                    if (isDowngrade) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.errorContainer)
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.found_chip_older),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        }
+                    } else if (isUpdate) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.primaryContainer)
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.found_chip_update),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                            )
+                        }
+                    } else if (isSame) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.surfaceVariant)
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.found_chip_installed),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    } else if (installedVersionCode == null && pkg.isNotBlank()) {
+                        Box(
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(MaterialTheme.colorScheme.secondaryContainer)
+                                .padding(horizontal = 8.dp, vertical = 3.dp)
+                        ) {
+                            Text(
+                                text = stringResource(R.string.found_chip_new),
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onSecondaryContainer
+                            )
+                        }
+                    }
                 }
 
                 if (pkg.isNotBlank()) {
@@ -180,6 +245,33 @@ fun ApkOverviewPane(
                     value = if (targetSdk > 0) (if (targetVer != null) "Android $targetVer" else "API $targetSdk") else "—",
                     subValue = if (targetSdk > 0 && targetVer != null) "API $targetSdk" else null,
                     modifier = Modifier.weight(1f)
+                )
+            }
+        }
+
+        installedVersion?.let { installed ->
+            val statusText = when {
+                isDowngrade -> stringResource(R.string.tv_details_status_downgrade, installed)
+                isUpdate -> stringResource(R.string.tv_details_status_update, installed)
+                isSame -> stringResource(R.string.tv_details_status_same, installed)
+                else -> stringResource(R.string.tv_details_status_update, installed)
+            }
+            val statusColor = if (isDowngrade) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+            Spacer(Modifier.height(10.dp))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(10.dp))
+                    .background(
+                        if (isDowngrade) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
+                        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                    )
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
+            ) {
+                Text(
+                    text = statusText,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = statusColor
                 )
             }
         }

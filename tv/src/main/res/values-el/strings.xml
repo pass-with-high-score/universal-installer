@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">Προσθήκη</string>
     <string name="tv_updates_add_cancel">Ακύρωση</string>
     <string name="tv_error_cannot_open_settings">Δεν είναι δυνατή η εκκίνηση των ρυθμίσεων συστήματος σε αυτή τη συσκευή</string>
+    <string name="found_chip_older">Παλαιότερο</string>
+    <string name="found_chip_update">Ενημέρωση</string>
+    <string name="found_chip_installed">Εγκατεστημένο</string>
+    <string name="found_chip_new">Νέο</string>
+    <string name="dialog_chip_downgrade">Υποβάθμιση έκδοσης</string>
 </resources>

@@ -212,6 +212,14 @@ fun ManageScreen(
                         }
                     )
                     SmallFilterChip(
+                        selected = uiState.filter == AppFilter.Sideloaded,
+                        label = stringResource(R.string.tv_manage_filter_sideloaded),
+                        onClick = {
+                            viewModel.setFilter(AppFilter.Sideloaded)
+                            scrollToTopAndFocus()
+                        }
+                    )
+                    SmallFilterChip(
                         selected = uiState.filter == AppFilter.System,
                         label = stringResource(R.string.tv_manage_filter_system),
                         onClick = {
@@ -231,36 +239,76 @@ fun ManageScreen(
 
                 Spacer(Modifier.height(8.dp))
                 
-                // Sort chips
+                // Sort chips & Batch select toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SmallFilterChip(
+                            selected = uiState.sortBy == SortBy.Name,
+                            label = stringResource(R.string.tv_manage_sort_name),
+                            onClick = {
+                                viewModel.setSortBy(SortBy.Name)
+                                scrollToTopAndFocus()
+                            }
+                        )
+                        SmallFilterChip(
+                            selected = uiState.sortBy == SortBy.Size,
+                            label = stringResource(R.string.tv_manage_sort_size),
+                            onClick = {
+                                viewModel.setSortBy(SortBy.Size)
+                                scrollToTopAndFocus()
+                            }
+                        )
+                        SmallFilterChip(
+                            selected = uiState.sortBy == SortBy.Date,
+                            label = stringResource(R.string.tv_manage_sort_date),
+                            onClick = {
+                                viewModel.setSortBy(SortBy.Date)
+                                scrollToTopAndFocus()
+                            }
+                        )
+                    }
+
                     SmallFilterChip(
-                        selected = uiState.sortBy == SortBy.Name,
-                        label = stringResource(R.string.tv_manage_sort_name),
+                        selected = uiState.selectionMode,
+                        label = if (uiState.selectionMode) stringResource(R.string.tv_manage_confirm_cancel) else stringResource(R.string.tv_manage_batch_select),
                         onClick = {
-                            viewModel.setSortBy(SortBy.Name)
-                            scrollToTopAndFocus()
+                            if (uiState.selectionMode) viewModel.exitSelection() else viewModel.enterSelection()
                         }
                     )
-                    SmallFilterChip(
-                        selected = uiState.sortBy == SortBy.Size,
-                        label = stringResource(R.string.tv_manage_sort_size),
-                        onClick = {
-                            viewModel.setSortBy(SortBy.Size)
-                            scrollToTopAndFocus()
+                }
+
+                if (uiState.selectionMode) {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        SmallFilterChip(
+                            selected = false,
+                            label = stringResource(R.string.tv_manage_batch_select_all),
+                            onClick = { viewModel.selectAllVisible() }
+                        )
+                        SmallFilterChip(
+                            selected = false,
+                            label = stringResource(R.string.tv_manage_batch_clear),
+                            onClick = { viewModel.exitSelection(); viewModel.enterSelection() }
+                        )
+                        if (uiState.selectedPackages.isNotEmpty() && uiState.rootAvailable) {
+                            SmallFilterChip(
+                                selected = true,
+                                label = stringResource(R.string.tv_manage_batch_uninstall, uiState.selectedPackages.size),
+                                onClick = { viewModel.batchUninstall() }
+                            )
                         }
-                    )
-                    SmallFilterChip(
-                        selected = uiState.sortBy == SortBy.Date,
-                        label = stringResource(R.string.tv_manage_sort_date),
-                        onClick = {
-                            viewModel.setSortBy(SortBy.Date)
-                            scrollToTopAndFocus()
-                        }
-                    )
+                    }
                 }
 
                 Spacer(Modifier.height(12.dp))
@@ -296,6 +344,9 @@ fun ManageScreen(
                                 app = app,
                                 isSelected = focusedApp?.packageName == app.packageName,
                                 focusRequester = if (app.packageName == firstPackage) firstRowFocus else null,
+                                selectionMode = uiState.selectionMode,
+                                isChecked = uiState.selectedPackages.contains(app.packageName),
+                                onToggleCheck = { viewModel.toggleSelection(app.packageName) },
                                 onFocus = { focusedApp = app }
                             )
                         }

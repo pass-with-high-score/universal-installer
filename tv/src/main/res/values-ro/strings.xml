@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">Adaugă</string>
     <string name="tv_updates_add_cancel">Anulare</string>
     <string name="tv_error_cannot_open_settings">Nu se pot deschide setările de sistem pe acest dispozitiv</string>
+    <string name="found_chip_older">Mai vechi</string>
+    <string name="found_chip_update">Actualizare</string>
+    <string name="found_chip_installed">Instalat</string>
+    <string name="found_chip_new">Nou</string>
+    <string name="dialog_chip_downgrade">Downgrade</string>
 </resources>

@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">添加</string>
     <string name="tv_updates_add_cancel">取消</string>
     <string name="tv_error_cannot_open_settings">无法在此设备上打开系统设置</string>
+    <string name="found_chip_older">旧版本</string>
+    <string name="found_chip_update">更新</string>
+    <string name="found_chip_installed">已安装</string>
+    <string name="found_chip_new">新应用</string>
+    <string name="dialog_chip_downgrade">降级</string>
 </resources>

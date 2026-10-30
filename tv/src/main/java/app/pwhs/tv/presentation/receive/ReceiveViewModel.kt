@@ -75,7 +75,7 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     private var lastInstall: InstallRequest? = null
 
     sealed interface InstallOutcome {
-        data class Success(val label: String, val silent: Boolean = false) : InstallOutcome
+        data class Success(val label: String, val silent: Boolean = false, val packageName: String? = null) : InstallOutcome
         data class Failure(val label: String, val message: String) : InstallOutcome
     }
 
@@ -273,7 +273,11 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
                         }
                         _downloads.value = _downloads.value.filterNot { it.uri == uri.toString() }
                     }
-                    InstallOutcome.Success(label, silent = useRoot || useShizuku)
+                    val meta = withContext(Dispatchers.IO) {
+                        metadataReader.readMetadata(uri, isBundle)
+                    }
+                    val pkgName = meta?.packageName
+                    InstallOutcome.Success(label, silent = useRoot || useShizuku, packageName = pkgName)
                 }
                 is ApkInstaller.Result.Failure -> InstallOutcome.Failure(label, result.message)
             }

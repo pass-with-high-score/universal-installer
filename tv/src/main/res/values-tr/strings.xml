@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">Ekle</string>
     <string name="tv_updates_add_cancel">İptal</string>
     <string name="tv_error_cannot_open_settings">Bu cihazda sistem ayarları açılamıyor</string>
+    <string name="found_chip_older">Daha eski</string>
+    <string name="found_chip_update">Güncelle</string>
+    <string name="found_chip_installed">Yüklü</string>
+    <string name="found_chip_new">Yeni</string>
+    <string name="dialog_chip_downgrade">Eski sürüme düşür</string>
 </resources>

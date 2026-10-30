@@ -253,6 +253,15 @@ fun ReceiveScreen(
             result = installResult,
             deleteOutcome = deleteOutcome,
             onRetry = { viewModel.retryInstall() },
+            onOpenApp = { pkg ->
+                runCatching {
+                    val pm = context.packageManager
+                    val intent = pm.getLeanbackLaunchIntentForPackage(pkg)
+                        ?: pm.getLaunchIntentForPackage(pkg)
+                    intent?.let { context.startActivity(it) }
+                }
+                viewModel.clearInstallResult()
+            },
             onDismiss = { viewModel.clearInstallResult() },
             onDismissDelete = { viewModel.clearDeleteOutcome() },
             modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 40.dp)

@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">Добавить</string>
     <string name="tv_updates_add_cancel">Отмена</string>
     <string name="tv_error_cannot_open_settings">Не удалось открыть системные настройки на этом устройстве</string>
+    <string name="found_chip_older">Старое</string>
+    <string name="found_chip_update">Обновление</string>
+    <string name="found_chip_installed">Установлено</string>
+    <string name="found_chip_new">Новое</string>
+    <string name="dialog_chip_downgrade">Понижение</string>
 </resources>

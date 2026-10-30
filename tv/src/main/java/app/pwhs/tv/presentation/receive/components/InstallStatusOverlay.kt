@@ -45,14 +45,15 @@ fun InstallStatusOverlay(
     result: ReceiveViewModel.InstallOutcome?,
     deleteOutcome: ReceiveViewModel.DeleteOutcome?,
     onRetry: () -> Unit,
+    onOpenApp: ((String) -> Unit)? = null,
     onDismiss: () -> Unit,
     onDismissDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Success auto-dismisses; a failure lingers so the Retry/Dismiss action stays reachable.
+    // Success auto-dismisses after 6s (or stays reachable if Open App is shown); a failure lingers so the Retry/Dismiss action stays reachable.
     LaunchedEffect(result) {
         if (result is ReceiveViewModel.InstallOutcome.Success) {
-            delay(3000)
+            delay(if (result.packageName != null) 6000 else 3000)
             onDismiss()
         }
     }
@@ -167,6 +168,30 @@ fun InstallStatusOverlay(
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis
                         )
+                        if (result.packageName != null && onOpenApp != null) {
+                            Spacer(Modifier.height(14.dp))
+                            val openFocus = remember { FocusRequester() }
+                            LaunchedEffect(Unit) { runCatching { openFocus.requestFocus() } }
+                            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                                val btnShape = CircleShape
+                                Button(
+                                    onClick = { onOpenApp(result.packageName) },
+                                    shape = ButtonDefaults.shape(btnShape),
+                                    modifier = Modifier.clip(btnShape).focusRequester(openFocus),
+                                    colors = ButtonDefaults.colors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary)
+                                ) {
+                                    Text(stringResource(R.string.tv_dialog_btn_open))
+                                }
+                                Button(
+                                    onClick = onDismiss,
+                                    shape = ButtonDefaults.shape(btnShape),
+                                    modifier = Modifier.clip(btnShape),
+                                    colors = ButtonDefaults.colors(containerColor = content.copy(alpha = 0.15f), contentColor = content)
+                                ) {
+                                    Text(stringResource(R.string.tv_receive_dismiss))
+                                }
+                            }
+                        }
                     }
                     result is ReceiveViewModel.InstallOutcome.Failure -> {
                         Text(

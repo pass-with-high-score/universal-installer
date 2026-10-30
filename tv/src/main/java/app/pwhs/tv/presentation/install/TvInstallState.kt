@@ -20,6 +20,7 @@ sealed interface TvInstallState {
         val isBundle: Boolean,
         val sizeBytes: Long,
         val installedVersion: String? = null,
+        val installedVersionCode: Long? = null,
         val showPermissions: Boolean = false
     ) : TvInstallState
 

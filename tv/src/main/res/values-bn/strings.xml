@@ -186,4 +186,9 @@
     <string name="app_name">Universal Installer</string>
     <string name="tv_settings_app_name">Universal Installer</string>
     <string name="tv_error_cannot_open_settings">এই ডিভাইসে সিস্টেম সেটিংস খুলতে অক্ষম</string>
+    <string name="found_chip_older">পুরানো</string>
+    <string name="found_chip_update">আপডেট</string>
+    <string name="found_chip_installed">ইনস্টল করা</string>
+    <string name="found_chip_new">নতুন</string>
+    <string name="dialog_chip_downgrade">ডাউনগ্রেড</string>
 </resources>

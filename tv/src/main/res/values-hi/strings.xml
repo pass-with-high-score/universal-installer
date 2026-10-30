@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">जोड़ें</string>
     <string name="tv_updates_add_cancel">रद्द करें</string>
     <string name="tv_error_cannot_open_settings">इस डिवाइस पर सिस्टम सेटिंग खोलने में असमर्थ</string>
+    <string name="found_chip_older">पुराना</string>
+    <string name="found_chip_update">अपडेट</string>
+    <string name="found_chip_installed">इंस्टॉल किया गया</string>
+    <string name="found_chip_new">नया</string>
+    <string name="dialog_chip_downgrade">डाउनग्रेड</string>
 </resources>

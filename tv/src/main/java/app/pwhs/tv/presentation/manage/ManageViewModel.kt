@@ -20,7 +20,7 @@ import app.pwhs.core.install.ApkExtractor
 import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.core.telemetry.TelemetryEvents
 
-enum class AppFilter { User, System, Disabled }
+enum class AppFilter { User, Sideloaded, System, Disabled }
 enum class SortBy { Name, Size, Date }
 
 sealed interface ExtractState {
@@ -99,6 +99,7 @@ class ManageViewModel(application: Application) : AndroidViewModel(application) 
         val filtered = apps.filter { app ->
             val matchesFilter = when (filter) {
                 AppFilter.User -> !app.isSystemApp && app.enabled
+                AppFilter.Sideloaded -> !app.isSystemApp && !app.isLeanbackSupported && app.enabled
                 AppFilter.System -> app.isSystemApp
                 AppFilter.Disabled -> !app.enabled
             }

@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">추가</string>
     <string name="tv_updates_add_cancel">취소</string>
     <string name="tv_error_cannot_open_settings">이 기기에서 시스템 설정을 열 수 없습니다</string>
+    <string name="found_chip_older">이전 버전</string>
+    <string name="found_chip_update">업데이트</string>
+    <string name="found_chip_installed">설치됨</string>
+    <string name="found_chip_new">신규</string>
+    <string name="dialog_chip_downgrade">다운그레이드</string>
 </resources>

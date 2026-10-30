@@ -26,4 +26,6 @@ data class InstalledApp(
     val originatingPackage: String? = null,
     /** Whether the app declares Android Auto compatibility. */
     val isAndroidAutoSupported: Boolean = false,
+    /** Whether the app has Leanback launcher support (TV-friendly). */
+    val isLeanbackSupported: Boolean = false,
 )

@@ -43,6 +43,11 @@ import app.pwhs.tv.TvNoScale
 import app.pwhs.tv.formatSize
 import app.pwhs.tv.rememberAppIcon
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.RadioButtonUnchecked
+import androidx.tv.material3.Icon
+
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 private fun AppStatusBadge(
@@ -72,6 +77,9 @@ fun AppListRow(
     app: InstalledApp,
     isSelected: Boolean,
     focusRequester: FocusRequester?,
+    selectionMode: Boolean = false,
+    isChecked: Boolean = false,
+    onToggleCheck: (() -> Unit)? = null,
     onFocus: () -> Unit
 ) {
     val context = LocalContext.current
@@ -80,7 +88,11 @@ fun AppListRow(
     var isFocused by remember { mutableStateOf(false) }
 
     Surface(
-        onClick = { /* Detail pane updates on focus */ },
+        onClick = {
+            if (selectionMode && onToggleCheck != null) {
+                onToggleCheck()
+            }
+        },
         modifier = Modifier
             .fillMaxWidth()
             .then(if (focusRequester != null) Modifier.focusRequester(focusRequester) else Modifier)
@@ -92,7 +104,9 @@ fun AppListRow(
         border = TvCardBorder,
         shape = ClickableSurfaceDefaults.shape(shape),
         colors = ClickableSurfaceDefaults.colors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f) else Color.Transparent,
+            containerColor = if (isChecked) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+            else if (isSelected) MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            else Color.Transparent,
             focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             contentColor = if (isSelected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant,
             focusedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -102,6 +116,16 @@ fun AppListRow(
             modifier = Modifier.padding(horizontal = 14.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            if (selectionMode) {
+                Icon(
+                    imageVector = if (isChecked) Icons.Rounded.CheckCircle else Icons.Rounded.RadioButtonUnchecked,
+                    contentDescription = null,
+                    tint = if (isChecked) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(24.dp).padding(end = 4.dp)
+                )
+                Spacer(Modifier.width(8.dp))
+            }
+
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -168,6 +192,14 @@ fun AppListRow(
                             else MaterialTheme.colorScheme.surfaceVariant,
                             contentColor = if (isFocused) MaterialTheme.colorScheme.onPrimaryContainer
                             else MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    } else if (!app.isLeanbackSupported) {
+                        AppStatusBadge(
+                            text = stringResource(R.string.tv_manage_badge_mobile),
+                            containerColor = if (isFocused) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.15f)
+                            else MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f),
+                            contentColor = if (isFocused) MaterialTheme.colorScheme.onPrimaryContainer
+                            else MaterialTheme.colorScheme.onTertiaryContainer
                         )
                     }
                 }

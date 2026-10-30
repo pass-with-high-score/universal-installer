@@ -173,4 +173,9 @@
     <string name="tv_updates_add_submit">افزودن</string>
     <string name="tv_updates_add_cancel">لغو</string>
     <string name="tv_error_cannot_open_settings">باز کردن تنظیمات سیستم در این دستگاه امکان‌پذیر نیست</string>
+    <string name="found_chip_older">قدیمی‌تر</string>
+    <string name="found_chip_update">به‌روزرسانی</string>
+    <string name="found_chip_installed">نصب‌شده</string>
+    <string name="found_chip_new">جدید</string>
+    <string name="dialog_chip_downgrade">برگشت به نسخه قبل</string>
 </resources>

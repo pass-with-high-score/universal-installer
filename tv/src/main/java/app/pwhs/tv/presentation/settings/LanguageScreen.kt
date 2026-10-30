@@ -6,16 +6,15 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -23,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +33,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.Text
 import app.pwhs.tv.R
+import app.pwhs.tv.TvNoScale
+import app.pwhs.tv.presentation.settings.components.TvSubScreenHeader
 import app.pwhs.tv.util.LocaleHelper
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -47,7 +47,7 @@ fun LanguageScreen(onBack: () -> Unit) {
     // D-pad Back returns to Settings instead of bubbling to the Activity and exiting the app.
     BackHandler(onBack = onBack)
 
-    // Entering this screen removes the Settings card that had focus, so land focus on the Back row.
+    // Entering this screen removes the Settings card that had focus, so land focus on the Back button.
     LaunchedEffect(Unit) { runCatching { backFocus.requestFocus() } }
 
     val languages = remember {
@@ -72,37 +72,14 @@ fun LanguageScreen(onBack: () -> Unit) {
             .fillMaxSize()
             .padding(horizontal = 48.dp),
         contentPadding = PaddingValues(top = 32.dp, bottom = 48.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
     ) {
         item {
-            val shape = RoundedCornerShape(12.dp)
-            Surface(
-                onClick = onBack,
-                modifier = Modifier
-                    .clip(shape)
-                    .focusRequester(backFocus),
-                scale = app.pwhs.tv.TvNoScale,
-                shape = ClickableSurfaceDefaults.shape(shape),
-                colors = ClickableSurfaceDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
-                    focusedContainerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    focusedContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
-            ) {
-                Row(
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = null)
-                    Spacer(Modifier.width(12.dp))
-                    Text(
-                        stringResource(R.string.tv_language_title),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
-            }
+            TvSubScreenHeader(
+                title = stringResource(R.string.tv_language_title),
+                onBack = onBack,
+                backFocusRequester = backFocus
+            )
         }
 
         items(languages) { (tag, name) ->
@@ -122,7 +99,7 @@ fun LanguageScreen(onBack: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(shape),
-                scale = app.pwhs.tv.TvNoScale,
+                scale = TvNoScale,
                 shape = ClickableSurfaceDefaults.shape(shape),
                 colors = ClickableSurfaceDefaults.colors(
                     containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
@@ -131,12 +108,27 @@ fun LanguageScreen(onBack: () -> Unit) {
                     focusedContentColor = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurface
                 )
             ) {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                    modifier = Modifier.padding(24.dp)
-                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 18.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                    )
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Rounded.Check,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
             }
         }
     }

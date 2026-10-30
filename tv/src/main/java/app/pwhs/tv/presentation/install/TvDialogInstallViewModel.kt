@@ -61,15 +61,20 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
                 return@launch
             }
 
-            val installedVersion = runCatching {
-                val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val pkgInfo = runCatching {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     context.packageManager.getPackageInfo(meta.packageName, PackageManager.PackageInfoFlags.of(0))
                 } else {
                     @Suppress("DEPRECATION")
                     context.packageManager.getPackageInfo(meta.packageName, 0)
                 }
-                info.versionName
             }.getOrNull()
+
+            val installedVersion = pkgInfo?.versionName
+            val installedVersionCode = pkgInfo?.let {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.longVersionCode
+                else @Suppress("DEPRECATION") it.versionCode.toLong()
+            }
 
             _state.value = TvInstallState.Ready(
                 uri = stagedUri,
@@ -77,6 +82,7 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
                 isBundle = isBundle,
                 sizeBytes = sizeBytes,
                 installedVersion = installedVersion,
+                installedVersionCode = installedVersionCode,
                 showPermissions = false
             )
         }

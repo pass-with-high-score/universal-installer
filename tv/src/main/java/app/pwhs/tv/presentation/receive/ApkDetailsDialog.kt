@@ -58,6 +58,7 @@ fun ApkDetailsDialog(
     val isBundle: Boolean
     val minSdk: Int
     val targetSdk: Int
+    val versionCode: Long
 
     when (apkItem) {
         is TvApkItem.Received -> {
@@ -71,6 +72,7 @@ fun ApkDetailsDialog(
             isBundle = apkItem.apk.fileName.isBundleName()
             minSdk = meta?.minSdk ?: 0
             targetSdk = meta?.targetSdk ?: 0
+            versionCode = meta?.versionCode ?: 0L
         }
         is TvApkItem.Local -> {
             val meta = apkItem.apk.metadata
@@ -83,7 +85,26 @@ fun ApkDetailsDialog(
             isBundle = apkItem.apk.isBundle
             minSdk = meta?.minSdk ?: 0
             targetSdk = meta?.targetSdk ?: 0
+            versionCode = meta?.versionCode ?: 0L
         }
+    }
+
+    val installedPkgInfo = remember(pkg) {
+        if (pkg.isBlank()) null
+        else runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(pkg, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(pkg, 0)
+            }
+        }.getOrNull()
+    }
+
+    val installedVersion = installedPkgInfo?.versionName
+    val installedVersionCode = installedPkgInfo?.let {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.longVersionCode
+        else @Suppress("DEPRECATION") it.versionCode.toLong()
     }
 
     val permissions: List<String> = remember(apkItem) {
@@ -174,6 +195,9 @@ fun ApkDetailsDialog(
                         size = size,
                         minSdk = minSdk,
                         targetSdk = targetSdk,
+                        versionCode = versionCode,
+                        installedVersion = installedVersion,
+                        installedVersionCode = installedVersionCode,
                         isBundle = isBundle,
                         isInstalling = isInstalling,
                         hasDelete = apkItem is TvApkItem.Local && onDelete != null,

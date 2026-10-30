@@ -61,6 +61,8 @@ class AppRepository(private val context: Context) {
             installing = runCatching { pm.getInstallerPackageName(packageName) }.getOrNull()
         }
 
+        val isLeanback = pm.getLeanbackLaunchIntentForPackage(packageName) != null
+
         return InstalledApp(
             packageName = packageName,
             appName = loadLabel(pm).toString(),
@@ -73,6 +75,7 @@ class AppRepository(private val context: Context) {
             installerPackage = installing,
             initiatingPackage = initiating,
             originatingPackage = originating,
+            isLeanbackSupported = isLeanback,
         )
     }
 }

@@ -51,6 +51,8 @@ import app.pwhs.core.receiver.ConnectedClient
 import app.pwhs.core.receiver.ReceivedApk
 import app.pwhs.core.receiver.ReceivingProgress
 import app.pwhs.core.receiver.ReceiverStatus
+import android.content.pm.PackageManager
+import android.os.Build
 import app.pwhs.tv.R
 import app.pwhs.tv.TvButtonNoScale
 import app.pwhs.tv.TvNoScale
@@ -217,7 +219,92 @@ fun HeroPendingCard(
             }
             Spacer(Modifier.width(32.dp))
             Column(Modifier.weight(1f)) {
-                Text(meta?.appName ?: apk.fileName, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(meta?.appName ?: apk.fileName, style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f, fill = false))
+                    if (meta != null) {
+                        val installedPkgInfo = remember(meta.packageName) {
+                            runCatching {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                    context.packageManager.getPackageInfo(meta.packageName, PackageManager.PackageInfoFlags.of(0))
+                                } else {
+                                    @Suppress("DEPRECATION")
+                                    context.packageManager.getPackageInfo(meta.packageName, 0)
+                                }
+                            }.getOrNull()
+                        }
+                        val installedVersionCode = installedPkgInfo?.let {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.longVersionCode
+                            else @Suppress("DEPRECATION") it.versionCode.toLong()
+                        }
+
+                        if (installedVersionCode != null) {
+                            val isDowngrade = meta.versionCode < installedVersionCode
+                            val isUpdate = meta.versionCode > installedVersionCode
+                            val isSame = meta.versionCode == installedVersionCode
+
+                            if (isDowngrade) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(MaterialTheme.colorScheme.errorContainer)
+                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.found_chip_older),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onErrorContainer
+                                    )
+                                }
+                            } else if (isUpdate) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(MaterialTheme.colorScheme.primaryContainer)
+                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.found_chip_update),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                }
+                            } else if (isSame) {
+                                Box(
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(6.dp))
+                                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.found_chip_installed),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        fontWeight = FontWeight.Bold,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(MaterialTheme.colorScheme.secondaryContainer)
+                                    .padding(horizontal = 8.dp, vertical = 3.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.found_chip_new),
+                                    style = MaterialTheme.typography.labelMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSecondaryContainer
+                                )
+                            }
+                        }
+                    }
+                }
                 if (meta != null) {
                     Text("${meta.packageName} · v${meta.versionName}", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }

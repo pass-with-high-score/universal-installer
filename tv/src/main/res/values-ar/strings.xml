@@ -171,4 +171,9 @@
     <string name="tv_updates_add_submit">إضافة</string>
     <string name="tv_updates_add_cancel">إلغاء</string>
     <string name="tv_error_cannot_open_settings">تعذر فتح إعدادات النظام على هذا الجهاز</string>
+    <string name="found_chip_older">أقدم</string>
+    <string name="found_chip_update">تحديث</string>
+    <string name="found_chip_installed">مثبت</string>
+    <string name="found_chip_new">جديد</string>
+    <string name="dialog_chip_downgrade">إرجاع</string>
 </resources>

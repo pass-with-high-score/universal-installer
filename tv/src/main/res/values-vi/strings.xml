@@ -54,8 +54,14 @@
     <string name="tv_settings_cpu_arch">Kiến trúc CPU</string>
     <string name="tv_manage_title">Ứng dụng đã cài đặt</string>
     <string name="tv_manage_filter_user">Người dùng</string>
+    <string name="tv_manage_filter_sideloaded">Sideloaded</string>
     <string name="tv_manage_filter_system">Hệ thống</string>
     <string name="tv_manage_filter_disabled">Đã vô hiệu hóa</string>
+    <string name="tv_manage_badge_mobile">Di động</string>
+    <string name="tv_manage_batch_select">Chọn nhiều</string>
+    <string name="tv_manage_batch_select_all">Chọn tất cả</string>
+    <string name="tv_manage_batch_clear">Hủy chọn</string>
+    <string name="tv_manage_batch_uninstall">Gỡ cài đặt (%d)</string>
     <string name="tv_manage_sort_name">Tên</string>
     <string name="tv_manage_sort_size">Kích cỡ</string>
     <string name="tv_manage_sort_date">Ngày</string>
@@ -195,4 +201,9 @@
     <string name="tv_updates_add_submit">Thêm</string>
     <string name="tv_updates_add_cancel">Hủy</string>
     <string name="tv_error_cannot_open_settings">Không thể mở cài đặt hệ thống trên thiết bị này</string>
+    <string name="found_chip_older">Cũ hơn</string>
+    <string name="found_chip_update">Cập nhật</string>
+    <string name="found_chip_installed">Đã cài</string>
+    <string name="found_chip_new">Mới</string>
+    <string name="dialog_chip_downgrade">Hạ cấp</string>
 </resources>

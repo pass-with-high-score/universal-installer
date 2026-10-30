@@ -87,8 +87,14 @@
     <!-- TV Manage Screen -->
     <string name="tv_manage_title">Installed apps</string>
     <string name="tv_manage_filter_user">User</string>
+    <string name="tv_manage_filter_sideloaded">Sideloaded</string>
     <string name="tv_manage_filter_system">System</string>
     <string name="tv_manage_filter_disabled">Disabled</string>
+    <string name="tv_manage_badge_mobile">Mobile</string>
+    <string name="tv_manage_batch_select">Select</string>
+    <string name="tv_manage_batch_select_all">Select All</string>
+    <string name="tv_manage_batch_clear">Clear</string>
+    <string name="tv_manage_batch_uninstall">Uninstall (%d)</string>
     <string name="tv_manage_sort_name">Name</string>
     <string name="tv_manage_sort_size">Size</string>
     <string name="tv_manage_sort_date">Date</string>
@@ -225,4 +231,9 @@
     <string name="tv_updates_add_submit">Add</string>
     <string name="tv_updates_add_cancel">Cancel</string>
     <string name="tv_error_cannot_open_settings">Unable to open system settings on this device</string>
+    <string name="found_chip_older">Older</string>
+    <string name="found_chip_update">Update</string>
+    <string name="found_chip_installed">Installed</string>
+    <string name="found_chip_new">New</string>
+    <string name="dialog_chip_downgrade">Downgrade</string>
 </resources>
