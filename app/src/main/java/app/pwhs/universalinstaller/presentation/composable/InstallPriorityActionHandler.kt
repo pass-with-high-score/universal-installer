@@ -136,10 +136,6 @@ internal fun handleBackendSelection(
                 ).show()
                 return
             }
-            if (settingState.rootState == RootState.DENIED) {
-                settingViewModel.retryRoot()
-                return
-            }
             settingViewModel.promoteBackendToTop(InstallBackend.ROOT)
             settingViewModel.setBackendEnabled(InstallBackend.ROOT, true)
             settingViewModel.setInstallMode(InstallMode.ROOT)

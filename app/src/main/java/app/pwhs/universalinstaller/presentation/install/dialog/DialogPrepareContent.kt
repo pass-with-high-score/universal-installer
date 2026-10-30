@@ -48,6 +48,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +63,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.data.local.SharedPrefsKeys
+import app.pwhs.core.data.local.dataStore
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
@@ -86,6 +89,11 @@ fun DialogPrepareContent(
     val context = LocalContext.current
     var showTrackersDialog by remember { mutableStateOf(false) }
     var showAbiWarningDialog by remember { mutableStateOf(false) }
+    var showVtSetupDialog by remember { mutableStateOf(false) }
+    var pendingInstallAfterVt by remember { mutableStateOf(false) }
+    val storedPrefs by context.dataStore.data.collectAsState(initial = null)
+    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank()
+    val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
     val isUpdate = installedVersionCode != null && installedVersionCode > 0
     val isDowngrade = isUpdate && apkInfo.versionCode < installedVersionCode
 
@@ -291,7 +299,13 @@ fun DialogPrepareContent(
             }
             VirusTotalInstallPrompt(
                 apkInfo = apkInfo,
-                onScan = onCheckVirusTotal,
+                onScan = {
+                    if (!hasVtKey) {
+                        showVtSetupDialog = true
+                    } else {
+                        onCheckVirusTotal()
+                    }
+                },
             )
             if (apkInfo.isScanningTrackers) {
                 DialogPill(
@@ -383,10 +397,7 @@ fun DialogPrepareContent(
             OutlinedButton(
                 onClick = onMenu,
                 modifier = Modifier.weight(1f),
-                border = androidx.compose.foundation.BorderStroke(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Menu,
@@ -406,6 +417,9 @@ fun DialogPrepareContent(
                 onClick = {
                     if (apkInfo.isAbiIncompatible) {
                         showAbiWarningDialog = true
+                    } else if (!hasVtKey && !dontAskAgain) {
+                        pendingInstallAfterVt = true
+                        showVtSetupDialog = true
                     } else {
                         onInstall()
                     }
@@ -438,10 +452,7 @@ fun DialogPrepareContent(
         OutlinedButton(
             onClick = onCancel,
             modifier = Modifier.fillMaxWidth(),
-            border = androidx.compose.foundation.BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.primary,
-            ),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary),
         ) {
             Text(stringResource(R.string.dialog_cancel_btn))
         }
@@ -457,7 +468,29 @@ fun DialogPrepareContent(
             AbiIncompatibleDialog(
                 apkAbis = apkInfo.supportedAbis,
                 onDismiss = { showAbiWarningDialog = false },
-                onInstallAnyway = onInstall,
+                onInstallAnyway = {
+                    showAbiWarningDialog = false
+                    if (!hasVtKey && !dontAskAgain) {
+                        pendingInstallAfterVt = true
+                        showVtSetupDialog = true
+                    } else {
+                        onInstall()
+                    }
+                },
+            )
+        }
+
+        if (showVtSetupDialog) {
+            VirusTotalSetupDialog(
+                onDismiss = {
+                    showVtSetupDialog = false
+                    pendingInstallAfterVt = false
+                },
+                onSaveAndScan = {
+                    onCheckVirusTotal()
+                    pendingInstallAfterVt = false
+                },
+                onProceedInstall = if (pendingInstallAfterVt) onInstall else null,
             )
         }
     }

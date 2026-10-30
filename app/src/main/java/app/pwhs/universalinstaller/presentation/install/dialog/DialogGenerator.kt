@@ -88,7 +88,6 @@ fun generateDialogParams(
                     content = DialogInnerParams("loading") {
                         LoadingContent(
                             onSkipParse = onSkipParse,
-                            onFallbackInstall = onFallbackInstall,
                             onCancel = onCancel,
                         )
                     }
@@ -103,7 +102,6 @@ fun generateDialogParams(
                     content = DialogInnerParams("loading") {
                         LoadingContent(
                             onSkipParse = onSkipParse,
-                            onFallbackInstall = onFallbackInstall,
                             onCancel = onCancel,
                         )
                     }
@@ -217,7 +215,6 @@ fun generateDialogParams(
                 DialogParams(
                     content = DialogInnerParams("loading") {
                         LoadingContent(
-                            onFallbackInstall = onFallbackInstall,
                             onCancel = onCancel,
                         )
                     }

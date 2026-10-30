@@ -140,11 +140,9 @@ class MainActivity : ComponentActivity() {
                         OnboardingScreen(
                             onFinish = {
                                 val durationSec = (System.currentTimeMillis() - onboardingStartTime) / 1000L
-                                app.pwhs.core.telemetry.AnalyticsHelper.logOnboardingComplete(stepCount = 4, durationSec = durationSec)
+                                app.pwhs.core.telemetry.AnalyticsHelper.logOnboardingComplete(durationSec = durationSec)
                                 currentRoute = AppRoute.Main
                             },
-                            showXiaomiTip = DeviceCompat.isXiaomi,
-                            showVirusTotalTip = true,
                             // Only the build that has reporting asks about it. On `opensource`
                             // there is no sink, so the page would be a question about nothing.
                             showAnalyticsConsent = Telemetry.isCollecting,

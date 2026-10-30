@@ -93,6 +93,9 @@ fun InstallPriorityBottomSheet(
         canInstallPackages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.packageManager.canRequestPackageInstalls()
         } else true
+        settingViewModel.refreshRootState()
+        settingViewModel.refreshDhizukuState()
+        settingViewModel.updateShizukuState()
         onPauseOrDispose {}
     }
 

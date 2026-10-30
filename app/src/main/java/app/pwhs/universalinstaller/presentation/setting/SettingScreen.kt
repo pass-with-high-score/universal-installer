@@ -92,9 +92,11 @@ fun SettingScreen(
     val analyticsEnabled by viewModel.analyticsEnabled.collectAsState()
     val context = androidx.compose.ui.platform.LocalContext.current
 
-    // Dhizuku can be granted or revoked in its own app while we are backgrounded.
+    // Privilege states can be granted or revoked in their own apps while we are backgrounded.
     LifecycleResumeEffect(Unit) {
         viewModel.refreshDhizukuState()
+        viewModel.refreshRootState()
+        viewModel.updateShizukuState()
         onPauseOrDispose {}
     }
 

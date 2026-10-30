@@ -15,6 +15,7 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,12 +37,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 
 internal enum class OnboardingBadgeType {
     INSTALL,
     MANAGE,
+    DEVICES,
     RESTORE,
     VIRUSTOTAL,
     XIAOMI,
@@ -242,6 +245,40 @@ private fun AnimatedBadgeIcon(
             )
         }
 
+        OnboardingBadgeType.DEVICES -> {
+            val floatPx = with(density) { (-4).dp.toPx() }
+            val floatY by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = floatPx,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1800, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+                label = "devicesFloat",
+            )
+            val scale by infiniteTransition.animateFloat(
+                initialValue = 0.96f,
+                targetValue = 1.04f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(2200, easing = FastOutSlowInEasing),
+                    repeatMode = RepeatMode.Reverse,
+                ),
+                label = "devicesScale",
+            )
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = tint,
+                modifier = Modifier
+                    .size(48.dp)
+                    .graphicsLayer {
+                        translationY = floatY
+                        scaleX = scale
+                        scaleY = scale
+                    },
+            )
+        }
+
         OnboardingBadgeType.VIRUSTOTAL -> {
             // Scanner beam sweeping over the shield
             val scanSweep by infiniteTransition.animateFloat(
@@ -254,10 +291,9 @@ private fun AnimatedBadgeIcon(
                 label = "scanSweep",
             )
             Box(contentAlignment = Alignment.Center) {
-                Icon(
-                    imageVector = icon,
+                Image(
+                    painter = painterResource(app.pwhs.core.R.drawable.ic_virustotal_logo),
                     contentDescription = null,
-                    tint = tint,
                     modifier = Modifier.size(48.dp),
                 )
                 Canvas(modifier = Modifier.size(54.dp)) {

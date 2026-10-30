@@ -41,6 +41,12 @@ object SharedPrefsKeys {
      */
     val VIRUSTOTAL_API_KEY = stringPreferencesKey("virustotal_api_key")
 
+    /** Whether the user has seen the VirusTotal onboarding / story intro sheet before installing. */
+    val VIRUSTOTAL_ONBOARDING_SEEN = booleanPreferencesKey("virustotal_onboarding_seen")
+
+    /** Whether the user chose not to be prompted again for VirusTotal before installs. */
+    val VIRUSTOTAL_DONT_ASK_AGAIN = booleanPreferencesKey("virustotal_dont_ask_again")
+
     /**
      * Whether the Play build may report anonymous install statistics and crashes. Absent means
      * on — the onboarding page presents it opted in, and the open-source build ignores the key

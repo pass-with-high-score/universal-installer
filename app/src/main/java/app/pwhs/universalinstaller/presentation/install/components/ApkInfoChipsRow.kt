@@ -39,6 +39,8 @@ fun ApkInfoChipsRow(
     onCheckVirusTotal: () -> Unit,
     onShowTrackers: () -> Unit,
     onExpand: () -> Unit,
+    onOpenSettings: () -> Unit = {},
+    onOpenDetail: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
@@ -128,16 +130,12 @@ fun ApkInfoChipsRow(
             VtStatusChip(
                 vt = vt,
                 onClick = onCheckVirusTotal,
-                onOpenWeb = {
+                onOpenWeb = onOpenDetail ?: {
                     if (apkInfo.sha256.isNotBlank()) {
                         uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
                     }
                 },
-                onOpenSettings = {
-                    context.startActivity(
-                        Intent(context, SettingActivity::class.java),
-                    )
-                },
+                onOpenSettings = onOpenSettings,
             )
         }
         if (apkInfo.isScanningTrackers) {

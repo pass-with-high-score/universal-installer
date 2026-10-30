@@ -336,7 +336,7 @@ fun isBackendAvailable(
     return when (backend) {
         InstallBackend.SHIZUKU -> uiState.shizukuState == ShizukuState.READY
         InstallBackend.DHIZUKU -> dhizukuState == DhizukuState.READY
-        InstallBackend.ROOT -> uiState.rootSupported && (uiState.rootState == RootState.READY || uiState.rootState == RootState.UNKNOWN)
+        InstallBackend.ROOT -> uiState.rootSupported && (uiState.rootState == RootState.READY || uiState.rootState == RootState.UNKNOWN || uiState.rootState == RootState.DENIED)
         InstallBackend.CUSTOM -> true
         InstallBackend.MICROG -> microGAvailable
         InstallBackend.DEFAULT -> !isSystemFrozen

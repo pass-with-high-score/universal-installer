@@ -141,6 +141,8 @@ fun DialogMenuContent(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
+    var showVtSetupDialog by remember { mutableStateOf(false) }
+    var showVtDetailSheet by remember { mutableStateOf(false) }
     
     val prefs by context.dataStore.data.collectAsState(initial = null)
     val spoofSource = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
@@ -343,7 +345,13 @@ fun DialogMenuContent(
             ) {
                 when (page) {
                     0 -> infoTab(apkInfo, context)
-                    1 -> securityTab(apkInfo, context, onCheckVirusTotal)
+                    1 -> securityTab(
+                        apkInfo = apkInfo,
+                        context = context,
+                        onCheckVirusTotal = onCheckVirusTotal,
+                        onConfigureVirusTotal = { showVtSetupDialog = true },
+                        onOpenDetail = { showVtDetailSheet = true },
+                    )
                     2 -> advancedTab(
                         apkInfo = apkInfo,
                         attachedObbFiles = attachedObbFiles,
@@ -431,6 +439,21 @@ fun DialogMenuContent(
         }
         
         Spacer(modifier = Modifier.height(16.dp)) // Padding from card bottom
+        
+        if (showVtSetupDialog) {
+            VirusTotalSetupDialog(
+                onDismiss = { showVtSetupDialog = false },
+                onSaveAndScan = { onCheckVirusTotal() },
+            )
+        }
+
+        if (showVtDetailSheet && apkInfo.vtResult != null) {
+            VirusTotalDetailSheet(
+                vt = apkInfo.vtResult,
+                apkInfo = apkInfo,
+                onDismiss = { showVtDetailSheet = false },
+            )
+        }
     }
 }
 

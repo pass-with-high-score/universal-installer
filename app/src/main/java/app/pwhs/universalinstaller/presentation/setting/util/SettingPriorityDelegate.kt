@@ -129,6 +129,7 @@ class SettingPriorityDelegate(
                         dataStore.edit { it[PreferencesKeys.USE_ROOT] = false }
                         return@launch
                     }
+                    backendFactory.resetCachedShell()
                     val state = backendFactory.requestRoot()
                     updateRootState(state)
                     if (state == RootState.READY) {

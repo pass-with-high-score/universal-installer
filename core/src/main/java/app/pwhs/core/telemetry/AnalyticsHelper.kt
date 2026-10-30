@@ -345,6 +345,37 @@ object AnalyticsHelper {
         Telemetry.setUserProperty(TelemetryEvents.PROPERTY_PREFERRED_FILE_TYPE, fileType.normalizeFileType())
     }
 
+    // ── Giai đoạn 7: VirusTotal Onboarding & Prompt ───────────────────────
+    fun logVirusTotalPromptShown(isFirstTime: Boolean, source: String = "pre_install") {
+        Telemetry.event(
+            TelemetryEvents.EVENT_VIRUSTOTAL_PROMPT_SHOWN,
+            TelemetryEvents.PARAM_IS_FIRST_TIME to isFirstTime,
+            TelemetryEvents.PARAM_SOURCE to source
+        )
+    }
+
+    fun logVirusTotalStoryStep(step: Int) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_VIRUSTOTAL_STORY_STEP,
+            TelemetryEvents.PARAM_STEP to step
+        )
+    }
+
+    fun logVirusTotalAction(
+        action: String,
+        hasKey: Boolean = false,
+        dontAskAgain: Boolean = false,
+    ) {
+        val params = mutableMapOf<String, Any?>(
+            TelemetryEvents.PARAM_ACTION to action,
+            "has_key" to hasKey,
+        )
+        if (dontAskAgain) {
+            params["dont_ask_again"] = true
+        }
+        Telemetry.event(TelemetryEvents.EVENT_VIRUSTOTAL_ACTION, params)
+    }
+
     private fun String.normalizeFileType(): String =
         substringAfterLast('.', "").lowercase(Locale.ROOT).ifEmpty { lowercase(Locale.ROOT) }
 }

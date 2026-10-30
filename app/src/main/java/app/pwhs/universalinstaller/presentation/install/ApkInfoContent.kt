@@ -34,6 +34,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -48,6 +49,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import app.pwhs.core.data.local.SharedPrefsKeys
+import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.util.openUriSafely
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -78,6 +81,8 @@ import app.pwhs.universalinstaller.presentation.install.components.VirusTotalCar
 import app.pwhs.universalinstaller.presentation.install.components.VtStatusChip
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogKeepApkOption
 import app.pwhs.universalinstaller.presentation.install.dialog.InstallSupportBottomSheet
+import app.pwhs.universalinstaller.presentation.install.dialog.VirusTotalDetailSheet
+import app.pwhs.universalinstaller.presentation.install.dialog.VirusTotalSetupDialog
 import app.pwhs.universalinstaller.presentation.setting.SettingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -121,6 +126,13 @@ internal fun ApkInfoContent(
     var showTrackersDialog by rememberSaveable { mutableStateOf(false) }
     var showAbiWarningDialog by rememberSaveable { mutableStateOf(false) }
     var showSupportSheet by rememberSaveable { mutableStateOf(false) }
+    var showVtSetupDialog by rememberSaveable { mutableStateOf(false) }
+    var showVtDetailSheet by rememberSaveable { mutableStateOf(false) }
+    var pendingInstallAfterVt by rememberSaveable { mutableStateOf(false) }
+
+    val storedPrefs by context.dataStore.data.collectAsState(initial = null)
+    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank()
+    val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
 
     androidx.compose.runtime.LaunchedEffect(installError) {
         if (!installError.isNullOrBlank()) {
@@ -169,6 +181,8 @@ internal fun ApkInfoContent(
                 onCheckVirusTotal = onCheckVirusTotal,
                 onShowTrackers = { showTrackersDialog = true },
                 onExpand = { isExpanded = true },
+                onOpenSettings = { showVtSetupDialog = true },
+                onOpenDetail = { showVtDetailSheet = true },
                 modifier = Modifier.fillMaxWidth(),
             )
 
@@ -219,19 +233,13 @@ internal fun ApkInfoContent(
                     fileSizeBytes = apkInfo.fileSizeBytes,
                     sha256 = apkInfo.sha256,
                     onCheck = onCheckVirusTotal,
-                    onOpenSettings = {
-                        context.startActivity(
-                            Intent(context, SettingActivity::class.java),
-                        )
-                    },
+                    onOpenSettings = { showVtSetupDialog = true },
                     onGetKey = {
                         uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/my-apikey")
                     },
                     onOpenLink = {
-                        if (apkInfo.vtResult?.status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS) &&
-                            apkInfo.sha256.isNotBlank()
-                        ) {
-                            uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
+                        if (apkInfo.vtResult?.status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)) {
+                            showVtDetailSheet = true
                         }
                     },
                 )
@@ -327,6 +335,9 @@ internal fun ApkInfoContent(
             onInstall = {
                 if (apkInfo.isAbiIncompatible) {
                     showAbiWarningDialog = true
+                } else if (!hasVtKey && !dontAskAgain) {
+                    pendingInstallAfterVt = true
+                    showVtSetupDialog = true
                 } else {
                     onInstall()
                 }
@@ -349,7 +360,15 @@ internal fun ApkInfoContent(
             AbiIncompatibleDialog(
                 apkAbis = apkInfo.supportedAbis,
                 onDismiss = { showAbiWarningDialog = false },
-                onInstallAnyway = onInstall,
+                onInstallAnyway = {
+                    showAbiWarningDialog = false
+                    if (!hasVtKey && !dontAskAgain) {
+                        pendingInstallAfterVt = true
+                        showVtSetupDialog = true
+                    } else {
+                        onInstall()
+                    }
+                },
             )
         }
 
@@ -367,6 +386,28 @@ internal fun ApkInfoContent(
                 target = target,
                 errorMessage = installError,
                 onDismiss = { showSupportSheet = false },
+            )
+        }
+
+        if (showVtSetupDialog) {
+            VirusTotalSetupDialog(
+                onDismiss = {
+                    showVtSetupDialog = false
+                    pendingInstallAfterVt = false
+                },
+                onSaveAndScan = {
+                    onCheckVirusTotal()
+                    pendingInstallAfterVt = false
+                },
+                onProceedInstall = if (pendingInstallAfterVt) onInstall else null,
+            )
+        }
+
+        if (showVtDetailSheet && apkInfo.vtResult != null) {
+            VirusTotalDetailSheet(
+                vt = apkInfo.vtResult,
+                apkInfo = apkInfo,
+                onDismiss = { showVtDetailSheet = false },
             )
         }
     }

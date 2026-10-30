@@ -41,6 +41,8 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     apkInfo: ApkInfo,
     context: Context,
     onCheckVirusTotal: () -> Unit,
+    onConfigureVirusTotal: () -> Unit = {},
+    onOpenDetail: (() -> Unit)? = null,
 ) {
     // 1. VirusTotal
     item(key = "virustotal") {
@@ -100,7 +102,9 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             onClick = {
                 when {
                     vtResult?.status in listOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS) -> {
-                        if (apkInfo.sha256.isNotBlank()) {
+                        if (onOpenDetail != null) {
+                            onOpenDetail()
+                        } else if (apkInfo.sha256.isNotBlank()) {
                             uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
                         }
                     }
@@ -108,12 +112,7 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
                     // is already reading. Send them where the key is entered instead.
                     vtResult?.status == VtStatus.NO_API_KEY ||
                         vtResult?.status == VtStatus.INVALID_API_KEY -> {
-                        context.startActivity(
-                            android.content.Intent(
-                                context,
-                                app.pwhs.universalinstaller.presentation.setting.SettingActivity::class.java,
-                            ).addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
-                        )
+                        onConfigureVirusTotal()
                     }
                     else -> onCheckVirusTotal()
                 }

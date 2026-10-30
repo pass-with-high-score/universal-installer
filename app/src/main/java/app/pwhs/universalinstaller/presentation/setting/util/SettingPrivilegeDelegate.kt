@@ -345,6 +345,7 @@ class SettingPrivilegeDelegate(
     fun setUseRoot(enabled: Boolean) {
         scope.launch {
             if (enabled) {
+                backendFactory.resetCachedShell()
                 val state = backendFactory.requestRoot()
                 _rootState.value = state
                 if (state == RootState.READY) {
@@ -355,6 +356,8 @@ class SettingPrivilegeDelegate(
                         prefs[PreferencesKeys.USE_MICROG] = false
                         prefs[PreferencesKeys.USE_ROOT] = true
                     }
+                } else {
+                    emitEvent(R.string.installer_engine_root_request)
                 }
             } else {
                 dataStore.edit { prefs -> prefs[PreferencesKeys.USE_ROOT] = false }
@@ -362,11 +365,27 @@ class SettingPrivilegeDelegate(
         }
     }
 
-    fun retryRoot() {
+    fun retryRoot(enableOnSuccess: Boolean = true) {
         scope.launch {
             _rootState.value = RootState.UNKNOWN
             backendFactory.resetCachedShell()
-            _rootState.value = backendFactory.requestRoot()
+            val state = backendFactory.requestRoot()
+            _rootState.value = state
+            if (enableOnSuccess && state == RootState.READY) {
+                dataStore.edit { prefs -> prefs[PreferencesKeys.USE_ROOT] = true }
+            }
+        }
+    }
+
+    fun refreshRootState() {
+        if (!backendFactory.rootSupportCompiledIn) return
+        scope.launch(Dispatchers.IO) {
+            val cached = com.topjohnwu.superuser.Shell.getCachedShell()
+            if (cached != null && !cached.isRoot) {
+                backendFactory.resetCachedShell()
+            }
+            val probed = backendFactory.probeRootState()
+            _rootState.value = probed
         }
     }
 

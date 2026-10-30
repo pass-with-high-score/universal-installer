@@ -29,6 +29,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -61,6 +65,7 @@ fun VirusTotalInstallPrompt(
     val context = LocalContext.current
     val vt = apkInfo.vtResult
     val status = vt?.status
+    var showDetailSheet by remember { mutableStateOf(false) }
 
     val inProgress = status in setOf(
         VtStatus.SCANNING,
@@ -114,8 +119,8 @@ fun VirusTotalInstallPrompt(
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
-                        .clickable(enabled = apkInfo.sha256.isNotBlank()) {
-                            uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
+                        .clickable {
+                            showDetailSheet = true
                         }
                         .background(extendedColors.success.copy(alpha = 0.12f))
                         .border(
@@ -137,15 +142,6 @@ fun VirusTotalInstallPrompt(
                         style = MaterialTheme.typography.labelSmall,
                         color = extendedColors.success,
                     )
-                    if (apkInfo.sha256.isNotBlank()) {
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
-                            contentDescription = null,
-                            tint = extendedColors.success.copy(alpha = 0.7f),
-                            modifier = Modifier.size(11.dp),
-                        )
-                    }
                 }
             }
 
@@ -159,8 +155,8 @@ fun VirusTotalInstallPrompt(
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
-                        .clickable(enabled = apkInfo.sha256.isNotBlank()) {
-                            uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
+                        .clickable {
+                            showDetailSheet = true
                         }
                         .background(containerColor)
                         .border(BorderStroke(1.dp, contentColor), RoundedCornerShape(50))
@@ -179,15 +175,6 @@ fun VirusTotalInstallPrompt(
                         style = MaterialTheme.typography.labelSmall,
                         color = contentColor,
                     )
-                    if (apkInfo.sha256.isNotBlank()) {
-                        Spacer(Modifier.width(4.dp))
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
-                            contentDescription = null,
-                            tint = contentColor.copy(alpha = 0.8f),
-                            modifier = Modifier.size(11.dp),
-                        )
-                    }
                 }
             }
 
@@ -239,6 +226,30 @@ fun VirusTotalInstallPrompt(
                 }
             }
 
+            currentStatus == VtStatus.NO_API_KEY || currentStatus == VtStatus.INVALID_API_KEY -> {
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .clickable(onClick = onScan)
+                        .background(extendedColors.warningContainer.copy(alpha = 0.7f))
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Security,
+                        contentDescription = null,
+                        tint = extendedColors.warning,
+                        modifier = Modifier.size(14.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(R.string.virustotal_prompt_needs_key),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = extendedColors.warning,
+                    )
+                }
+            }
+
             else -> {
                 // Prompt to scan with VirusTotal
                 Row(
@@ -264,5 +275,13 @@ fun VirusTotalInstallPrompt(
                 }
             }
         }
+    }
+
+    if (showDetailSheet && vt != null) {
+        VirusTotalDetailSheet(
+            vt = vt,
+            apkInfo = apkInfo,
+            onDismiss = { showDetailSheet = false },
+        )
     }
 }

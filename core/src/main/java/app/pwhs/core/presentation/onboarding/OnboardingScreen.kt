@@ -1,10 +1,6 @@
 package app.pwhs.core.presentation.onboarding
 
-import android.content.ActivityNotFoundException
-import android.content.Intent
-import android.net.Uri
 import android.os.Build
-import android.provider.Settings
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
@@ -24,14 +20,11 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
-import androidx.compose.material.icons.automirrored.rounded.OpenInNew
-import androidx.compose.material.icons.rounded.GppGood
+import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.material.icons.rounded.Insights
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Security
-import androidx.compose.material.icons.rounded.Tune
-import androidx.compose.material.icons.rounded.Widgets
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -50,7 +43,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
@@ -60,15 +52,9 @@ import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.core.telemetry.TelemetryEvents
-import app.pwhs.core.util.DeviceCompat
 import app.pwhs.core.util.PermissionMonitor
 import app.pwhs.core.util.PermissionSettingsHelper
-import app.pwhs.core.util.openUriSafely
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-
-/** Where a free VirusTotal API key comes from — the same URL the scanner error message cites. */
-private const val VIRUSTOTAL_API_KEY_URL = "https://www.virustotal.com/gui/my-apikey"
 
 /**
  * Shared onboarding screen for both Mobile and TV.
@@ -85,29 +71,15 @@ private const val VIRUSTOTAL_API_KEY_URL = "https://www.virustotal.com/gui/my-ap
 @Composable
 fun OnboardingScreen(
     onFinish: () -> Unit,
-    showXiaomiTip: Boolean = false,
-    showVirusTotalTip: Boolean = false,
     showAnalyticsConsent: Boolean = false,
     onRestoreBackup: (() -> Unit)? = null,
+    showXiaomiTip: Boolean = false,
+    showVirusTotalTip: Boolean = false,
 ) {
     val context = LocalContext.current
     val activity = context as? android.app.Activity
-    val uriHandler = LocalUriHandler.current
 
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
-    val storedVirusTotalKey = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).orEmpty()
-    var virusTotalKeyEdited by remember { mutableStateOf(false) }
-
-    // If key is already configured/restored and user hasn't actively edited it here, skip the setup page
-    val isVirusTotalConfigured = remember(storedVirusTotalKey, virusTotalKeyEdited) {
-        storedVirusTotalKey.isNotBlank() && !virusTotalKeyEdited
-    }
-
-    // Hide the shortcut when Developer options aren't reachable — the text alone still tells the
-    // user what to look for.
-    val developerOptions = remember(showXiaomiTip) {
-        if (showXiaomiTip) DeviceCompat.developerOptionsIntent(context) else null
-    }
 
     val pages = buildList {
         add(
@@ -120,55 +92,13 @@ fun OnboardingScreen(
         )
         add(
             OnboardingPage(
-                icon = Icons.Rounded.Widgets,
-                title = stringResource(R.string.onboarding_page2_title),
-                description = stringResource(R.string.onboarding_page2_desc),
-                badgeType = OnboardingBadgeType.MANAGE,
+                icon = Icons.Rounded.Devices,
+                title = stringResource(R.string.onboarding_devices_title),
+                description = stringResource(R.string.onboarding_devices_desc),
+                badgeType = OnboardingBadgeType.DEVICES,
+                deviceSupportList = true,
             )
         )
-        if (onRestoreBackup != null) {
-            add(
-                OnboardingPage(
-                    icon = Icons.Rounded.Restore,
-                    title = stringResource(R.string.onboarding_restore_title),
-                    description = stringResource(R.string.onboarding_restore_desc),
-                    badgeType = OnboardingBadgeType.RESTORE,
-                    actionLabel = stringResource(R.string.onboarding_restore_action),
-                    actionIcon = Icons.Rounded.Restore,
-                    onAction = onRestoreBackup,
-                )
-            )
-        }
-        if (showVirusTotalTip && !isVirusTotalConfigured) {
-            add(
-                OnboardingPage(
-                    icon = Icons.Rounded.GppGood,
-                    title = stringResource(R.string.onboarding_virustotal_title),
-                    description = stringResource(R.string.onboarding_virustotal_desc),
-                    badgeType = OnboardingBadgeType.VIRUSTOTAL,
-                    securityPicker = true,
-                    virusTotalKeyField = true,
-                    // Rendered as a text link inside the key block rather than the shared button,
-                    // so "get a key" and "paste it here" read as one step.
-                    actionLabel = stringResource(R.string.onboarding_virustotal_get_key),
-                    actionIcon = Icons.AutoMirrored.Rounded.OpenInNew,
-                    onAction = { uriHandler.openUriSafely(context, VIRUSTOTAL_API_KEY_URL) },
-                )
-            )
-        }
-        if (showXiaomiTip) {
-            add(
-                OnboardingPage(
-                    icon = Icons.Rounded.Tune,
-                    title = stringResource(R.string.onboarding_xiaomi_title),
-                    description = stringResource(R.string.onboarding_xiaomi_desc),
-                    badgeType = OnboardingBadgeType.XIAOMI,
-                    actionLabel = stringResource(R.string.onboarding_xiaomi_open_developer_options),
-                    actionIcon = Icons.Rounded.Tune,
-                    onAction = { PermissionSettingsHelper.openDeveloperOptions(context) },
-                )
-            )
-        }
         if (showAnalyticsConsent) {
             add(
                 OnboardingPage(
@@ -192,23 +122,13 @@ fun OnboardingScreen(
     }
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(pageCount = { pages.size })
-    // Normal by default — the level only becomes Strict if the user picks it here or from backup.
-    var strictSecurity by remember { mutableStateOf(false) }
 
     var analyticsEnabled by remember { mutableStateOf(true) }
-    var virusTotalKey by remember { mutableStateOf("") }
 
     LaunchedEffect(storedPrefs) {
         val prefs = storedPrefs ?: return@LaunchedEffect
-        prefs[SharedPrefsKeys.SECURITY_LEVEL]?.let { level ->
-            strictSecurity = level == "Strict"
-        }
         prefs[SharedPrefsKeys.ANALYTICS_ENABLED]?.let { analytics ->
             analyticsEnabled = analytics
-        }
-        val vtKey = prefs[SharedPrefsKeys.VIRUSTOTAL_API_KEY].orEmpty()
-        if (!virusTotalKeyEdited && vtKey.isNotEmpty()) {
-            virusTotalKey = vtKey
         }
     }
 
@@ -255,11 +175,28 @@ fun OnboardingScreen(
                 .padding(24.dp)
                 .imePadding(),
         ) {
-            // Skip button
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.CenterEnd,
+            // Top action bar: Restore backup (if available) + Skip button
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                if (onRestoreBackup != null) {
+                    TextButton(onClick = onRestoreBackup) {
+                        Icon(
+                            Icons.Rounded.Restore,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text(stringResource(R.string.onboarding_restore_action))
+                    }
+                } else {
+                    Spacer(Modifier.width(1.dp))
+                }
+
                 if (pagerState.currentPage < pages.lastIndex) {
                     TextButton(onClick = {
                         AnalyticsHelper.logOnboardingSkipped(pageIndex = pagerState.currentPage + 1)
@@ -282,26 +219,6 @@ fun OnboardingScreen(
                 val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
                 PageContent(
                     pageOffset = pageOffset,
-                    strictSecurity = strictSecurity,
-                    onStrictSecurityChange = { strict ->
-                        strictSecurity = strict
-                        scope.launch {
-                            context.dataStore.edit { prefs ->
-                                prefs[SharedPrefsKeys.SECURITY_LEVEL] = if (strict) "Strict" else "Normal"
-                                prefs[SharedPrefsKeys.STRICT_VIRUSTOTAL_CHECK] = strict
-                            }
-                        }
-                    },
-                    virusTotalKey = virusTotalKey,
-                    onVirusTotalKeyChange = { value ->
-                        virusTotalKeyEdited = true
-                        virusTotalKey = value
-                        scope.launch {
-                            context.dataStore.edit { prefs ->
-                                prefs[SharedPrefsKeys.VIRUSTOTAL_API_KEY] = value.trim()
-                            }
-                        }
-                    },
                     analyticsEnabled = analyticsEnabled,
                     onAnalyticsEnabledChange = { enabled ->
                         analyticsEnabled = enabled

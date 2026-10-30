@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.install.components
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -110,7 +112,11 @@ fun VirusTotalCard(
     ) {
         Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Rounded.Security, null, tint = vtColor, modifier = Modifier.size(20.dp))
+                Image(
+                    painter = painterResource(R.drawable.ic_virustotal_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
                 Spacer(Modifier.width(8.dp))
                 Text(
                     text = stringResource(R.string.apk_info_vt_scan_title),
@@ -240,8 +246,8 @@ fun VirusTotalCard(
                     shape = MaterialTheme.shapes.medium,
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Security,
+                    Image(
+                        painter = painterResource(R.drawable.ic_virustotal_logo),
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                     )
@@ -433,11 +439,10 @@ fun VtStatusChip(
         VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY -> InfoChip(
             label = stringResource(R.string.apk_info_vt_add_key),
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Security,
+                Image(
+                    painter = painterResource(R.drawable.ic_virustotal_logo),
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = extendedColors.warning,
                 )
             },
             contentColor = extendedColors.warning,
@@ -446,11 +451,10 @@ fun VtStatusChip(
         else -> InfoChip(
             label = stringResource(R.string.scan_virustotal_btn),
             leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Security,
+                Image(
+                    painter = painterResource(R.drawable.ic_virustotal_logo),
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary,
                 )
             },
             contentColor = MaterialTheme.colorScheme.primary,

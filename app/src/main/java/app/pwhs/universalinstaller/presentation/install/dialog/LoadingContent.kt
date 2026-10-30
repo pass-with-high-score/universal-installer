@@ -26,7 +26,6 @@ import app.pwhs.universalinstaller.ui.theme.Spacing
 @Composable
 fun LoadingContent(
     onSkipParse: (() -> Unit)? = null,
-    onFallbackInstall: (() -> Unit)? = null,
     onCancel: (() -> Unit)? = null,
 ) {
     Column(
@@ -56,20 +55,16 @@ fun LoadingContent(
         
         Spacer(modifier = Modifier.height(20.dp))
 
-        if (onFallbackInstall != null) {
-            androidx.compose.material3.Button(
-                onClick = onFallbackInstall,
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                androidx.compose.material3.Text(
-                    androidx.compose.ui.res.stringResource(
-                        app.pwhs.universalinstaller.R.string.dialog_failed_fallback_install,
-                        "Install via System Installer"
-                    )
-                )
-            }
-            Spacer(modifier = Modifier.height(8.dp))
+        // Action buttons row placeholder (mirrors Menu + Install in Prepare)
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ShimmerBox(modifier = Modifier.weight(1f).height(40.dp), shape = RoundedCornerShape(20.dp))
+            ShimmerBox(modifier = Modifier.weight(1f).height(40.dp), shape = RoundedCornerShape(20.dp))
         }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         if (onCancel != null) {
             androidx.compose.material3.OutlinedButton(

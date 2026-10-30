@@ -180,4 +180,18 @@ object TelemetryEvents {
     const val FEATURE_REVIEW_PROMPT = "review_prompt"
 
     const val PROPERTY_INSTALL_METHOD = "install_method"
+
+    // ── Giai đoạn 7: VirusTotal Onboarding & Story Funnel ───────────────
+    const val EVENT_VIRUSTOTAL_PROMPT_SHOWN = "virustotal_prompt_shown"
+    const val EVENT_VIRUSTOTAL_STORY_STEP = "virustotal_story_step"
+    const val EVENT_VIRUSTOTAL_ACTION = "virustotal_action"
+
+    const val PARAM_IS_FIRST_TIME = "is_first_time"
+    const val PARAM_STEP = "step"
+    const val ACTION_NEXT = "next"
+    const val ACTION_SKIP_INSTALL = "skip_and_install"
+    const val ACTION_SAVE_AND_SCAN = "save_and_scan"
+    const val ACTION_SAVE_KEY = "save_key"
+    const val ACTION_GET_API_KEY = "get_api_key"
+    const val ACTION_DISMISS = "dismiss"
 }

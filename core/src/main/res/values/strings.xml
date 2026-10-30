@@ -12,6 +12,12 @@
     <string name="onboarding_page1_desc">Support for APK, APKS, XAPK, and APKM formats. Install split APKs with ease.</string>
     <string name="onboarding_page2_title">Manage Your Apps</string>
     <string name="onboarding_page2_desc">Browse installed apps, uninstall unwanted ones, and manage your device effortlessly.</string>
+    <string name="onboarding_devices_title">Support Multiple Devices</string>
+    <string name="onboarding_devices_desc">Seamlessly install and manage applications across Android phones, Android TV, Android Auto, and Wear OS smartwatches.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
     <string name="onboarding_page3_title">Allow Installation</string>
     <string name="onboarding_page3_desc">To install packages, the app needs permission to install from unknown sources. Tap the button below to grant it.</string>
     <string name="onboarding_virustotal_title">Scan before you install</string>

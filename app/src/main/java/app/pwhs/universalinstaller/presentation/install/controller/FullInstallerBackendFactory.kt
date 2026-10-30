@@ -65,8 +65,19 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
      */
     override suspend fun requestRoot(): RootState = withContext(Dispatchers.IO) {
         try {
+            val cached = Shell.getCachedShell()
+            if (cached != null && !cached.isRoot) {
+                runCatching { cached.close() }
+            }
             val shell = Shell.getShell()
-            if (shell.isRoot) RootState.READY else RootState.NOT_ROOTED
+            if (shell.isRoot) {
+                RootState.READY
+            } else {
+                when (Shell.isAppGrantedRoot()) {
+                    false -> RootState.DENIED
+                    else -> RootState.NOT_ROOTED
+                }
+            }
         } catch (t: Throwable) {
             Timber.w(t, "Shell.getShell() failed — likely no root manager / su binary")
             RootState.NOT_ROOTED

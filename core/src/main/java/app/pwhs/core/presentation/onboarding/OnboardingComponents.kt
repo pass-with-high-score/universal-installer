@@ -2,6 +2,8 @@ package app.pwhs.core.presentation.onboarding
 
 import android.content.ClipboardManager
 import android.content.Context
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -16,13 +18,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.ContentPaste
+import androidx.compose.material.icons.rounded.DirectionsCar
+import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Tv
+import androidx.compose.material.icons.rounded.Watch
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,12 +46,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import app.pwhs.core.R
@@ -57,6 +66,8 @@ internal data class OnboardingPage(
     val title: String,
     val description: String,
     val badgeType: OnboardingBadgeType = OnboardingBadgeType.GENERIC,
+    /** Renders supported devices badges under the description. */
+    val deviceSupportList: Boolean = false,
     /** Renders a two-option security picker under the description. */
     val securityPicker: Boolean = false,
     /** Renders the VirusTotal API key field under the action button. */
@@ -118,6 +129,11 @@ internal fun PageContent(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
+
+            if (page.deviceSupportList) {
+                Spacer(Modifier.height(24.dp))
+                DeviceSupportGrid()
+            }
 
             if (page.securityPicker) {
                 Spacer(Modifier.height(28.dp))
@@ -354,5 +370,96 @@ private fun OnboardingSecurityPicker(
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
+    }
+}
+
+@Composable
+private fun DeviceSupportGrid(modifier: Modifier = Modifier) {
+    val devices = listOf(
+        Pair(Icons.Rounded.PhoneAndroid, R.string.onboarding_device_android),
+        Pair(Icons.Rounded.Tv, R.string.onboarding_device_tv),
+        Pair(Icons.Rounded.DirectionsCar, R.string.onboarding_device_auto),
+        Pair(Icons.Rounded.Watch, R.string.onboarding_device_wearos),
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            DeviceBadgeCard(
+                modifier = Modifier.weight(1f),
+                icon = devices[0].first,
+                label = stringResource(devices[0].second),
+            )
+            DeviceBadgeCard(
+                modifier = Modifier.weight(1f),
+                icon = devices[1].first,
+                label = stringResource(devices[1].second),
+            )
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            DeviceBadgeCard(
+                modifier = Modifier.weight(1f),
+                icon = devices[2].first,
+                label = stringResource(devices[2].second),
+            )
+            DeviceBadgeCard(
+                modifier = Modifier.weight(1f),
+                icon = devices[3].first,
+                label = stringResource(devices[3].second),
+            )
+        }
+    }
+}
+
+@Composable
+private fun DeviceBadgeCard(
+    icon: ImageVector,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
+    Surface(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.primaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
     }
 }
