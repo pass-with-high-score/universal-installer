@@ -35,4 +35,95 @@
     <string name="dir_picker_grant_action">Grant access</string>
     <string name="error_cannot_open_app">Unable to open app</string>
     <string name="error_no_file_picker">No file manager app found to select files</string>
+
+    <!-- User Stats & Milestones -->
+    <string name="stats_screen_title">Stats &amp; Milestones</string>
+    <string name="stats_tab_overview">Overview</string>
+    <string name="stats_tab_milestones">Milestones</string>
+    <string name="stats_rank_label">Current Rank</string>
+    <string name="stats_rank_newbie">Newcomer</string>
+    <string name="stats_rank_newbie_sub">Just getting started with sideloading</string>
+    <string name="stats_rank_tinkerer">App Tinkerer</string>
+    <string name="stats_rank_tinkerer_sub">Comfortable installing and testing packages</string>
+    <string name="stats_rank_explorer">Package Explorer</string>
+    <string name="stats_rank_explorer_sub">Handling bundles, updates, and cleanups with ease</string>
+    <string name="stats_rank_privileged_pro">Privileged Pro</string>
+    <string name="stats_rank_privileged_pro_sub">Mastering advanced install tools and security checks</string>
+    <string name="stats_rank_sideload_master">Sideload Master</string>
+    <string name="stats_rank_sideload_master_sub">Top-tier Universal Installer veteran</string>
+    <string name="stats_next_rank_progress">%1$d / %2$d milestones unlocked</string>
+    <string name="stats_next_rank_hint">Unlock %1$d more for %2$s</string>
+    <string name="stats_max_rank_reached">Maximum rank achieved!</string>
+
+    <string name="stats_section_install_uninstall">Install &amp; Debloat Overview</string>
+    <string name="stats_total_installed">Successful Installs</string>
+    <string name="stats_failed_installs">Failed</string>
+    <string name="stats_success_rate">Success Rate</string>
+    <string name="stats_op_new">New Installs</string>
+    <string name="stats_op_update">Updates</string>
+    <string name="stats_op_downgrade">Downgrades</string>
+    <string name="stats_total_uninstalled">Apps Uninstalled</string>
+    <string name="stats_total_downloads">Packages Downloaded</string>
+
+    <string name="stats_section_storage_formats">Storage &amp; Package Formats</string>
+    <string name="stats_bytes_installed">Volume Installed</string>
+    <string name="stats_bytes_cleaned">Storage Freed</string>
+    <string name="stats_files_cleaned_sub">%1$d source files auto-cleaned</string>
+    <string name="stats_format_single_apk">Single APK</string>
+    <string name="stats_format_split_bundle">Split Bundle (XAPK/APKS)</string>
+    <string name="stats_format_obb">With OBB Data</string>
+
+    <string name="stats_section_modes_security">Installer Modes &amp; Security</string>
+    <string name="stats_mode_default">Default Session</string>
+    <string name="stats_mode_shizuku">Shizuku</string>
+    <string name="stats_mode_root">Root</string>
+    <string name="stats_mode_dhizuku">Dhizuku</string>
+    <string name="stats_vt_scans">VirusTotal Scans</string>
+    <string name="stats_tracker_scans">Tracker Scans</string>
+    <string name="stats_trackers_found">%1$d trackers spotted</string>
+
+    <string name="stats_section_activity">Activity Timeline</string>
+    <string name="stats_period_7d">7 Days</string>
+    <string name="stats_period_30d">30 Days</string>
+    <string name="stats_busiest_day">Peak in 30d: %1$d installs/day</string>
+    <string name="stats_activity_empty">Install packages to see your daily timeline</string>
+    <string name="stats_section_top_apps">Most Frequently Installed</string>
+    <string name="stats_top_app_meta">%1$d installs • %2$d updates</string>
+
+    <string name="stats_category_all">All</string>
+    <string name="stats_category_install">Installs</string>
+    <string name="stats_category_storage">Storage</string>
+    <string name="stats_category_power">Power User</string>
+    <string name="stats_category_security">Security</string>
+
+    <string name="milestone_badge_new">NEW</string>
+    <string name="milestone_unlocked_label">Unlocked</string>
+    <string name="milestone_banner_title">Milestone Unlocked!</string>
+    <string name="milestone_banner_view">View</string>
+
+    <string name="milestone_first_install_title">First Step</string>
+    <string name="milestone_first_install_desc">Successfully install your first package</string>
+    <string name="milestone_ten_installs_title">App Tinkerer</string>
+    <string name="milestone_ten_installs_desc">Successfully install 10 packages</string>
+    <string name="milestone_fifty_installs_title">Package Veteran</string>
+    <string name="milestone_fifty_installs_desc">Successfully install 50 packages</string>
+    <string name="milestone_hundred_installs_title">Centurion Installer</string>
+    <string name="milestone_hundred_installs_desc">Successfully install 100 packages</string>
+    <string name="milestone_split_bundle_title">Bundle Wrangler</string>
+    <string name="milestone_split_bundle_desc">Install a split package (.xapk, .apks, or .apkm)</string>
+    <string name="milestone_obb_master_title">Gamer / OBB Pro</string>
+    <string name="milestone_obb_master_desc">Install a package with OBB game data</string>
+    <string name="milestone_gigabyte_club_title">Gigabyte Club</string>
+    <string name="milestone_gigabyte_club_desc">Reach 1 GB of total installed package volume</string>
+    <string name="milestone_ten_gigabytes_title">Heavy Lifter</string>
+    <string name="milestone_ten_gigabytes_desc">Reach 10 GB of total installed package volume</string>
+    <string name="milestone_privileged_user_title">Power User</string>
+    <string name="milestone_privileged_user_desc">Install a package using Shizuku, Root, or Dhizuku</string>
+    <string name="milestone_time_traveler_title">Time Traveler</string>
+    <string name="milestone_time_traveler_desc">Downgrade an app to an older version</string>
+    <string name="milestone_debloat_warrior_title">Debloat Warrior</string>
+    <string name="milestone_debloat_warrior_desc">Successfully uninstall 10 apps</string>
+    <string name="milestone_security_guardian_title">Security Guardian</string>
+    <string name="milestone_security_guardian_desc">Scan 5 packages with VirusTotal or Tracker Scanner</string>
+    <string name="app_functions_display_description">Search installed apps, inspect install and uninstall history, view installer statistics, and scan storage for APK packages.</string>
 </resources>

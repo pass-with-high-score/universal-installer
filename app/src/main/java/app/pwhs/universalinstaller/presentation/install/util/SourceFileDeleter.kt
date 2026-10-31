@@ -21,8 +21,10 @@ object SourceFileDeleter {
 
 
     suspend fun deleteSourceFileAndWarn(context: Context, uri: Uri) {
+        val fileSize = resolveUriFileSize(context, uri)
         if (deleteSourceFile(context, uri)) {
             Timber.d("Deleted source file: $uri")
+            app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordSourceFileDeleted(context, fileSize)
             return
         }
         withContext(Dispatchers.Main) {
@@ -33,4 +35,12 @@ object SourceFileDeleter {
             ).show()
         }
     }
+
+    private fun resolveUriFileSize(context: Context, uri: Uri): Long = runCatching {
+        when (uri.scheme) {
+            ContentResolver.SCHEME_FILE -> uri.path?.let { File(it).length() } ?: 0L
+            ContentResolver.SCHEME_CONTENT -> DocumentFile.fromSingleUri(context, uri)?.length() ?: 0L
+            else -> 0L
+        }
+    }.getOrDefault(0L)
 }

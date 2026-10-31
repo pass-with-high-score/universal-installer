@@ -430,7 +430,19 @@ abstract class BaseInstallController(
             // The same install can be observed by its headless notification owner and by an
             // activity restoring the session. The unique session ID makes the history write the
             // one atomic completion claim they share, so its downstream count stays one too.
-            if (success && rowId != -1L) ReviewGate.recordSuccessfulInstall(context)
+            if (rowId != -1L) {
+                if (success) ReviewGate.recordSuccessfulInstall(context)
+                app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordInstallResult(
+                    context = context,
+                    fileName = sessionData.name,
+                    fileSizeBytes = sessionData.fileSizeBytes,
+                    success = success,
+                    operationType = sessionData.operationType,
+                    installerMode = sessionData.installerMode,
+                    isSplitBundle = sessionData.uris.size > 1 ||
+                        app.pwhs.universalinstaller.domain.stats.UserStatsTracker.isSplitFileName(sessionData.name),
+                )
+            }
         } catch (e: Exception) {
             Timber.e(e, "Failed to save install history")
         }

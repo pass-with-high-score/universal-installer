@@ -48,8 +48,11 @@ wearCompose = "1.6.2"
 wearToolingPreview = "1.0.0"
 playServicesWearable = "20.0.1"
 playServicesCodeScanner = "16.1.0"
+appfunctions = "1.0.0-beta01"
 
 [libraries]
+androidx-appfunctions = { module = "androidx.appfunctions:appfunctions", version.ref = "appfunctions" }
+androidx-appfunctions-compiler = { module = "androidx.appfunctions:appfunctions-compiler", version.ref = "appfunctions" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 bottom-sheet = { module = "io.github.raamcosta.compose-destinations:bottom-sheet", version.ref = "core" }

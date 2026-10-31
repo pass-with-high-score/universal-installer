@@ -35,4 +35,95 @@
     <string name="dir_picker_grant_action">Cấp quyền</string>
     <string name="error_cannot_open_app">Không thể mở ứng dụng</string>
     <string name="error_no_file_picker">Không tìm thấy ứng dụng quản lý tệp để chọn file</string>
+
+    <!-- User Stats & Milestones -->
+    <string name="stats_screen_title">Thống kê &amp; Cột mốc</string>
+    <string name="stats_tab_overview">Tổng quan</string>
+    <string name="stats_tab_milestones">Cột mốc</string>
+    <string name="stats_rank_label">Danh hiệu hiện tại</string>
+    <string name="stats_rank_newbie">Tân thủ</string>
+    <string name="stats_rank_newbie_sub">Mới bắt đầu hành trình cài đặt gói APK</string>
+    <string name="stats_rank_tinkerer">Người vọc App</string>
+    <string name="stats_rank_tinkerer_sub">Quen thuộc với việc cài đặt và thử nghiệm ứng dụng</string>
+    <string name="stats_rank_explorer">Nhà thám hiểm Gói</string>
+    <string name="stats_rank_explorer_sub">Xử lý mượt mà các gói Split, cập nhật và dọn rác</string>
+    <string name="stats_rank_privileged_pro">Chuyên gia Quyền năng</string>
+    <string name="stats_rank_privileged_pro_sub">Làm chủ công cụ nâng cao và kiểm tra bảo mật</string>
+    <string name="stats_rank_sideload_master">Bậc thầy Sideload</string>
+    <string name="stats_rank_sideload_master_sub">Kỳ cựu đỉnh cao của Universal Installer</string>
+    <string name="stats_next_rank_progress">Đã mở khóa %1$d / %2$d cột mốc</string>
+    <string name="stats_next_rank_hint">Mở thêm %1$d cột mốc để đạt %2$s</string>
+    <string name="stats_max_rank_reached">Đã đạt danh hiệu tối đa!</string>
+
+    <string name="stats_section_install_uninstall">Tổng quan Cài đặt &amp; Gỡ bỏ</string>
+    <string name="stats_total_installed">Cài thành công</string>
+    <string name="stats_failed_installs">Thất bại</string>
+    <string name="stats_success_rate">Tỷ lệ thành công</string>
+    <string name="stats_op_new">Cài mới</string>
+    <string name="stats_op_update">Cập nhật</string>
+    <string name="stats_op_downgrade">Hạ cấp</string>
+    <string name="stats_total_uninstalled">Ứng dụng đã gỡ</string>
+    <string name="stats_total_downloads">Gói đã tải về</string>
+
+    <string name="stats_section_storage_formats">Dung lượng &amp; Định dạng</string>
+    <string name="stats_bytes_installed">Tổng dung lượng cài</string>
+    <string name="stats_bytes_cleaned">Dung lượng giải phóng</string>
+    <string name="stats_files_cleaned_sub">Đã tự động dọn %1$d file nguồn</string>
+    <string name="stats_format_single_apk">APK đơn</string>
+    <string name="stats_format_split_bundle">Gói Split (XAPK/APKS)</string>
+    <string name="stats_format_obb">Kèm dữ liệu OBB</string>
+
+    <string name="stats_section_modes_security">Chế độ Cài đặt &amp; Bảo mật</string>
+    <string name="stats_mode_default">Mặc định</string>
+    <string name="stats_mode_shizuku">Shizuku</string>
+    <string name="stats_mode_root">Root</string>
+    <string name="stats_mode_dhizuku">Dhizuku</string>
+    <string name="stats_vt_scans">Lượt quét VirusTotal</string>
+    <string name="stats_tracker_scans">Lượt quét Tracker</string>
+    <string name="stats_trackers_found">Phát hiện %1$d trình theo dõi</string>
+
+    <string name="stats_section_activity">Biểu đồ Hoạt động</string>
+    <string name="stats_period_7d">7 ngày</string>
+    <string name="stats_period_30d">30 ngày</string>
+    <string name="stats_busiest_day">Cao nhất 30 ngày: %1$d lần cài/ngày</string>
+    <string name="stats_activity_empty">Hãy cài đặt ứng dụng để xem biểu đồ hoạt động theo ngày</string>
+    <string name="stats_section_top_apps">Ứng dụng cài / cập nhật nhiều nhất</string>
+    <string name="stats_top_app_meta">%1$d lần cài • %2$d lần cập nhật</string>
+
+    <string name="stats_category_all">Tất cả</string>
+    <string name="stats_category_install">Cài đặt</string>
+    <string name="stats_category_storage">Dung lượng</string>
+    <string name="stats_category_power">Nâng cao</string>
+    <string name="stats_category_security">Bảo mật</string>
+
+    <string name="milestone_badge_new">MỚI</string>
+    <string name="milestone_unlocked_label">Đã đạt</string>
+    <string name="milestone_banner_title">Mở khóa Cột mốc mới!</string>
+    <string name="milestone_banner_view">Xem ngay</string>
+
+    <string name="milestone_first_install_title">Bước đầu tiên</string>
+    <string name="milestone_first_install_desc">Cài đặt thành công ứng dụng đầu tiên</string>
+    <string name="milestone_ten_installs_title">Người vọc App</string>
+    <string name="milestone_ten_installs_desc">Cài đặt thành công 10 ứng dụng</string>
+    <string name="milestone_fifty_installs_title">Kỳ cựu Sideload</string>
+    <string name="milestone_fifty_installs_desc">Cài đặt thành công 50 ứng dụng</string>
+    <string name="milestone_hundred_installs_title">Chiến thần 100 App</string>
+    <string name="milestone_hundred_installs_desc">Cài đặt thành công 100 ứng dụng</string>
+    <string name="milestone_split_bundle_title">Chuyên gia Gói Split</string>
+    <string name="milestone_split_bundle_desc">Cài thành công gói Split (.xapk, .apks hoặc .apkm)</string>
+    <string name="milestone_obb_master_title">Game thủ OBB</string>
+    <string name="milestone_obb_master_desc">Cài đặt thành công ứng dụng kèm dữ liệu OBB</string>
+    <string name="milestone_gigabyte_club_title">Câu lạc bộ Gigabyte</string>
+    <string name="milestone_gigabyte_club_desc">Tổng dung lượng các gói đã cài đạt 1 GB</string>
+    <string name="milestone_ten_gigabytes_title">Siêu trọng tải</string>
+    <string name="milestone_ten_gigabytes_desc">Tổng dung lượng các gói đã cài đạt 10 GB</string>
+    <string name="milestone_privileged_user_title">Người dùng Quyền năng</string>
+    <string name="milestone_privileged_user_desc">Cài ứng dụng thông qua Shizuku, Root hoặc Dhizuku</string>
+    <string name="milestone_time_traveler_title">Cỗ máy Thời gian</string>
+    <string name="milestone_time_traveler_desc">Hạ cấp ứng dụng về phiên bản cũ hơn thành công</string>
+    <string name="milestone_debloat_warrior_title">Chiến binh Dọn rác</string>
+    <string name="milestone_debloat_warrior_desc">Gỡ cài đặt thành công 10 ứng dụng</string>
+    <string name="milestone_security_guardian_title">Lá chắn Bảo mật</string>
+    <string name="milestone_security_guardian_desc">Quét bảo mật 5 gói bằng VirusTotal hoặc trình quét Tracker</string>
+    <string name="app_functions_display_description">Tìm kiếm ứng dụng đã cài, xem lịch sử cài đặt và gỡ cài đặt, thống kê cài đặt và quét tìm file APK trên thiết bị.</string>
 </resources>

@@ -321,6 +321,10 @@
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
+            android:name=".presentation.stats.StatsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.UniversalInstaller" />
+        <activity
             android:name=".presentation.manage.BackupsActivity"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
@@ -454,6 +458,27 @@
         <receiver
             android:name=".presentation.install.InstallActionReceiver"
             android:exported="false" />
+
+        <!-- Android 16+ AppFunctions service exposing app capabilities to on-device AI agents. -->
+        <service
+            android:name="app.pwhs.universalinstaller.appfunctions.UniversalInstallerAppFunctionService"
+            android:exported="true"
+            android:permission="android.permission.BIND_APP_FUNCTION_SERVICE"
+            tools:targetApi="36">
+            <property
+                android:name="android.app.appfunctions.schema"
+                android:value="app_functions_schema.xsd" />
+            <property
+                android:name="android.app.appfunctions.v2"
+                android:value="universal_installer_app_function_service.xml" />
+            <intent-filter>
+                <action android:name="android.app.appfunctions.AppFunctionService" />
+            </intent-filter>
+        </service>
+
+        <property
+            android:name="android.app.appfunctions.app_metadata"
+            android:resource="@xml/app_metadata" />
 
     </application>
 

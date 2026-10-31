@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.QueryStats
 import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Badge
@@ -25,9 +26,12 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.pwhs.core.R as CoreR
+import app.pwhs.core.data.local.SharedPrefsKeys
+import app.pwhs.core.data.local.dataStore
 import app.pwhs.universalinstaller.presentation.install.InstallActivity
 import app.pwhs.universalinstaller.presentation.manage.ManageActivity
 import app.pwhs.universalinstaller.presentation.setting.SettingActivity
+import app.pwhs.universalinstaller.presentation.stats.StatsActivity
 import app.pwhs.universalinstaller.util.extension.disableSceneTransition
 
 enum class BottomBarItem(
@@ -49,6 +53,11 @@ enum class BottomBarItem(
         activityClass = ManageActivity::class.java,
         label = CoreR.string.nav_manage,
         icon = Icons.Rounded.Apps,
+    ),
+    Stats(
+        activityClass = StatsActivity::class.java,
+        label = CoreR.string.nav_stats,
+        icon = Icons.Rounded.QueryStats,
     ),
     Settings(
         activityClass = SettingActivity::class.java,
@@ -82,6 +91,14 @@ fun BottomBar(
         }
     }
 
+    val unseenMilestoneCount by produceState(initialValue = 0, context) {
+        runCatching {
+            context.dataStore.data.collect { prefs ->
+                value = prefs[SharedPrefsKeys.UNSEEN_MILESTONE_COUNT] ?: 0
+            }
+        }
+    }
+
     val destinations = remember {
         BottomBarItem.entries.filter { it.activityClass != null }
     }
@@ -106,11 +123,16 @@ fun BottomBar(
                     }
                 },
                 icon = {
-                    if (destination == BottomBarItem.Updates && updateCount > 0) {
+                    val badgeCount = when (destination) {
+                        BottomBarItem.Updates -> updateCount
+                        BottomBarItem.Stats -> unseenMilestoneCount
+                        else -> 0
+                    }
+                    if (badgeCount > 0) {
                         BadgedBox(
                             badge = {
                                 Badge {
-                                    Text(if (updateCount > 99) "99+" else updateCount.toString())
+                                    Text(if (badgeCount > 99) "99+" else badgeCount.toString())
                                 }
                             }
                         ) {

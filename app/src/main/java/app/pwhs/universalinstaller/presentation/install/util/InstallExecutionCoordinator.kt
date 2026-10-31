@@ -117,6 +117,7 @@ object InstallExecutionCoordinator {
         val onSuccess: (suspend () -> Unit)? = if (apkInfo != null && (hasZipObbs || hasAttachedObbs || (dex2oatEnabled && isPrivilegedBackend))) {
             val callback: suspend () -> Unit = {
                 if (hasZipObbs || hasAttachedObbs) {
+                    app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordObbInstall(application)
                     onCopyObbs(originalUri, obbEntries, attachedObbs, pkg.orEmpty(), appName)
                 }
                 if (dex2oatEnabled && isPrivilegedBackend && !pkg.isNullOrBlank()) {

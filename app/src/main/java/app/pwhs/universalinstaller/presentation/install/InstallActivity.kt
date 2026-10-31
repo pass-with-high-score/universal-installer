@@ -26,14 +26,24 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.bridge.AntiSplitBridge
+import app.pwhs.universalinstaller.domain.stats.MilestoneId
+import app.pwhs.universalinstaller.domain.stats.UserStatsTracker
 import app.pwhs.universalinstaller.presentation.composable.AntiSplitPromptDialog
+import app.pwhs.universalinstaller.presentation.stats.StatsActivity
+import app.pwhs.universalinstaller.presentation.stats.components.MilestoneUnlockBanner
+import app.pwhs.universalinstaller.util.extension.disableSceneTransition
+import kotlinx.coroutines.delay
 import ru.solrudev.ackpine.splits.SplitPackage.Companion.toSplitPackage
 
 class InstallActivity : BaseActivity() {
@@ -101,6 +111,18 @@ class InstallActivity : BaseActivity() {
         maybeRequestNotificationPermission()
         observeReviewOpportunities()
         setContentWithTheme {
+            var unlockedMilestone by remember { mutableStateOf<MilestoneId?>(null) }
+
+            LaunchedEffect(Unit) {
+                UserStatsTracker.milestoneEvents.collect { milestone ->
+                    unlockedMilestone = milestone
+                    delay(6_000L)
+                    if (unlockedMilestone == milestone) {
+                        unlockedMilestone = null
+                    }
+                }
+            }
+
             Scaffold(
                 bottomBar = { BottomBar(BottomBarItem.Install) }
             ) { innerPadding ->
@@ -110,6 +132,20 @@ class InstallActivity : BaseActivity() {
                     InstallScreen(
                         viewModel = viewModel,
                         onMergeSplits = { uri -> requestMergeExternalFile(uri) },
+                    )
+                    MilestoneUnlockBanner(
+                        milestone = unlockedMilestone,
+                        onViewClick = {
+                            unlockedMilestone = null
+                            val intent = Intent(this@InstallActivity, StatsActivity::class.java).apply {
+                                putExtra(StatsActivity.EXTRA_OPEN_MILESTONES, true)
+                                flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NO_ANIMATION
+                            }
+                            startActivity(intent)
+                            disableSceneTransition()
+                        },
+                        onDismiss = { unlockedMilestone = null },
+                        modifier = Modifier.align(Alignment.BottomCenter),
                     )
                 }
             }

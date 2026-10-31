@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
 import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.QueryStats
 import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Badge
@@ -16,10 +17,14 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import app.pwhs.core.R as CoreR
+import app.pwhs.core.data.local.SharedPrefsKeys
+import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.util.disableSceneTransition
 
 private enum class UpdaterBottomNavDestination(
@@ -42,6 +47,11 @@ private enum class UpdaterBottomNavDestination(
         labelRes = CoreR.string.nav_manage,
         icon = Icons.Rounded.Apps,
     ),
+    STATS(
+        targetActivityClassName = "app.pwhs.universalinstaller.presentation.stats.StatsActivity",
+        labelRes = CoreR.string.nav_stats,
+        icon = Icons.Rounded.QueryStats,
+    ),
     SETTINGS(
         targetActivityClassName = "app.pwhs.universalinstaller.presentation.setting.SettingActivity",
         labelRes = CoreR.string.nav_settings,
@@ -63,6 +73,14 @@ fun UpdaterBottomBar(
         unselectedTextColor = colors.onSurfaceVariant,
     )
 
+    val unseenMilestoneCount by produceState(initialValue = 0, context) {
+        runCatching {
+            context.dataStore.data.collect { prefs ->
+                value = prefs[SharedPrefsKeys.UNSEEN_MILESTONE_COUNT] ?: 0
+            }
+        }
+    }
+
     NavigationBar {
         UpdaterBottomNavDestination.entries.forEach { destination ->
             val isSelected = destination == UpdaterBottomNavDestination.UPDATES
@@ -79,11 +97,16 @@ fun UpdaterBottomBar(
                     }
                 },
                 icon = {
-                    if (destination == UpdaterBottomNavDestination.UPDATES && updateCount > 0) {
+                    val badgeCount = when (destination) {
+                        UpdaterBottomNavDestination.UPDATES -> updateCount
+                        UpdaterBottomNavDestination.STATS -> unseenMilestoneCount
+                        else -> 0
+                    }
+                    if (badgeCount > 0) {
                         BadgedBox(
                             badge = {
                                 Badge {
-                                    Text(if (updateCount > 99) "99+" else updateCount.toString())
+                                    Text(if (badgeCount > 99) "99+" else badgeCount.toString())
                                 }
                             }
                         ) {

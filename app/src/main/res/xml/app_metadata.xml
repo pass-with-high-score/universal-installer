@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AppFunctionAppMetadata xmlns:appfn="http://schemas.android.com/apk/androidx.appfunctions"
+    appfn:displayDescription="@string/app_functions_display_description"
+    appfn:instructions="Universal Installer is a package installer and app management utility for Android supporting APK, APKS, XAPK, and APKM packages.
+Operational Patterns:
+- Use 'searchInstalledApps' to find installed apps by name or package name before calling 'getInstalledAppDetails' or 'openUninstallDialog'.
+- Use 'getRecentInstallHistory' and 'getRecentUninstallLogs' to inspect recent package installation and uninstallation outcomes.
+- Use 'getInstallerStats' to retrieve lifetime installation, uninstallation, storage, and security scan statistics.
+- Use 'scanDeviceForPackageFiles' to discover installable APK, APKS, XAPK, and APKM files on device storage.
+- Use 'openAppScreen' or 'openUninstallDialog' to return a PendingIntent when the user wants to navigate into a specific screen or confirm uninstalling an app.
+Constraints:
+- Package installation and uninstallation always require explicit user confirmation in the UI; functions never silently install or remove apps." />

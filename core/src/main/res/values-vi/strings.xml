@@ -89,6 +89,7 @@
     <string name="nav_install">Cài đặt</string>
     <string name="nav_updates">Cập nhật</string>
     <string name="nav_manage">Quản lý</string>
+    <string name="nav_stats">Thống kê</string>
     <string name="nav_settings">Thiết lập</string>
 
     <!-- Transfer Estimator -->

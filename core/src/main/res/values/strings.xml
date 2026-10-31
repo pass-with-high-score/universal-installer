@@ -118,6 +118,7 @@
     <string name="nav_install">Install</string>
     <string name="nav_updates">Updates</string>
     <string name="nav_manage">Manage</string>
+    <string name="nav_stats">Stats</string>
     <string name="nav_settings">Settings</string>
 
     <!-- Transfer Estimator -->

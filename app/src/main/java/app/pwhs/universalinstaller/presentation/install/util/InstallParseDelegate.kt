@@ -222,6 +222,7 @@ class InstallParseDelegate(
         scanJob?.cancel()
         Telemetry.feature(TelemetryEvents.FEATURE_VIRUSTOTAL)
         scanJob = scope.launch {
+            app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
             InstallVirusTotalHelper.scanVirusTotal(
                 context = context,
                 uri = uri,
@@ -262,6 +263,7 @@ class InstallParseDelegate(
                 ?: splitUris?.firstOrNull()
                 ?: uri
             val detected = DexTrackerScanner.scanApk(context, targetUri)
+            app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordTrackerScan(context, detected.size)
             withContext(Dispatchers.Main) {
                 updatePendingApkInfo {
                     it.copy(isScanningTrackers = false, trackers = detected)

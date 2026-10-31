@@ -337,6 +337,12 @@ object ManageUninstallHelper {
                     errorMessage = errorMessage,
                 )
             )
+            if (success) {
+                runCatching {
+                    val appContext = org.koin.java.KoinJavaComponent.get<Context>(Context::class.java)
+                    app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordUninstallSuccess(appContext)
+                }
+            }
         } catch (e: Exception) {
             Timber.e(e, "Failed to persist uninstall log")
         }
