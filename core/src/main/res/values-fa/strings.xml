@@ -112,4 +112,13 @@
     <string name="transfer_eta_minutes_seconds">حدود %1$d دقیقه و %2$d ثانیه باقی‌مانده</string>
     <string name="transfer_eta_hours_minutes">حدود %1$d ساعت و %2$d دقیقه باقی‌مانده</string>
     <string name="error_cannot_open_link_copied">باز کردن پیوند ممکن نیست. در کلیپ‌بورد کپی شد</string>
+    <string name="onboarding_devices_title">پشتیبانی از چندین دستگاه</string>
+    <string name="onboarding_devices_desc">نصب و مدیریت آسان برنامه‌ها در تلفن‌های Android، Android TV، Android Auto و ساعت‌های هوشمند Wear OS.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">آمار</string>
+    <string name="error_cannot_open_settings">امکان باز کردن تنظیمات سیستم وجود ندارد. لطفاً تنظیمات را به صورت دستی باز کنید &gt; برنامه‌ها &gt; Universal Installer تا مجوز را اعطا کنید.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">گزینه‌های برنامه‌نویس باز نشده است. لطفاً تنظیمات &gt; درباره تلفن را باز کرده و ۷ بار روی شماره ساخت ضربه بزنید.</string>
 </resources>

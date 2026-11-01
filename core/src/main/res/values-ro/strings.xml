@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">Categorie</string>
     <string name="updates_config_category_placeholder">ex. Utilitare, Social, Jocuri</string>
     <string name="error_cannot_open_link_copied">Nu se poate deschide linkul. Copiat în clipboard</string>
+    <string name="onboarding_devices_title">Suport pentru mai multe dispozitive</string>
+    <string name="onboarding_devices_desc">Instalați și gestionați fără probleme aplicații pe telefoane Android, Android TV, Android Auto și ceasuri inteligente Wear OS.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">Statistici</string>
+    <string name="error_cannot_open_settings">Nu se pot deschide setările de sistem. Deschideți Setări manual &gt; Aplicații &gt; Universal Installer pentru a acorda permisiunea.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Opțiunile pentru dezvoltatori nu sunt deblocate. Deschideți Setări &gt; Despre telefon și atingeți Numărul versiunii de 7 ori.</string>
 </resources>

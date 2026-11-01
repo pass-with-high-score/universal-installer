@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">Categoria</string>
     <string name="updates_config_category_placeholder">es. Strumenti, Social, Giochi</string>
     <string name="error_cannot_open_link_copied">Impossibile aprire il link. Copiato negli appunti</string>
+    <string name="onboarding_devices_title">Supporto per più dispositivi</string>
+    <string name="onboarding_devices_desc">Installa e gestisci facilmente le applicazioni su telefoni Android, Android TV, Android Auto e smartwatch Wear OS.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">Statistiche</string>
+    <string name="error_cannot_open_settings">Impossibile aprire le impostazioni di sistema. Apri Impostazioni manualmente &gt; App &gt; Universal Installer per concedere l\'autorizzazione.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Opzioni sviluppatore non sbloccate. Apri Impostazioni &gt; Informazioni sul telefono e tocca 7 volte Numero di build.</string>
 </resources>

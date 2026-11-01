@@ -121,4 +121,13 @@
     <string name="transfer_eta_minutes_seconds">~%1$d মি %2$d সে বাকি</string>
     <string name="transfer_eta_hours_minutes">~%1$d ঘণ্টা %2$d মি বাকি</string>
     <string name="error_cannot_open_link_copied">লিঙ্কটি খোলা যাচ্ছে না। ক্লিপবোর্ডে কপি করা হয়েছে</string>
+    <string name="onboarding_devices_title">একাধিক ডিভাইসের জন্য সমর্থন</string>
+    <string name="onboarding_devices_desc">Android ফোন, Android TV, Android Auto এবং Wear OS স্মার্টওয়াচে নির্বিঘ্নে অ্যাপ্লিকেশন ইনস্টল ও পরিচালনা করুন।</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">পরিসংখ্যান</string>
+    <string name="error_cannot_open_settings">সিস্টেম সেটিংস খুলতে ব্যর্থ হয়েছে। অনুমতি দিতে অনুগ্রহ করে ম্যানুয়ালি সেটিংস &gt; অ্যাপস &gt; Universal Installer খুলুন।</string>
+    <string name="onboarding_xiaomi_dev_options_hint">বিকাশকারী বিকল্পগুলি আনলক করা নেই। অনুগ্রহ করে সেটিংস &gt; ফোন সম্পর্কিত খুলুন এবং বিল্ড নম্বরে ৭ বার ট্যাপ করুন।</string>
 </resources>

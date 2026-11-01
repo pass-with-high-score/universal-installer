@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">Kategori</string>
     <string name="updates_config_category_placeholder">örn. Araçlar, Sosyal, Oyunlar</string>
     <string name="error_cannot_open_link_copied">Bağlantı açılamıyor. Panoya kopyalandı</string>
+    <string name="onboarding_devices_title">Çoklu Cihaz Desteği</string>
+    <string name="onboarding_devices_desc">Android telefonlar, Android TV, Android Auto ve Wear OS akıllı saatlerde uygulamaları sorunsuzca yükleyin ve yönetin.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">İstatistikler</string>
+    <string name="error_cannot_open_settings">Sistem ayarları açılamıyor. İzin vermek için lütfen Ayarlar\'ı manuel olarak açın &gt; Uygulamalar &gt; Universal Installer.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Geliştirici seçeneklerinin kilidi açılmadı. Lütfen Ayarlar &gt; Telefon hakkında bölümünü açın ve Derleme numarasına 7 kez dokunun.</string>
 </resources>

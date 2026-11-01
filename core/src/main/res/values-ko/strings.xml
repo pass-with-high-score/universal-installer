@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">카테고리</string>
     <string name="updates_config_category_placeholder">예: 도구, 소셜, 게임</string>
     <string name="error_cannot_open_link_copied">링크를 열 수 없습니다. 클립보드에 복사되었습니다</string>
+    <string name="onboarding_devices_title">여러 기기 지원</string>
+    <string name="onboarding_devices_desc">Android 스마트폰, Android TV, Android Auto 및 Wear OS 스마트워치에서 원활하게 앱을 설치하고 관리하세요.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">통계</string>
+    <string name="error_cannot_open_settings">시스템 설정을 열 수 없습니다. 권한을 부여하려면 설정 &gt; 앱 &gt; Universal Installer를 수동으로 여세요.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">개발자 옵션이 잠금 해제되지 않았습니다. 설정 &gt; 휴대전화 정보로 이동하여 빌드 번호를 7번 탭하세요.</string>
 </resources>

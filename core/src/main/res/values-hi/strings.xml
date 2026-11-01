@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">श्रेणी</string>
     <string name="updates_config_category_placeholder">उदा. उपकरण, सोशल, खेल</string>
     <string name="error_cannot_open_link_copied">लिंक खोला नहीं जा सका। क्लिपबोर्ड पर कॉपी किया गया</string>
+    <string name="onboarding_devices_title">एकाधिक डिवाइस का समर्थन</string>
+    <string name="onboarding_devices_desc">Android फोन, Android TV, Android Auto और Wear OS स्मार्टवॉच पर ऐप्स को आसानी से इंस्टॉल और प्रबंधित करें।</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">आँकड़े</string>
+    <string name="error_cannot_open_settings">सिस्टम सेटिंग खोलने में असमर्थ। अनुमति देने के लिए कृपया सेटिंग मैन्युअल रूप से खोलें &gt; ऐप्स &gt; Universal Installer।</string>
+    <string name="onboarding_xiaomi_dev_options_hint">डेवलपर विकल्प अनलॉक नहीं हैं। कृपया सेटिंग &gt; फ़ोन के बारे में खोलें, और बिल्ड नंबर पर 7 बार टैप करें।</string>
 </resources>

@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">Kategori</string>
     <string name="updates_config_category_placeholder">cth. Alat, Sosial, Game</string>
     <string name="error_cannot_open_link_copied">Tidak dapat membuka tautan. Disalin ke papan klip</string>
+    <string name="onboarding_devices_title">Dukungan Banyak Perangkat</string>
+    <string name="onboarding_devices_desc">Instal dan kelola aplikasi dengan lancar di ponsel Android, Android TV, Android Auto, dan smartwatch Wear OS.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">Statistik</string>
+    <string name="error_cannot_open_settings">Tidak dapat membuka pengaturan sistem. Silakan buka Pengaturan secara manual &gt; Aplikasi &gt; Universal Installer untuk memberikan izin.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Opsi pengembang belum terbuka. Silakan buka Pengaturan &gt; Tentang ponsel, dan ketuk Nomor versi sebanyak 7 kali.</string>
 </resources>

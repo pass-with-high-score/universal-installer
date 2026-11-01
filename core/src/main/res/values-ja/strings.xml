@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">カテゴリ</string>
     <string name="updates_config_category_placeholder">例: ツール、SNS、ゲーム</string>
     <string name="error_cannot_open_link_copied">リンクを開けません。クリップボードにコピーしました</string>
+    <string name="onboarding_devices_title">複数のデバイスに対応</string>
+    <string name="onboarding_devices_desc">Android スマートフォン、Android TV、Android Auto、Wear OS スマートウォッチでアプリをシームレスにインストール・管理できます。</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">統計</string>
+    <string name="error_cannot_open_settings">システム設定を開けません。手動で「設定」&gt;「アプリ」&gt;「Universal Installer」を開いて権限を付与してください。</string>
+    <string name="onboarding_xiaomi_dev_options_hint">開発者向けオプションがロック解除されていません。「設定」&gt;「デバイス情報」を開き、「ビルド番号」を7回タップしてください。</string>
 </resources>

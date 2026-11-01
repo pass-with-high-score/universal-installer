@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">Kategorie</string>
     <string name="updates_config_category_placeholder">z.B. Tools, Social, Spiele</string>
     <string name="error_cannot_open_link_copied">Link kann nicht geöffnet werden. In Zwischenablage kopiert</string>
+    <string name="onboarding_devices_title">Unterstützung mehrerer Geräte</string>
+    <string name="onboarding_devices_desc">Anwendungen nahtlos auf Android-Smartphones, Android TV, Android Auto und Wear OS-Smartwatches installieren und verwalten.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">Statistiken</string>
+    <string name="error_cannot_open_settings">Systemeinstellungen können nicht geöffnet werden. Bitte öffnen Sie Einstellungen manuell &gt; Apps &gt; Universal Installer, um die Berechtigung zu erteilen.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Entwickleroptionen nicht freigeschaltet. Bitte öffnen Sie Einstellungen &gt; Über das Telefon und tippen Sie 7 Mal auf die Build-Nummer.</string>
 </resources>

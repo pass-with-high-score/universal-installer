@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">Κατηγορία</string>
     <string name="updates_config_category_placeholder">π.χ. Εργαλεία, Κοινωνικά, Παιχνίδια</string>
     <string name="error_cannot_open_link_copied">Δεν είναι δυνατό το άνοιγμα του συνδέσμου. Αντιγράφηκε στο πρόχειρο</string>
+    <string name="onboarding_devices_title">Υποστήριξη πολλαπλών συσκευών</string>
+    <string name="onboarding_devices_desc">Εγκαταστήστε και διαχειριστείτε απρόσκοπτα εφαρμογές σε τηλέφωνα Android, Android TV, Android Auto και έξυπνα ρολόγια Wear OS.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">Στατιστικά</string>
+    <string name="error_cannot_open_settings">Δεν είναι δυνατό το άνοιγμα των ρυθμίσεων συστήματος. Ανοίξτε μη αυτόματα τις Ρυθμίσεις &gt; Εφαρμογές &gt; Universal Installer για να εκχωρήσετε άδεια.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Οι επιλογές για προγραμματιστές δεν έχουν ξεκλειδωθεί. Ανοίξτε Ρυθμίσεις &gt; Σχετικά με το τηλέφωνο και πατήστε τον Αριθμό έκδοσης 7 φορές.</string>
 </resources>

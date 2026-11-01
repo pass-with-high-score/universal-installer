@@ -1,7 +1,10 @@
 package app.pwhs.core.util
 
+import android.os.Build
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runInterruptible
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.TimeUnit
 
 /**
@@ -53,12 +56,33 @@ object RootShell {
         val process = ProcessBuilder("su", "-c", cmd)
             .redirectErrorStream(true)
             .start()
-        val finished = process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
+        val finished = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            process.waitFor(timeoutSeconds, TimeUnit.SECONDS)
+        } else {
+            val exit = try {
+                withTimeoutOrNull(TimeUnit.SECONDS.toMillis(timeoutSeconds)) {
+                    runInterruptible { process.waitFor() }
+                }
+            } catch (_: InterruptedException) {
+                null
+            }
+            exit != null
+        }
         if (!finished) {
-            runCatching { process.destroyForcibly() }
+            destroyProcess(process)
             return@withContext Result(-1, "Command timed out after ${timeoutSeconds}s: $cmd")
         }
         val output = process.inputStream.bufferedReader().use { it.readText() }
         Result(process.exitValue(), output)
+    }
+
+    private fun destroyProcess(process: Process) {
+        runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                process.destroyForcibly()
+            } else {
+                process.destroy()
+            }
+        }
     }
 }

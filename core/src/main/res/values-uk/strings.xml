@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">Категорія</string>
     <string name="updates_config_category_placeholder">напр. Інструменти, Ігри</string>
     <string name="error_cannot_open_link_copied">Не вдалося відкрити посилання. Скопійовано в буфер обміну</string>
+    <string name="onboarding_devices_title">Підтримка кількох пристроїв</string>
+    <string name="onboarding_devices_desc">Легке встановлення та керування програмами на телефонах Android, Android TV, Android Auto та смартгодинниках Wear OS.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">Статистика</string>
+    <string name="error_cannot_open_settings">Не вдалося відкрити системні налаштування. Відкрийте Налаштування вручну &gt; Програми &gt; Universal Installer, щоб надати дозвіл.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">Параметри розробника не ввімкнено. Відкрийте Налаштування &gt; Про телефон і торкніться 7 разів Номер збірки.</string>
 </resources>

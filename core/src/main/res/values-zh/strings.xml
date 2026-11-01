@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">分类</string>
     <string name="updates_config_category_placeholder">例如：工具、社交、游戏</string>
     <string name="error_cannot_open_link_copied">无法打开链接，已复制到剪贴板</string>
+    <string name="onboarding_devices_title">支持多种设备</string>
+    <string name="onboarding_devices_desc">在 Android 手机、Android TV、Android Auto 和 Wear OS 智能手表之间无缝安装和管理应用。</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">统计</string>
+    <string name="error_cannot_open_settings">无法打开系统设置。请手动打开设置 &gt; 应用 &gt; Universal Installer 以授予权限。</string>
+    <string name="onboarding_xiaomi_dev_options_hint">开发者选项未解锁。请打开设置 &gt; 关于手机，然后连续点击“版本号”7 次。</string>
 </resources>

@@ -110,4 +110,13 @@
     <string name="updates_config_category_label">الفئة</string>
     <string name="updates_config_category_placeholder">مثال: أدوات، تواصل، ألعاب</string>
     <string name="error_cannot_open_link_copied">تعذر فتح الرابط. تم النسخ إلى الحافظة</string>
+    <string name="onboarding_devices_title">دعم أجهزة متعددة</string>
+    <string name="onboarding_devices_desc">تثبيت التطبيقات وإدارتها بسلاسة عبر هواتف Android وAndroid TV وAndroid Auto وساعات Wear OS الذكية.</string>
+    <string name="onboarding_device_android">Android</string>
+    <string name="onboarding_device_tv">Android TV</string>
+    <string name="onboarding_device_auto">Android Auto</string>
+    <string name="onboarding_device_wearos">Wear OS</string>
+    <string name="nav_stats">الإحصائيات</string>
+    <string name="error_cannot_open_settings">تعذر فتح إعدادات النظام. يرجى فتح الإعدادات يدويًا &gt; التطبيقات &gt; Universal Installer لمنح الإذن.</string>
+    <string name="onboarding_xiaomi_dev_options_hint">خيارات المطور غير مفعلة. يرجى فتح الإعدادات &gt; لمحة عن الهاتف، والنقر على رقم الإصدار 7 مرات.</string>
 </resources>
