@@ -376,6 +376,56 @@ object AnalyticsHelper {
         Telemetry.event(TelemetryEvents.EVENT_VIRUSTOTAL_ACTION, params)
     }
 
+    // ── Giai đoạn 8: Thống kê & Cột mốc (User Stats & Milestones) ───────
+    fun logStatsTabChanged(tabName: String) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_STATS_TAB_CHANGED,
+            TelemetryEvents.PARAM_TAB_NAME to tabName
+        )
+    }
+
+    fun logStatsPeriodChanged(days: Int) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_STATS_PERIOD_CHANGED,
+            TelemetryEvents.PARAM_PERIOD_DAYS to days
+        )
+    }
+
+    fun logStatsCategoryChanged(category: String) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_STATS_CATEGORY_CHANGED,
+            TelemetryEvents.PARAM_CATEGORY to category.lowercase(Locale.ROOT)
+        )
+    }
+
+    fun logMilestoneUnlocked(milestoneId: String, category: String? = null) {
+        val params = mutableMapOf<String, Any?>(
+            TelemetryEvents.PARAM_MILESTONE_ID to milestoneId
+        )
+        if (!category.isNullOrBlank()) {
+            params[TelemetryEvents.PARAM_CATEGORY] = category.lowercase(Locale.ROOT)
+        }
+        Telemetry.event(TelemetryEvents.EVENT_MILESTONE_UNLOCKED, params)
+    }
+
+    fun logMilestoneClicked(milestoneId: String, isUnlocked: Boolean) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_MILESTONE_CLICKED,
+            TelemetryEvents.PARAM_MILESTONE_ID to milestoneId,
+            TelemetryEvents.PARAM_IS_UNLOCKED to isUnlocked
+        )
+    }
+
+    fun logMilestoneBannerAction(action: String, milestoneId: String?) {
+        val params = mutableMapOf<String, Any?>(
+            TelemetryEvents.PARAM_ACTION to action
+        )
+        if (!milestoneId.isNullOrBlank()) {
+            params[TelemetryEvents.PARAM_MILESTONE_ID] = milestoneId
+        }
+        Telemetry.event(TelemetryEvents.EVENT_MILESTONE_BANNER_ACTION, params)
+    }
+
     private fun String.normalizeFileType(): String =
         substringAfterLast('.', "").lowercase(Locale.ROOT).ifEmpty { lowercase(Locale.ROOT) }
 }

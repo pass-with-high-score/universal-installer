@@ -6,9 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.universalinstaller.base.BaseActivity
 import app.pwhs.universalinstaller.presentation.composable.BottomBar
 import app.pwhs.universalinstaller.presentation.composable.BottomBarItem
+import app.pwhs.universalinstaller.telemetry.Telemetry
+import app.pwhs.universalinstaller.telemetry.TelemetryEvents
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class StatsActivity : BaseActivity() {
@@ -17,6 +20,8 @@ class StatsActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        AnalyticsHelper.logScreenView("stats_screen", "StatsActivity")
+        Telemetry.feature(TelemetryEvents.FEATURE_USER_STATS)
         val openMilestones = intent?.getBooleanExtra(EXTRA_OPEN_MILESTONES, false) == true
         setContentWithTheme {
             Scaffold(

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.universalinstaller.data.local.DownloadHistoryDao
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
 import app.pwhs.universalinstaller.data.local.UninstallLogDao
@@ -59,11 +60,17 @@ class StatsViewModel(
     }
 
     fun selectPeriodDays(days: Int) {
-        _selectedPeriodDays.value = days
+        if (_selectedPeriodDays.value != days) {
+            _selectedPeriodDays.value = days
+            AnalyticsHelper.logStatsPeriodChanged(days)
+        }
     }
 
     fun selectCategory(category: MilestoneCategory?) {
-        _selectedCategory.value = category
+        if (_selectedCategory.value != category) {
+            _selectedCategory.value = category
+            AnalyticsHelper.logStatsCategoryChanged(category?.name ?: "all")
+        }
     }
 
     fun markMilestonesSeen() {

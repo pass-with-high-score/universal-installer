@@ -431,6 +431,7 @@ object UserStatsTracker {
         if (emitPopup) {
             newlyUnlocked.forEach { milestone ->
                 _milestoneEvents.tryEmit(milestone)
+                app.pwhs.core.telemetry.AnalyticsHelper.logMilestoneUnlocked(milestone.name, milestone.category.name)
             }
         }
     }

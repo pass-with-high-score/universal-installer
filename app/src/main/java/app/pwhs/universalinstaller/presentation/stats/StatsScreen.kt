@@ -38,6 +38,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.stats.components.ActivityTimelineCard
 import app.pwhs.universalinstaller.presentation.stats.components.InstallUninstallOverviewCard
@@ -60,6 +61,9 @@ fun StatsScreen(
     var activeTab by rememberSaveable { mutableIntStateOf(initialTab) }
 
     LaunchedEffect(Unit) {
+        if (initialTab == 1) {
+            AnalyticsHelper.logStatsTabChanged("milestones")
+        }
         delay(2_500L)
         viewModel.markMilestonesSeen()
     }
@@ -106,7 +110,12 @@ fun StatsScreen(
                 ) {
                     SegmentedButton(
                         selected = activeTab == 0,
-                        onClick = { activeTab = 0 },
+                        onClick = {
+                            if (activeTab != 0) {
+                                activeTab = 0
+                                AnalyticsHelper.logStatsTabChanged("overview")
+                            }
+                        },
                         shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
                         icon = {
                             Icon(
@@ -124,7 +133,12 @@ fun StatsScreen(
                     }
                     SegmentedButton(
                         selected = activeTab == 1,
-                        onClick = { activeTab = 1 },
+                        onClick = {
+                            if (activeTab != 1) {
+                                activeTab = 1
+                                AnalyticsHelper.logStatsTabChanged("milestones")
+                            }
+                        },
                         shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
                         icon = {
                             Icon(
@@ -202,6 +216,9 @@ fun StatsScreen(
                     MilestoneItemCard(
                         item = milestone,
                         modifier = Modifier.animateItem(),
+                        onClick = {
+                            AnalyticsHelper.logMilestoneClicked(milestone.id.name, milestone.isUnlocked)
+                        },
                     )
                 }
             }

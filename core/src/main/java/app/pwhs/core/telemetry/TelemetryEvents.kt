@@ -194,4 +194,22 @@ object TelemetryEvents {
     const val ACTION_SAVE_KEY = "save_key"
     const val ACTION_GET_API_KEY = "get_api_key"
     const val ACTION_DISMISS = "dismiss"
+
+    // ── Giai đoạn 8: Thống kê & Cột mốc (User Stats & Milestones) ───────
+    const val EVENT_STATS_TAB_CHANGED = "stats_tab_changed"
+    const val EVENT_STATS_PERIOD_CHANGED = "stats_period_changed"
+    const val EVENT_STATS_CATEGORY_CHANGED = "stats_category_changed"
+    const val EVENT_MILESTONE_UNLOCKED = "milestone_unlocked"
+    const val EVENT_MILESTONE_CLICKED = "milestone_clicked"
+    const val EVENT_MILESTONE_BANNER_ACTION = "milestone_banner_action"
+
+    const val PARAM_TAB_NAME = "tab_name"
+    const val PARAM_PERIOD_DAYS = "period_days"
+    const val PARAM_CATEGORY = "category"
+    const val PARAM_MILESTONE_ID = "milestone_id"
+    const val PARAM_IS_UNLOCKED = "is_unlocked"
+
+    const val ACTION_VIEW = "view"
+
+    const val FEATURE_USER_STATS = "user_stats"
 }

@@ -136,7 +136,12 @@ class InstallActivity : BaseActivity() {
                     MilestoneUnlockBanner(
                         milestone = unlockedMilestone,
                         onViewClick = {
+                            val id = unlockedMilestone?.name
                             unlockedMilestone = null
+                            app.pwhs.core.telemetry.AnalyticsHelper.logMilestoneBannerAction(
+                                app.pwhs.core.telemetry.TelemetryEvents.ACTION_VIEW,
+                                id,
+                            )
                             val intent = Intent(this@InstallActivity, StatsActivity::class.java).apply {
                                 putExtra(StatsActivity.EXTRA_OPEN_MILESTONES, true)
                                 flags = Intent.FLAG_ACTIVITY_REORDER_TO_FRONT or Intent.FLAG_ACTIVITY_NO_ANIMATION
@@ -144,7 +149,14 @@ class InstallActivity : BaseActivity() {
                             startActivity(intent)
                             disableSceneTransition()
                         },
-                        onDismiss = { unlockedMilestone = null },
+                        onDismiss = {
+                            val id = unlockedMilestone?.name
+                            unlockedMilestone = null
+                            app.pwhs.core.telemetry.AnalyticsHelper.logMilestoneBannerAction(
+                                app.pwhs.core.telemetry.TelemetryEvents.ACTION_DISMISS,
+                                id,
+                            )
+                        },
                         modifier = Modifier.align(Alignment.BottomCenter),
                     )
                 }
