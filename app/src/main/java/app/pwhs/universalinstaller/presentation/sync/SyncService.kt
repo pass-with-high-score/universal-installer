@@ -15,6 +15,7 @@ import androidx.core.app.ServiceCompat
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.core.data.local.dataStore
+import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -98,13 +99,15 @@ class SyncService : Service() {
     private var serverUrlCache: String? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action == "STOP") {
+        if (intent == null || intent.action == "STOP") {
             stopSelf()
             return START_NOT_STICKY
         }
 
         SyncManager.state.value = SyncState.STARTING
-        startForegroundService()
+        if (!startForegroundService()) {
+            return START_NOT_STICKY
+        }
         
         runBlocking {
             val prefs = applicationContext.dataStore.data.first()
@@ -146,10 +149,10 @@ class SyncService : Service() {
             }
         }
 
-        return START_STICKY
+        return START_NOT_STICKY
     }
 
-    private fun startForegroundService() {
+    private fun startForegroundService(): Boolean {
         val channelId = "sync_service_channel"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
@@ -163,15 +166,23 @@ class SyncService : Service() {
 
         val notification = createNotification(channelId, "Server starting...")
         
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ServiceCompat.startForeground(
-                this, 
-                1001, 
-                notification, 
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC else 0
-            )
-        } else {
-            startForeground(1001, notification)
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ServiceCompat.startForeground(
+                    this, 
+                    1001, 
+                    notification, 
+                    ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+                )
+            } else {
+                startForeground(1001, notification)
+            }
+            true
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to start SyncService in foreground")
+            SyncManager.state.value = SyncState.ERROR
+            stopSelf()
+            false
         }
     }
 
@@ -213,6 +224,11 @@ class SyncService : Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        try {
+            ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        } catch (e: Exception) {
+            Timber.w(e, "Failed to stop foreground for SyncService")
+        }
         serviceScope.cancel()
         server?.stop()
         SyncManager.state.value = SyncState.STOPPED

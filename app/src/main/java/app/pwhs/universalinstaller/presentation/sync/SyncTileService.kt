@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
+import androidx.core.content.ContextCompat
+import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -45,13 +47,18 @@ class SyncTileService : TileService() {
         if (currentState == SyncState.RUNNING || currentState == SyncState.STARTING) {
             // Stop the server
             intent.action = "STOP"
-            startService(intent)
+            try {
+                startService(intent)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to stop SyncService from tile")
+            }
         } else {
             // Start the server
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(intent)
-            } else {
-                startService(intent)
+            try {
+                ContextCompat.startForegroundService(this, intent)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to start SyncService from tile")
+                SyncManager.state.value = SyncState.ERROR
             }
         }
     }
