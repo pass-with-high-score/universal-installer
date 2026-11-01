@@ -1,0 +1,5 @@
+• Added version status chips to app details
+• Standardized settings sub-screen headers
+• Enhanced app management list and about section
+• Improved link opening fallbacks and navigation UX
+• Bug fixes and stability improvements

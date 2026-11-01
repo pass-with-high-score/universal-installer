@@ -1,0 +1,3 @@
+• Improved install permission handling and settings navigation
+• Added clipboard fallback when opening store links
+• UI responsiveness and stability improvements
