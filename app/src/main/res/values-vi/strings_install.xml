@@ -73,6 +73,7 @@
     <string name="install_error_suggest_shizuku_action">Thử cài bằng Shizuku</string>
     <string name="install_delete_source_failed">Đã cài đặt, nhưng không xoá được file APK. Ứng dụng chia sẻ file cho Universal Installer thường không cho phép xoá — hãy xoá trong trình quản lý file bạn đã mở nó.</string>
     <string name="install_error_miui_hint">Trên thiết bị Xiaomi, Redmi và POCO, tính năng tối ưu hóa MIUI/HyperOS thường âm thầm chặn việc cài đặt. Hãy mở Cài đặt &gt; Cài đặt bổ sung &gt; Tùy chọn nhà phát triển, tắt \"Tối ưu hóa MIUI\", cài đặt ứng dụng rồi bật lại. Khi đang tắt, giao diện hệ thống có thể bị lỗi hiển thị — khởi động lại điện thoại sẽ khắc phục.</string>
+    <string name="install_error_miui_shizuku_hint">Trên thiết bị Xiaomi/HyperOS dùng Shizuku, hãy bật \"Cài đặt qua USB\" và \"Gỡ lỗi USB (Cài đặt bảo mật)\" trong Tùy chọn nhà phát triển (cần SIM và tài khoản Mi). Nếu vẫn lỗi, hãy thử đổi Chế độ cài đặt sang Mặc định trong Cài đặt.</string>
     <string name="apk_info_vt_uploading">Đang tải lên VirusTotal… %d%%</string>
     <string name="apk_info_vt_add_key">Thêm API key</string>
     <string name="apk_info_vt_get_key">Lấy key miễn phí</string>

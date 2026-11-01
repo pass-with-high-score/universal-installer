@@ -80,4 +80,12 @@ class InstallErrorHelperTest {
         val failure = InstallFailure.Generic("INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION: commit failed")
         assertEquals("INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION", InstallErrorHelper.extractErrorCode(failure))
     }
+
+    @Test
+    fun `isMiuiSuspect flags generic incompatible failures but allows genuine ABI and SDK mismatches`() {
+        org.junit.Assert.assertTrue(InstallErrorHelper.isMiuiSuspect(InstallFailure.Incompatible("INSTALL_FAILED_INCOMPATIBLE")))
+        org.junit.Assert.assertTrue(InstallErrorHelper.isMiuiSuspect(InstallFailure.Incompatible("INSTALL_FAILED_USER_RESTRICTED")))
+        org.junit.Assert.assertFalse(InstallErrorHelper.isMiuiSuspect(InstallFailure.Incompatible("INSTALL_FAILED_CPU_ABI_INCOMPATIBLE")))
+        org.junit.Assert.assertFalse(InstallErrorHelper.isMiuiSuspect(InstallFailure.Incompatible("Requires newer SDK version 35")))
+    }
 }

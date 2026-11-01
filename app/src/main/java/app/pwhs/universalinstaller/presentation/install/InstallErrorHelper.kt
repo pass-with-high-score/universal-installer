@@ -26,10 +26,20 @@ object InstallErrorHelper {
      * history stores the plain diagnosis, not a paragraph of advice that would be replayed on
      * every history card forever.
      */
-    fun withDeviceHint(context: Context, info: ErrorInfo, failure: InstallFailure): ErrorInfo {
+    fun withDeviceHint(
+        context: Context,
+        info: ErrorInfo,
+        failure: InstallFailure,
+        isShizuku: Boolean = false,
+    ): ErrorInfo {
         if (!DeviceCompat.isXiaomi || !isMiuiSuspect(failure)) return info
+        val hintRes = if (isShizuku) {
+            R.string.install_error_miui_shizuku_hint
+        } else {
+            R.string.install_error_miui_hint
+        }
         return info.copy(
-            guidance = "${info.guidance}\n\n${context.getString(R.string.install_error_miui_hint)}",
+            guidance = "${info.guidance}\n\n${context.getString(hintRes)}",
         )
     }
 
@@ -126,14 +136,22 @@ object InstallErrorHelper {
                     ),
                 )
             }
+            "UPDATE_INCOMPATIBLE" in raw || "SIGNATURES DO NOT MATCH" in raw -> ErrorInfo(
+                title = context.getString(R.string.install_error_conflict_title),
+                guidance = context.getString(R.string.install_error_conflict_signature_guidance),
+            )
             "MISSING_FEATURE" in raw || "FEATURE" in raw -> ErrorInfo(
                 title = context.getString(R.string.install_error_incompatible_feature_title),
                 guidance = context.getString(R.string.install_error_incompatible_feature_guidance),
             )
-            else -> ErrorInfo(
-                title = context.getString(R.string.install_error_incompatible_title),
-                guidance = context.getString(R.string.install_error_incompatible_guidance),
-            )
+            else -> {
+                val baseGuidance = context.getString(R.string.install_error_incompatible_guidance)
+                val detail = message?.takeIf { it.isNotBlank() }
+                ErrorInfo(
+                    title = context.getString(R.string.install_error_incompatible_title),
+                    guidance = if (detail != null) "$baseGuidance\n($detail)" else baseGuidance,
+                )
+            }
         }
     }
 
@@ -180,7 +198,7 @@ object InstallErrorHelper {
                 "COLOROS" in upper
     }
 
-    private fun isMiuiSuspect(failure: InstallFailure): Boolean {
+    fun isMiuiSuspect(failure: InstallFailure): Boolean {
         if (isFrpFailure(failure)) return false
         val msg = failure.message.orEmpty()
         if (isIsolationViolationMessage(msg)) return true
@@ -192,8 +210,12 @@ object InstallErrorHelper {
             is InstallFailure.Blocked,
             is InstallFailure.Generic,
             -> true
+            is InstallFailure.Incompatible -> {
+                val raw = msg.uppercase()
+                !app.pwhs.universalinstaller.presentation.install.util.AbiCompatibilityHelper.isAbiErrorMessage(raw) &&
+                    "OLDER_SDK" !in raw && "NEWER SDK" !in raw && "MISSING_FEATURE" !in raw
+            }
             is InstallFailure.Conflict,
-            is InstallFailure.Incompatible,
             is InstallFailure.Invalid,
             is InstallFailure.Storage,
             is InstallFailure.Timeout,
@@ -392,125 +414,17 @@ object InstallErrorHelper {
 
     /**
      * A stable, non-localised name for a failure kind, for telemetry.
-     *
-     * Deliberately not `failure::class.simpleName`: R8 renames ackpine's classes, so release
-     * builds would report a different — and meaningless — name than debug ones. Never include
-     * `failure.message`; it carries package and file names.
      */
-    fun failureKey(failure: InstallFailure): String {
-        if (isFrpFailure(failure)) {
-            return "security_frp"
-        }
-        return when (failure) {
-            is InstallFailure.Aborted -> "aborted"
-            is InstallFailure.Blocked -> "blocked"
-            is InstallFailure.Conflict -> "conflict"
-            is InstallFailure.Incompatible -> "incompatible"
-            is InstallFailure.Invalid -> "invalid"
-            is InstallFailure.Storage -> "storage"
-            is InstallFailure.Timeout -> "timeout"
-            is InstallFailure.Exceptional -> "exceptional"
-            is InstallFailure.Generic -> "generic"
-            else -> "unknown"
-        }
-    }
-
-    private val PM_ERROR_CODE_REGEX = Regex("""\b(INSTALL_(?:PARSE_)?FAILED_[A-Z0-9_]+)\b""")
+    fun failureKey(failure: InstallFailure): String = InstallErrorClassifier.failureKey(failure)
 
     /**
-     * Extracts a standard Android PackageManager error code (e.g. INSTALL_FAILED_VERSION_DOWNGRADE,
-     * INSTALL_FAILED_INSUFFICIENT_STORAGE, INSTALL_FAILED_UPDATE_INCOMPATIBLE).
-     *
-     * Never returns file names or package names to preserve privacy.
+     * Extracts a standard Android PackageManager error code.
      */
-    fun extractErrorCode(failure: InstallFailure): String {
-        if (isFrpFailure(failure)) {
-            return "INSTALL_FAILED_SECURITY_FRP"
-        }
-        val rawMessage = failure.message.orEmpty()
-        if (app.pwhs.universalinstaller.presentation.install.util.AbiCompatibilityHelper.isAbiErrorMessage(rawMessage)) {
-            return "INSTALL_FAILED_CPU_ABI_INCOMPATIBLE"
-        }
-        if (isNoCertificatesMessage(rawMessage)) {
-            return "INSTALL_PARSE_FAILED_NO_CERTIFICATES"
-        }
-        if (isMissingSplitMessage(rawMessage)) {
-            return "INSTALL_FAILED_MISSING_SPLIT"
-        }
-        if (isSecurityMessage(rawMessage)) {
-            return "INSTALL_FAILED_SECURITY_EXCEPTION"
-        }
-        if (isIsolationViolationMessage(rawMessage)) {
-            val match = PM_ERROR_CODE_REGEX.find(rawMessage)
-            if (match != null) return match.groupValues[1]
-            return "INSTALL_FAILED_HYPEROS_ISOLATION_VIOLATION"
-        }
-        val match = PM_ERROR_CODE_REGEX.find(rawMessage)
-        if (match != null) {
-            return match.groupValues[1]
-        }
-        return when (failure) {
-            is InstallFailure.Aborted -> "INSTALL_FAILED_ABORTED"
-            is InstallFailure.Storage -> "INSTALL_FAILED_INSUFFICIENT_STORAGE"
-            is InstallFailure.Conflict -> {
-                val upper = rawMessage.uppercase()
-                if ("VERSION_DOWNGRADE" in upper) "INSTALL_FAILED_VERSION_DOWNGRADE"
-                else "INSTALL_FAILED_UPDATE_INCOMPATIBLE"
-            }
-            is InstallFailure.Invalid -> "INSTALL_FAILED_INVALID_APK"
-            is InstallFailure.Incompatible -> {
-                val upper = rawMessage.uppercase()
-                when {
-                    "CPU_ABI" in upper || "NO_MATCHING_ABIS" in upper -> "INSTALL_FAILED_CPU_ABI_INCOMPATIBLE"
-                    "OLDER_SDK" in upper -> "INSTALL_FAILED_OLDER_SDK"
-                    "NEWER_SDK" in upper -> "INSTALL_FAILED_NEWER_SDK"
-                    "FEATURE" in upper -> "INSTALL_FAILED_MISSING_FEATURE"
-                    else -> "INSTALL_FAILED_INCOMPATIBLE"
-                }
-            }
-            is InstallFailure.Blocked -> "INSTALL_FAILED_USER_RESTRICTED"
-            is InstallFailure.Timeout -> "INSTALL_FAILED_VERIFICATION_TIMEOUT"
-            is InstallFailure.Exceptional, is InstallFailure.Generic -> "INSTALL_FAILED_INTERNAL_ERROR"
-            else -> "INSTALL_FAILED_UNKNOWN"
-        }
-    }
+    fun extractErrorCode(failure: InstallFailure): String = InstallErrorClassifier.extractErrorCode(failure)
 
     /**
-     * Classifies a failure into high-level technical categories for GA4 dimension reporting:
-     * signature_mismatch, version_downgrade, insufficient_storage, corrupted_package,
-     * incompatible_device, permission_denied, os_blocked, system_aborted, verification_timeout,
-     * security_frp.
+     * Classifies a failure into high-level technical categories for GA4 dimension reporting.
      */
-    fun classifyErrorType(failure: InstallFailure, errorCode: String = extractErrorCode(failure)): String {
-        if (isFrpFailure(failure) || errorCode == "INSTALL_FAILED_SECURITY_FRP" || errorCode.equals("security_frp", ignoreCase = true)) {
-            return "security_frp"
-        }
-        val upperCode = errorCode.uppercase()
-        val rawMessage = failure.message.orEmpty().uppercase()
-        return when {
-            isIsolationViolationMessage(upperCode) || isIsolationViolationMessage(rawMessage) ->
-                "os_blocked"
-            isMissingSplitMessage(upperCode) || isMissingSplitMessage(rawMessage) ->
-                "missing_split"
-            isSecurityMessage(upperCode) || isSecurityMessage(rawMessage) ->
-                "permission_denied"
-            "SIGNATURE" in upperCode || "UPDATE_INCOMPATIBLE" in upperCode || "CERTIFICATE" in upperCode || "SIGNATURES DO NOT MATCH" in rawMessage ->
-                "signature_mismatch"
-            "DOWNGRADE" in upperCode || "VERSION_DOWNGRADE" in rawMessage ->
-                "version_downgrade"
-            "STORAGE" in upperCode || failure is InstallFailure.Storage ->
-                "insufficient_storage"
-            "PARSE" in upperCode || "INVALID_APK" in upperCode || "BAD_MANIFEST" in upperCode || failure is InstallFailure.Invalid ->
-                "corrupted_package"
-            "ABI" in upperCode || "SDK" in upperCode || "FEATURE" in upperCode || failure is InstallFailure.Incompatible ->
-                "incompatible_device"
-            "RESTRICTED" in upperCode || "PERMISSION" in upperCode || failure is InstallFailure.Blocked ->
-                "permission_denied"
-            "ABORTED" in upperCode || failure is InstallFailure.Aborted ->
-                "system_aborted"
-            "TIMEOUT" in upperCode || failure is InstallFailure.Timeout ->
-                "verification_timeout"
-            else -> "os_blocked"
-        }
-    }
+    fun classifyErrorType(failure: InstallFailure, errorCode: String = extractErrorCode(failure)): String =
+        InstallErrorClassifier.classifyErrorType(failure, errorCode)
 }

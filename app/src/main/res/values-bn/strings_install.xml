@@ -193,6 +193,7 @@
     <string name="install_error_unknown_guidance_short">একটি অজানা ত্রুটি ঘটেছে।</string>
     <string name="install_delete_source_failed">ইনস্টল করা হয়েছে, কিন্তু APK ফাইলটি মুছে ফেলা যায়নি। যে অ্যাপগুলো Universal Installer-এর সাথে ফাইল শেয়ার করে সেগুলো প্রায়শই এটি মুছে ফেলার অনুমতি দেয় না — যে ফাইল ম্যানেজার থেকে এটি খুলেছেন সেখান থেকে সরান।</string>
     <string name="install_error_miui_hint">Xiaomi, Redmi এবং POCO ডিভাইসে, MIUI/HyperOS অপ্টিমাইজেশন প্রায়শই কোনো বার্তা ছাড়াই ইনস্টলেশন ব্লক করে। সেটিংস &gt; অতিরিক্ত সেটিংস &gt; ডেভেলপার বিকল্প খুলুন, \"MIUI অপ্টিমাইজেশন\" বন্ধ করুন, অ্যাপটি ইনস্টল করুন, তারপর আবার চালু করুন। বন্ধ থাকা অবস্থায় সিস্টেম থিম বিকৃত দেখাতে পারে — ফোন রিস্টার্ট করলে ঠিক হয়ে যাবে।</string>
+    <string name="install_error_miui_shizuku_hint">Shizuku সহ Xiaomi/HyperOS ডিভাইসে, ডেভেলপার বিকল্পে \"USB এর মাধ্যমে ইনস্টল\" এবং \"USB ডিবাগিং (নিরাপত্তা সেটিংস)\" চালু করুন (সিম এবং Mi অ্যাকাউন্ট প্রয়োজন)। সমস্যা অব্যাহত থাকলে, সেটিংসে ইনস্টলার মোড ডিফল্টে পরিবর্তন করার চেষ্টা করুন।</string>
     <string name="dialog_install_btn">ইনস্টল</string>
     <string name="dialog_update_btn">আপডেট</string>
     <string name="dialog_downgrade_btn">ডাউনগ্রেড</string>

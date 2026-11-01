@@ -255,6 +255,7 @@
     <string name="install_error_suggest_shizuku_action">Try with Shizuku</string>
     <string name="install_delete_source_failed">Installed, but the APK file could not be deleted. Apps that share a file with Universal Installer often do not allow deleting it — remove it from the file manager you opened it with.</string>
     <string name="install_error_miui_hint">On Xiaomi, Redmi and POCO devices, MIUI/HyperOS optimization often blocks installs silently. Open Settings &gt; Additional settings &gt; Developer options, turn off \&quot;MIUI optimization\&quot;, install the app, then turn it back on. While it is off the system theme may look distorted — restarting the phone fixes that.</string>
+    <string name="install_error_miui_shizuku_hint">On Xiaomi/HyperOS devices with Shizuku, enable \"Install via USB\" and \"USB debugging (Security settings)\" in Developer options (requires SIM and Mi Account). If issues persist, try switching Installer Mode to Default in Settings.</string>
     <string name="dialog_install_btn">Install</string>
     <string name="dialog_update_btn">Update</string>
     <string name="dialog_downgrade_btn">Downgrade</string>

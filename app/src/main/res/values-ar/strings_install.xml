@@ -267,6 +267,7 @@
     <string name="install_error_conflict_signature_guidance">التطبيق المثبَّت موقَّع بمفتاح مختلف، لذا لن يتعامل Android مع هذا الملف كتحديث. ألغِ تثبيت التطبيق الحالي أولًا — وستُفقد بياناته. ولا يمكن لأي خيار في المثبِّت تجاوز ذلك.</string>
     <string name="install_delete_source_failed">تم التثبيت، لكن تعذّر حذف ملف APK. التطبيقات التي تشارك ملفًا مع Universal Installer غالبًا لا تسمح بحذفه — احذفه من مدير الملفات الذي فتحته منه.</string>
     <string name="install_error_miui_hint">على أجهزة Xiaomi وRedmi وPOCO، غالبًا ما يمنع تحسين MIUI/HyperOS عمليات التثبيت بصمت. افتح الإعدادات &gt; إعدادات إضافية &gt; خيارات المطور، وأوقف «تحسين MIUI»، ثم ثبّت التطبيق وأعد تفعيله بعد ذلك. وأثناء إيقافه قد يبدو مظهر النظام مشوَّهًا — وإعادة تشغيل الهاتف تصلح ذلك.</string>
+    <string name="install_error_miui_shizuku_hint">على أجهزة Xiaomi/HyperOS التي تستخدم Shizuku، فعّل «التثبيت عبر USB» و«تصحيح أخطاء USB (إعدادات الأمان)» في خيارات المطور (يتطلب شريحة SIM وحساب Mi). إذا استمرت المشكلة، فجرّب تبديل وضع المثبت إلى الافتراضي في الإعدادات.</string>
     <string name="dialog_risk_signature_mismatch">التطبيق المثبَّت موقَّع بمفتاح مختلف. لن يقبل Android هذا الملف كتحديث — يجب إلغاء تثبيت التطبيق الحالي أولًا، وستُفقد بياناته.</string>
     <string name="dialog_risk_action_uninstall_existing">إلغاء تثبيت التطبيق الحالي</string>
     <string name="dialog_risk_action_view_report">عرض تقرير VirusTotal</string>

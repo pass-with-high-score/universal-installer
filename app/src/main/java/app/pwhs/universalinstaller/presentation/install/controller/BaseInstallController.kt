@@ -330,7 +330,9 @@ abstract class BaseInstallController(
                         )
                         // Device-specific workarounds go to the live error only — history keeps
                         // the plain diagnosis.
-                        val shown = InstallErrorHelper.withDeviceHint(context, errorInfo, result.failure)
+                        val shown = InstallErrorHelper.withDeviceHint(
+                            context, errorInfo, result.failure, telemetryMethod.equals("shizuku", true)
+                        )
                         handleError("${shown.title}\n${shown.guidance}", session.id)
                         activeSessions.remove(session.id)
                         sessionUris.remove(session.id)

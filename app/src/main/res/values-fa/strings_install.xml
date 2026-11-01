@@ -210,6 +210,7 @@
     <string name="install_error_suggest_shizuku_action">تلاش با Shizuku</string>
     <string name="install_delete_source_failed">نصب شد، اما فایل APK حذف نشد. برنامه‌هایی که فایلی را با Universal Installer به اشتراک می‌گذارند اغلب اجازه حذف آن را نمی‌دهند — آن را از برنامه مدیریت فایلی که با آن باز کرده‌اید حذف کنید.</string>
     <string name="install_error_miui_hint">در دستگاه‌های شیائومی، ردمی و پوکو، بهینه‌سازی MIUI/HyperOS اغلب نصب‌ها را بدون صدا مسدود می‌کند. به تنظیمات &gt; تنظیمات بیشتر &gt; گزینه‌های توسعه‌دهنده بروید، \"MIUI optimization\" را خاموش کنید، برنامه را نصب کنید و سپس دوباره آن را روشن کنید. هنگام خاموش بودن ممکن است پوسته سیستم نامرتب به نظر برسد — راه‌اندازی مجدد گوشی آن را رفع می‌کند.</string>
+    <string name="install_error_miui_shizuku_hint">در دستگاه‌های Xiaomi/HyperOS با Shizuku، «نصب از طریق USB» و «اشکال‌زدایی USB (تنظیمات امنیتی)» را در گزینه‌های توسعه‌دهنده روشن کنید (نیازمند سیم‌کارت و حساب Mi است). اگر مشکل برطرف نشد، حالت نصب‌کننده را در تنظیمات روی پیش‌فرض قرار دهید.</string>
     <string name="dialog_install_btn">نصب</string>
     <string name="dialog_update_btn">به‌روزرسانی</string>
     <string name="dialog_downgrade_btn">برگشت به نسخه قبل</string>

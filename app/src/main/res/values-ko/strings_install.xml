@@ -267,6 +267,7 @@
     <string name="install_error_conflict_signature_guidance">설치된 앱이 다른 키로 서명되어 있어 Android가 이 파일을 업데이트로 인식하지 않습니다. 기존 앱을 먼저 제거하세요 — 데이터는 사라집니다. 어떤 설치 옵션으로도 우회할 수 없습니다.</string>
     <string name="install_delete_source_failed">설치는 됐지만 APK 파일을 삭제하지 못했습니다. Universal Installer에 파일을 공유하는 앱은 삭제를 허용하지 않는 경우가 많습니다 — 파일을 연 파일 관리자에서 직접 삭제하세요.</string>
     <string name="install_error_miui_hint">Xiaomi, Redmi, POCO 기기에서는 MIUI/HyperOS 최적화가 아무 안내 없이 설치를 막는 경우가 많습니다. 설정 &gt; 추가 설정 &gt; 개발자 옵션을 열어 ‘MIUI 최적화’를 끄고 앱을 설치한 뒤 다시 켜세요. 꺼져 있는 동안에는 시스템 테마가 깨져 보일 수 있는데, 휴대폰을 재부팅하면 정상으로 돌아옵니다.</string>
+    <string name="install_error_miui_shizuku_hint">Shizuku를 사용하는 Xiaomi/HyperOS 기기에서는 개발자 옵션에서 \'USB를 통해 설치\'와 \'USB 디버깅(보안 설정)\'을 켜세요(SIM 카드와 Mi 계정 필요). 문제가 지속되면 설정에서 설치 모드를 \'기본\'으로 변경해 보세요.</string>
     <string name="dialog_risk_signature_mismatch">설치된 앱이 다른 키로 서명되어 있습니다. Android는 이 파일을 업데이트로 받아들이지 않습니다 — 기존 앱을 먼저 제거해야 하며 그 데이터는 사라집니다.</string>
     <string name="dialog_risk_action_uninstall_existing">기존 앱 제거</string>
     <string name="dialog_risk_action_view_report">VirusTotal 보고서 보기</string>

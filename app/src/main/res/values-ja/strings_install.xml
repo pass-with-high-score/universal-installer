@@ -267,6 +267,7 @@
     <string name="install_error_conflict_signature_guidance">インストール済みアプリは別の鍵で署名されているため、Android はこのファイルを更新として扱いません。先に既存のアプリをアンインストールしてください — そのデータは失われます。どのインストーラーオプションでも回避できません。</string>
     <string name="install_delete_source_failed">インストールは完了しましたが、APK ファイルを削除できませんでした。Universal Installer にファイルを渡すアプリは削除を許可しないことが多いため、開いたときに使ったファイルマネージャーから削除してください。</string>
     <string name="install_error_miui_hint">Xiaomi・Redmi・POCO の端末では、MIUI/HyperOS の最適化が何も表示せずインストールをブロックすることがよくあります。設定 &gt; その他の設定 &gt; 開発者向けオプション を開き、「MIUI 最適化」をオフにしてアプリをインストールし、その後オンに戻してください。オフの間はシステムのテーマが崩れて見えることがありますが、端末を再起動すれば直ります。</string>
+    <string name="install_error_miui_shizuku_hint">Shizuku を使用する Xiaomi/HyperOS 端末では、開発者向けオプションで「USB 経由でインストール」および「USB デバッグ (セキュリティ設定)」を有効にしてください (SIM と Mi アカウントが必要です)。問題が解決しない場合は、設定でインストーラーモードを「デフォルト」に切り替えてみてください。</string>
     <string name="dialog_risk_signature_mismatch">インストール済みアプリは別の鍵で署名されています。Android はこのファイルを更新として受け付けません — 既存のアプリを先にアンインストールする必要があり、そのデータは失われます。</string>
     <string name="dialog_risk_action_uninstall_existing">既存のアプリをアンインストール</string>
     <string name="dialog_risk_action_view_report">VirusTotal のレポートを表示</string>

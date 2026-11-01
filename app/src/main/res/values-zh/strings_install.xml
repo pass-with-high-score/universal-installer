@@ -53,6 +53,7 @@
     <string name="install_error_unknown_guidance_short">发生未知错误。</string>
     <string name="install_delete_source_failed">已安装，但无法删除 APK 文件。将文件分享给Universal Installer的应用通常不允许删除该文件 — 请在您打开它的文件管理器中删除。</string>
     <string name="install_error_miui_hint">在小米、红米和 POCO 设备上，MIUI/HyperOS 优化经常会静默阻止安装。请打开设置 &gt; 更多设置 &gt; 开发者选项，关闭\"MIUI 优化\"，安装应用后再重新打开。关闭期间系统主题可能显示异常，重启手机即可恢复。</string>
+    <string name="install_error_miui_shizuku_hint">在配合 Shizuku 使用的小米/HyperOS 设备上，请在开发者选项中开启“通过 USB 安装”和“USB 调试（安全设置）”（需要插入 SIM 卡并登录小米账号）。如果仍失败，请尝试在设置中将安装模式切换为“默认”。</string>
     <string name="apk_info_vt_uploading">正在上传至 VirusTotal… %d%%</string>
     <string name="apk_info_vt_add_key">添加 API 密钥</string>
     <string name="apk_info_vt_get_key">获取免费密钥</string>
