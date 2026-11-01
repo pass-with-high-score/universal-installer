@@ -71,6 +71,7 @@ class InstallViewModel(
     private val backendFactory: InstallerBackendFactory,
     private val packageUninstaller: PackageUninstaller,
     private val appScope: CoroutineScope,
+    private val installNotifier: InstallProgressNotifier,
 ) : ViewModel() {
 
     private val defaultController = DefaultInstallController(
@@ -100,10 +101,13 @@ class InstallViewModel(
     private val obbDelegate = InstallObbDelegate(application, viewModelScope)
     private val batchDelegate = InstallBatchDelegate(
         application = application,
-        scope = viewModelScope,
+        scope = appScope,
         backendFactory = backendFactory,
         resolveController = { activeController(it) },
         onStorageInsufficient = { showStorageWarning(it) },
+        onSessionTracked = { id, pkg, app, icon ->
+            installNotifier.track(id, pkg, app, icon)
+        },
     )
 
     private val parseDelegate = InstallParseDelegate(
@@ -372,7 +376,7 @@ class InstallViewModel(
         dialogDelegate.resetRetry()
         _installError.value = null
 
-        val installScope = if (trackDialogTarget) appScope else viewModelScope
+        val installScope = appScope
         installScope.launch {
             InstallExecutionCoordinator.executeSingleInstall(
                 application = application,
@@ -394,6 +398,9 @@ class InstallViewModel(
                 onDialogTargetCreated = { dialogDelegate.setTarget(it) },
                 onCopyObbs = { src, obbs, attached, pkg, name ->
                     obbDelegate.copyObbFiles(src, obbs, attached, pkg, name)
+                },
+                onSessionTracked = { id, pkg, app, icon ->
+                    installNotifier.track(id, pkg, app, icon)
                 },
                 onStarted = {
                     if (!trackDialogTarget) {

@@ -1,7 +1,15 @@
 package app.pwhs.universalinstaller.presentation.stats.components
 
 import android.text.format.Formatter
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,11 +47,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -54,6 +67,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.stats.MilestoneCategory
 import app.pwhs.universalinstaller.domain.stats.MilestoneId
 import app.pwhs.universalinstaller.domain.stats.MilestoneProgress
+import kotlin.math.roundToLong
 
 @Composable
 fun MilestoneCategoryFilterRow(
@@ -89,17 +103,37 @@ fun MilestoneItemCard(
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
+
+    var entered by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { entered = true }
+
     val animatedProgress by animateFloatAsState(
-        targetValue = item.progressFraction,
+        targetValue = if (entered) item.progressFraction else 0f,
+        animationSpec = tween(durationMillis = 750, easing = FastOutSlowInEasing),
         label = "milestone_${item.id.name}",
     )
 
+    val iconPopScale by animateFloatAsState(
+        targetValue = if (entered) 1f else 0.6f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "iconPop_${item.id.name}",
+    )
+
+    val displayedCurrent = (item.currentValue.coerceAtMost(item.targetValue) *
+        (if (entered) 1f else 0f)).roundToLong()
+
     val progressText = if (item.id.isBytes) {
-        val currentFmt = Formatter.formatFileSize(context, item.currentValue.coerceAtMost(item.targetValue))
+        val currentFmt = Formatter.formatFileSize(
+            context,
+            (item.targetValue * animatedProgress).roundToLong(),
+        )
         val targetFmt = Formatter.formatFileSize(context, item.targetValue)
         "$currentFmt / $targetFmt"
     } else {
-        "${item.currentValue.coerceAtMost(item.targetValue)} / ${item.targetValue}"
+        "${(item.targetValue * animatedProgress).roundToLong().coerceAtMost(displayedCurrent)} / ${item.targetValue}"
     }
 
     ElevatedCard(
@@ -122,7 +156,12 @@ fun MilestoneItemCard(
             Surface(
                 shape = CircleShape,
                 color = if (item.isUnlocked) colors.primary else colors.surfaceContainerHighest,
-                modifier = Modifier.size(46.dp),
+                modifier = Modifier
+                    .size(46.dp)
+                    .graphicsLayer {
+                        scaleX = iconPopScale
+                        scaleY = iconPopScale
+                    },
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
@@ -149,9 +188,23 @@ fun MilestoneItemCard(
                         modifier = Modifier.weight(1f, fill = false),
                     )
                     if (item.isNewlyUnlocked) {
+                        val pulseTransition = rememberInfiniteTransition(label = "newBadgePulse")
+                        val newBadgeScale by pulseTransition.animateFloat(
+                            initialValue = 1f,
+                            targetValue = 1.12f,
+                            animationSpec = infiniteRepeatable(
+                                animation = tween(650, easing = FastOutSlowInEasing),
+                                repeatMode = RepeatMode.Reverse,
+                            ),
+                            label = "newBadgeScale",
+                        )
                         Surface(
                             shape = RoundedCornerShape(6.dp),
                             color = colors.tertiary,
+                            modifier = Modifier.graphicsLayer {
+                                scaleX = newBadgeScale
+                                scaleY = newBadgeScale
+                            },
                         ) {
                             Text(
                                 text = stringResource(R.string.milestone_badge_new),

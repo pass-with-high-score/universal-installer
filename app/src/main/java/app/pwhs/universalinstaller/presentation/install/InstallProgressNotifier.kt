@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller.presentation.install
 
 import android.Manifest
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -14,6 +15,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
+import app.pwhs.universalinstaller.presentation.install.service.InstallProgressService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -84,6 +86,7 @@ class InstallProgressNotifier(
         val entry = TrackedInstall(sessionId, packageName, appName, iconPath)
         tracked[sessionId] = entry
         ensureObserverRunning()
+        InstallProgressService.start(context)
         refreshProgressNotification()
 
         scope.launch {
@@ -99,6 +102,7 @@ class InstallProgressNotifier(
     fun untrack(sessionId: UUID) {
         if (tracked.remove(sessionId) == null) return
         if (tracked.isEmpty()) {
+            InstallProgressService.stop(context)
             nm.cancel(NOTIF_ID_PROGRESS)
             observerJob?.cancel()
             observerJob = null
@@ -157,19 +161,17 @@ class InstallProgressNotifier(
         if (tracked.remove(entry.sessionId) == null) return
         postResultNotification(entry, success, errorText)
         if (tracked.isEmpty()) {
+            InstallProgressService.stop(context)
             nm.cancel(NOTIF_ID_PROGRESS)
             observerJob?.cancel()
             observerJob = null
         }
     }
 
-    private fun refreshProgressNotification() {
-        if (!canPost()) return
+    fun buildProgressNotification(): Notification? {
+        ensureChannel()
         val active = tracked.values.toList()
-        if (active.isEmpty()) {
-            nm.cancel(NOTIF_ID_PROGRESS)
-            return
-        }
+        if (active.isEmpty()) return null
         val newest = active.last()
         val args = if (active.size == 1) {
             val a = active.first()
@@ -203,7 +205,18 @@ class InstallProgressNotifier(
             .setProgress(args.max, args.progress, args.indeterminate)
             .setContentIntent(buildOpenAppIntent(newest.sessionId))
         loadIconBitmap(newest.iconPath)?.let { builder.setLargeIcon(it) }
-        nm.notify(NOTIF_ID_PROGRESS, builder.build())
+        return builder.build()
+    }
+
+    private fun refreshProgressNotification() {
+        if (!canPost()) return
+        val notification = buildProgressNotification()
+        if (notification == null) {
+            nm.cancel(NOTIF_ID_PROGRESS)
+            InstallProgressService.stop(context)
+            return
+        }
+        nm.notify(NOTIF_ID_PROGRESS, notification)
     }
 
     private fun postResultNotification(entry: TrackedInstall, success: Boolean, errorText: String?) {
@@ -304,7 +317,7 @@ class InstallProgressNotifier(
 
     companion object {
         private const val CHANNEL_ID = "install_progress"
-        private const val NOTIF_ID_PROGRESS = 5000
+        const val NOTIF_ID_PROGRESS = 5000
         /** If a tracked session never appears in the repo within this window, clean it up. */
         private const val STALE_TIMEOUT_MS = 30_000L
         private val resultIdSeq = AtomicInteger(5001)

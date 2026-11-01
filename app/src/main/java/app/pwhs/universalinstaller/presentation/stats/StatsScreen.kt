@@ -1,10 +1,11 @@
-@file:OptIn(androidx.compose.material3.ExperimentalMaterial3Api::class)
+@file:OptIn(
+    androidx.compose.material3.ExperimentalMaterial3Api::class,
+    androidx.compose.foundation.ExperimentalFoundationApi::class,
+)
 package app.pwhs.universalinstaller.presentation.stats
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -32,10 +33,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.stats.components.ActivityTimelineCard
@@ -91,11 +92,18 @@ fun StatsScreen(
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             item(key = "rank_banner") {
-                UserRankBannerCard(summary = summary)
+                UserRankBannerCard(
+                    summary = summary,
+                    modifier = Modifier.animateItem(),
+                )
             }
 
             item(key = "tab_selector") {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                SingleChoiceSegmentedButtonRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .animateItem(),
+                ) {
                     SegmentedButton(
                         selected = activeTab == 0,
                         onClick = { activeTab = 0 },
@@ -108,7 +116,11 @@ fun StatsScreen(
                             )
                         },
                     ) {
-                        Text(stringResource(R.string.stats_tab_overview))
+                        Text(
+                            text = stringResource(R.string.stats_tab_overview),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
                     }
                     SegmentedButton(
                         selected = activeTab == 1,
@@ -124,6 +136,8 @@ fun StatsScreen(
                     ) {
                         Text(
                             text = "${stringResource(R.string.stats_tab_milestones)} (${summary.unlockedCount}/${summary.totalMilestones})",
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
@@ -131,24 +145,37 @@ fun StatsScreen(
 
             if (activeTab == 0) {
                 item(key = "install_uninstall_card") {
-                    InstallUninstallOverviewCard(summary = summary)
+                    InstallUninstallOverviewCard(
+                        summary = summary,
+                        modifier = Modifier.animateItem(),
+                    )
                 }
                 item(key = "storage_formats_card") {
-                    StorageFormatsCard(summary = summary)
+                    StorageFormatsCard(
+                        summary = summary,
+                        modifier = Modifier.animateItem(),
+                    )
                 }
                 item(key = "modes_security_card") {
-                    ModesAndSecurityCard(summary = summary)
+                    ModesAndSecurityCard(
+                        summary = summary,
+                        modifier = Modifier.animateItem(),
+                    )
                 }
                 item(key = "activity_timeline_card") {
                     ActivityTimelineCard(
                         summary = summary,
                         selectedDays = selectedDays,
                         onSelectDays = viewModel::selectPeriodDays,
+                        modifier = Modifier.animateItem(),
                     )
                 }
                 if (summary.topUpdatedApps.isNotEmpty()) {
                     item(key = "top_apps_card") {
-                        TopInstalledAppsCard(topApps = summary.topUpdatedApps)
+                        TopInstalledAppsCard(
+                            topApps = summary.topUpdatedApps,
+                            modifier = Modifier.animateItem(),
+                        )
                     }
                 }
             } else {
@@ -156,6 +183,7 @@ fun StatsScreen(
                     MilestoneCategoryFilterRow(
                         selectedCategory = selectedCategory,
                         onSelectCategory = viewModel::selectCategory,
+                        modifier = Modifier.animateItem(),
                     )
                 }
 
@@ -171,7 +199,10 @@ fun StatsScreen(
                     items = filteredMilestones,
                     key = { "milestone_${it.id.name}" },
                 ) { milestone ->
-                    MilestoneItemCard(item = milestone)
+                    MilestoneItemCard(
+                        item = milestone,
+                        modifier = Modifier.animateItem(),
+                    )
                 }
             }
 

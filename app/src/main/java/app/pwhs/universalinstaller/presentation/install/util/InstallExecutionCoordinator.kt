@@ -50,6 +50,7 @@ object InstallExecutionCoordinator {
         resolveActiveController: suspend (String?) -> BaseInstallController,
         onDialogTargetCreated: (DialogTarget) -> Unit,
         onCopyObbs: suspend (Uri?, List<ObbEntry>, List<AttachedObb>, String, String) -> Unit,
+        onSessionTracked: ((UUID, String, String, String?) -> Unit)? = null,
         onStarted: (() -> Unit)? = null,
         onAbort: (() -> Unit)? = null,
         onFailed: ((String) -> Unit)? = null,
@@ -161,11 +162,11 @@ object InstallExecutionCoordinator {
                 sessionData = sessionData,
                 userId = targetedUserId,
                 backend = targetedBackend,
-                scope = if (trackDialogTarget) appScope else scope,
+                scope = appScope,
                 originalUri = originalUri,
                 deleteAfterInstall = deleteAfterInstall,
-                onSessionCreated = if (trackDialogTarget) {
-                    { realId ->
+                onSessionCreated = { realId ->
+                    if (trackDialogTarget) {
                         onDialogTargetCreated(
                             DialogTarget(
                                 sessionId = realId,
@@ -177,7 +178,8 @@ object InstallExecutionCoordinator {
                             )
                         )
                     }
-                } else null,
+                    onSessionTracked?.invoke(realId, pkgForTarget, nameForTarget, iconPath)
+                },
             )
         } else {
             InstallSessionManager.writeProfileFlags(application, profile)
@@ -185,14 +187,14 @@ object InstallExecutionCoordinator {
             controller.install(
                 uris = uris,
                 sessionData = sessionData,
-                scope = if (trackDialogTarget) appScope else scope,
+                scope = appScope,
                 context = application,
                 originalUri = originalUri,
                 deleteAfterInstall = deleteAfterInstall,
                 allowDowngrade = apkInfo?.let { isDowngrade(it) } ?: false,
                 onSuccess = onSuccess,
-                onSessionCreated = if (trackDialogTarget) {
-                    { realId ->
+                onSessionCreated = { realId ->
+                    if (trackDialogTarget) {
                         onDialogTargetCreated(
                             DialogTarget(
                                 sessionId = realId,
@@ -204,7 +206,8 @@ object InstallExecutionCoordinator {
                             )
                         )
                     }
-                } else null,
+                    onSessionTracked?.invoke(realId, pkgForTarget, nameForTarget, iconPath)
+                },
             )
         }
     }
@@ -216,6 +219,7 @@ object InstallExecutionCoordinator {
         currentProfileId: String?,
         backendFactory: InstallerBackendFactory? = null,
         resolveActiveController: suspend (String?) -> BaseInstallController,
+        onSessionTracked: ((UUID, String, String, String?) -> Unit)? = null,
     ) {
         if (picked.isEmpty()) return
         Telemetry.feature(TelemetryEvents.FEATURE_BATCH_INSTALL)
@@ -269,6 +273,8 @@ object InstallExecutionCoordinator {
                 }
             } else null
 
+            val pkgName = entry.apkInfo.packageName
+            val appLabel = entry.apkInfo.appName.ifBlank { entry.fileName }
             controller.install(
                 uris = entry.splitUris,
                 sessionData = sessionData,
@@ -278,6 +284,9 @@ object InstallExecutionCoordinator {
                 deleteAfterInstall = deleteAfterInstall,
                 allowDowngrade = isDowngrade(entry.apkInfo),
                 onSuccess = batchOnSuccess,
+                onSessionCreated = { id ->
+                    onSessionTracked?.invoke(id, pkgName, appLabel, iconPath)
+                },
             )
         }
     }

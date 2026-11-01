@@ -1,6 +1,9 @@
 package app.pwhs.universalinstaller.presentation.stats.components
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -27,8 +30,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -44,12 +53,29 @@ fun MilestoneUnlockBanner(
 ) {
     AnimatedVisibility(
         visible = milestone != null,
-        enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
+        enter = slideInVertically(
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMediumLow,
+            ),
+            initialOffsetY = { it },
+        ) + fadeIn(),
         exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
         modifier = modifier,
     ) {
         val current = milestone ?: return@AnimatedVisibility
         val colors = MaterialTheme.colorScheme
+
+        var popped by remember(current) { mutableStateOf(false) }
+        LaunchedEffect(current) { popped = true }
+        val badgeScale by animateFloatAsState(
+            targetValue = if (popped) 1f else 0.4f,
+            animationSpec = spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessMedium,
+            ),
+            label = "bannerIconPop",
+        )
 
         ElevatedCard(
             modifier = Modifier
@@ -71,7 +97,12 @@ fun MilestoneUnlockBanner(
                 Surface(
                     shape = CircleShape,
                     color = colors.tertiary,
-                    modifier = Modifier.size(42.dp),
+                    modifier = Modifier
+                        .size(42.dp)
+                        .graphicsLayer {
+                            scaleX = badgeScale
+                            scaleY = badgeScale
+                        },
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(

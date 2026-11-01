@@ -416,6 +416,11 @@
             android:foregroundServiceType="dataSync" />
 
         <service
+            android:name=".presentation.install.service.InstallProgressService"
+            android:exported="false"
+            android:foregroundServiceType="dataSync" />
+
+        <service
             android:name=".presentation.sync.SyncTileService"
             android:exported="true"
             android:icon="@drawable/ic_qs_sync"

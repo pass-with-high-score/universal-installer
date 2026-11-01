@@ -1,6 +1,15 @@
 package app.pwhs.universalinstaller.presentation.stats.components
 
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,12 +36,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -41,6 +55,30 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.stats.UserStatsSummary
+
+@Composable
+internal fun rememberCountUpInt(target: Int, durationMillis: Int = 750): Int {
+    var entered by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { entered = true }
+    val animated by animateIntAsState(
+        targetValue = if (entered) target else 0,
+        animationSpec = tween(durationMillis = durationMillis, easing = FastOutSlowInEasing),
+        label = "countUpInt",
+    )
+    return animated
+}
+
+@Composable
+internal fun rememberGrowFloat(target: Float, durationMillis: Int = 800): Float {
+    var entered by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { entered = true }
+    val animated by animateFloatAsState(
+        targetValue = if (entered) target else 0f,
+        animationSpec = tween(durationMillis = durationMillis, easing = FastOutSlowInEasing),
+        label = "growFloat",
+    )
+    return animated
+}
 
 @Composable
 fun UserRankBannerCard(
@@ -53,7 +91,19 @@ fun UserRankBannerCard(
     } else {
         0f
     }
-    val animatedProgress by animateFloatAsState(targetValue = progressTarget, label = "rankProgress")
+    val animatedProgress = rememberGrowFloat(target = progressTarget, durationMillis = 900)
+    val animatedUnlocked = rememberCountUpInt(target = summary.unlockedCount, durationMillis = 700)
+
+    val infiniteTransition = rememberInfiniteTransition(label = "rankPulse")
+    val badgeScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.07f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1600, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse,
+        ),
+        label = "rankBadgeScale",
+    )
 
     ElevatedCard(
         modifier = modifier.fillMaxWidth(),
@@ -74,7 +124,12 @@ fun UserRankBannerCard(
                 Surface(
                     shape = CircleShape,
                     color = colors.primary,
-                    modifier = Modifier.size(52.dp),
+                    modifier = Modifier
+                        .size(52.dp)
+                        .graphicsLayer {
+                            scaleX = badgeScale
+                            scaleY = badgeScale
+                        },
                 ) {
                     Box(contentAlignment = Alignment.Center) {
                         Icon(
@@ -108,6 +163,32 @@ fun UserRankBannerCard(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(
+                        R.string.stats_next_rank_progress,
+                        animatedUnlocked,
+                        summary.totalMilestones,
+                    ),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = colors.onPrimaryContainer,
+                )
+                val pct = (animatedProgress * 100).toInt()
+                Text(
+                    text = "$pct%",
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = colors.onPrimaryContainer,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(6.dp))
+
             LinearProgressIndicator(
                 progress = { animatedProgress },
                 modifier = Modifier
@@ -121,37 +202,23 @@ fun UserRankBannerCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = stringResource(
-                        R.string.stats_next_rank_progress,
-                        summary.unlockedCount,
-                        summary.totalMilestones,
-                    ),
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.SemiBold,
-                    color = colors.onPrimaryContainer,
-                )
-                val nextRank = summary.nextRank
-                Text(
-                    text = if (nextRank != null) {
-                        val needed = (nextRank.minUnlockedMilestones - summary.unlockedCount).coerceAtLeast(1)
-                        stringResource(
-                            R.string.stats_next_rank_hint,
-                            needed,
-                            stringResource(nextRank.titleRes),
-                        )
-                    } else {
-                        stringResource(R.string.stats_max_rank_reached)
-                    },
-                    style = MaterialTheme.typography.labelSmall,
-                    color = colors.onPrimaryContainer.copy(alpha = 0.8f),
-                )
-            }
+            val nextRank = summary.nextRank
+            Text(
+                text = if (nextRank != null) {
+                    val needed = (nextRank.minUnlockedMilestones - summary.unlockedCount).coerceAtLeast(1)
+                    stringResource(
+                        R.string.stats_next_rank_hint,
+                        needed,
+                        stringResource(nextRank.titleRes),
+                    )
+                } else {
+                    stringResource(R.string.stats_max_rank_reached)
+                },
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.onPrimaryContainer.copy(alpha = 0.85f),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+            )
         }
     }
 }
@@ -162,6 +229,14 @@ fun InstallUninstallOverviewCard(
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
+    val animInstalled = rememberCountUpInt(summary.totalSuccessInstalls)
+    val animRate = rememberCountUpInt(summary.successRatePercent)
+    val animUninstalled = rememberCountUpInt(summary.totalUninstalls)
+    val animNew = rememberCountUpInt(summary.newInstallCount)
+    val animUpdate = rememberCountUpInt(summary.updateCount)
+    val animDowngrade = rememberCountUpInt(summary.downgradeCount)
+    val animFailed = rememberCountUpInt(summary.totalFailedInstalls)
+
     StatsSectionCard(
         title = stringResource(R.string.stats_section_install_uninstall),
         icon = Icons.Rounded.InstallMobile,
@@ -175,7 +250,7 @@ fun InstallUninstallOverviewCard(
         ) {
             HighlightMetricBox(
                 label = stringResource(R.string.stats_total_installed),
-                value = summary.totalSuccessInstalls.toString(),
+                value = animInstalled.toString(),
                 accentColor = colors.primary,
                 modifier = Modifier
                     .weight(1f)
@@ -183,7 +258,7 @@ fun InstallUninstallOverviewCard(
             )
             HighlightMetricBox(
                 label = stringResource(R.string.stats_success_rate),
-                value = "${summary.successRatePercent}%",
+                value = "$animRate%",
                 accentColor = colors.tertiary,
                 modifier = Modifier
                     .weight(1f)
@@ -191,7 +266,7 @@ fun InstallUninstallOverviewCard(
             )
             HighlightMetricBox(
                 label = stringResource(R.string.stats_total_uninstalled),
-                value = summary.totalUninstalls.toString(),
+                value = animUninstalled.toString(),
                 accentColor = colors.secondary,
                 modifier = Modifier
                     .weight(1f)
@@ -211,28 +286,28 @@ fun InstallUninstallOverviewCard(
         ) {
             MiniStatPill(
                 label = stringResource(R.string.stats_op_new),
-                value = summary.newInstallCount.toString(),
+                value = animNew.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_op_update),
-                value = summary.updateCount.toString(),
+                value = animUpdate.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_op_downgrade),
-                value = summary.downgradeCount.toString(),
+                value = animDowngrade.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_failed_installs),
-                value = summary.totalFailedInstalls.toString(),
+                value = animFailed.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
@@ -250,8 +325,30 @@ fun StatsSectionCard(
     content: @Composable () -> Unit,
 ) {
     val colors = MaterialTheme.colorScheme
+    var appeared by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { appeared = true }
+    val scale by animateFloatAsState(
+        targetValue = if (appeared) 1f else 0.96f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioLowBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "cardScale",
+    )
+    val alpha by animateFloatAsState(
+        targetValue = if (appeared) 1f else 0f,
+        animationSpec = tween(durationMillis = 350),
+        label = "cardAlpha",
+    )
+
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+                this.alpha = alpha
+            },
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = colors.surfaceContainerLow,

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.UUID
 
 class InstallBatchDelegate(
     private val application: Application,
@@ -21,6 +22,7 @@ class InstallBatchDelegate(
     private val backendFactory: app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory? = null,
     private val resolveController: suspend (String?) -> BaseInstallController,
     private val onStorageInsufficient: (Long) -> Unit = {},
+    private val onSessionTracked: ((UUID, String, String, String?) -> Unit)? = null,
 ) {
     private val _batchState = MutableStateFlow<BatchInstallState>(BatchInstallState.Idle)
     val batchState: StateFlow<BatchInstallState> = _batchState.asStateFlow()
@@ -95,6 +97,7 @@ class InstallBatchDelegate(
                 currentProfileId = selectedProfileId,
                 backendFactory = backendFactory,
                 resolveActiveController = resolveController,
+                onSessionTracked = onSessionTracked,
             )
         }
     }

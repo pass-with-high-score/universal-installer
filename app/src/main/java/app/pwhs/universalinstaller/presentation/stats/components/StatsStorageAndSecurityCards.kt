@@ -38,6 +38,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.stats.UserStatsSummary
+import kotlin.math.roundToLong
 
 @Composable
 fun StorageFormatsCard(
@@ -46,8 +47,20 @@ fun StorageFormatsCard(
 ) {
     val context = LocalContext.current
     val colors = MaterialTheme.colorScheme
-    val installedFormatted = Formatter.formatFileSize(context, summary.totalBytesInstalled)
-    val cleanedFormatted = Formatter.formatFileSize(context, summary.totalBytesCleaned)
+    val animFraction = rememberGrowFloat(target = 1f, durationMillis = 800)
+    val installedFormatted = Formatter.formatFileSize(
+        context,
+        (summary.totalBytesInstalled * animFraction).roundToLong(),
+    )
+    val cleanedFormatted = Formatter.formatFileSize(
+        context,
+        (summary.totalBytesCleaned * animFraction).roundToLong(),
+    )
+
+    val animSingle = rememberCountUpInt(summary.singleApkCount)
+    val animSplit = rememberCountUpInt(summary.splitBundleCount)
+    val animObb = rememberCountUpInt(summary.obbInstallCount)
+    val animCleanedFiles = rememberCountUpInt(summary.totalFilesCleaned)
 
     StatsSectionCard(
         title = stringResource(R.string.stats_section_storage_formats),
@@ -150,7 +163,7 @@ fun StorageFormatsCard(
                             maxLines = 1,
                         )
                         Text(
-                            text = stringResource(R.string.stats_files_cleaned_sub, summary.totalFilesCleaned),
+                            text = stringResource(R.string.stats_files_cleaned_sub, animCleanedFiles),
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.onSurfaceVariant,
                             maxLines = 1,
@@ -165,6 +178,7 @@ fun StorageFormatsCard(
 
         val totalPackages = (summary.singleApkCount + summary.splitBundleCount).coerceAtLeast(1)
         val splitRatio = summary.splitBundleCount.toFloat() / totalPackages.toFloat()
+        val animatedSplitRatio = rememberGrowFloat(target = splitRatio, durationMillis = 850)
 
         Row(
             modifier = Modifier
@@ -173,10 +187,10 @@ fun StorageFormatsCard(
                 .clip(RoundedCornerShape(4.dp))
                 .background(colors.primary.copy(alpha = 0.25f)),
         ) {
-            if (splitRatio > 0f) {
+            if (animatedSplitRatio > 0f) {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth(splitRatio.coerceIn(0.05f, 1f))
+                        .fillMaxWidth(animatedSplitRatio.coerceIn(0.02f, 1f))
                         .height(8.dp)
                         .background(colors.tertiary),
                 )
@@ -193,21 +207,21 @@ fun StorageFormatsCard(
         ) {
             MiniStatPill(
                 label = stringResource(R.string.stats_format_single_apk),
-                value = summary.singleApkCount.toString(),
+                value = animSingle.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_format_split_bundle),
-                value = summary.splitBundleCount.toString(),
+                value = animSplit.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_format_obb),
-                value = summary.obbInstallCount.toString(),
+                value = animObb.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
@@ -222,6 +236,13 @@ fun ModesAndSecurityCard(
     modifier: Modifier = Modifier,
 ) {
     val colors = MaterialTheme.colorScheme
+    val animDefault = rememberCountUpInt(summary.defaultModeCount)
+    val animShizuku = rememberCountUpInt(summary.shizukuModeCount)
+    val animRoot = rememberCountUpInt(summary.rootModeCount)
+    val animDhizuku = rememberCountUpInt(summary.dhizukuModeCount)
+    val animVt = rememberCountUpInt(summary.virusTotalScans)
+    val animTracker = rememberCountUpInt(summary.trackerScans)
+
     StatsSectionCard(
         title = stringResource(R.string.stats_section_modes_security),
         icon = Icons.Rounded.AdminPanelSettings,
@@ -235,28 +256,28 @@ fun ModesAndSecurityCard(
         ) {
             MiniStatPill(
                 label = stringResource(R.string.stats_mode_default),
-                value = summary.defaultModeCount.toString(),
+                value = animDefault.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_mode_shizuku),
-                value = summary.shizukuModeCount.toString(),
+                value = animShizuku.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_mode_root),
-                value = summary.rootModeCount.toString(),
+                value = animRoot.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             )
             MiniStatPill(
                 label = stringResource(R.string.stats_mode_dhizuku),
-                value = summary.dhizukuModeCount.toString(),
+                value = animDhizuku.toString(),
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
@@ -274,76 +295,82 @@ fun ModesAndSecurityCard(
             horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
             Surface(
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = colors.surfaceContainerHigh,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Shield,
-                        contentDescription = null,
-                        tint = colors.primary,
-                        modifier = Modifier.size(22.dp),
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Column(verticalArrangement = Arrangement.Center) {
-                        Text(
-                            text = summary.virusTotalScans.toString(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.Shield,
+                            contentDescription = null,
+                            tint = colors.primary,
+                            modifier = Modifier.size(18.dp),
                         )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = stringResource(R.string.stats_vt_scans),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelMedium,
                             color = colors.onSurfaceVariant,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Text(
+                        text = animVt.toString(),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = colors.onSurface,
+                    )
                 }
             }
 
             Surface(
-                shape = RoundedCornerShape(14.dp),
+                shape = RoundedCornerShape(16.dp),
                 color = colors.surfaceContainerHigh,
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight(),
             ) {
-                Row(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .fillMaxHeight()
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                        .padding(14.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Icon(
-                        imageVector = Icons.Rounded.CheckCircle,
-                        contentDescription = null,
-                        tint = colors.tertiary,
-                        modifier = Modifier.size(22.dp),
-                    )
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Column(verticalArrangement = Arrangement.Center) {
-                        Text(
-                            text = summary.trackerScans.toString(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Rounded.CheckCircle,
+                            contentDescription = null,
+                            tint = colors.tertiary,
+                            modifier = Modifier.size(18.dp),
                         )
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = stringResource(R.string.stats_tracker_scans),
-                            style = MaterialTheme.typography.labelSmall,
+                            style = MaterialTheme.typography.labelMedium,
                             color = colors.onSurfaceVariant,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Column {
+                        Text(
+                            text = animTracker.toString(),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = colors.onSurface,
                         )
                         if (summary.trackersDetectedCount > 0) {
                             Text(
