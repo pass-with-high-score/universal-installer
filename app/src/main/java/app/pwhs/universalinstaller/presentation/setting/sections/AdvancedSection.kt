@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
@@ -26,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import app.pwhs.core.util.openUriSafely
@@ -54,6 +56,11 @@ internal fun LazyListScope.AdvancedSection(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .toggleable(
+                        value = virusTotalDisabled,
+                        role = Role.Switch,
+                        onValueChange = onVirusTotalDisabledChanged,
+                    )
                     .padding(horizontal = 16.dp, vertical = 8.dp),
             ) {
                 Column(Modifier.weight(1f)) {
@@ -65,9 +72,12 @@ internal fun LazyListScope.AdvancedSection(
                     )
                 }
                 Spacer(Modifier.width(8.dp))
+                // onCheckedChange stays null: the row itself is toggleable, so the label and
+                // switch state are announced together instead of the switch being an unnamed
+                // separate focus target.
                 Switch(
                     checked = virusTotalDisabled,
-                    onCheckedChange = onVirusTotalDisabledChanged,
+                    onCheckedChange = null,
                 )
             }
             if (!virusTotalDisabled) {

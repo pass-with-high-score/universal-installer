@@ -353,7 +353,12 @@ class DialogInstallActivity : FragmentActivity() {
                 val isScanning = apkInfo?.vtResult?.status == VtStatus.SCANNING || (blockOnTrackers && apkInfo?.isScanningTrackers == true)
                 if (isScanning) return@LaunchedEffect
 
-                val risks = if (apkInfo != null) detectInstallRisks(apkInfo, strictVirusTotalCheck, blockOnTrackers) else emptyList()
+                val risks = if (apkInfo != null) detectInstallRisks(
+                    apkInfo,
+                    strictVirusTotalCheck,
+                    blockOnTrackers,
+                    prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false,
+                ) else emptyList()
                 val hasSecurityFlags = risks.isNotEmpty() || (apkInfo?.vtResult?.let { it.malicious > 0 || it.suspicious > 0 } == true)
                 val shouldAutoInstall = (autoConfirmExternalInstall || isCallerAutoApproved) && !securityGate.isPinRequired && !hasSecurityFlags && !isRetry
                 if (hasSecurityFlags && (autoConfirmExternalInstall || isCallerAutoApproved)) {
@@ -425,6 +430,7 @@ class DialogInstallActivity : FragmentActivity() {
                 keepApk = keepApk,
                 onKeepApkChanged = { keepApk = it },
                 strictVirusTotalCheck = strictVirusTotalCheck,
+                vtDisabled = prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false,
                 blockOnTrackers = blockOnTrackers,
                 autoBlockedRisks = autoBlockedRisks,
                 canInstallPackages = { canInstallPackages(prefs, uiState.selectedProfileId) },

@@ -62,6 +62,7 @@ fun HeadlessNotificationInstall(
             prefs?.get(PreferencesKeys.SECURITY_LEVEL)
         ) == SecurityLevel.Strict
         val blockOnTrackers = prefs?.get(PreferencesKeys.AUTO_APPROVE_BLOCK_TRACKERS) ?: false
+        val vtDisabled = prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false
 
         // If VirusTotal hash lookup or tracker scanning is in progress, give it a brief window to complete so security flags aren't bypassed
         var currentApkInfo: ApkInfo = apkInfo
@@ -76,7 +77,7 @@ fun HeadlessNotificationInstall(
             }
         }
 
-        val risks = detectInstallRisks(currentApkInfo, strictVirusTotal, blockOnTrackers)
+        val risks = detectInstallRisks(currentApkInfo, strictVirusTotal, blockOnTrackers, vtDisabled)
         val hasVtFlags = currentApkInfo.vtResult?.let { it.malicious > 0 || it.suspicious > 0 } == true
         val isCallerAutoApproved = AutoApproveApps.isAutoApproved(prefs, callerPackage)
 

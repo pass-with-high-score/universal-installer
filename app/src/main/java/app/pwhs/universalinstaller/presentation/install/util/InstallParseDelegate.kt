@@ -243,7 +243,15 @@ class InstallParseDelegate(
 
     private fun launchHashLookupOnly(context: Context, originalUri: Uri) {
         scope.launch {
-            if (InstallVirusTotalHelper.isDisabled(context)) return@launch
+            if (InstallVirusTotalHelper.isDisabled(context)) {
+                // VirusTotal is off: still populate the SHA-256 (it is shown with a copy action
+                // in the APK info) but skip every VirusTotal lookup.
+                val sha256 = InstallVirusTotalHelper.computeSha256(context, originalUri)
+                if (sha256.isNotBlank()) {
+                    _pendingApkInfo.value = _pendingApkInfo.value?.copy(sha256 = sha256)
+                }
+                return@launch
+            }
             _pendingApkInfo.value = _pendingApkInfo.value?.copy(
                 vtResult = VtResult(status = VtStatus.SCANNING),
             )

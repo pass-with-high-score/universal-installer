@@ -111,6 +111,7 @@ fun DialogInstallContent(
     keepApk: Boolean = false,
     onKeepApkChanged: (Boolean) -> Unit = {},
     strictVirusTotalCheck: Boolean,
+    vtDisabled: Boolean = false,
     blockOnTrackers: Boolean = false,
     autoBlockedRisks: List<InstallRisk> = emptyList(),
     canInstallPackages: () -> Boolean,
@@ -133,7 +134,7 @@ fun DialogInstallContent(
     val handleInstallTap = {
         val info = uiState.pendingApkInfo
         val risks = if (info != null) {
-            detectInstallRisks(info, strictVirusTotalCheck, blockOnTrackers)
+            detectInstallRisks(info, strictVirusTotalCheck, blockOnTrackers, vtDisabled)
         } else {
             emptyList()
         }

@@ -11,6 +11,7 @@ import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -27,9 +28,33 @@ object InstallVirusTotalHelper {
     suspend fun isDisabled(context: Context): Boolean {
         return try {
             context.dataStore.data.first()[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false
+        } catch (e: CancellationException) {
+            throw e
         } catch (_: Exception) {
-            false
+            // Fail closed: if the preference can't be read, assume VirusTotal is disabled so a
+            // flaky read can never let a lookup/upload through behind the user's back.
+            true
         }
+    }
+
+    /**
+     * Local SHA-256 of the file, with no VirusTotal interaction. Used even when VirusTotal is
+     * disabled — the hash is shown in the APK info (with its copy action) regardless of the
+     * feature toggle.
+     */
+    suspend fun computeSha256(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
+        runCatching {
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                val digest = java.security.MessageDigest.getInstance("SHA-256")
+                val buffer = ByteArray(8192)
+                var read = input.read(buffer)
+                while (read >= 0) {
+                    digest.update(buffer, 0, read)
+                    read = input.read(buffer)
+                }
+                digest.digest().joinToString("") { "%02x".format(it) }
+            } ?: ""
+        }.getOrDefault("")
     }
 
     suspend fun readVirusTotalApiKey(context: Context): String {
