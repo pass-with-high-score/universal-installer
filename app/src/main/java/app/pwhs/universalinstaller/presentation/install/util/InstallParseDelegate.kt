@@ -82,6 +82,7 @@ class InstallParseDelegate(
 
     private var scanJob: Job? = null
     private var parseJob: Job? = null
+    private var hashJob: Job? = null
     private var trackerScanJob: Job? = null
 
     fun parseApkInfo(
@@ -168,6 +169,7 @@ class InstallParseDelegate(
 
     fun dismissPendingInstall() {
         scanJob?.cancel()
+        hashJob?.cancel()
         virusTotalNotifier.cancelAll()
         trackerScanJob?.cancel()
         _pendingApkInfo.value = null
@@ -212,6 +214,7 @@ class InstallParseDelegate(
         _isLoading.value = false
         parseJob?.cancel()
         scanJob?.cancel()
+        hashJob?.cancel()
         trackerScanJob?.cancel()
     }
 
@@ -242,12 +245,16 @@ class InstallParseDelegate(
     }
 
     private fun launchHashLookupOnly(context: Context, originalUri: Uri) {
-        scope.launch {
+        // Hashing runs outside parseJob: cancel any in-flight hash so a slow first file can
+        // never land its SHA-256 on a second APK parsed in the meantime.
+        hashJob?.cancel()
+        hashJob = scope.launch {
+            fun isStillCurrent() = pendingOriginalUri == originalUri
             if (InstallVirusTotalHelper.isDisabled(context)) {
                 // VirusTotal is off: still populate the SHA-256 (it is shown with a copy action
                 // in the APK info) but skip every VirusTotal lookup.
                 val sha256 = InstallVirusTotalHelper.computeSha256(context, originalUri)
-                if (sha256.isNotBlank()) {
+                if (sha256.isNotBlank() && isStillCurrent()) {
                     _pendingApkInfo.value = _pendingApkInfo.value?.copy(sha256 = sha256)
                 }
                 return@launch
@@ -256,6 +263,7 @@ class InstallParseDelegate(
                 vtResult = VtResult(status = VtStatus.SCANNING),
             )
             val result = InstallVirusTotalHelper.launchHashLookupOnly(context, originalUri, virusTotalService)
+            if (!isStillCurrent()) return@launch
             _pendingApkInfo.value = _pendingApkInfo.value?.copy(
                 sha256 = result.first,
                 vtResult = result.second,

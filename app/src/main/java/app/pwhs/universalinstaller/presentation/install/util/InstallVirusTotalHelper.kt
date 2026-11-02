@@ -43,7 +43,7 @@ object InstallVirusTotalHelper {
      * feature toggle.
      */
     suspend fun computeSha256(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
-        runCatching {
+        try {
             context.contentResolver.openInputStream(uri)?.use { input ->
                 val digest = java.security.MessageDigest.getInstance("SHA-256")
                 val buffer = ByteArray(8192)
@@ -54,7 +54,13 @@ object InstallVirusTotalHelper {
                 }
                 digest.digest().joinToString("") { "%02x".format(it) }
             } ?: ""
-        }.getOrDefault("")
+        } catch (e: CancellationException) {
+            // Never swallow cancellation into an empty hash — propagate so the job dies.
+            throw e
+        } catch (_: Exception) {
+            // Ordinary read failure: empty hash, caller decides what to show.
+            ""
+        }
     }
 
     suspend fun readVirusTotalApiKey(context: Context): String {

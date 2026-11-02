@@ -66,10 +66,13 @@ fun HeadlessNotificationInstall(
 
         // If VirusTotal hash lookup or tracker scanning is in progress, give it a brief window to complete so security flags aren't bypassed
         var currentApkInfo: ApkInfo = apkInfo
-        if (currentApkInfo.vtResult?.status == VtStatus.SCANNING || (blockOnTrackers && currentApkInfo.isScanningTrackers)) {
+        if ((!vtDisabled && currentApkInfo.vtResult?.status == VtStatus.SCANNING) ||
+            (blockOnTrackers && currentApkInfo.isScanningTrackers)
+        ) {
             val updated = withTimeoutOrNull(2500L) {
                 viewModel.uiState.map { it.pendingApkInfo }.filterNotNull().first {
-                    it.vtResult?.status != VtStatus.SCANNING && (!blockOnTrackers || !it.isScanningTrackers)
+                    (!vtDisabled || it.vtResult?.status != VtStatus.SCANNING) &&
+                        (!blockOnTrackers || !it.isScanningTrackers)
                 }
             }
             if (updated != null) {
@@ -78,7 +81,8 @@ fun HeadlessNotificationInstall(
         }
 
         val risks = detectInstallRisks(currentApkInfo, strictVirusTotal, blockOnTrackers, vtDisabled)
-        val hasVtFlags = currentApkInfo.vtResult?.let { it.malicious > 0 || it.suspicious > 0 } == true
+        // A stale verdict from before the user disabled VirusTotal must not block auto-install.
+        val hasVtFlags = !vtDisabled && currentApkInfo.vtResult?.let { it.malicious > 0 || it.suspicious > 0 } == true
         val isCallerAutoApproved = AutoApproveApps.isAutoApproved(prefs, callerPackage)
 
         if ((mode == ExternalOpenMode.AutoNotification || isCallerAutoApproved) && risks.isEmpty() && !hasVtFlags) {
