@@ -131,12 +131,15 @@ fun DialogInstallContent(
         }
     }
 
-    // If VirusTotal gets disabled while a risk dialog is open, drop its risks so the stale
-    // warning (and its install button) doesn't linger next to an install that no longer needs
-    // consent for it. Other risks are preserved.
+    // Recompute the open risk dialog when the VirusTotal toggle changes (possible in
+    // multi-window): risks are a pure function of the APK info and the settings, so this both
+    // drops VirusTotal risks when the feature is turned off and restores them when it is
+    // turned back on. Only adjust when the dialog is already up — never summon it here.
     LaunchedEffect(vtDisabled) {
-        if (vtDisabled && pendingRisks.isNotEmpty()) {
-            pendingRisks = pendingRisks.withoutVirusTotalRisks()
+        if (pendingRisks.isNotEmpty()) {
+            uiState.pendingApkInfo?.let { info ->
+                pendingRisks = detectInstallRisks(info, strictVirusTotalCheck, blockOnTrackers, vtDisabled)
+            }
         }
     }
 

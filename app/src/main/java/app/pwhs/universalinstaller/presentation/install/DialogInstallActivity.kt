@@ -43,7 +43,6 @@ import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallUriH
 import app.pwhs.universalinstaller.presentation.install.dialog.InsufficientStorageDialog
 import app.pwhs.universalinstaller.presentation.install.dialog.HeadlessNotificationInstall
 import app.pwhs.universalinstaller.presentation.install.dialog.InstallRisk
-import app.pwhs.universalinstaller.presentation.install.dialog.withoutVirusTotalRisks
 import app.pwhs.universalinstaller.presentation.install.util.SourceFileDeleter
 import app.pwhs.universalinstaller.presentation.install.util.CallerAppDetector
 import app.pwhs.universalinstaller.domain.manager.AutoApproveApps
@@ -353,10 +352,17 @@ class DialogInstallActivity : FragmentActivity() {
             LaunchedEffect(uiState.dialogStage, autoConfirmExternalInstall, isCallerAutoApproved, autoOpenAfterInstall, vtDisabledForAutoInstall, uiState.pendingApkInfo) {
                 val apkInfo = uiState.pendingApkInfo
                 val vtDisabled = vtDisabledForAutoInstall
-                // If the user disabled VirusTotal while a risk dialog was up, drop the stale
-                // VirusTotal warnings so the old prompt doesn't linger through the install.
-                if (vtDisabled && autoBlockedRisks.isNotEmpty()) {
-                    autoBlockedRisks = autoBlockedRisks.withoutVirusTotalRisks()
+                // Risks are a pure function of the APK info and the settings, so refresh the
+                // remembered blocked list whenever the effect re-runs (e.g. the VirusTotal
+                // toggle changed in another window): VT risks drop when disabled and return
+                // when re-enabled. The list stays empty until a block actually happened.
+                if (autoBlockedRisks.isNotEmpty() && apkInfo != null) {
+                    autoBlockedRisks = detectInstallRisks(
+                        apkInfo,
+                        strictVirusTotalCheck,
+                        blockOnTrackers,
+                        vtDisabled,
+                    )
                 }
                 // With VirusTotal disabled a stale SCANNING/verdict from an earlier session
                 // must not delay auto-install or block it with raw VirusTotal counts.

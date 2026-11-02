@@ -83,7 +83,7 @@ object InstallVirusTotalHelper {
     ): Pair<String, VtResult> = withContext(Dispatchers.IO) {
         if (isDisabled(context)) return@withContext "" to VtResult(status = VtStatus.NO_API_KEY)
         val apiKey = readVirusTotalApiKey(context)
-        runCatching {
+        return@withContext try {
             val sha256 = context.contentResolver.openInputStream(originalUri)?.use { input ->
                 virusTotalService.computeSha256(input)
             } ?: ""
@@ -95,7 +95,9 @@ object InstallVirusTotalHelper {
             } else {
                 sha256 to virusTotalService.checkFile(apiKey, sha256)
             }
-        }.getOrElse { e ->
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
             Timber.e(e, "VirusTotal hash lookup error")
             val message = when {
                 VirusTotalService.isNetworkError(e) -> VirusTotalService.NETWORK_ERROR_TAG
@@ -152,13 +154,19 @@ object InstallVirusTotalHelper {
             }
 
             val sha256 = current.sha256.ifBlank {
-                runCatching {
+                try {
                     withContext(Dispatchers.IO) {
                         context.contentResolver.openInputStream(uri)?.use { input ->
                             virusTotalService.computeSha256(input)
                         } ?: ""
                     }
-                }.getOrDefault("")
+                } catch (e: CancellationException) {
+                    // Rethrow so the scan job dies and the notification is properly cancelled
+                    // below instead of being reported as "Could not hash file".
+                    throw e
+                } catch (_: Exception) {
+                    ""
+                }
             }
 
             if (sha256.isBlank()) {

@@ -80,15 +80,6 @@ sealed interface InstallRisk {
 }
 
 /**
- * Drops the VirusTotal-derived risks (verdicts and strict-mode "unscanned"). Used when the user
- * disables VirusTotal while a risk dialog is already up, so the stale warnings don't survive
- * alongside a setting that turns them off. Other risks are preserved untouched.
- */
-fun List<InstallRisk>.withoutVirusTotalRisks(): List<InstallRisk> = filter {
-    it !is InstallRisk.VtMalicious && it !is InstallRisk.VtSuspicious && it !is InstallRisk.VtUnscanned
-}
-
-/**
  * True when installing [apkInfo] would replace a newer already-installed version.
  *
  * Shared with the install path on purpose: whether we *warn* about a downgrade and whether we
