@@ -42,6 +42,7 @@ object SettingUiStateBuilder {
         val showDownload = interfaceFlags[3]
         val autoApprove = interfaceFlags.getOrElse(5) { false }
         val autoApproveBlockTrackers = interfaceFlags.getOrElse(6) { false }
+        val virusTotalDisabled = interfaceFlags.getOrElse(7) { false }
         @Suppress("UNCHECKED_CAST")
         val extractorAndProfiles = flows[12] as List<String>
         val extractorPath = extractorAndProfiles[0]
@@ -76,6 +77,7 @@ object SettingUiStateBuilder {
             useShizuku = useShizuku && (shizukuState == ShizukuState.READY),
             useRoot = useRoot && (rootState == RootState.READY || rootState == RootState.UNKNOWN),
             virusTotalApiKey = vtKey,
+            virusTotalDisabled = virusTotalDisabled,
             deleteApkAfterInstall = deleteApk,
             autoOpenAfterInstall = autoOpen,
             shizukuState = shizukuState,

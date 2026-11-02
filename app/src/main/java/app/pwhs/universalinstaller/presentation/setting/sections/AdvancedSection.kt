@@ -1,6 +1,8 @@
 package app.pwhs.universalinstaller.presentation.setting.sections
 
 import android.content.ClipboardManager
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,8 +18,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
@@ -36,6 +40,8 @@ internal fun LazyListScope.AdvancedSection(
     advancedLabels: List<String>,
     virusTotalApiKey: String,
     onVirusTotalKeyChanged: (String) -> Unit,
+    virusTotalDisabled: Boolean,
+    onVirusTotalDisabledChanged: (Boolean) -> Unit,
     securityLevel: SecurityLevel,
     onSecurityLevelChanged: (SecurityLevel) -> Unit,
 ) {
@@ -44,6 +50,27 @@ internal fun LazyListScope.AdvancedSection(
         val uriHandler = LocalUriHandler.current
 
         SettingsSection(title = stringResource(R.string.setting_section_advanced), icon = Icons.Rounded.Terminal) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                Column(Modifier.weight(1f)) {
+                    Text(stringResource(R.string.setting_vt_disable_title))
+                    Text(
+                        text = stringResource(R.string.setting_vt_disable_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                Switch(
+                    checked = virusTotalDisabled,
+                    onCheckedChange = onVirusTotalDisabledChanged,
+                )
+            }
+            if (!virusTotalDisabled) {
             OutlinedTextField(
                 value = virusTotalApiKey,
                 onValueChange = onVirusTotalKeyChanged,
@@ -85,6 +112,7 @@ internal fun LazyListScope.AdvancedSection(
                     text = stringResource(R.string.virustotal_setup_get_free_key),
                     style = MaterialTheme.typography.labelMedium,
                 )
+            }
             }
             SecurityLevelSelector(
                 current = securityLevel,

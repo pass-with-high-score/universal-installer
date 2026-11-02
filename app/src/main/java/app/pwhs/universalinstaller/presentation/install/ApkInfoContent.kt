@@ -133,6 +133,7 @@ internal fun ApkInfoContent(
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
     val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank()
     val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
+    val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
 
     androidx.compose.runtime.LaunchedEffect(installError) {
         if (!installError.isNullOrBlank()) {
@@ -228,7 +229,7 @@ internal fun ApkInfoContent(
                     AbisCard(abis = apkInfo.supportedAbis)
                 }
                 Spacer(Modifier.height(16.dp))
-                VirusTotalCard(
+                if (!vtDisabled) VirusTotalCard(
                     vt = apkInfo.vtResult,
                     fileSizeBytes = apkInfo.fileSizeBytes,
                     sha256 = apkInfo.sha256,
@@ -335,7 +336,7 @@ internal fun ApkInfoContent(
             onInstall = {
                 if (apkInfo.isAbiIncompatible) {
                     showAbiWarningDialog = true
-                } else if (!hasVtKey && !dontAskAgain) {
+                } else if (!vtDisabled && !hasVtKey && !dontAskAgain) {
                     pendingInstallAfterVt = true
                     showVtSetupDialog = true
                 } else {
@@ -362,7 +363,7 @@ internal fun ApkInfoContent(
                 onDismiss = { showAbiWarningDialog = false },
                 onInstallAnyway = {
                     showAbiWarningDialog = false
-                    if (!hasVtKey && !dontAskAgain) {
+                    if (!vtDisabled && !hasVtKey && !dontAskAgain) {
                         pendingInstallAfterVt = true
                         showVtSetupDialog = true
                     } else {
@@ -389,7 +390,7 @@ internal fun ApkInfoContent(
             )
         }
 
-        if (showVtSetupDialog) {
+        if (showVtSetupDialog && !vtDisabled) {
             VirusTotalSetupDialog(
                 onDismiss = {
                     showVtSetupDialog = false
@@ -403,7 +404,7 @@ internal fun ApkInfoContent(
             )
         }
 
-        if (showVtDetailSheet && apkInfo.vtResult != null) {
+        if (showVtDetailSheet && !vtDisabled && apkInfo.vtResult != null) {
             VirusTotalDetailSheet(
                 vt = apkInfo.vtResult,
                 apkInfo = apkInfo,

@@ -148,6 +148,12 @@ class SettingPreferencesDelegate(
         }
     }
 
+    fun setVirusTotalDisabled(enabled: Boolean) {
+        scope.launch {
+            dataStore.edit { prefs -> prefs[PreferencesKeys.DISABLE_VIRUSTOTAL] = enabled }
+        }
+    }
+
     fun setDeleteApkAfterInstall(enabled: Boolean) {
         scope.launch {
             dataStore.edit { prefs -> prefs[PreferencesKeys.DELETE_APK_AFTER_INSTALL] = enabled }

@@ -270,7 +270,8 @@ class DialogInstallActivity : FragmentActivity() {
             val blockOnTrackers = prefs?.get(PreferencesKeys.AUTO_APPROVE_BLOCK_TRACKERS) ?: false
             var autoBlockedRisks by remember { mutableStateOf<List<InstallRisk>>(emptyList()) }
             var keepApk by remember(dialogTarget?.sessionId) { mutableStateOf(false) }
-            val strictVirusTotalCheck = SecurityLevel.from(
+            val strictVirusTotalCheck = !(prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false) &&
+                SecurityLevel.from(
                 stored = prefs?.get(PreferencesKeys.SECURITY_LEVEL),
                 legacyStrict = prefs?.get(PreferencesKeys.STRICT_VIRUSTOTAL_CHECK) ?: false,
             ) == SecurityLevel.Strict

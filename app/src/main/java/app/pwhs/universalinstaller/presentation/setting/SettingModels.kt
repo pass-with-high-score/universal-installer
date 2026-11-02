@@ -187,6 +187,7 @@ data class SettingUiState(
     val useShizuku: Boolean = false,
     val useRoot: Boolean = false,
     val virusTotalApiKey: String = "",
+    val virusTotalDisabled: Boolean = false,
     val deleteApkAfterInstall: Boolean = false,
     val autoOpenAfterInstall: Boolean = false,
     val shizukuState: ShizukuState = ShizukuState.NOT_INSTALLED,

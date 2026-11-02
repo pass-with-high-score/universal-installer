@@ -145,6 +145,7 @@ fun DialogMenuContent(
     var showVtDetailSheet by remember { mutableStateOf(false) }
     
     val prefs by context.dataStore.data.collectAsState(initial = null)
+    val vtDisabled = prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false
     val spoofSource = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
     val installerPkg = prefs?.get(PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME) ?: DEFAULT_INSTALLER_PACKAGE_NAME
     val overridesSerialized = prefs?.get(PreferencesKeys.INSTALLER_OVERRIDES)
@@ -348,6 +349,7 @@ fun DialogMenuContent(
                     1 -> securityTab(
                         apkInfo = apkInfo,
                         context = context,
+                        vtDisabled = vtDisabled,
                         onCheckVirusTotal = onCheckVirusTotal,
                         onConfigureVirusTotal = { showVtSetupDialog = true },
                         onOpenDetail = { showVtDetailSheet = true },
@@ -440,14 +442,14 @@ fun DialogMenuContent(
         
         Spacer(modifier = Modifier.height(16.dp)) // Padding from card bottom
         
-        if (showVtSetupDialog) {
+        if (showVtSetupDialog && !vtDisabled) {
             VirusTotalSetupDialog(
                 onDismiss = { showVtSetupDialog = false },
                 onSaveAndScan = { onCheckVirusTotal() },
             )
         }
 
-        if (showVtDetailSheet && apkInfo.vtResult != null) {
+        if (showVtDetailSheet && !vtDisabled && apkInfo.vtResult != null) {
             VirusTotalDetailSheet(
                 vt = apkInfo.vtResult,
                 apkInfo = apkInfo,

@@ -36,6 +36,7 @@ data class AppSettingsBackupDto(
     // Security & VirusTotal
     val virusTotalApiKey: String? = null,
     val strictVirusTotalCheck: Boolean? = null,
+    val virusTotalDisabled: Boolean? = null,
     val securityLevel: String? = null,
 
     // General Install Options

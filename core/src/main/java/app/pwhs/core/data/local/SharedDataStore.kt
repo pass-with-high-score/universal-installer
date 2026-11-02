@@ -49,6 +49,13 @@ object SharedPrefsKeys {
     val VIRUSTOTAL_DONT_ASK_AGAIN = booleanPreferencesKey("virustotal_dont_ask_again")
 
     /**
+     * When true the whole VirusTotal integration is disabled: no scans are started and every
+     * VirusTotal UI surface is hidden. Lives here (like the other VirusTotal keys) because both
+     * the install flow and the Settings screen read it from the same preference store.
+     */
+    val DISABLE_VIRUSTOTAL = booleanPreferencesKey("disable_virustotal")
+
+    /**
      * Whether the Play build may report anonymous install statistics and crashes. Absent means
      * on — the onboarding page presents it opted in, and the open-source build ignores the key
      * entirely because it has nothing to report with.

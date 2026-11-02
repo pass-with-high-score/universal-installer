@@ -10,6 +10,7 @@ import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
@@ -17,6 +18,19 @@ import timber.log.Timber
 import java.io.File
 
 object InstallVirusTotalHelper {
+
+    /**
+     * Whether the user has turned the whole VirusTotal integration off in Settings. Every
+     * entry point into VirusTotal checks this first; when it is true nothing should touch the
+     * VirusTotal API or surface any VirusTotal UI.
+     */
+    suspend fun isDisabled(context: Context): Boolean {
+        return try {
+            context.dataStore.data.first()[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false
+        } catch (_: Exception) {
+            false
+        }
+    }
 
     suspend fun readVirusTotalApiKey(context: Context): String {
         return try {
@@ -32,6 +46,7 @@ object InstallVirusTotalHelper {
         originalUri: Uri,
         virusTotalService: VirusTotalService,
     ): Pair<String, VtResult> = withContext(Dispatchers.IO) {
+        if (isDisabled(context)) return@withContext "" to VtResult(status = VtStatus.NO_API_KEY)
         val apiKey = readVirusTotalApiKey(context)
         runCatching {
             val sha256 = context.contentResolver.openInputStream(originalUri)?.use { input ->
@@ -66,6 +81,7 @@ object InstallVirusTotalHelper {
         onUpdateSha256: (String) -> Unit,
         onProgress: (VtResult) -> Unit,
     ) {
+        if (isDisabled(context)) return
         val apiKey = readVirusTotalApiKey(context)
         val sizeBytes = current.fileSizeBytes
 

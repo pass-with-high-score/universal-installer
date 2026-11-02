@@ -349,6 +349,8 @@
     <string name="setting_section_advanced">Advanced</string>
     <string name="setting_vt_api_key_title">VirusTotal API Key</string>
     <string name="setting_vt_api_key_placeholder">Paste API key here…</string>
+    <string name="setting_vt_disable_title">Disable VirusTotal</string>
+    <string name="setting_vt_disable_desc">Turns off every VirusTotal feature: no scans are run, nothing is uploaded, and all VirusTotal UI is hidden.</string>
     <string name="setting_security_level_title">Security level</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Strict</string>

@@ -220,8 +220,9 @@ class InstallParseDelegate(
         val fileName = pendingFileName ?: "APK"
         val current = _pendingApkInfo.value ?: return
         scanJob?.cancel()
-        Telemetry.feature(TelemetryEvents.FEATURE_VIRUSTOTAL)
         scanJob = scope.launch {
+            if (InstallVirusTotalHelper.isDisabled(context)) return@launch
+            Telemetry.feature(TelemetryEvents.FEATURE_VIRUSTOTAL)
             app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
             InstallVirusTotalHelper.scanVirusTotal(
                 context = context,
@@ -242,6 +243,7 @@ class InstallParseDelegate(
 
     private fun launchHashLookupOnly(context: Context, originalUri: Uri) {
         scope.launch {
+            if (InstallVirusTotalHelper.isDisabled(context)) return@launch
             _pendingApkInfo.value = _pendingApkInfo.value?.copy(
                 vtResult = VtResult(status = VtStatus.SCANNING),
             )

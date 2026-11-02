@@ -57,7 +57,8 @@ fun HeadlessNotificationInstall(
         Timber.i("$LOG: parsed ${apkInfo.packageName}, ${apkInfo.splitEntries.size} split(s)")
 
         val prefs = runCatching { context.dataStore.data.first() }.getOrNull()
-        val strictVirusTotal = SecurityLevel.from(
+        val strictVirusTotal = !(prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false) &&
+            SecurityLevel.from(
             prefs?.get(PreferencesKeys.SECURITY_LEVEL)
         ) == SecurityLevel.Strict
         val blockOnTrackers = prefs?.get(PreferencesKeys.AUTO_APPROVE_BLOCK_TRACKERS) ?: false

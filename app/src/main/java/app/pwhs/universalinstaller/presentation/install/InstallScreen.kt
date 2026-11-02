@@ -117,10 +117,14 @@ fun InstallScreen(
     // take the primary slot; Normal keeps VirusTotal available without pushing it.
     val strictVirusTotalCheck by remember(context) {
         context.dataStore.data.map {
-            SecurityLevel.from(
-                stored = it[PreferencesKeys.SECURITY_LEVEL],
-                legacyStrict = it[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] ?: false,
-            ) == SecurityLevel.Strict
+            if (it[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false) {
+                false
+            } else {
+                SecurityLevel.from(
+                    stored = it[PreferencesKeys.SECURITY_LEVEL],
+                    legacyStrict = it[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] ?: false,
+                ) == SecurityLevel.Strict
+            }
         }
     }.collectAsState(initial = false)
 

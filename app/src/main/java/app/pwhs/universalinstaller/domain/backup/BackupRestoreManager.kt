@@ -70,6 +70,7 @@ class BackupRestoreManager(
                 themePreset = prefs[PreferencesKeys.THEME_PRESET] ?: prefs[SharedPrefsKeys.THEME_PRESET],
                 virusTotalApiKey = prefs[PreferencesKeys.VIRUSTOTAL_API_KEY] ?: prefs[SharedPrefsKeys.VIRUSTOTAL_API_KEY],
                 strictVirusTotalCheck = prefs[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] ?: prefs[SharedPrefsKeys.STRICT_VIRUSTOTAL_CHECK],
+                virusTotalDisabled = prefs[PreferencesKeys.DISABLE_VIRUSTOTAL],
                 securityLevel = prefs[PreferencesKeys.SECURITY_LEVEL] ?: prefs[SharedPrefsKeys.SECURITY_LEVEL],
                 useShizuku = prefs[PreferencesKeys.USE_SHIZUKU],
                 useRoot = prefs[PreferencesKeys.USE_ROOT],
@@ -253,6 +254,7 @@ class BackupRestoreManager(
                 s.themePreset?.let { prefs[PreferencesKeys.THEME_PRESET] = it; prefs[SharedPrefsKeys.THEME_PRESET] = it }
                 s.virusTotalApiKey?.let { prefs[PreferencesKeys.VIRUSTOTAL_API_KEY] = it; prefs[SharedPrefsKeys.VIRUSTOTAL_API_KEY] = it }
                 s.strictVirusTotalCheck?.let { prefs[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] = it; prefs[SharedPrefsKeys.STRICT_VIRUSTOTAL_CHECK] = it }
+                s.virusTotalDisabled?.let { prefs[PreferencesKeys.DISABLE_VIRUSTOTAL] = it }
                 s.securityLevel?.let { prefs[PreferencesKeys.SECURITY_LEVEL] = it; prefs[SharedPrefsKeys.SECURITY_LEVEL] = it }
                 s.useShizuku?.let { prefs[PreferencesKeys.USE_SHIZUKU] = it }
                 s.useRoot?.let { prefs[PreferencesKeys.USE_ROOT] = it }

@@ -40,12 +40,13 @@ import app.pwhs.universalinstaller.presentation.install.resolvePermissionEntries
 internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     apkInfo: ApkInfo,
     context: Context,
+    vtDisabled: Boolean = false,
     onCheckVirusTotal: () -> Unit,
     onConfigureVirusTotal: () -> Unit = {},
     onOpenDetail: (() -> Unit)? = null,
 ) {
     // 1. VirusTotal
-    item(key = "virustotal") {
+    if (!vtDisabled) item(key = "virustotal") {
         val vtResult = apkInfo.vtResult
         val vtErrorMsg = vtResult?.errorMessage?.takeIf { it.isNotBlank() }
         val extendedColors = LocalExtendedColors.current
