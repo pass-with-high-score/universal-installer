@@ -20,10 +20,10 @@ object ShizukuObbWriter {
 
     private const val BUFFER_BYTES = 1 * 1024 * 1024
 
-    fun isReady(): Boolean = try {
+    fun isReady(context: android.content.Context? = null): Boolean = try {
         Shizuku.pingBinder() &&
             !Shizuku.isPreV11() &&
-            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+            app.pwhs.universalinstaller.util.ShizukuServices.hasShizukuPermission(context)
     } catch (_: Exception) { false }
 
     suspend fun copy(

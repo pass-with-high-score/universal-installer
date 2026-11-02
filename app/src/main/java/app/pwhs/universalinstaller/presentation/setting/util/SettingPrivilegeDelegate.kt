@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.datastore.preferences.core.edit
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.util.ShizukuStarterHelper
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
@@ -177,18 +178,37 @@ class SettingPrivilegeDelegate(
 
     private fun isShizukuInstalled(): Boolean = ShizukuServices.isShizukuInstalled(application)
 
+    private var awaitingPermissionGrant = false
+
     private fun startServiceHint(): Int =
         if (ShizukuServices.isPorterOnly(application)) R.string.setting_porter_start_service_hint
         else R.string.setting_shizuku_start_service_hint
 
     fun updateShizukuState() {
         val isInstalled = isShizukuInstalled() || ShizukuServices.isPorterInstalled(application)
-        _shizukuState.value = when {
-            !Shizuku.pingBinder() && !isInstalled -> ShizukuState.NOT_INSTALLED
-            !Shizuku.pingBinder() -> ShizukuState.NOT_RUNNING
-            Shizuku.getVersion() < 11 -> ShizukuState.UNSUPPORTED
-            Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED -> ShizukuState.NO_PERMISSION
+        val ping = Shizuku.pingBinder()
+        val hasPerm = ShizukuServices.hasShizukuPermission(application)
+        val versionOk = ping && runCatching { Shizuku.getVersion() }.getOrDefault(0) >= 11
+        val newState = when {
+            !ping && !isInstalled -> ShizukuState.NOT_INSTALLED
+            !ping -> ShizukuState.NOT_RUNNING
+            !versionOk -> ShizukuState.UNSUPPORTED
+            !hasPerm -> ShizukuState.NO_PERMISSION
             else -> ShizukuState.READY
+        }
+        _shizukuState.value = newState
+        if (awaitingPermissionGrant && newState == ShizukuState.READY) {
+            awaitingPermissionGrant = false
+            scope.launch {
+                dataStore.edit { prefs ->
+                    val keepDhizuku = prefs[PreferencesKeys.USE_DHIZUKU] ?: false
+                    prefs[PreferencesKeys.USE_ROOT] = false
+                    prefs[PreferencesKeys.USE_CUSTOM_AUTHORIZER] = false
+                    prefs[PreferencesKeys.USE_MICROG] = false
+                    prefs[PreferencesKeys.USE_SHIZUKU] = true
+                    prefs[PreferencesKeys.USE_DHIZUKU] = keepDhizuku
+                }
+            }
         }
     }
 
@@ -317,7 +337,7 @@ class SettingPrivilegeDelegate(
                 }
             }
             emitEvent(R.string.setting_shizuku_start_service_hint)
-            val launchIntent = application.packageManager.getLaunchIntentForPackage(ShizukuServices.SHIZUKU_PACKAGE)
+            val launchIntent = ShizukuStarterHelper.getManagerLaunchIntent(application)
             if (launchIntent != null) {
                 launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 runCatching { application.startActivity(launchIntent) }
@@ -326,10 +346,20 @@ class SettingPrivilegeDelegate(
     }
 
     fun requestShizukuPermission() {
+        awaitingPermissionGrant = true
+        if (ShizukuStarterHelper.isShevery(application)) {
+            emitEvent(R.string.setting_shevery_grant_permission_hint)
+            val launchIntent = ShizukuStarterHelper.getManagerLaunchIntent(application)
+            if (launchIntent != null) {
+                runCatching { application.startActivity(launchIntent) }
+            }
+            return
+        }
         try {
             Shizuku.requestPermission(SHIZUKU_PERMISSION_REQ_CODE)
         } catch (t: Throwable) {
             Timber.w(t, "Shizuku.requestPermission threw")
+            awaitingPermissionGrant = false
             emitEvent(startServiceHint())
         }
     }

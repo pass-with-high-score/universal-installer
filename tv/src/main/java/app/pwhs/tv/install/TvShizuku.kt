@@ -3,6 +3,7 @@ package app.pwhs.tv.install
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import app.pwhs.core.util.ShizukuStarterHelper
 import rikka.shizuku.Shizuku
 
 /** Binder readiness is authoritative, including for compatible TV manager forks. */
@@ -12,16 +13,21 @@ object TvShizuku {
 
     enum class Status { Missing, Stopped, Unsupported, PermissionRequired, Ready }
 
+    fun hasPermission(context: Context): Boolean = try {
+        Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED ||
+            context.checkSelfPermission(ShizukuStarterHelper.SHEVERY_PERMISSION) == PackageManager.PERMISSION_GRANTED
+    } catch (_: Throwable) {
+        false
+    }
+
     fun status(context: Context): Status = try {
         when {
             !Shizuku.pingBinder() -> {
-                val installed = runCatching {
-                    context.packageManager.getPackageInfo("moe.shizuku.privileged.api", 0)
-                }.isSuccess
+                val installed = ShizukuStarterHelper.isManagerInstalled(context)
                 if (installed) Status.Stopped else Status.Missing
             }
             Shizuku.isPreV11() -> Status.Unsupported
-            Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED -> Status.PermissionRequired
+            !hasPermission(context) -> Status.PermissionRequired
             else -> Status.Ready
         }
     } catch (_: Exception) {

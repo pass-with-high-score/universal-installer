@@ -22,6 +22,7 @@
     <string name="setting_shizuku_ready">Cài đặt ngầm không cần xác nhận</string>
     <string name="setting_shizuku_permission_denied">Quyền Shizuku đã bị từ chối</string>
     <string name="setting_shizuku_start_service_hint">Hãy mở ứng dụng Shizuku và bắt đầu dịch vụ trước</string>
+    <string name="setting_shevery_grant_permission_hint">Vui lòng cấp quyền cho Universal Installer trong Shevery</string>
     <string name="setting_shizuku_install_hint">Cài đặt Shizuku từ Play Store để sử dụng backend này</string>
     <string name="setting_delete_apk_title">Xóa APK sau khi cài đặt</string>
     <string name="setting_shizuku_replace">Thay thế bản hiện tại</string>

@@ -88,6 +88,7 @@
     <string name="setting_shizuku_permission_denied">Shizuku permission was denied</string>
     <string name="setting_shizuku_start_service_hint">Open the Shizuku app and start the service first</string>
     <string name="setting_porter_start_service_hint">Open Porter and start its service first</string>
+    <string name="setting_shevery_grant_permission_hint">Please grant permission for Universal Installer inside Shevery</string>
     <string name="setting_shizuku_install_hint">Install Shizuku from Play Store to use this backend</string>
     <string name="setting_delete_apk_title">Delete APK after install</string>
     <string name="setting_auto_open_title">Open app after install</string>

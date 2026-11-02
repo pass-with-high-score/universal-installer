@@ -67,12 +67,12 @@ object InstallSessionManager {
                     else state
                     if (finalState == RootState.READY) return rootController
                 }
-                "Shizuku" -> if (isShizukuReadyForInstall()) return shizukuController
+                "Shizuku" -> if (isShizukuReadyForInstall(context)) return shizukuController
                 "Dhizuku" -> dhizukuController?.let {
                     if (DhizukuCompat.isReady(context)) return it
                 }
                 "Shizuku + Dhizuku" -> {
-                    if (isShizukuReadyForInstall()) return shizukuController
+                    if (isShizukuReadyForInstall(context)) return shizukuController
                     dhizukuController?.let {
                         if (DhizukuCompat.isReady(context)) return it
                     }
@@ -95,7 +95,7 @@ object InstallSessionManager {
         for (backend in priorityList) {
             when (backend) {
                 app.pwhs.universalinstaller.domain.model.InstallBackend.SHIZUKU -> {
-                    if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) {
+                    if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall(context)) {
                         return shizukuController
                     }
                 }
@@ -136,7 +136,7 @@ object InstallSessionManager {
         // confirmation dialog. If it is disabled, DefaultInstallController will fail or hang.
         // Therefore, if any elevated backend (Shizuku / Root / Dhizuku) is ready, auto-promote to it.
         if (SystemInstallerManager.isSystemPackageInstallerDisabled(context)) {
-            if (isShizukuReadyForInstall()) {
+            if (isShizukuReadyForInstall(context)) {
                 Timber.i("System package installer is frozen: auto-promoting to Shizuku")
                 return shizukuController
             }
@@ -162,9 +162,10 @@ object InstallSessionManager {
         rootController: BaseInstallController?,
         backendFactory: InstallerBackendFactory,
         targetUserId: Int? = null,
+        context: Context? = null,
     ): ManualInstallController.TargetedBackend? {
         val isKnox = targetUserId != null && isKnoxOrSecureFolder(targetUserId)
-        val shizukuReady = !isKnox && isShizukuReadyForInstall()
+        val shizukuReady = !isKnox && isShizukuReadyForInstall(context)
         val rootReady = if (rootController != null) {
             val state = backendFactory.probeRootState()
             state == RootState.READY
@@ -181,10 +182,10 @@ object InstallSessionManager {
         }
     }
 
-    fun isShizukuReadyForInstall(): Boolean = try {
+    fun isShizukuReadyForInstall(context: Context? = null): Boolean = try {
         rikka.shizuku.Shizuku.pingBinder() &&
-                !rikka.shizuku.Shizuku.isPreV11() &&
-                rikka.shizuku.Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+            !rikka.shizuku.Shizuku.isPreV11() &&
+            app.pwhs.universalinstaller.util.ShizukuServices.hasShizukuPermission(context)
     } catch (t: Throwable) {
         Timber.w(t, "Shizuku readiness probe failed")
         false
@@ -212,7 +213,7 @@ object InstallSessionManager {
                 "Custom" -> return false
                 "MicroG", "microG" -> if (app.pwhs.universalinstaller.util.MicroGCompat.isAvailable(context)) return false
                 "Root" -> return false
-                "Shizuku" -> if (isShizukuReadyForInstall()) return false
+                "Shizuku" -> if (isShizukuReadyForInstall(context)) return false
                 "Dhizuku" -> if (DhizukuCompat.isReady(context)) return false
                 "Default" -> return true
             }
@@ -232,7 +233,7 @@ object InstallSessionManager {
         for (backend in priorityList) {
             when (backend) {
                 app.pwhs.universalinstaller.domain.model.InstallBackend.SHIZUKU -> {
-                    if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall()) return false
+                    if ((useShizuku || spoofShizuku) && isShizukuReadyForInstall(context)) return false
                 }
                 app.pwhs.universalinstaller.domain.model.InstallBackend.DHIZUKU -> {
                     if (useDhizuku && DhizukuCompat.isReady(context)) return false
@@ -255,7 +256,7 @@ object InstallSessionManager {
         }
 
         if (SystemInstallerManager.isSystemPackageInstallerDisabled(context)) {
-            if (isShizukuReadyForInstall()) return false
+            if (isShizukuReadyForInstall(context)) return false
             if (useRoot) return false
             if (DhizukuCompat.isReady(context)) return false
         }

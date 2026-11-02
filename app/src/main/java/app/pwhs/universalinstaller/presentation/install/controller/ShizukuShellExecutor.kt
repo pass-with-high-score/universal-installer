@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.presentation.install.controller
 
+import android.content.Context
 import android.content.pm.PackageManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,12 +30,12 @@ object ShizukuShellExecutor {
         null
     }
 
-    fun isReady(): Boolean {
+    fun isReady(context: Context? = null): Boolean {
         if (newProcessMethod == null) return false
         return try {
             Shizuku.pingBinder() &&
                 !Shizuku.isPreV11() &&
-                Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+                app.pwhs.universalinstaller.util.ShizukuServices.hasShizukuPermission(context)
         } catch (t: Throwable) {
             Timber.w(t, "Shizuku readiness check failed")
             false

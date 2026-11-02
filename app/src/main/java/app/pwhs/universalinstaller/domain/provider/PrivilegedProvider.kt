@@ -6,6 +6,7 @@ import app.pwhs.core.data.local.dataStore
 import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.util.ShizukuServices
 import kotlinx.coroutines.flow.first
 import rikka.shizuku.Shizuku
 import timber.log.Timber
@@ -71,7 +72,7 @@ class PrivilegedProviderImpl(
     override fun isShizukuReady(): Boolean = try {
         Shizuku.pingBinder() &&
             !Shizuku.isPreV11() &&
-            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+            ShizukuServices.hasShizukuPermission(context)
     } catch (e: Exception) {
         Timber.w(e, "Shizuku readiness probe failed")
         false

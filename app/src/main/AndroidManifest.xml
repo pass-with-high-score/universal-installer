@@ -7,6 +7,9 @@
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Shizuku & Shevery Privileged API permissions -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+    <uses-permission android:name="com.hamondev.shevery.permission.PRIVILEGED_API" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -62,8 +65,14 @@
     <queries>
         <!-- Khai báo package của Universal Anti-Split -->
         <package android:name="app.pwhs.universalantisplit" />
+        <package android:name="moe.shizuku.privileged.api" />
+        <package android:name="com.hamondev.shevery" />
+        <package android:name="eu.darken.porter" />
         <intent>
             <action android:name="app.pwhs.universalinstaller.action.MERGE_SPLIT" />
+        </intent>
+        <intent>
+            <action android:name="moe.shizuku.manager.action.REQUEST_PERMISSION" />
         </intent>
     </queries>
 
@@ -392,7 +401,7 @@
 
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
-            android:authorities="${applicationId}.shizuku"
+            android:authorities="${applicationId}.shizuku;${applicationId}.shevery"
             android:enabled="true"
             android:exported="true"
             android:multiprocess="false"

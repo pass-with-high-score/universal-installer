@@ -23,6 +23,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Shizuku & Shevery Privileged API permissions -->
+    <uses-permission android:name="moe.shizuku.manager.permission.API_V23" />
+    <uses-permission android:name="com.hamondev.shevery.permission.PRIVILEGED_API" />
 
     <uses-feature
         android:name="android.hardware.touchscreen"
@@ -30,6 +33,15 @@
     <uses-feature
         android:name="android.software.leanback"
         android:required="true" />
+
+    <queries>
+        <package android:name="moe.shizuku.privileged.api" />
+        <package android:name="com.hamondev.shevery" />
+        <package android:name="eu.darken.porter" />
+        <intent>
+            <action android:name="moe.shizuku.manager.action.REQUEST_PERMISSION" />
+        </intent>
+    </queries>
 
     <application
         android:name=".TvApplication"
@@ -42,7 +54,7 @@
         android:theme="@style/Theme.UniversalInstaller">
         <provider
             android:name="rikka.shizuku.ShizukuProvider"
-            android:authorities="${applicationId}.shizuku"
+            android:authorities="${applicationId}.shizuku;${applicationId}.shevery"
             android:enabled="true"
             android:exported="true"
             android:multiprocess="false"

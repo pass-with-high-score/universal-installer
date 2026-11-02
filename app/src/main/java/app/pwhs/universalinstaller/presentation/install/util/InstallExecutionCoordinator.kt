@@ -139,6 +139,7 @@ object InstallExecutionCoordinator {
                 rootController = rootController,
                 backendFactory = backendFactory,
                 targetUserId = targetedUserId,
+                context = application,
             )
             if (targetedBackend == null) {
                 val errorRes = if (app.pwhs.universalinstaller.presentation.install.isKnoxOrSecureFolder(targetedUserId)) {

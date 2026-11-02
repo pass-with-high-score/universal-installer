@@ -57,6 +57,7 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.util.ShizukuStarterHelper
 import app.pwhs.core.util.openUriSafely
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.setting.InstallMode
@@ -181,9 +182,11 @@ fun ShizukuPromoBanner(
                     scope.launch { pagerState.animateScrollToPage(1) }
                 }
                 ShizukuState.NOT_RUNNING -> {
-                    val launchIntent = context.packageManager.getLaunchIntentForPackage(
-                        if (porterOnly) ShizukuServices.PORTER_PACKAGE else SHIZUKU_PACKAGE_NAME
-                    )
+                    val launchIntent = if (porterOnly) {
+                        context.packageManager.getLaunchIntentForPackage(ShizukuServices.PORTER_PACKAGE)
+                    } else {
+                        ShizukuStarterHelper.getManagerLaunchIntent(context)
+                    }
                     if (launchIntent != null) {
                         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         runCatching { context.startActivity(launchIntent) }

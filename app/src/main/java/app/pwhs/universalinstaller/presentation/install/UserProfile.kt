@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import com.topjohnwu.superuser.Shell
+import app.pwhs.universalinstaller.util.ShizukuServices
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.lsposed.hiddenapibypass.HiddenApiBypass
@@ -53,7 +54,7 @@ fun rememberDeviceUserProfiles(): List<DeviceUserProfile> {
     }
     LaunchedEffect(context) {
         withContext(Dispatchers.IO) {
-            val enriched = getUsersFromShizuku(ownId) ?: getUsersFromRoot(ownId)
+            val enriched = getUsersFromShizuku(ownId, context) ?: getUsersFromRoot(ownId)
             if (!enriched.isNullOrEmpty()) {
                 withContext(Dispatchers.Main) {
                     profiles = enriched
@@ -66,7 +67,7 @@ fun rememberDeviceUserProfiles(): List<DeviceUserProfile> {
 
 fun loadDeviceUserProfiles(context: Context): List<DeviceUserProfile> {
     val ownId = getUserId(Process.myUserHandle())
-    val fromShizuku = getUsersFromShizuku(ownId)
+    val fromShizuku = getUsersFromShizuku(ownId, context)
     if (!fromShizuku.isNullOrEmpty()) return fromShizuku
 
     val fromRoot = getUsersFromRoot(ownId)
@@ -75,11 +76,9 @@ fun loadDeviceUserProfiles(context: Context): List<DeviceUserProfile> {
     return getUsersFromUserManager(context, ownId)
 }
 
-private fun getUsersFromShizuku(ownId: Int): List<DeviceUserProfile>? {
+private fun getUsersFromShizuku(ownId: Int, context: Context? = null): List<DeviceUserProfile>? {
     return runCatching {
-        if (!Shizuku.pingBinder() ||
-            Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
-        ) {
+        if (!ShizukuServices.hasShizukuPermission(context)) {
             return null
         }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {

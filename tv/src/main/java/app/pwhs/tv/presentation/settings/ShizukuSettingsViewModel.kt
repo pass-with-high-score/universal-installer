@@ -10,6 +10,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.util.RootShell
+import app.pwhs.core.util.ShizukuStarterHelper
 import app.pwhs.tv.R
 import app.pwhs.tv.install.TvShizuku
 import kotlinx.coroutines.Dispatchers
@@ -89,25 +90,7 @@ class ShizukuSettingsViewModel(application: Application) : AndroidViewModel(appl
                 viewModelScope.launch {
                     var startedViaRoot = false
                     if (RootShell.isAvailable()) {
-                        val starterCmd = """
-                            if [ -x /data/local/tmp/shizuku_starter ]; then
-                                /data/local/tmp/shizuku_starter
-                            elif [ -f /data/user_de/0/moe.shizuku.privileged.api/bin/shizuku_starter ]; then
-                                /data/user_de/0/moe.shizuku.privileged.api/bin/shizuku_starter
-                            elif [ -f /sdcard/Android/data/moe.shizuku.privileged.api/start.sh ]; then
-                                sh /sdcard/Android/data/moe.shizuku.privileged.api/start.sh
-                            else
-                                APK=${'$'}(pm path moe.shizuku.privileged.api 2>/dev/null | head -n 1 | cut -d: -f2)
-                                if [ -n "${'$'}APK" ]; then
-                                    LIB=${'$'}(find ${'$'}(dirname "${'$'}APK")/lib -name "libshizuku.so" 2>/dev/null | head -n 1)
-                                    if [ -f "${'$'}LIB" ]; then
-                                        cp "${'$'}LIB" /data/local/tmp/shizuku_starter
-                                        chmod 755 /data/local/tmp/shizuku_starter
-                                        /data/local/tmp/shizuku_starter
-                                    fi
-                                fi
-                            fi
-                        """.trimIndent()
+                        val starterCmd = ShizukuStarterHelper.buildStarterScript(context)
                         RootShell.exec(starterCmd)
                         delay(1200)
                         refresh()
@@ -129,9 +112,8 @@ class ShizukuSettingsViewModel(application: Application) : AndroidViewModel(appl
                     if (!startedViaRoot) {
                         _message.value = R.string.tv_shizuku_stopped
                         showToast(context.getString(R.string.tv_shizuku_stopped))
-                        val launchIntent = context.packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")
+                        val launchIntent = ShizukuStarterHelper.getManagerLaunchIntent(context)
                         if (launchIntent != null) {
-                            launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             runCatching { context.startActivity(launchIntent) }
                         }
                     }

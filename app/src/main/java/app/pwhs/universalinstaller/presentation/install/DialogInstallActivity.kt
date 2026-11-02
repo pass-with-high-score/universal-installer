@@ -311,7 +311,7 @@ class DialogInstallActivity : FragmentActivity() {
                         else -> "Default"
                     }
                     val isBackendReady = when (configuredBackend) {
-                        "Shizuku" -> InstallSessionManager.isShizukuReadyForInstall()
+                        "Shizuku" -> InstallSessionManager.isShizukuReadyForInstall(context)
                         "Dhizuku" -> DhizukuCompat.isReady(context)
                         "MicroG" -> MicroGCompat.isAvailable(context)
                         else -> true

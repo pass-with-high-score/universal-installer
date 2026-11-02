@@ -58,7 +58,7 @@ object BackendSelfHeal {
 
         val useShizuku = prefs[PreferencesKeys.USE_SHIZUKU] ?: false
         if (useShizuku) {
-            val healthy = awaitShizukuReady()
+            val healthy = awaitShizukuReady(application)
             reportHealth("shizuku", healthy)
             if (!healthy) {
                 Timber.i("BackendSelfHeal: USE_SHIZUKU on but Shizuku not ready within probe window — keeping pref, runtime will fall back if needed")
@@ -82,20 +82,20 @@ object BackendSelfHeal {
     // Shizuku's binder is bound asynchronously after the app starts, so an immediate
     // pingBinder() right at process launch can return false even when Shizuku is healthy.
     // Poll briefly (~2s) to give the binder a chance to land before we conclude it's gone.
-    private suspend fun awaitShizukuReady(timeoutMs: Long = 2000L, stepMs: Long = 100L): Boolean {
+    private suspend fun awaitShizukuReady(context: android.content.Context, timeoutMs: Long = 2000L, stepMs: Long = 100L): Boolean {
         var elapsed = 0L
         while (elapsed <= timeoutMs) {
-            if (probeShizukuReady()) return true
+            if (probeShizukuReady(context)) return true
             delay(stepMs)
             elapsed += stepMs
         }
         return false
     }
 
-    private fun probeShizukuReady(): Boolean = try {
+    private fun probeShizukuReady(context: android.content.Context): Boolean = try {
         Shizuku.pingBinder() &&
             !Shizuku.isPreV11() &&
-            Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
+            app.pwhs.universalinstaller.util.ShizukuServices.hasShizukuPermission(context)
     } catch (t: Throwable) {
         Timber.w(t, "BackendSelfHeal: Shizuku probe threw")
         false
