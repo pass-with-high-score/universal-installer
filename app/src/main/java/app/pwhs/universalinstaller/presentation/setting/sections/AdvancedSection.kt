@@ -124,10 +124,15 @@ internal fun LazyListScope.AdvancedSection(
                 )
             }
             }
-            SecurityLevelSelector(
-                current = securityLevel,
-                onChange = onSecurityLevelChanged,
-            )
+            // The security level's Strict mode only adds VirusTotal scan gates, so with
+            // VirusTotal disabled the selector would promise protection that isn't running.
+            // Hiding it leaves the saved value untouched; turning the toggle off restores it.
+            if (!virusTotalDisabled) {
+                SecurityLevelSelector(
+                    current = securityLevel,
+                    onChange = onSecurityLevelChanged,
+                )
+            }
         }
     }
 }
