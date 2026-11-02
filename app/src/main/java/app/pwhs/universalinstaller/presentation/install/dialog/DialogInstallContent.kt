@@ -131,6 +131,15 @@ fun DialogInstallContent(
         }
     }
 
+    // If VirusTotal gets disabled while a risk dialog is open, drop its risks so the stale
+    // warning (and its install button) doesn't linger next to an install that no longer needs
+    // consent for it. Other risks are preserved.
+    LaunchedEffect(vtDisabled) {
+        if (vtDisabled && pendingRisks.isNotEmpty()) {
+            pendingRisks = pendingRisks.withoutVirusTotalRisks()
+        }
+    }
+
     val handleInstallTap = {
         val info = uiState.pendingApkInfo
         val risks = if (info != null) {

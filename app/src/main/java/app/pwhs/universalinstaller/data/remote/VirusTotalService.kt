@@ -19,6 +19,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.util.cio.readChannel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import timber.log.Timber
@@ -38,6 +39,9 @@ class VirusTotalService(
         val buffer = ByteArray(8192)
         var read: Int
         while (input.read(buffer).also { read = it } != -1) {
+            // Blocking reads can't be interrupted; check cancellation between chunks so a
+            // cancelled scan (e.g. pending install dismissed) stops reading to EOF.
+            ensureActive()
             digest.update(buffer, 0, read)
         }
         digest.digest().joinToString("") { "%02x".format(it) }

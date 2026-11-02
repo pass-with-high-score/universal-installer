@@ -179,6 +179,7 @@ internal fun ApkInfoContent(
                 apkInfo = apkInfo,
                 isExpanded = isExpanded,
                 isDowngrade = isDowngrade,
+                vtDisabled = vtDisabled,
                 onCheckVirusTotal = onCheckVirusTotal,
                 onShowTrackers = { showTrackersDialog = true },
                 onExpand = { isExpanded = true },

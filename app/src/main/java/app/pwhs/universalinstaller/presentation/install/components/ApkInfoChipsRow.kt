@@ -36,6 +36,7 @@ fun ApkInfoChipsRow(
     apkInfo: ApkInfo,
     isExpanded: Boolean,
     isDowngrade: Boolean,
+    vtDisabled: Boolean = false,
     onCheckVirusTotal: () -> Unit,
     onShowTrackers: () -> Unit,
     onExpand: () -> Unit,
@@ -126,7 +127,7 @@ fun ApkInfoChipsRow(
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         }
-        apkInfo.vtResult?.let { vt ->
+        if (!vtDisabled) apkInfo.vtResult?.let { vt ->
             VtStatusChip(
                 vt = vt,
                 onClick = onCheckVirusTotal,

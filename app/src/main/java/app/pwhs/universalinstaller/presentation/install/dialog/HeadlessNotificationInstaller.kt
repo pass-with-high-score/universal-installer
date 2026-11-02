@@ -71,7 +71,9 @@ fun HeadlessNotificationInstall(
         ) {
             val updated = withTimeoutOrNull(2500L) {
                 viewModel.uiState.map { it.pendingApkInfo }.filterNotNull().first {
-                    (!vtDisabled || it.vtResult?.status != VtStatus.SCANNING) &&
+                    // When VirusTotal is on, keep waiting until its scan leaves SCANNING;
+                    // when it is off, ignore the stale VirusTotal state entirely.
+                    (vtDisabled || it.vtResult?.status != VtStatus.SCANNING) &&
                         (!blockOnTrackers || !it.isScanningTrackers)
                 }
             }

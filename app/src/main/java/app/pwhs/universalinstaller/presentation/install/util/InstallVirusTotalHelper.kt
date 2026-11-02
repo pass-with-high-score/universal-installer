@@ -13,6 +13,7 @@ import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -49,6 +50,9 @@ object InstallVirusTotalHelper {
                 val buffer = ByteArray(8192)
                 var read = input.read(buffer)
                 while (read >= 0) {
+                    // A dismissed APK must stop its read loop; blocking reads can't be
+                    // interrupted, so check cancellation between chunks.
+                    ensureActive()
                     digest.update(buffer, 0, read)
                     read = input.read(buffer)
                 }
