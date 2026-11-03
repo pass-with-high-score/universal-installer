@@ -332,6 +332,8 @@
     <string name="setting_section_advanced">Nâng cao</string>
     <string name="setting_vt_api_key_title">Khóa API VirusTotal</string>
     <string name="setting_vt_api_key_placeholder">Dán khóa API vào đây…</string>
+    <string name="setting_vt_disable_title">Tắt VirusTotal</string>
+    <string name="setting_vt_disable_desc">Tắt toàn bộ tính năng VirusTotal: không quét, không tải lên tệp/hash và ẩn toàn bộ giao diện VirusTotal.</string>
     <string name="setting_security_level_title">Mức bảo mật</string>
     <string name="setting_security_normal">Bình thường</string>
     <string name="setting_security_strict">Nghiêm ngặt</string>

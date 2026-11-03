@@ -7,7 +7,11 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.datastore.preferences.core.Preferences
+import app.pwhs.universalinstaller.domain.manager.ProfileManager
 import app.pwhs.universalinstaller.presentation.install.InstallViewModel
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import app.pwhs.universalinstaller.util.DhizukuCompat
+import app.pwhs.universalinstaller.util.MicroGCompat
 import app.pwhs.core.util.PermissionMonitor
 import app.pwhs.core.util.PermissionSettingsHelper
 import app.pwhs.universalinstaller.presentation.install.util.InstallSessionManager
@@ -41,6 +45,30 @@ object DialogInstallActivityHelper {
     ): Boolean = !InstallSessionManager.requiresInstallPermission(context, prefs, profileId) ||
         Build.VERSION.SDK_INT < Build.VERSION_CODES.O ||
         context.packageManager.canRequestPackageInstalls()
+
+    fun resolveBackendAndReadiness(
+        context: Context,
+        prefs: Preferences?,
+        selectedProfileId: String?,
+    ): Pair<String, Boolean> {
+        val profiles = ProfileManager.parseProfiles(prefs?.get(PreferencesKeys.INSTALLER_PROFILES))
+        val profile = profiles.find { it.id == selectedProfileId }
+        val configuredBackend = profile?.preferredBackend ?: when {
+            prefs?.get(PreferencesKeys.USE_SHIZUKU) == true -> "Shizuku"
+            prefs?.get(PreferencesKeys.USE_ROOT) == true -> "Root"
+            prefs?.get(PreferencesKeys.USE_DHIZUKU) == true -> "Dhizuku"
+            prefs?.get(PreferencesKeys.USE_CUSTOM_AUTHORIZER) == true -> "Custom"
+            prefs?.get(PreferencesKeys.USE_MICROG) == true -> "MicroG"
+            else -> "Default"
+        }
+        val isBackendReady = when (configuredBackend) {
+            "Shizuku" -> InstallSessionManager.isShizukuReadyForInstall(context)
+            "Dhizuku" -> DhizukuCompat.isReady(context)
+            "MicroG" -> MicroGCompat.isAvailable(context)
+            else -> true
+        }
+        return configuredBackend to isBackendReady
+    }
 
     fun openInstallPermissionSettings(activity: Activity) {
         PermissionMonitor.start(activity) { activity.packageManager.canRequestPackageInstalls() }

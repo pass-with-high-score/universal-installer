@@ -77,17 +77,26 @@ fun HeadlessNotificationInstall(
                         (!blockOnTrackers || !it.isScanningTrackers)
                 }
             }
-            if (updated != null) {
-                currentApkInfo = updated
-            }
+            // Even if the combined wait timed out, preserve whichever scan finished
+            // (e.g. trackers finished but VirusTotal was still scanning).
+            currentApkInfo = updated ?: viewModel.uiState.value.pendingApkInfo ?: currentApkInfo
         }
+
+        // If either required check is still actively scanning after the timeout,
+        // do not auto-install without confirmation.
+        val isRequiredScanPending = (blockOnTrackers && currentApkInfo.isScanningTrackers) ||
+            (strictVirusTotal && !vtDisabled && currentApkInfo.vtResult?.status == VtStatus.SCANNING)
 
         val risks = detectInstallRisks(currentApkInfo, strictVirusTotal, blockOnTrackers, vtDisabled)
         // A stale verdict from before the user disabled VirusTotal must not block auto-install.
         val hasVtFlags = !vtDisabled && currentApkInfo.vtResult?.let { it.malicious > 0 || it.suspicious > 0 } == true
         val isCallerAutoApproved = AutoApproveApps.isAutoApproved(prefs, callerPackage)
 
-        if ((mode == ExternalOpenMode.AutoNotification || isCallerAutoApproved) && risks.isEmpty() && !hasVtFlags) {
+        if ((mode == ExternalOpenMode.AutoNotification || isCallerAutoApproved) &&
+            !isRequiredScanPending &&
+            risks.isEmpty() &&
+            !hasVtFlags
+        ) {
             Timber.i("$LOG: auto mode/approved, no risks - installing without asking (caller=$callerPackage, mode=$mode)")
             onInstallFromNotificationAction()
             return@LaunchedEffect

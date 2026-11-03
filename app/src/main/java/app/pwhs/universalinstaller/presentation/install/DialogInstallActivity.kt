@@ -59,9 +59,6 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallActivityHelper
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallFallbackDialog
-import app.pwhs.universalinstaller.domain.manager.ProfileManager
-import app.pwhs.universalinstaller.util.DhizukuCompat
-import app.pwhs.universalinstaller.util.MicroGCompat
 import app.pwhs.universalinstaller.util.ShizukuServices
 import androidx.fragment.app.FragmentActivity
 import timber.log.Timber
@@ -302,22 +299,11 @@ class DialogInstallActivity : FragmentActivity() {
                 if (!StorageUtil.hasSufficientStorage(apkSize)) {
                     viewModel.showStorageWarning(apkSize)
                 } else {
-                    val profiles = ProfileManager.parseProfiles(prefs?.get(PreferencesKeys.INSTALLER_PROFILES))
-                    val profile = profiles.find { it.id == uiState.selectedProfileId }
-                    val configuredBackend = profile?.preferredBackend ?: when {
-                        prefs?.get(PreferencesKeys.USE_SHIZUKU) == true -> "Shizuku"
-                        prefs?.get(PreferencesKeys.USE_ROOT) == true -> "Root"
-                        prefs?.get(PreferencesKeys.USE_DHIZUKU) == true -> "Dhizuku"
-                        prefs?.get(PreferencesKeys.USE_CUSTOM_AUTHORIZER) == true -> "Custom"
-                        prefs?.get(PreferencesKeys.USE_MICROG) == true -> "MicroG"
-                        else -> "Default"
-                    }
-                    val isBackendReady = when (configuredBackend) {
-                        "Shizuku" -> InstallSessionManager.isShizukuReadyForInstall(context)
-                        "Dhizuku" -> DhizukuCompat.isReady(context)
-                        "MicroG" -> MicroGCompat.isAvailable(context)
-                        else -> true
-                    }
+                    val (configuredBackend, isBackendReady) = DialogInstallActivityHelper.resolveBackendAndReadiness(
+                        context = context,
+                        prefs = prefs,
+                        selectedProfileId = uiState.selectedProfileId,
+                    )
                     if (configuredBackend != "Default" && !isBackendReady) {
                         pendingFallbackBackend = configuredBackend
                     } else {
