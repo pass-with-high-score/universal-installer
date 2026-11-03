@@ -103,8 +103,8 @@
     <string name="updates_config_version_regex_placeholder">pl. ^NeoPlayer(.+)$ vagy [0-9.]+</string>
     <string name="updates_config_preview_extracted">Kinyert előnézet: %1$s</string>
     <string name="updates_config_match_group_label">Használandó egyezési csoport (nem kötelező)</string>
-    <string name="updates_config_match_group_placeholder">pl. 1 vagy  vagy .$2 (alapértelmezett:  vagy $0)</string>
-    <string name="updates_config_installed_match_group_placeholder">pl. 1 vagy  (alapértelmezett:  vagy $0)</string>
+    <string name="updates_config_match_group_placeholder">pl. 1 vagy $1 vagy $1.$2 (alapértelmezett: $1 vagy $0)</string>
+    <string name="updates_config_installed_match_group_placeholder">pl. 1 vagy $1 (alapértelmezett: $1 vagy $0)</string>
     <string name="updates_config_category_label">Kategória</string>
     <string name="updates_config_category_placeholder">pl. Eszközök, Közösségi, Játékok</string>
     <string name="nav_install">Telepítés</string>

@@ -16,7 +16,7 @@
     <string name="apk_received_title">APK megérkezett</string>
     <string name="receive_channel_name">Csomag fogadása</string>
     <string name="home_empty_title">Még nincs itt semmi</string>
-    <string name="home_empty_hint">Nyisd meg a Universal Installert a telefonodon</string>
+    <string name="home_empty_hint">Nyisd meg a Universal Installert a telefonodon, és küldj egy csomagot erre az órára.</string>
     <string name="receiving">%1$s fogadása…</string>
     <string name="receive_failed">Sikertelen átvitel</string>
     <string name="badge_phone_app">Telefonos app</string>
