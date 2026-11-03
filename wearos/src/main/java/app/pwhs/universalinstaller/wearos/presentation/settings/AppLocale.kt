@@ -13,7 +13,7 @@ object AppLocale {
     const val SYSTEM = ""
 
     val TAGS = listOf(
-        SYSTEM, "ar", "bn", "de", "el", "en", "es", "fr", "hi", "in", "it",
+        SYSTEM, "ar", "bn", "de", "el", "en", "es", "fr", "hi", "hu", "in", "it",
         "ja", "ko", "pl", "pt-BR", "ro", "ru", "tr", "uk", "vi", "zh",
     )
 

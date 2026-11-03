@@ -92,6 +92,7 @@ private fun LanguageUi(
             "fa" to "فارسی",
             "fr" to "Français",
             "hi" to "हिन्दी",
+            "hu" to "Magyar",
             "in" to "Indonesia",
             "it" to "Italiano",
             "ja" to "日本語",
