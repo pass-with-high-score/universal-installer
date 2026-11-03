@@ -270,7 +270,9 @@ class DialogInstallActivity : FragmentActivity() {
             val blockOnTrackers = prefs?.get(PreferencesKeys.AUTO_APPROVE_BLOCK_TRACKERS) ?: false
             var autoBlockedRisks by remember { mutableStateOf<List<InstallRisk>>(emptyList()) }
             var keepApk by remember(dialogTarget?.sessionId) { mutableStateOf(false) }
-            val strictVirusTotalCheck = SecurityLevel.from(
+            val vtDisabledForAutoInstall = prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false
+            val strictVirusTotalCheck = !(prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false) &&
+                SecurityLevel.from(
                 stored = prefs?.get(PreferencesKeys.SECURITY_LEVEL),
                 legacyStrict = prefs?.get(PreferencesKeys.STRICT_VIRUSTOTAL_CHECK) ?: false,
             ) == SecurityLevel.Strict
@@ -347,13 +349,35 @@ class DialogInstallActivity : FragmentActivity() {
                 }
             }
 
-            LaunchedEffect(uiState.dialogStage, autoConfirmExternalInstall, isCallerAutoApproved, autoOpenAfterInstall, uiState.pendingApkInfo) {
+            LaunchedEffect(uiState.dialogStage, autoConfirmExternalInstall, isCallerAutoApproved, autoOpenAfterInstall, vtDisabledForAutoInstall, uiState.pendingApkInfo) {
                 val apkInfo = uiState.pendingApkInfo
-                val isScanning = apkInfo?.vtResult?.status == VtStatus.SCANNING || (blockOnTrackers && apkInfo?.isScanningTrackers == true)
+                val vtDisabled = vtDisabledForAutoInstall
+                // Risks are a pure function of the APK info and the settings, so refresh the
+                // remembered blocked list whenever the effect re-runs (e.g. the VirusTotal
+                // toggle changed in another window): VT risks drop when disabled and return
+                // when re-enabled. The list stays empty until a block actually happened.
+                if (autoBlockedRisks.isNotEmpty() && apkInfo != null) {
+                    autoBlockedRisks = detectInstallRisks(
+                        apkInfo,
+                        strictVirusTotalCheck,
+                        blockOnTrackers,
+                        vtDisabled,
+                    )
+                }
+                // With VirusTotal disabled a stale SCANNING/verdict from an earlier session
+                // must not delay auto-install or block it with raw VirusTotal counts.
+                val isScanning = (!vtDisabled && apkInfo?.vtResult?.status == VtStatus.SCANNING) ||
+                    (blockOnTrackers && apkInfo?.isScanningTrackers == true)
                 if (isScanning) return@LaunchedEffect
 
-                val risks = if (apkInfo != null) detectInstallRisks(apkInfo, strictVirusTotalCheck, blockOnTrackers) else emptyList()
-                val hasSecurityFlags = risks.isNotEmpty() || (apkInfo?.vtResult?.let { it.malicious > 0 || it.suspicious > 0 } == true)
+                val risks = if (apkInfo != null) detectInstallRisks(
+                    apkInfo,
+                    strictVirusTotalCheck,
+                    blockOnTrackers,
+                    vtDisabled,
+                ) else emptyList()
+                val hasVtFlags = !vtDisabled && apkInfo?.vtResult?.let { it.malicious > 0 || it.suspicious > 0 } == true
+                val hasSecurityFlags = risks.isNotEmpty() || hasVtFlags
                 val shouldAutoInstall = (autoConfirmExternalInstall || isCallerAutoApproved) && !securityGate.isPinRequired && !hasSecurityFlags && !isRetry
                 if (hasSecurityFlags && (autoConfirmExternalInstall || isCallerAutoApproved)) {
                     Timber.w("Auto-approve install blocked: security risks/VT flags present ($risks, vt=${apkInfo?.vtResult?.status})")
@@ -424,6 +448,7 @@ class DialogInstallActivity : FragmentActivity() {
                 keepApk = keepApk,
                 onKeepApkChanged = { keepApk = it },
                 strictVirusTotalCheck = strictVirusTotalCheck,
+                vtDisabled = prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false,
                 blockOnTrackers = blockOnTrackers,
                 autoBlockedRisks = autoBlockedRisks,
                 canInstallPackages = { canInstallPackages(prefs, uiState.selectedProfileId) },

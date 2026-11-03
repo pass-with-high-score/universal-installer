@@ -117,11 +117,19 @@ fun InstallScreen(
     // take the primary slot; Normal keeps VirusTotal available without pushing it.
     val strictVirusTotalCheck by remember(context) {
         context.dataStore.data.map {
-            SecurityLevel.from(
-                stored = it[PreferencesKeys.SECURITY_LEVEL],
-                legacyStrict = it[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] ?: false,
-            ) == SecurityLevel.Strict
+            if (it[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false) {
+                false
+            } else {
+                SecurityLevel.from(
+                    stored = it[PreferencesKeys.SECURITY_LEVEL],
+                    legacyStrict = it[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] ?: false,
+                ) == SecurityLevel.Strict
+            }
         }
+    }.collectAsState(initial = false)
+
+    val vtDisabled by remember(context) {
+        context.dataStore.data.map { it[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false }
     }.collectAsState(initial = false)
 
     // Risk consent gate — populated when the user taps Install on a downgrade or
@@ -209,7 +217,11 @@ fun InstallScreen(
             // rather than a surprise after fingerprint auth completes.
             val info = uiState.pendingApkInfo
             val risks = if (info != null) {
-                app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks(info, strictVirusTotalCheck)
+                app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks(
+                    info,
+                    strictVirusTotalCheck,
+                    vtDisabled = vtDisabled,
+                )
             } else emptyList()
             if (risks.isNotEmpty()) {
                 pendingRisks = risks
@@ -262,7 +274,11 @@ fun InstallScreen(
             if (ready != null) {
                 val picked = ready.entries.filter { it.selected && it.splitUris.isNotEmpty() }
                 val risks = picked.flatMap { 
-                    app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks(it.apkInfo, strictVirusTotalCheck) 
+                    app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks(
+                        it.apkInfo,
+                        strictVirusTotalCheck,
+                        vtDisabled = vtDisabled,
+                    )
                 }.distinct()
                 
                 if (risks.isNotEmpty()) {

@@ -12,6 +12,7 @@ import app.pwhs.universalinstaller.util.CustomTabsHelper
 import app.pwhs.universalinstaller.presentation.manage.BatchExtractState
 import app.pwhs.universalinstaller.presentation.manage.ExtractMode
 import app.pwhs.universalinstaller.presentation.manage.ExtractState
+import app.pwhs.universalinstaller.presentation.install.util.InstallVirusTotalHelper
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -23,6 +24,7 @@ import java.security.MessageDigest
 object ManageExtractHelper {
 
     suspend fun scanVirusTotal(context: Context, app: InstalledApp) = withContext(Dispatchers.IO) {
+        if (InstallVirusTotalHelper.isDisabled(context)) return@withContext
         try {
             val appInfo = context.packageManager.getApplicationInfo(app.packageName, 0)
             val baseApkFile = File(appInfo.sourceDir)

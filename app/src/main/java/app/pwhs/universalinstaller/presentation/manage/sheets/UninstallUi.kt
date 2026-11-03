@@ -134,6 +134,7 @@ import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMeth
 import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsActivity
 import app.pwhs.universalinstaller.presentation.manage.permissions.AppPermissionsActivity
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.universalinstaller.util.AppIconData
 import app.pwhs.universalinstaller.util.BiometricGate
 import coil3.compose.SubcomposeAsyncImage
@@ -199,6 +200,8 @@ internal fun UninstallUi(
     val context = LocalContext.current
     val resource = LocalResources.current
     var actionTarget by remember { mutableStateOf<InstalledApp?>(null) }
+    val storedPrefs by context.dataStore.data.collectAsState(initial = null)
+    val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
     var confirmUninstallTarget by remember { mutableStateOf<InstalledApp?>(null) }
 
     BackHandler(enabled = uiState.isSelectionMode) {
@@ -282,6 +285,7 @@ internal fun UninstallUi(
                 actionTarget = null
                 onCheckVirusTotal(target)
             },
+            vtDisabled = vtDisabled,
             onExtract = {
                 actionTarget = null
                 onExtract(target.packageName, target.appName)

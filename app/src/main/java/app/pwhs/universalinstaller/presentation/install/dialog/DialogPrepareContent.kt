@@ -94,6 +94,7 @@ fun DialogPrepareContent(
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
     val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank()
     val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
+    val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
     val isUpdate = installedVersionCode != null && installedVersionCode > 0
     val isDowngrade = isUpdate && apkInfo.versionCode < installedVersionCode
 
@@ -297,7 +298,7 @@ fun DialogPrepareContent(
                     onClick = { showAbiWarningDialog = true },
                 )
             }
-            VirusTotalInstallPrompt(
+            if (!vtDisabled) VirusTotalInstallPrompt(
                 apkInfo = apkInfo,
                 onScan = {
                     if (!hasVtKey) {
@@ -417,7 +418,7 @@ fun DialogPrepareContent(
                 onClick = {
                     if (apkInfo.isAbiIncompatible) {
                         showAbiWarningDialog = true
-                    } else if (!hasVtKey && !dontAskAgain) {
+                    } else if (!vtDisabled && !hasVtKey && !dontAskAgain) {
                         pendingInstallAfterVt = true
                         showVtSetupDialog = true
                     } else {
@@ -470,7 +471,7 @@ fun DialogPrepareContent(
                 onDismiss = { showAbiWarningDialog = false },
                 onInstallAnyway = {
                     showAbiWarningDialog = false
-                    if (!hasVtKey && !dontAskAgain) {
+                    if (!vtDisabled && !hasVtKey && !dontAskAgain) {
                         pendingInstallAfterVt = true
                         showVtSetupDialog = true
                     } else {
@@ -480,7 +481,7 @@ fun DialogPrepareContent(
             )
         }
 
-        if (showVtSetupDialog) {
+        if (showVtSetupDialog && !vtDisabled) {
             VirusTotalSetupDialog(
                 onDismiss = {
                     showVtSetupDialog = false

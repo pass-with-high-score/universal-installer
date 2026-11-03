@@ -226,6 +226,7 @@ class SettingViewModel(
                 prefs[PreferencesKeys.STRICT_VIRUSTOTAL_CHECK] ?: false,
                 prefs[PreferencesKeys.AUTO_APPROVE_CALLER_APPS] ?: false,
                 prefs[PreferencesKeys.AUTO_APPROVE_BLOCK_TRACKERS] ?: false,
+                prefs[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false,
             )
         },
         dataStore.data.map { prefs ->
@@ -295,6 +296,7 @@ class SettingViewModel(
     fun removeFromBlacklist(packageName: String) = preferencesDelegate.removeFromBlacklist(packageName)
     fun setVirusTotalApiKey(key: String) = preferencesDelegate.setVirusTotalApiKey(key)
     fun setStrictVirusTotalCheck(enabled: Boolean) = preferencesDelegate.setStrictVirusTotalCheck(enabled)
+    fun setVirusTotalDisabled(enabled: Boolean) = preferencesDelegate.setVirusTotalDisabled(enabled)
     fun setDeleteApkAfterInstall(enabled: Boolean) = preferencesDelegate.setDeleteApkAfterInstall(enabled)
     fun setAutoOpenAfterInstall(enabled: Boolean) = preferencesDelegate.setAutoOpenAfterInstall(enabled)
     fun setBiometricLockInstall(enabled: Boolean) = preferencesDelegate.setBiometricLockInstall(enabled)

@@ -94,6 +94,7 @@ fun detectInstallRisks(
     apkInfo: ApkInfo,
     strictVirusTotal: Boolean = false,
     blockOnTrackers: Boolean = false,
+    vtDisabled: Boolean = false,
 ): List<InstallRisk> {
     val risks = mutableListOf<InstallRisk>()
     if (isDowngrade(apkInfo)) {
@@ -109,12 +110,16 @@ fun detectInstallRisks(
     if (blockOnTrackers && apkInfo.trackers.isNotEmpty()) {
         risks += InstallRisk.TrackersDetected(apkInfo.trackers.size)
     }
-    when (val status = apkInfo.vtResult?.status) {
-        VtStatus.MALICIOUS -> risks += InstallRisk.VtMalicious(apkInfo.vtResult.malicious, apkInfo.sha256)
-        VtStatus.SUSPICIOUS -> risks += InstallRisk.VtSuspicious(apkInfo.vtResult.suspicious, apkInfo.sha256)
-        VtStatus.CLEAN -> Unit
-        null -> if (strictVirusTotal) risks += InstallRisk.VtUnscanned
-        else -> if (strictVirusTotal) risks += InstallRisk.VtUnscanned
+    // A stale VirusTotal verdict can survive on a stashed/restored session after the user has
+    // turned VirusTotal off — it must not raise VirusTotal risks either.
+    if (!vtDisabled) {
+        when (val status = apkInfo.vtResult?.status) {
+            VtStatus.MALICIOUS -> risks += InstallRisk.VtMalicious(apkInfo.vtResult.malicious, apkInfo.sha256)
+            VtStatus.SUSPICIOUS -> risks += InstallRisk.VtSuspicious(apkInfo.vtResult.suspicious, apkInfo.sha256)
+            VtStatus.CLEAN -> Unit
+            null -> if (strictVirusTotal) risks += InstallRisk.VtUnscanned
+            else -> if (strictVirusTotal) risks += InstallRisk.VtUnscanned
+        }
     }
     return risks
 }

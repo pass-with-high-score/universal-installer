@@ -76,6 +76,7 @@ internal fun AppActionSheet(
     onShare: () -> Unit,
     onReinstall: () -> Unit,
     onCheckVirusTotal: () -> Unit,
+    vtDisabled: Boolean = false,
     onAddToServer: () -> Unit,
     onExtract: () -> Unit,
     onForceStop: () -> Unit,
@@ -289,7 +290,7 @@ internal fun AppActionSheet(
                         },
                     )
                 )
-                add(
+                if (!vtDisabled) add(
                     AppActionItem(
                         icon = Icons.Rounded.Search,
                         iconTint = MaterialTheme.colorScheme.primary,

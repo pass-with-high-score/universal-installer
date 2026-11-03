@@ -111,6 +111,7 @@ fun DialogInstallContent(
     keepApk: Boolean = false,
     onKeepApkChanged: (Boolean) -> Unit = {},
     strictVirusTotalCheck: Boolean,
+    vtDisabled: Boolean = false,
     blockOnTrackers: Boolean = false,
     autoBlockedRisks: List<InstallRisk> = emptyList(),
     canInstallPackages: () -> Boolean,
@@ -130,10 +131,22 @@ fun DialogInstallContent(
         }
     }
 
+    // Recompute the open risk dialog when the VirusTotal toggle changes (possible in
+    // multi-window): risks are a pure function of the APK info and the settings, so this both
+    // drops VirusTotal risks when the feature is turned off and restores them when it is
+    // turned back on. Only adjust when the dialog is already up — never summon it here.
+    LaunchedEffect(vtDisabled) {
+        if (pendingRisks.isNotEmpty()) {
+            uiState.pendingApkInfo?.let { info ->
+                pendingRisks = detectInstallRisks(info, strictVirusTotalCheck, blockOnTrackers, vtDisabled)
+            }
+        }
+    }
+
     val handleInstallTap = {
         val info = uiState.pendingApkInfo
         val risks = if (info != null) {
-            detectInstallRisks(info, strictVirusTotalCheck, blockOnTrackers)
+            detectInstallRisks(info, strictVirusTotalCheck, blockOnTrackers, vtDisabled)
         } else {
             emptyList()
         }

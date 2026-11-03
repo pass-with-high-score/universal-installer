@@ -17,6 +17,7 @@ object PreferencesKeys {
     val VIRUSTOTAL_ONBOARDING_SEEN = booleanPreferencesKey("virustotal_onboarding_seen")
     val VIRUSTOTAL_DONT_ASK_AGAIN = booleanPreferencesKey("virustotal_dont_ask_again")
     val STRICT_VIRUSTOTAL_CHECK = booleanPreferencesKey("strict_virustotal_check")
+    val DISABLE_VIRUSTOTAL = booleanPreferencesKey("disable_virustotal")
     val SECURITY_LEVEL = stringPreferencesKey("security_level")
     val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
     val DISMISS_SHIZUKU_PROMO_BANNER = booleanPreferencesKey("dismiss_shizuku_promo_banner")

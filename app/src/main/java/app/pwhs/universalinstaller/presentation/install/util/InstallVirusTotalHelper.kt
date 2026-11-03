@@ -10,13 +10,62 @@ import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
 
 object InstallVirusTotalHelper {
+
+    /**
+     * Whether the user has turned the whole VirusTotal integration off in Settings. Every
+     * entry point into VirusTotal checks this first; when it is true nothing should touch the
+     * VirusTotal API or surface any VirusTotal UI.
+     */
+    suspend fun isDisabled(context: Context): Boolean {
+        return try {
+            context.dataStore.data.first()[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            // Fail closed: if the preference can't be read, assume VirusTotal is disabled so a
+            // flaky read can never let a lookup/upload through behind the user's back.
+            true
+        }
+    }
+
+    /**
+     * Local SHA-256 of the file, with no VirusTotal interaction. Used even when VirusTotal is
+     * disabled — the hash is shown in the APK info (with its copy action) regardless of the
+     * feature toggle.
+     */
+    suspend fun computeSha256(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
+        try {
+            context.contentResolver.openInputStream(uri)?.use { input ->
+                val digest = java.security.MessageDigest.getInstance("SHA-256")
+                val buffer = ByteArray(8192)
+                var read = input.read(buffer)
+                while (read >= 0) {
+                    // A dismissed APK must stop its read loop; blocking reads can't be
+                    // interrupted, so check cancellation between chunks.
+                    ensureActive()
+                    digest.update(buffer, 0, read)
+                    read = input.read(buffer)
+                }
+                digest.digest().joinToString("") { "%02x".format(it) }
+            } ?: ""
+        } catch (e: CancellationException) {
+            // Never swallow cancellation into an empty hash — propagate so the job dies.
+            throw e
+        } catch (_: Exception) {
+            // Ordinary read failure: empty hash, caller decides what to show.
+            ""
+        }
+    }
 
     suspend fun readVirusTotalApiKey(context: Context): String {
         return try {
@@ -32,8 +81,9 @@ object InstallVirusTotalHelper {
         originalUri: Uri,
         virusTotalService: VirusTotalService,
     ): Pair<String, VtResult> = withContext(Dispatchers.IO) {
+        if (isDisabled(context)) return@withContext "" to VtResult(status = VtStatus.NO_API_KEY)
         val apiKey = readVirusTotalApiKey(context)
-        runCatching {
+        return@withContext try {
             val sha256 = context.contentResolver.openInputStream(originalUri)?.use { input ->
                 virusTotalService.computeSha256(input)
             } ?: ""
@@ -45,7 +95,9 @@ object InstallVirusTotalHelper {
             } else {
                 sha256 to virusTotalService.checkFile(apiKey, sha256)
             }
-        }.getOrElse { e ->
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
             Timber.e(e, "VirusTotal hash lookup error")
             val message = when {
                 VirusTotalService.isNetworkError(e) -> VirusTotalService.NETWORK_ERROR_TAG
@@ -66,6 +118,7 @@ object InstallVirusTotalHelper {
         onUpdateSha256: (String) -> Unit,
         onProgress: (VtResult) -> Unit,
     ) {
+        if (isDisabled(context)) return
         val apiKey = readVirusTotalApiKey(context)
         val sizeBytes = current.fileSizeBytes
 
@@ -101,13 +154,19 @@ object InstallVirusTotalHelper {
             }
 
             val sha256 = current.sha256.ifBlank {
-                runCatching {
+                try {
                     withContext(Dispatchers.IO) {
                         context.contentResolver.openInputStream(uri)?.use { input ->
                             virusTotalService.computeSha256(input)
                         } ?: ""
                     }
-                }.getOrDefault("")
+                } catch (e: CancellationException) {
+                    // Rethrow so the scan job dies and the notification is properly cancelled
+                    // below instead of being reported as "Could not hash file".
+                    throw e
+                } catch (_: Exception) {
+                    ""
+                }
             }
 
             if (sha256.isBlank()) {
