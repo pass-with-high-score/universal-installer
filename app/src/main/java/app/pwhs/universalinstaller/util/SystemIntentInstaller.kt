@@ -3,6 +3,8 @@ package app.pwhs.universalinstaller.util
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import app.pwhs.core.security.GhostMapPregate
+import timber.log.Timber
 
 /**
  * Creates an install Intent for single APKs with [Intent.EXTRA_INSTALLER_PACKAGE_NAME]
@@ -20,6 +22,12 @@ object SystemIntentInstaller {
         apkUri: Uri,
         installerPackageName: String = VENDING_PKG,
     ): Intent {
+        val check = GhostMapPregate.validateUri(context, apkUri)
+        if (check is GhostMapPregate.ValidationResult.Invalid) {
+            Timber.w("Refusing to create install intent for GhostMap malicious APK: ${check.reason}")
+            throw GhostMapPregate.GhostMapSecurityException(check.reason, check.entryName)
+        }
+
         val baseIntent = SystemInstallerFallback.resolve(context, apkUri)
             ?: Intent(Intent.ACTION_INSTALL_PACKAGE).apply {
                 setDataAndType(apkUri, MIME)

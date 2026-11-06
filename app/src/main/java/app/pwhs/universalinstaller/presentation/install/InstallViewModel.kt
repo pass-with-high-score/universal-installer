@@ -117,7 +117,16 @@ class InstallViewModel(
         virusTotalNotifier = virusTotalNotifier,
         obbDelegate = obbDelegate,
         onProfileMatched = { _selectedProfileId.value = it },
-        onParseFailed = { dialogDelegate.parseFailed(it) },
+        onParseFailed = { error, isGhostMap ->
+            dialogDelegate.parseFailed(error)
+            if (isGhostMap || error.contains("GhostMap", ignoreCase = true)) {
+                _securityThreat.value = SecurityThreat(
+                    title = application.getString(R.string.dialog_security_ghostmap_title),
+                    message = application.getString(R.string.dialog_security_ghostmap_text),
+                    detail = error,
+                )
+            }
+        },
     )
 
     private val scanDelegate = InstallScanDelegate(
@@ -151,6 +160,13 @@ class InstallViewModel(
     private val _selectedProfileId = MutableStateFlow<String?>(null)
     private val _installError = MutableStateFlow<String?>(null)
     val installError: StateFlow<String?> = _installError.asStateFlow()
+
+    private val _securityThreat = MutableStateFlow<SecurityThreat?>(null)
+    val securityThreat: StateFlow<SecurityThreat?> = _securityThreat.asStateFlow()
+
+    fun dismissSecurityThreat() {
+        _securityThreat.value = null
+    }
 
     fun clearInstallError() {
         _installError.value = null
@@ -638,3 +654,9 @@ class InstallViewModel(
 
     fun dismissWatchSend() = wearDelegate.dismissWatchSend()
 }
+
+data class SecurityThreat(
+    val title: String,
+    val message: String,
+    val detail: String? = null,
+)
