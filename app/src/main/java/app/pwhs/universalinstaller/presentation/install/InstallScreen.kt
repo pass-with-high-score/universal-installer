@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,10 +32,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.Watch
 import androidx.compose.material.icons.rounded.WifiTethering
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -63,6 +69,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -169,6 +176,57 @@ fun InstallScreen(
                         it is app.pwhs.universalinstaller.presentation.install.dialog.InstallRisk.Downgrade
                 }
             },
+        )
+    }
+
+    val securityThreat by viewModel.securityThreat.collectAsState()
+    val threat = securityThreat
+    if (threat != null) {
+        AlertDialog(
+            onDismissRequest = viewModel::dismissSecurityThreat,
+            icon = {
+                Icon(
+                    imageVector = Icons.Rounded.Security,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.size(32.dp),
+                )
+            },
+            title = {
+                Text(
+                    text = threat.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                )
+            },
+            text = {
+                Column {
+                    Text(
+                        text = threat.message,
+                        style = MaterialTheme.typography.bodyMedium,
+                    )
+                    if (!threat.detail.isNullOrBlank()) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = threat.detail,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = viewModel::dismissSecurityThreat,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.error,
+                        contentColor = MaterialTheme.colorScheme.onError,
+                    ),
+                ) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+            shape = RoundedCornerShape(20.dp),
         )
     }
 
@@ -905,17 +963,19 @@ private fun InstallUi(
                 ) { session ->
                     val sessionProgress =
                         uiState.sessionsProgress.find { it.id == session.id }
+                    val sessionError = session.error.resolve(context)
+                    val isGhostMapThreat = sessionError.contains("GhostMap", ignoreCase = true)
                     val fallbackUri = session.originalUri ?: session.uris.firstOrNull() ?: session.filePath?.let { Uri.fromFile(java.io.File(it)) }
                     SessionCard(
                         sessionData = session,
                         sessionProgress = sessionProgress,
                         onCancel = { onCancel(session.id) },
-                        onRetry = { onRetry(session.id) },
+                        onRetry = { if (!isGhostMapThreat) onRetry(session.id) },
                         onDismiss = { onDismissSession(session.id) },
                         onOpenShizuku = {
                             context.startActivity(Intent(context, SettingActivity::class.java))
                         },
-                        onFallbackInstall = fallbackUri?.let { apkUri ->
+                        onFallbackInstall = if (isGhostMapThreat) null else fallbackUri?.let { apkUri ->
                             {
                                 val intent = SystemIntentInstaller.createInstallIntent(context, apkUri)
                                 val launched = runCatching { context.startActivity(intent) }

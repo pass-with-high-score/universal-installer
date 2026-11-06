@@ -227,6 +227,15 @@ object InstallApkSplitsHelper {
                 tempFile.outputStream().use { output -> input.copyTo(output) }
             }
 
+            val ghostMapCheck = app.pwhs.core.security.GhostMapPregate.validate(tempFile)
+            if (ghostMapCheck is app.pwhs.core.security.GhostMapPregate.ValidationResult.Invalid) {
+                tempFile.delete()
+                throw app.pwhs.core.security.GhostMapPregate.GhostMapSecurityException(
+                    ghostMapCheck.reason,
+                    ghostMapCheck.entryName
+                )
+            }
+
             val parseFlags = (PackageManager.GET_PERMISSIONS or
                     PackageManager.GET_SERVICES or
                     PackageManager.GET_META_DATA or
