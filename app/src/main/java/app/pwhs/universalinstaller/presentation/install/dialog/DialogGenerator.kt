@@ -315,13 +315,14 @@ fun generateDialogParams(
 
         is DialogStage.ParseFailed -> DialogParams(
             content = DialogInnerParams("parse_failed") {
+                val isGhostMapThreat = stage.reason.contains("GhostMap", ignoreCase = true)
                 DialogProblemContent(
-                    icon = Icons.Rounded.ErrorOutline,
-                    title = stringResource(R.string.dialog_parse_failed_title),
-                    explanation = stringResource(R.string.dialog_parse_failed_text),
+                    icon = if (isGhostMapThreat) Icons.Rounded.Security else Icons.Rounded.ErrorOutline,
+                    title = if (isGhostMapThreat) stringResource(R.string.dialog_security_ghostmap_title) else stringResource(R.string.dialog_parse_failed_title),
+                    explanation = if (isGhostMapThreat) stringResource(R.string.dialog_security_ghostmap_text) else stringResource(R.string.dialog_parse_failed_text),
                     detail = stage.reason,
-                    actionLabel = onFallbackInstall?.let { stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer") },
-                    onAction = onFallbackInstall,
+                    actionLabel = if (isGhostMapThreat) null else onFallbackInstall?.let { stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer") },
+                    onAction = if (isGhostMapThreat) null else onFallbackInstall,
                     onClose = { onCloseAfterResult(false) },
                 )
             }
