@@ -51,7 +51,7 @@ fun SettingProBanner(
     val borderColor = if (isProUser) {
         MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
     } else {
-        MaterialTheme.colorScheme.primary.copy(alpha = 0.35f)
+        MaterialTheme.colorScheme.outlineVariant
     }
 
     OutlinedCard(

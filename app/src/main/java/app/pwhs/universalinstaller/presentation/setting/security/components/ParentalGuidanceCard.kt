@@ -1,5 +1,6 @@
 package app.pwhs.universalinstaller.presentation.setting.security.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -45,6 +46,8 @@ fun ParentalGuidanceCard(
             containerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
         ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
     ) {
         Column(
             modifier = Modifier
