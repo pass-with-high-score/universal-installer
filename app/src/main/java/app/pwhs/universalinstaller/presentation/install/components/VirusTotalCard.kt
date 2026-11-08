@@ -44,6 +44,10 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.collectAsState
+import app.pwhs.core.network.VirusTotalKeyManager
+import app.pwhs.core.network.VtQuotaStatus
 import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
 import app.pwhs.core.presentation.components.VirusTotalUnlimitedOptionsSection
 import app.pwhs.universalinstaller.R
@@ -63,6 +67,10 @@ fun VirusTotalCard(
     onOpenLink: () -> Unit = {},
     onUpgradeProClick: (() -> Unit)? = null,
 ) {
+    val context = LocalContext.current
+    val quotaFlow = remember(context) { VirusTotalKeyManager.observeQuotaStatus(context) }
+    val quota by quotaFlow.collectAsState(initial = VtQuotaStatus())
+    val isPro = quota.isProUser
     val extendedColors = LocalExtendedColors.current
     val status = vt?.status
     val inProgress = status == VtStatus.SCANNING ||
@@ -82,8 +90,16 @@ fun VirusTotalCard(
         VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vt.malicious)
         VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vt.suspicious)
         VtStatus.NOT_FOUND -> stringResource(R.string.apk_info_vt_not_found)
-        VtStatus.NO_API_KEY -> stringResource(R.string.apk_info_vt_no_api_key)
-        VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_invalid_key)
+        VtStatus.NO_API_KEY -> if (isPro) {
+            stringResource(R.string.vt_cloud_keys_temporary_unavailable)
+        } else {
+            stringResource(R.string.apk_info_vt_no_api_key)
+        }
+        VtStatus.INVALID_API_KEY -> if (isPro && !quota.hasPersonalKey) {
+            stringResource(R.string.vt_cloud_keys_temporary_unavailable)
+        } else {
+            stringResource(R.string.apk_info_vt_invalid_key)
+        }
         VtStatus.RATE_LIMITED -> vt.errorMessage.takeIf { it.isNotBlank() }
             ?.let { stringResource(R.string.apk_info_vt_rate_limited_retry, it) }
             ?: stringResource(R.string.apk_info_vt_rate_limited)
@@ -185,7 +201,7 @@ fun VirusTotalCard(
                     }
                 }
             }
-            if (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY) {
+            if (!isPro && (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY)) {
                 Spacer(Modifier.height(10.dp))
                 VirusTotalUnlimitedOptionsSection(
                     showOption1Card = false,
@@ -209,6 +225,35 @@ fun VirusTotalCard(
                     ) {
                         Text(
                             text = stringResource(R.string.apk_info_vt_get_key),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+            } else if (isPro && (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY)) {
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilledTonalButton(
+                        onClick = onCheck,
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.dialog_failed_retry),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                    TextButton(
+                        onClick = onOpenSettings,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    ) {
+                        Text(
+                            text = stringResource(R.string.apk_info_vt_add_key),
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
@@ -272,203 +317,3 @@ fun VirusTotalCard(
     }
 }
 
-@Composable
-fun VtBreakdownSection(vt: VtResult, warningColor: Color, cleanColor: Color) {
-    val total = (vt.malicious + vt.suspicious + vt.harmless + vt.undetected).coerceAtLeast(1)
-    val malFraction = vt.malicious.toFloat() / total
-    val susFraction = vt.suspicious.toFloat() / total
-    val cleanFraction = (vt.harmless + vt.undetected).toFloat() / total
-    val errorColor = MaterialTheme.colorScheme.error
-    Canvas(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(8.dp)
-            .clip(MaterialTheme.shapes.small),
-    ) {
-        val w = size.width
-        val h = size.height
-        var x = 0f
-        val malW = w * malFraction
-        if (malW > 0f) {
-            drawRect(color = errorColor, topLeft = Offset(x, 0f), size = Size(malW, h))
-            x += malW
-        }
-        val susW = w * susFraction
-        if (susW > 0f) {
-            drawRect(color = warningColor, topLeft = Offset(x, 0f), size = Size(susW, h))
-            x += susW
-        }
-        val cleanW = w * cleanFraction
-        if (cleanW > 0f) {
-            drawRect(color = cleanColor, topLeft = Offset(x, 0f), size = Size(cleanW, h))
-            x += cleanW
-        }
-        drawRect(color = Color.Gray.copy(alpha = 0.3f), topLeft = Offset(x, 0f), size = Size(w - x, h))
-    }
-}
-
-@Composable
-fun VtEngineList(engines: List<VtEngineResult>, warningColor: Color) {
-    var expanded by remember { mutableStateOf(false) }
-    val flagged = engines.filter { it.category == "malicious" || it.category == "suspicious" }
-    val visible = if (expanded) engines else flagged
-    Column(modifier = Modifier.fillMaxWidth()) {
-        if (visible.isNotEmpty()) Spacer(Modifier.height(8.dp))
-        visible.forEach { engine ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 3.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Text(
-                    text = engine.engineName,
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.weight(1f),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-                Spacer(Modifier.width(8.dp))
-                Text(
-                    text = engine.result ?: engine.category,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = when (engine.category) {
-                        "malicious" -> MaterialTheme.colorScheme.error
-                        "suspicious" -> warningColor
-                        else -> MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                )
-            }
-        }
-        TextButton(
-            onClick = { expanded = !expanded },
-            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-        ) {
-            Text(
-                text = if (expanded) {
-                    stringResource(R.string.apk_info_vt_engines_hide)
-                } else {
-                    stringResource(R.string.apk_info_vt_engines_show)
-                },
-                style = MaterialTheme.typography.labelMedium,
-            )
-        }
-    }
-}
-
-@Composable
-fun VtStatusChip(
-    vt: VtResult,
-    onClick: (() -> Unit)? = null,
-    onOpenWeb: (() -> Unit)? = null,
-    onOpenSettings: (() -> Unit)? = null,
-) {
-    val extendedColors = LocalExtendedColors.current
-    when (vt.status) {
-        VtStatus.CLEAN -> {
-            val totalEngines = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
-            val tallySuffix = if (totalEngines > 0) " (0/$totalEngines)" else ""
-            InfoChip(
-                label = stringResource(R.string.apk_info_vt_chip_clean) + tallySuffix,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.GppGood,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = extendedColors.success,
-                    )
-                },
-                contentColor = extendedColors.success,
-                onClick = onOpenWeb,
-            )
-        }
-        VtStatus.MALICIOUS, VtStatus.SUSPICIOUS -> {
-            val alarming = vt.status == VtStatus.MALICIOUS
-            InfoChip(
-                label = stringResource(R.string.apk_info_vt_chip_flagged, vt.malicious + vt.suspicious),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Warning,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = if (alarming) MaterialTheme.colorScheme.onErrorContainer else extendedColors.warning,
-                    )
-                },
-                containerColor = if (alarming) MaterialTheme.colorScheme.errorContainer else extendedColors.warningContainer,
-                contentColor = if (alarming) MaterialTheme.colorScheme.onErrorContainer else extendedColors.warning,
-                onClick = onOpenWeb,
-            )
-        }
-        VtStatus.SCANNING, VtStatus.UPLOADING, VtStatus.QUEUED, VtStatus.ANALYZING -> {
-            val progressText = when (vt.status) {
-                VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_uploading, vt.uploadProgress)
-                VtStatus.QUEUED -> stringResource(R.string.apk_info_vt_queued)
-                VtStatus.ANALYZING -> stringResource(R.string.apk_info_vt_analyzing)
-                else -> stringResource(R.string.apk_info_vt_chip_scanning)
-            }
-            InfoChip(
-                label = progressText,
-                leadingIcon = {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(12.dp),
-                        strokeWidth = 1.5.dp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                },
-            )
-        }
-        VtStatus.NOT_FOUND -> InfoChip(
-            label = stringResource(R.string.apk_info_vt_upload_action),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.CloudUpload,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.primary,
-                )
-            },
-            contentColor = MaterialTheme.colorScheme.primary,
-            onClick = onClick,
-        )
-        VtStatus.ERROR -> InfoChip(
-            label = stringResource(R.string.dialog_failed_retry),
-            leadingIcon = {
-                Icon(
-                    imageVector = Icons.Rounded.Refresh,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = MaterialTheme.colorScheme.error,
-                )
-            },
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
-            contentColor = MaterialTheme.colorScheme.error,
-            onClick = onClick,
-        )
-        VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY -> InfoChip(
-            label = stringResource(R.string.apk_info_vt_add_key),
-            leadingIcon = {
-                Image(
-                    painter = painterResource(R.drawable.ic_virustotal_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                )
-            },
-            contentColor = extendedColors.warning,
-            onClick = onOpenSettings,
-        )
-        else -> InfoChip(
-            label = stringResource(R.string.scan_virustotal_btn),
-            leadingIcon = {
-                Image(
-                    painter = painterResource(R.drawable.ic_virustotal_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                )
-            },
-            contentColor = MaterialTheme.colorScheme.primary,
-            onClick = onClick,
-        )
-    }
-}

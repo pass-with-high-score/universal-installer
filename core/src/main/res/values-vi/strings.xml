@@ -147,10 +147,10 @@
     <!-- Pro Upgrade Sheet -->
     <string name="pro_upgrade_sheet_title">Universal Installer Pro</string>
     <string name="pro_upgrade_sheet_subtitle">Mở khóa bảo mật toàn diện và trải nghiệm cài đặt không giới hạn</string>
-    <string name="pro_benefit_vt_title">Quét VirusTotal Không Giới Hạn</string>
-    <string name="pro_benefit_vt_desc">Kiểm tra an toàn đám mây tự động mà không cần tự nhập API Key hoặc giới hạn hàng ngày</string>
-    <string name="pro_benefit_priority_title">Công Cụ Bảo Mật Ưu Tiên</string>
-    <string name="pro_benefit_priority_desc">Đánh giá rủi ro APK toàn diện và phát hiện phần mềm độc hại tức thì</string>
+    <string name="pro_benefit_vt_title">Tự Động Quét VirusTotal Tức Thì</string>
+    <string name="pro_benefit_vt_desc">Tự động kiểm tra mã độc ngay giây đầu tiên mở file APK — không cần bấm nút, không cần tạo API Key và không giới hạn lượt</string>
+    <string name="pro_benefit_priority_title">Soi Quyền Cập Nhật &amp; Cắt Gọn Split APK</string>
+    <string name="pro_benefit_priority_desc">Cảnh báo quyền nhạy cảm mới phát sinh khi cài đè, kiểm tra chữ ký gốc và lọc bỏ ngôn ngữ/cấu hình thừa chỉ với 1 chạm</string>
     <string name="pro_benefit_support_title">Ủng Hộ Dự Án Mã Nguồn Mở</string>
     <string name="pro_benefit_support_desc">Đồng hành và hỗ trợ phát triển các tính năng mới trong tương lai</string>
     <string name="pro_plan_yearly_title">Gói 1 Năm</string>

@@ -133,4 +133,20 @@
     <string name="milestone_pro_unlimited_champion_title">Chiến binh bảo mật Pro</string>
     <string name="milestone_pro_unlimited_champion_desc">Thực hiện 50 lần quét an toàn VirusTotal với gói Pro không giới hạn</string>
     <string name="app_functions_display_description">Tìm kiếm ứng dụng đã cài, xem lịch sử cài đặt và gỡ cài đặt, thống kê cài đặt và quét tìm file APK trên thiết bị.</string>
+
+    <string name="update_diff_card_title">Kiểm tra Bản cập nhật &amp; Chữ ký</string>
+    <string name="update_diff_sig_match">Chữ ký gốc trùng khớp — Cập nhật an toàn</string>
+    <string name="update_diff_sig_mismatch">Lệch chữ ký gốc — Cần gỡ bản cũ trước khi cài</string>
+    <string name="update_diff_no_new_perms">Không phát sinh quyền truy cập mới</string>
+    <string name="update_diff_added_perms_title">Phát sinh +%1$d quyền mới trong bản cập nhật này</string>
+    <string name="update_diff_removed_perms_title">Đã thu gọn -%1$d quyền so với bản đang cài</string>
+    <string name="update_diff_chip_clean">Bản cập nhật sạch</string>
+    <string name="update_diff_chip_new_perms">+%1$d quyền mới</string>
+    <string name="update_diff_chip_sig_mismatch">Lệch chữ ký gốc</string>
+
+    <string name="split_optimize_action">Tối ưu 1 chạm</string>
+    <string name="split_select_all_action">Chọn tất cả</string>
+    <string name="split_saved_badge">Đã giảm %1$s • Cài %2$s / %3$s</string>
+    <string name="split_full_size_badge">Cài đầy đủ %1$s (%2$d/%3$d gói)</string>
+    <string name="vt_cloud_keys_temporary_unavailable">Hệ thống quét đám mây tạm thời gián đoạn. Vui lòng thử lại sau hoặc nhập khóa API cá nhân.</string>
 </resources>

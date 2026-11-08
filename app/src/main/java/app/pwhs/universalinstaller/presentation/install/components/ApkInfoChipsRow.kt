@@ -67,6 +67,10 @@ fun ApkInfoChipsRow(
                 contentColor = MaterialTheme.colorScheme.onErrorContainer,
             )
         }
+        UpdateDiffStatusChip(
+            apkInfo = apkInfo,
+            onClick = onExpand,
+        )
         if (apkInfo.isAbiIncompatible) {
             InfoChip(
                 label = stringResource(R.string.dialog_chip_abi_incompatible),
@@ -127,9 +131,9 @@ fun ApkInfoChipsRow(
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         }
-        if (!vtDisabled) apkInfo.vtResult?.let { vt ->
+        if (!vtDisabled) {
             VtStatusChip(
-                vt = vt,
+                vt = apkInfo.vtResult,
                 onClick = onCheckVirusTotal,
                 onOpenWeb = onOpenDetail ?: {
                     if (apkInfo.sha256.isNotBlank()) {
@@ -235,8 +239,14 @@ fun ApkInfoChipsRow(
             )
         }
         if (apkInfo.splitCount > 1) {
+            val savedBytes = apkInfo.savedSplitsSizeBytes
+            val splitLabel = if (savedBytes > 0L) {
+                "${stringResource(R.string.apk_info_splits_count, apkInfo.splitCount)} (-${Formatter.formatShortFileSize(context, savedBytes)})"
+            } else {
+                stringResource(R.string.apk_info_splits_count, apkInfo.splitCount)
+            }
             InfoChip(
-                label = stringResource(R.string.apk_info_splits_count, apkInfo.splitCount),
+                label = splitLabel,
                 onClick = onExpand,
             )
         }

@@ -107,6 +107,7 @@ import app.pwhs.universalinstaller.presentation.setting.DEFAULT_INSTALLER_PACKAG
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.install.InstallTargetPicker
 import app.pwhs.universalinstaller.presentation.install.rememberDeviceUserProfiles
+import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import kotlinx.coroutines.launch
 import app.pwhs.universalinstaller.presentation.install.dialog.tabs.advancedTab
@@ -146,6 +147,8 @@ fun DialogMenuContent(
     
     val prefs by context.dataStore.data.collectAsState(initial = null)
     val vtDisabled = prefs?.get(PreferencesKeys.DISABLE_VIRUSTOTAL) ?: false
+    val isPro = prefs?.get(SharedPrefsKeys.IS_PRO_USER) ?: false
+    val hasCustomKey = !prefs?.get(PreferencesKeys.VIRUSTOTAL_API_KEY).isNullOrBlank()
     val spoofSource = prefs?.get(PreferencesKeys.SHIZUKU_SET_INSTALL_SOURCE) ?: false
     val installerPkg = prefs?.get(PreferencesKeys.SHIZUKU_INSTALLER_PACKAGE_NAME) ?: DEFAULT_INSTALLER_PACKAGE_NAME
     val overridesSerialized = prefs?.get(PreferencesKeys.INSTALLER_OVERRIDES)
@@ -350,6 +353,8 @@ fun DialogMenuContent(
                         apkInfo = apkInfo,
                         context = context,
                         vtDisabled = vtDisabled,
+                        isPro = isPro,
+                        hasCustomKey = hasCustomKey,
                         onCheckVirusTotal = onCheckVirusTotal,
                         onConfigureVirusTotal = { showVtSetupDialog = true },
                         onOpenDetail = { showVtDetailSheet = true },

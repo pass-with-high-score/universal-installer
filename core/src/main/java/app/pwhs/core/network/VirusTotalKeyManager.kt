@@ -160,6 +160,22 @@ object VirusTotalKeyManager {
     }
 
     /**
+     * Returns true when opening an APK should automatically look up its SHA-256 on VirusTotal
+     * without waiting for a manual button click:
+     * - Unlimited users (Pro subscribers or users with a personal API key), OR
+     * - Free users opening a file whose SHA-256 was already scanned today (costs 0 extra quota).
+     */
+    suspend fun shouldAutoLookupHash(context: Context, sha256: String): Boolean {
+        if (readUserApiKey(context).isNotBlank()) return true
+        remoteSource.ensureFetched()
+        if (!remoteSource.isFallbackEnabled()) return false
+        val pool = parseKeyPool(remoteSource.getRawKeys())
+        if (pool.isEmpty()) return false
+        if (isProUser(context)) return true
+        return isHashAlreadyScannedToday(context, sha256)
+    }
+
+    /**
      * Looks up a file hash on VirusTotal using the user's personal key if present, or rotating
      * through random Remote Config fallback keys when eligible.
      */
@@ -195,7 +211,7 @@ object VirusTotalKeyManager {
                     Timber.w("Trial VT key invalid on checkFile; rotating to next key")
                 }
                 else -> {
-                    if (result.status != VtStatus.ERROR) {
+                    if (result.status != VtStatus.ERROR && result.status != VtStatus.NOT_FOUND) {
                         recordTrialHashUsed(context, sha256)
                     }
                     return result
@@ -348,6 +364,30 @@ object VirusTotalKeyManager {
     private fun isOnCooldown(key: String): Boolean {
         val until = keyCooldownUntilMs[key] ?: return false
         return SystemClock.elapsedRealtime() < until
+    }
+
+    private suspend fun isHashAlreadyScannedToday(
+        context: Context,
+        sha256: String,
+    ): Boolean {
+        val normalizedHash = sha256.trim().lowercase(Locale.US)
+        if (normalizedHash.isBlank()) return false
+        return try {
+            val prefs = context.dataStore.data.first()
+            val today = todayString()
+            val storedDay = prefs[SharedPrefsKeys.VT_TRIAL_USAGE_DAY]
+            if (storedDay != today) return false
+            val hashes = prefs[SharedPrefsKeys.VT_TRIAL_SCANNED_HASHES]
+                .orEmpty()
+                .split(',')
+                .filter { it.isNotBlank() }
+                .toSet()
+            normalizedHash in hashes
+        } catch (e: CancellationException) {
+            throw e
+        } catch (_: Exception) {
+            false
+        }
     }
 
     private suspend fun isTrialQuotaAvailable(

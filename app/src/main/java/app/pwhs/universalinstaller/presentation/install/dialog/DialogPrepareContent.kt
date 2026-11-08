@@ -10,10 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import app.pwhs.universalinstaller.presentation.install.dialog.components.DialogPill
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -25,7 +22,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Block
@@ -36,8 +32,6 @@ import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Terminal
-import androidx.compose.material3.AssistChip
-import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,8 +49,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -69,6 +61,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.install.components.AbiIncompatibleBanner
+import app.pwhs.universalinstaller.presentation.install.components.UpdateDiffDialogPill
 import app.pwhs.universalinstaller.presentation.install.dialog.AbiIncompatibleDialog
 
 @OptIn(ExperimentalLayoutApi::class)
@@ -92,7 +85,7 @@ fun DialogPrepareContent(
     var showVtSetupDialog by remember { mutableStateOf(false) }
     var pendingInstallAfterVt by remember { mutableStateOf(false) }
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
-    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank() || apkInfo.vtResult?.let { it.status != app.pwhs.universalinstaller.domain.model.VtStatus.NO_API_KEY } == true
+    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank() || apkInfo.vtResult?.status != app.pwhs.universalinstaller.domain.model.VtStatus.NO_API_KEY
     val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
     val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
     val isUpdate = installedVersionCode != null && installedVersionCode > 0
@@ -268,6 +261,10 @@ fun DialogPrepareContent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             InstallerModeBadge()
+            UpdateDiffDialogPill(
+                apkInfo = apkInfo,
+                onClick = onMenu,
+            )
             DialogPill(
                 label = stringResource(R.string.dialog_menu_details),
                 leadingIcon = {

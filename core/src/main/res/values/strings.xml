@@ -151,10 +151,10 @@
     <!-- Pro Upgrade Sheet -->
     <string name="pro_upgrade_sheet_title">Universal Installer Pro</string>
     <string name="pro_upgrade_sheet_subtitle">Unlock the full power of security and seamless installations</string>
-    <string name="pro_benefit_vt_title">Unlimited VirusTotal Scans</string>
-    <string name="pro_benefit_vt_desc">Zero-config cloud safety inspection without requiring an API key or daily limit</string>
-    <string name="pro_benefit_priority_title">Priority Security Engine</string>
-    <string name="pro_benefit_priority_desc">Instant threat evaluation and comprehensive APK risk assessment</string>
+    <string name="pro_benefit_vt_title">Zero-Click Auto VirusTotal Scan</string>
+    <string name="pro_benefit_vt_desc">Automatically checks APK safety the instant you open a file — no button tap, no API key setup, and no daily limit</string>
+    <string name="pro_benefit_priority_title">Update Diff &amp; Smart Split Debloater</string>
+    <string name="pro_benefit_priority_desc">Inspect newly added permissions &amp; signature match on updates, and strip unused split APK languages/ABIs in 1 tap</string>
     <string name="pro_benefit_support_title">Support Open-Source</string>
     <string name="pro_benefit_support_desc">Help sustain ongoing development and new features</string>
     <string name="pro_plan_yearly_title">1 Year Subscription</string>

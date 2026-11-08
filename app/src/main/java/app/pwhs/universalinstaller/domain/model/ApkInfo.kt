@@ -34,6 +34,8 @@ data class ApkInfo(
     /** Installed version on this device, null if not installed. Powers the downgrade chip. */
     val installedVersionName: String? = null,
     val installedVersionCode: Long? = null,
+    /** Permissions requested by the currently installed version on this device, if installed. */
+    val installedPermissions: List<String> = emptyList(),
     /**
      * Whether the installed copy was signed with a different key, so Android will refuse this file
      * as an update. `null` means we could not determine it — treat as "no problem known", never as
@@ -59,4 +61,32 @@ data class ApkInfo(
 
     val isAbiIncompatible: Boolean
         get() = supportedAbis.isNotEmpty() && !app.pwhs.universalinstaller.presentation.install.util.AbiCompatibilityHelper.isCompatible(supportedAbis)
+
+    val isUpdateInstalled: Boolean
+        get() = installedVersionCode != null && installedVersionCode > 0L
+
+    val addedPermissions: List<String>
+        get() {
+            if (!isUpdateInstalled) return emptyList()
+            val installedSet = installedPermissions.toSet()
+            return permissions.filter { it !in installedSet }
+        }
+
+    val removedPermissions: List<String>
+        get() {
+            if (!isUpdateInstalled) return emptyList()
+            val newSet = permissions.toSet()
+            return installedPermissions.filter { it !in newSet }
+        }
+
+    val selectedSplitsSizeBytes: Long
+        get() = if (splitEntries.isEmpty()) fileSizeBytes
+        else splitEntries.filter { it.selected }.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+
+    val totalSplitsSizeBytes: Long
+        get() = if (splitEntries.isEmpty()) fileSizeBytes
+        else splitEntries.sumOf { it.sizeBytes.coerceAtLeast(0L) }
+
+    val savedSplitsSizeBytes: Long
+        get() = (totalSplitsSizeBytes - selectedSplitsSizeBytes).coerceAtLeast(0L)
 }

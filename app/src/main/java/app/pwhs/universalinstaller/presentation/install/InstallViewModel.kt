@@ -585,6 +585,7 @@ class InstallViewModel(
             it.copy(
                 installedVersionName = null,
                 installedVersionCode = null,
+                installedPermissions = emptyList(),
                 signatureMismatch = false,
             )
         }

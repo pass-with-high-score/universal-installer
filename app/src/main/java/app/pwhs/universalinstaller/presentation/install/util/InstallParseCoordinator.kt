@@ -41,6 +41,11 @@ object InstallParseCoordinator {
         val ext = fileName.substringAfterLast('.', "").lowercase()
         val obbEntries = if (ext in setOf("apks", "xapk", "apkm", "zip")) ObbExtractor.scan(context, uri) else emptyList()
         val installed = InstallSessionManager.lookupInstalledVersion(context, info.packageName)
+        val installedPermissions = if (installed != null) {
+            InstallSessionManager.lookupInstalledPermissions(context, info.packageName)
+        } else {
+            emptyList()
+        }
         val aaSupported = isAndroidAuto ?: info.isAndroidAutoSupported
 
         val fullInfo = info.copy(
@@ -48,6 +53,7 @@ object InstallParseCoordinator {
             obbTotalBytes = obbEntries.sumOf { it.sizeBytes.coerceAtLeast(0L) },
             installedVersionName = installed?.first,
             installedVersionCode = installed?.second,
+            installedPermissions = installedPermissions,
             isBlocked = info.packageName in blacklist,
             isAndroidAutoSupported = aaSupported,
         )

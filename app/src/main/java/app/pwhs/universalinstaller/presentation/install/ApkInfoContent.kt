@@ -77,6 +77,7 @@ import app.pwhs.universalinstaller.presentation.install.components.ObbAttachCard
 import app.pwhs.universalinstaller.presentation.install.components.PermissionsCard
 import app.pwhs.universalinstaller.presentation.install.components.ProfilePickerCard
 import app.pwhs.universalinstaller.presentation.install.components.SplitsCard
+import app.pwhs.universalinstaller.presentation.install.components.UpdateDiffCard
 import app.pwhs.universalinstaller.presentation.install.components.VirusTotalCard
 import app.pwhs.universalinstaller.presentation.install.components.VtStatusChip
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogKeepApkOption
@@ -132,7 +133,7 @@ internal fun ApkInfoContent(
 
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
     val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank() ||
-        apkInfo.vtResult?.let { it.status != app.pwhs.universalinstaller.domain.model.VtStatus.NO_API_KEY } == true
+        apkInfo.vtResult?.status != app.pwhs.universalinstaller.domain.model.VtStatus.NO_API_KEY
     val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
     val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
 
@@ -190,6 +191,11 @@ internal fun ApkInfoContent(
             )
 
             if (isExpanded) {
+                if (apkInfo.isUpdateInstalled) {
+                    Spacer(Modifier.height(16.dp))
+                    UpdateDiffCard(apkInfo = apkInfo)
+                }
+
                 Spacer(Modifier.height(16.dp))
 
                 InstallTargetCard(

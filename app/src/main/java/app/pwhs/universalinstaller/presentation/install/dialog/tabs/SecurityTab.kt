@@ -33,6 +33,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
+import app.pwhs.universalinstaller.presentation.install.components.UpdateDiffMenuCard
 import app.pwhs.universalinstaller.presentation.install.dialog.components.MenuCard
 import app.pwhs.universalinstaller.presentation.install.dialog.components.PermissionRowList
 import app.pwhs.universalinstaller.presentation.install.resolvePermissionEntries
@@ -41,10 +42,19 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     apkInfo: ApkInfo,
     context: Context,
     vtDisabled: Boolean = false,
+    isPro: Boolean = false,
+    hasCustomKey: Boolean = false,
     onCheckVirusTotal: () -> Unit,
     onConfigureVirusTotal: () -> Unit = {},
     onOpenDetail: (() -> Unit)? = null,
 ) {
+    // 0. Update Inspector (Signature & Permission Diff)
+    if (apkInfo.isUpdateInstalled) {
+        item(key = "update_diff") {
+            UpdateDiffMenuCard(apkInfo = apkInfo)
+        }
+    }
+
     // 1. VirusTotal
     if (!vtDisabled) item(key = "virustotal") {
         val vtResult = apkInfo.vtResult
@@ -59,8 +69,16 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_uploading, vtResult.uploadProgress)
             VtStatus.QUEUED -> stringResource(R.string.apk_info_vt_queued)
             VtStatus.ANALYZING -> stringResource(R.string.apk_info_vt_analyzing)
-            VtStatus.NO_API_KEY -> stringResource(R.string.apk_info_vt_no_api_key)
-            VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_invalid_key)
+            VtStatus.NO_API_KEY,
+            VtStatus.INVALID_API_KEY -> {
+                if (isPro && !hasCustomKey) {
+                    stringResource(R.string.vt_cloud_keys_temporary_unavailable)
+                } else if (vtResult?.status == VtStatus.INVALID_API_KEY) {
+                    stringResource(R.string.apk_info_vt_invalid_key)
+                } else {
+                    stringResource(R.string.apk_info_vt_no_api_key)
+                }
+            }
             VtStatus.RATE_LIMITED -> vtErrorMsg?.takeIf { it.isNotBlank() }
                 ?.let { stringResource(R.string.apk_info_vt_rate_limited_retry, it) }
                 ?: stringResource(R.string.apk_info_vt_rate_limited)
@@ -111,8 +129,8 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
                     }
                     // Without a key, tapping Check only rewrites the same "no key" line the user
                     // is already reading. Send them where the key is entered instead.
-                    vtResult?.status == VtStatus.NO_API_KEY ||
-                        vtResult?.status == VtStatus.INVALID_API_KEY -> {
+                    (vtResult?.status == VtStatus.NO_API_KEY ||
+                        vtResult?.status == VtStatus.INVALID_API_KEY) && (!isPro || hasCustomKey) -> {
                         onConfigureVirusTotal()
                     }
                     else -> onCheckVirusTotal()

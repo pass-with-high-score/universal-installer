@@ -54,7 +54,11 @@ import app.pwhs.universalinstaller.domain.model.SplitEntry
 import app.pwhs.universalinstaller.domain.model.SplitType
 import app.pwhs.universalinstaller.presentation.install.AttachedObb
 import app.pwhs.universalinstaller.presentation.install.InstallTargetPicker
+import app.pwhs.universalinstaller.presentation.install.dialog.components.SmartSplitOptimizerBar
+import app.pwhs.universalinstaller.presentation.install.dialog.components.splitChipLabel
 import app.pwhs.universalinstaller.presentation.install.rememberDeviceUserProfiles
+import android.text.format.Formatter
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun sectionCardBorder() = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
@@ -321,12 +325,20 @@ fun SplitsCard(
     onToggle: (Int) -> Unit,
     onMergeSplits: (() -> Unit)? = null,
 ) {
+    val context = LocalContext.current
+    val selectedCount = splits.count { it.selected }
     SectionCard(
         icon = Icons.Rounded.Memory,
         title = stringResource(R.string.apk_info_section_splits, splits.size),
+        badge = "$selectedCount/${splits.size}",
         defaultExpanded = true,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            SmartSplitOptimizerBar(
+                entries = splits,
+                onToggle = onToggle,
+                modifier = Modifier.padding(bottom = 4.dp),
+            )
             if (onMergeSplits != null) {
                 OutlinedButton(
                     onClick = onMergeSplits,
@@ -358,10 +370,20 @@ fun SplitsCard(
                         enabled = split.type != SplitType.Base,
                     )
                     Text(
-                        text = split.name,
+                        text = "${splitChipLabel(split)} (${split.name})",
                         style = MaterialTheme.typography.bodySmall,
                         modifier = Modifier.weight(1f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                     )
+                    if (split.sizeBytes > 0L) {
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = Formatter.formatShortFileSize(context, split.sizeBytes),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+                    }
                 }
             }
         }

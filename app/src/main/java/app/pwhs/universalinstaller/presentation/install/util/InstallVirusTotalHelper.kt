@@ -81,7 +81,8 @@ object InstallVirusTotalHelper {
         context: Context,
         originalUri: Uri,
         virusTotalService: VirusTotalService,
-    ): Pair<String, VtResult> = withContext(Dispatchers.IO) {
+        onAutoLookupStart: () -> Unit = {},
+    ): Pair<String, VtResult?> = withContext(Dispatchers.IO) {
         if (isDisabled(context)) return@withContext "" to VtResult(status = VtStatus.NO_API_KEY)
         return@withContext try {
             val sha256 = context.contentResolver.openInputStream(originalUri)?.use { input ->
@@ -90,8 +91,17 @@ object InstallVirusTotalHelper {
 
             if (sha256.isBlank()) {
                 "" to VtResult(status = VtStatus.ERROR, errorMessage = "Could not hash file")
+            } else if (VirusTotalKeyManager.shouldAutoLookupHash(context, sha256)) {
+                onAutoLookupStart()
+                val vtResult = VirusTotalKeyManager.checkFile(context, virusTotalService, sha256)
+                if (vtResult.status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)) {
+                    app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
+                }
+                sha256 to vtResult
+            } else if (!VirusTotalKeyManager.canUseVirusTotal(context, sha256)) {
+                sha256 to VtResult(status = VtStatus.NO_API_KEY)
             } else {
-                sha256 to VirusTotalKeyManager.checkFile(context, virusTotalService, sha256)
+                sha256 to null
             }
         } catch (e: CancellationException) {
             throw e

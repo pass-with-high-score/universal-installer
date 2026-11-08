@@ -259,10 +259,18 @@ class InstallParseDelegate(
                 }
                 return@launch
             }
-            _pendingApkInfo.value = _pendingApkInfo.value?.copy(
-                vtResult = VtResult(status = VtStatus.SCANNING),
+            val result = InstallVirusTotalHelper.launchHashLookupOnly(
+                context = context,
+                originalUri = originalUri,
+                virusTotalService = virusTotalService,
+                onAutoLookupStart = {
+                    if (isStillCurrent()) {
+                        _pendingApkInfo.value = _pendingApkInfo.value?.copy(
+                            vtResult = VtResult(status = VtStatus.SCANNING),
+                        )
+                    }
+                },
             )
-            val result = InstallVirusTotalHelper.launchHashLookupOnly(context, originalUri, virusTotalService)
             if (!isStillCurrent()) return@launch
             _pendingApkInfo.value = _pendingApkInfo.value?.copy(
                 sha256 = result.first,

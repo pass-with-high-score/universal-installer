@@ -421,6 +421,24 @@ object InstallSessionManager {
         }
     }
 
+    fun lookupInstalledPermissions(context: Context, packageName: String): List<String> {
+        if (packageName.isBlank()) return emptyList()
+        return try {
+            val pi = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(
+                    packageName,
+                    PackageManager.PackageInfoFlags.of(PackageManager.GET_PERMISSIONS.toLong()),
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(packageName, PackageManager.GET_PERMISSIONS)
+            }
+            pi.requestedPermissions?.toList() ?: emptyList()
+        } catch (_: Exception) {
+            emptyList()
+        }
+    }
+
     suspend fun cacheIcon(context: Context, apkInfo: ApkInfo?): String? {
         val drawable = apkInfo?.icon ?: return null
         return withContext(Dispatchers.IO) {
