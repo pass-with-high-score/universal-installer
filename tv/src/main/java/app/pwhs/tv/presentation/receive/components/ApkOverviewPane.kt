@@ -35,8 +35,10 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
+import app.pwhs.core.domain.model.VtResult
 import app.pwhs.tv.R
 import app.pwhs.tv.formatSize
+import app.pwhs.tv.presentation.install.TvVirusTotalCard
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
@@ -59,6 +61,9 @@ fun ApkOverviewPane(
     onShowPermissions: () -> Unit,
     onDelete: () -> Unit,
     onDismiss: () -> Unit,
+    vtResult: VtResult? = null,
+    onUploadAndScanVt: () -> Unit = {},
+    onRetryVt: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -276,7 +281,16 @@ fun ApkOverviewPane(
             }
         }
 
-        Spacer(Modifier.height(24.dp))
+        if (vtResult != null) {
+            Spacer(Modifier.height(10.dp))
+            TvVirusTotalCard(
+                vtResult = vtResult,
+                onUploadAndScan = onUploadAndScanVt,
+                onRetry = onRetryVt,
+            )
+        }
+
+        Spacer(Modifier.height(20.dp))
 
         // Action Buttons: Install, Details & Close on main row, Delete APK below
         val btnShape = RoundedCornerShape(14.dp)

@@ -8,10 +8,13 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -24,11 +27,24 @@ import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Surface
 import androidx.tv.material3.SurfaceDefaults
+import app.pwhs.core.data.local.SharedPrefsKeys
+import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.domain.ApkFile
+import app.pwhs.core.domain.model.VtResult
+import app.pwhs.core.domain.model.VtStatus
+import app.pwhs.core.network.VirusTotalClientFactory
+import app.pwhs.core.network.VirusTotalKeyManager
+import app.pwhs.core.network.VirusTotalService
 import app.pwhs.core.receiver.ReceivedApk
+import app.pwhs.tv.BuildConfig
 import app.pwhs.tv.presentation.receive.components.ApkOverviewPane
 import app.pwhs.tv.presentation.receive.components.ApkPermissionsPane
 import app.pwhs.tv.presentation.receive.components.ConfirmDeleteDialog
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
 sealed interface TvApkItem {
@@ -48,7 +64,6 @@ fun ApkDetailsDialog(
     val context = LocalContext.current
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var showPermissions by remember { mutableStateOf(false) }
-
     val name: String
     val pkg: String
     val version: String
@@ -87,6 +102,50 @@ fun ApkDetailsDialog(
             targetSdk = meta?.targetSdk ?: 0
             versionCode = meta?.versionCode ?: 0L
         }
+    }
+
+    var vtResult by remember { mutableStateOf<VtResult?>(null) }
+    var sha256 by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
+    val vtHttpClient = remember { VirusTotalClientFactory.create(BuildConfig.DEBUG) }
+    val vtService = remember(vtHttpClient) { VirusTotalService(vtHttpClient) }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            vtHttpClient.close()
+        }
+    }
+
+    val runVtCheck: () -> Unit = {
+        scope.launch {
+            val prefs = context.dataStore.data.first()
+            val isDisabled = prefs[SharedPrefsKeys.DISABLE_VIRUSTOTAL] ?: false
+            if (isDisabled) return@launch
+
+            vtResult = VtResult(status = VtStatus.SCANNING)
+            val hash = if (sha256.isNotBlank()) sha256 else withContext(Dispatchers.IO) {
+                runCatching {
+                    context.contentResolver.openInputStream(uri)?.use { input ->
+                        vtService.computeSha256(input)
+                    }
+                }.getOrNull().orEmpty()
+            }
+
+            if (hash.isBlank()) {
+                vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Could not hash file")
+                return@launch
+            }
+            sha256 = hash
+            if (!VirusTotalKeyManager.canUseVirusTotal(context, hash)) {
+                vtResult = VtResult(status = VtStatus.NO_API_KEY)
+                return@launch
+            }
+            vtResult = VirusTotalKeyManager.checkFile(context, vtService, hash)
+        }
+    }
+
+    LaunchedEffect(uri) {
+        runVtCheck()
     }
 
     val installedPkgInfo = remember(pkg) {
@@ -206,7 +265,51 @@ fun ApkDetailsDialog(
                         onInstall = { onInstall(uri, isBundle, name, size) },
                         onShowPermissions = { showPermissions = true },
                         onDelete = { showDeleteConfirm = true },
-                        onDismiss = onDismiss
+                        onDismiss = onDismiss,
+                        vtResult = vtResult,
+                        onUploadAndScanVt = {
+                            scope.launch {
+                                if (!VirusTotalKeyManager.canUseVirusTotal(context, sha256)) {
+                                    vtResult = VtResult(status = VtStatus.NO_API_KEY)
+                                    return@launch
+                                }
+                                if (size > VirusTotalService.SIZE_LIMIT_LARGE) {
+                                    vtResult = VtResult(status = VtStatus.TOO_LARGE, errorMessage = "${size / (1024 * 1024)} MB")
+                                    return@launch
+                                }
+                                vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = 0)
+                                val tempFile = withContext(Dispatchers.IO) {
+                                    runCatching {
+                                        val f = File(context.cacheDir, "vt_recv_${System.currentTimeMillis()}.apk")
+                                        context.contentResolver.openInputStream(uri)?.use { input ->
+                                            f.outputStream().use { output -> input.copyTo(output) }
+                                        }
+                                        f
+                                    }.getOrNull()
+                                } ?: return@launch
+
+                                try {
+                                    vtResult = VirusTotalKeyManager.uploadAndPoll(
+                                        context = context,
+                                        service = vtService,
+                                        sha256 = sha256,
+                                        file = tempFile,
+                                        onUploadProgress = { pct ->
+                                            vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = pct)
+                                        },
+                                        onQueued = { analysisId ->
+                                            vtResult = VtResult(status = VtStatus.QUEUED, analysisId = analysisId)
+                                        },
+                                        onPollProgress = { st, analysisId ->
+                                            vtResult = VtResult(status = st, analysisId = analysisId)
+                                        },
+                                    )
+                                } finally {
+                                    tempFile.delete()
+                                }
+                            }
+                        },
+                        onRetryVt = { runVtCheck() },
                     )
                 }
             }

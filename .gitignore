@@ -48,3 +48,8 @@ firebase.json
 
 # CI staging dir for the store bundle attached to a GitHub Release
 /dist/
+
+# Signing properties
+key.properties
+*.jks
+*.keystore

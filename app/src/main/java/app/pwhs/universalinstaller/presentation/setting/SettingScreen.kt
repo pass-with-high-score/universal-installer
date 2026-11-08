@@ -56,7 +56,7 @@ import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.universalinstaller.domain.model.ExternalOpenMode
 import app.pwhs.universalinstaller.domain.model.InstallUiStyle
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
-import app.pwhs.universalinstaller.presentation.composable.InstallPriorityBottomSheet
+import app.pwhs.core.billing.BillingManager
 import app.pwhs.universalinstaller.presentation.composable.SettingsSection
 import app.pwhs.universalinstaller.presentation.composable.UniversalSearchBar
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
@@ -65,6 +65,7 @@ import app.pwhs.universalinstaller.util.AppIconData
 import app.pwhs.universalinstaller.util.DhizukuState
 import androidx.datastore.preferences.core.Preferences
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import app.pwhs.universalinstaller.presentation.composable.CommunityActionButtons
 import app.pwhs.universalinstaller.presentation.setting.sections.AboutSection
 import app.pwhs.universalinstaller.presentation.setting.sections.AdvancedSection
@@ -75,7 +76,7 @@ import app.pwhs.universalinstaller.presentation.setting.sections.PrivacySection
 import app.pwhs.universalinstaller.presentation.setting.sections.SecuritySection
 import app.pwhs.universalinstaller.presentation.setting.sections.SyncSection
 import app.pwhs.universalinstaller.presentation.setting.sections.BackupSection
-import app.pwhs.universalinstaller.presentation.setting.backup.BackupSheetsHost
+import app.pwhs.universalinstaller.presentation.setting.components.SettingSheetsHost
 import app.pwhs.universalinstaller.presentation.setting.backup.BackupViewModel
 import app.pwhs.universalinstaller.presentation.setting.components.*
 @Composable
@@ -205,6 +206,8 @@ private fun SettingUi(
     var showInstallOptionsSheet by rememberSaveable { mutableStateOf(false) }
     var showInstallPrioritySheet by rememberSaveable { mutableStateOf(false) }
     var showSyncOptionsSheet by rememberSaveable { mutableStateOf(false) }
+    var showUpgradeProSheet by rememberSaveable { mutableStateOf(false) }
+    val billingManager: BillingManager = koinInject()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
@@ -417,6 +420,7 @@ private fun SettingUi(
                     onVirusTotalDisabledChanged = onVirusTotalDisabledChanged,
                     securityLevel = securityLevel,
                     onSecurityLevelChanged = onSecurityLevelChanged,
+                    onUpgradeProClick = { showUpgradeProSheet = true },
                 )
 
                 // ── Backup & Restore Section ─────────────────
@@ -452,37 +456,25 @@ private fun SettingUi(
         } // end of Column
     } // end of Scaffold
 
-    BackupSheetsHost(
-        viewModel = backupViewModel,
+    SettingSheetsHost(
+        backupViewModel = backupViewModel,
         onPickerReady = { openRestorePicker = it },
+        showInstallOptionsSheet = showInstallOptionsSheet,
+        onDismissInstallOptionsSheet = { showInstallOptionsSheet = false },
+        showInstallPrioritySheet = showInstallPrioritySheet,
+        onDismissInstallPrioritySheet = { showInstallPrioritySheet = false },
+        showSyncOptionsSheet = showSyncOptionsSheet,
+        onDismissSyncOptionsSheet = { showSyncOptionsSheet = false },
+        showUpgradeProSheet = showUpgradeProSheet,
+        onDismissUpgradeProSheet = { showUpgradeProSheet = false },
+        billingManager = billingManager,
+        uiState = uiState,
+        useDhizuku = useDhizuku,
+        onPrivilegedOptionChanged = onPrivilegedOptionChanged,
+        onInstallerPackageChanged = onInstallerPackageChanged,
+        onShizukuOptionChanged = onShizukuOptionChanged,
+        onSyncServerPortChanged = onSyncServerPortChanged,
+        onSyncRequirePinChanged = onSyncRequirePinChanged,
+        onSyncPinCodeChanged = onSyncPinCodeChanged,
     )
-
-    if (showInstallOptionsSheet) {
-        InstallOptionsBottomSheet(
-            uiState = uiState,
-            useDhizuku = useDhizuku,
-            onDismiss = { showInstallOptionsSheet = false },
-            onPrivilegedOptionChanged = onPrivilegedOptionChanged,
-            onInstallerPackageChanged = onInstallerPackageChanged,
-            onShizukuOptionChanged = onShizukuOptionChanged,
-        )
-    }
-
-    if (showInstallPrioritySheet) {
-        InstallPriorityBottomSheet(
-            onDismissRequest = { showInstallPrioritySheet = false },
-        )
-    }
-
-    if (showSyncOptionsSheet) {
-        SyncOptionsBottomSheet(
-            syncOptions = uiState.syncOptions,
-            onDismiss = { showSyncOptionsSheet = false },
-            onSyncServerPortChanged = onSyncServerPortChanged,
-            onSyncRequirePinChanged = onSyncRequirePinChanged,
-            onSyncPinCodeChanged = onSyncPinCodeChanged,
-        )
-    }
 } // end of SettingUi
-
-/** True when [query] is blank (everything passes) or any [haystacks] entry contains it. */

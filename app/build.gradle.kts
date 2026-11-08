@@ -54,8 +54,8 @@ android {
         applicationId = "app.pwhs.universalinstaller"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 45
-        versionName = "1.21.0"
+        versionCode = 47
+        versionName = "1.22.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -239,10 +239,12 @@ dependencies {
     "playImplementation"(platform(libs.firebase.bom))
     "playImplementation"(libs.firebase.analytics)
     "playImplementation"(libs.firebase.crashlytics)
+    "playImplementation"(libs.firebase.config)
 
     // Play In-App Review, `play` flavor only for the same reason as Firebase: it is a closed
     // Play Services library, and `opensource` ships none. See docs/REVIEW.md.
     "playImplementation"(libs.play.review.ktx)
+    "playImplementation"(libs.play.billing)
 
     implementation(libs.nanohttpd)
     implementation(libs.zxing.core)

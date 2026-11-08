@@ -53,6 +53,8 @@ fun TvDialogInstallContent(
     onDismiss: () -> Unit,
     onOpenApp: (String) -> Unit,
     onRetry: () -> Unit,
+    onUploadAndScanVt: () -> Unit = {},
+    onRetryVt: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -95,7 +97,9 @@ fun TvDialogInstallContent(
                                 ready = currentState,
                                 onInstall = onInstall,
                                 onTogglePermissions = onTogglePermissions,
-                                onDismiss = onDismiss
+                                onDismiss = onDismiss,
+                                onUploadAndScanVt = onUploadAndScanVt,
+                                onRetryVt = onRetryVt,
                             )
                         }
                     }

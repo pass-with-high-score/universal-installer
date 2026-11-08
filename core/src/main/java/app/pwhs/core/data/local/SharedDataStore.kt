@@ -55,6 +55,15 @@ object SharedPrefsKeys {
      */
     val DISABLE_VIRUSTOTAL = booleanPreferencesKey("disable_virustotal")
 
+    /** Local day string (YYYY-MM-DD) for tracking daily fallback/trial VirusTotal scans. */
+    val VT_TRIAL_USAGE_DAY = stringPreferencesKey("vt_trial_usage_day")
+
+    /** Comma-separated SHA-256 hashes scanned today using Remote Config fallback keys. */
+    val VT_TRIAL_SCANNED_HASHES = stringPreferencesKey("vt_trial_scanned_hashes")
+
+    /** Whether the user has unlocked Universal Installer Pro (unlimited built-in VirusTotal). */
+    val IS_PRO_USER = booleanPreferencesKey("is_pro_user")
+
     /**
      * Whether the Play build may report anonymous install statistics and crashes. Absent means
      * on — the onboarding page presents it opted in, and the open-source build ignores the key

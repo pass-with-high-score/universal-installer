@@ -2,6 +2,7 @@ package app.pwhs.tv.presentation.install
 
 import android.net.Uri
 import app.pwhs.core.domain.PackageMetadata
+import app.pwhs.core.domain.model.VtResult
 
 /**
  * UI State for the TV Dialog Installer.
@@ -21,7 +22,11 @@ sealed interface TvInstallState {
         val sizeBytes: Long,
         val installedVersion: String? = null,
         val installedVersionCode: Long? = null,
-        val showPermissions: Boolean = false
+        val showPermissions: Boolean = false,
+        val sha256: String = "",
+        val vtResult: VtResult? = null,
+        val isUploadingVt: Boolean = false,
+        val vtUploadProgress: Int = 0,
     ) : TvInstallState
 
     /** Actively writing/installing the session */

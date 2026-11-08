@@ -84,7 +84,9 @@ class TvDialogInstallActivity : ComponentActivity() {
                         openApp(packageName)
                         finish()
                     },
-                    onRetry = viewModel::retry
+                    onRetry = viewModel::retry,
+                    onUploadAndScanVt = viewModel::uploadAndScanVirusTotal,
+                    onRetryVt = viewModel::retryVirusTotal,
                 )
             }
         }

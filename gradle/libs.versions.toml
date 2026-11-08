@@ -44,6 +44,7 @@ firebaseBom = "35.1.0"
 googleServices = "4.5.0"
 firebaseCrashlyticsPlugin = "3.0.8"
 playReview = "2.0.2"
+playBilling = "8.0.0"
 wearCompose = "1.7.1"
 wearToolingPreview = "1.0.0"
 playServicesWearable = "20.0.1"
@@ -162,10 +163,12 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
+firebase-config = { module = "com.google.firebase:firebase-config" }
 
 # Play In-App Review — `play` flavor only, same rule as Firebase above. `review-ktx` pulls
 # `review` in transitively, so one line covers both.
 play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "playReview" }
+play-billing = { module = "com.android.billingclient:billing-ktx", version.ref = "playBilling" }
 play-services-code-scanner = { module = "com.google.android.gms:play-services-code-scanner", version.ref = "playServicesCodeScanner" }
 
 # Wear OS

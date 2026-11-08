@@ -30,6 +30,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
+import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
+import app.pwhs.core.presentation.components.VirusTotalUnlimitedOptionsSection
 import app.pwhs.core.util.openUriSafely
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.composable.SettingsSection
@@ -46,6 +48,7 @@ internal fun LazyListScope.AdvancedSection(
     onVirusTotalDisabledChanged: (Boolean) -> Unit,
     securityLevel: SecurityLevel,
     onSecurityLevelChanged: (SecurityLevel) -> Unit,
+    onUpgradeProClick: () -> Unit = {},
 ) {
     if (matchesQuery(q, advancedLabels)) item {
         val context = LocalContext.current
@@ -81,6 +84,14 @@ internal fun LazyListScope.AdvancedSection(
                 )
             }
             if (!virusTotalDisabled) {
+            VirusTotalDailyQuotaBadge(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+            )
+            VirusTotalUnlimitedOptionsSection(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 6.dp),
+                showOption1Card = true,
+                onUpgradeProClick = onUpgradeProClick,
+            )
             OutlinedTextField(
                 value = virusTotalApiKey,
                 onValueChange = onVirusTotalKeyChanged,

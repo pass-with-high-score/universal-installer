@@ -185,6 +185,7 @@ dependencies {
         "playImplementation"(platform(libs.firebase.bom))
         "playImplementation"(libs.firebase.analytics)
         "playImplementation"(libs.firebase.crashlytics)
+        "playImplementation"(libs.firebase.config)
     }
 
     androidTestImplementation(platform(libs.androidx.compose.bom))

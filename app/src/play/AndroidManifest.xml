@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Required by Google Play Console for In-App Products / Purchases -->
+    <uses-permission android:name="com.android.vending.BILLING" />
+
     <application>
         <!-- Pre-downloads the Google Code Scanner model from Google Play Services on app install -->
         <meta-data

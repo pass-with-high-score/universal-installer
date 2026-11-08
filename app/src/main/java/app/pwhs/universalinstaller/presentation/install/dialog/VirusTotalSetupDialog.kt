@@ -21,7 +21,11 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
+import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
+import app.pwhs.core.presentation.components.VirusTotalUnlimitedOptionsSection
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Close
@@ -90,6 +94,7 @@ fun VirusTotalSetupSheet(
     onDismiss: () -> Unit,
     onSaveAndScan: ((String) -> Unit)? = null,
     onProceedInstall: (() -> Unit)? = null,
+    onUpgradeProClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -254,10 +259,12 @@ fun VirusTotalSetupSheet(
                     }
 
                     else -> {
-                        // Step 3: Enter API Key
+                        // Step 3: Enter API Key or Upgrade to Pro
                         Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState()),
+                            verticalArrangement = Arrangement.spacedBy(14.dp),
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -287,6 +294,13 @@ fun VirusTotalSetupSheet(
                                 text = stringResource(R.string.virustotal_story_step3_desc),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+
+                            VirusTotalDailyQuotaBadge()
+
+                            VirusTotalUnlimitedOptionsSection(
+                                showOption1Card = true,
+                                onUpgradeProClick = onUpgradeProClick,
                             )
 
                             if (!hasSeenStory) {
@@ -431,9 +445,11 @@ fun VirusTotalSetupDialog(
     onDismiss: () -> Unit,
     onSaveAndScan: ((String) -> Unit)? = null,
     onProceedInstall: (() -> Unit)? = null,
+    onUpgradeProClick: (() -> Unit)? = null,
 ) = VirusTotalSetupSheet(
     initialKey = initialKey,
     onDismiss = onDismiss,
     onSaveAndScan = onSaveAndScan,
     onProceedInstall = onProceedInstall,
+    onUpgradeProClick = onUpgradeProClick,
 )

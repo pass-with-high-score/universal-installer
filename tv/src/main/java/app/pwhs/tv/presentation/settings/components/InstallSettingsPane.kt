@@ -13,9 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.VerifiedUser
@@ -24,8 +24,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -44,6 +47,8 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
+import app.pwhs.core.presentation.components.VirusTotalUnlimitedOptionsSection
 import app.pwhs.core.util.RootShell
 import app.pwhs.tv.R
 import app.pwhs.tv.install.TvShizuku
@@ -88,6 +93,31 @@ fun InstallSettingsPane(
         .map { it[SharedPrefsKeys.DELETE_APK_AFTER_INSTALL] ?: false }
         .collectAsState(initial = false)
 
+    // ── VirusTotal & Security state ──────────────────────────────────────────
+    val disableVirusTotal by context.dataStore.data
+        .map { it[SharedPrefsKeys.DISABLE_VIRUSTOTAL] ?: false }
+        .collectAsState(initial = false)
+    val strictVirusTotal by context.dataStore.data
+        .map { it[SharedPrefsKeys.STRICT_VIRUSTOTAL_CHECK] ?: false }
+        .collectAsState(initial = false)
+    val virusTotalApiKey by context.dataStore.data
+        .map { it[SharedPrefsKeys.VIRUSTOTAL_API_KEY] ?: "" }
+        .collectAsState(initial = "")
+
+    var showKeyDialog by remember { mutableStateOf(false) }
+
+    if (showKeyDialog) {
+        TvVirusTotalKeyDialog(
+            initialKey = virusTotalApiKey,
+            onSaveKey = { newKey ->
+                scope.launch {
+                    context.dataStore.edit { it[SharedPrefsKeys.VIRUSTOTAL_API_KEY] = newKey }
+                }
+            },
+            onDismiss = { showKeyDialog = false },
+        )
+    }
+
     Column(
         modifier = modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -116,7 +146,7 @@ fun InstallSettingsPane(
             },
             trailingContent = {
                 Icon(
-                    Icons.Default.OpenInNew,
+                    Icons.AutoMirrored.Filled.OpenInNew,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(20.dp)
@@ -192,5 +222,77 @@ fun InstallSettingsPane(
                 )
             }
         )
+
+        Spacer(Modifier.height(8.dp))
+
+        // ── VirusTotal Section ───────────────────────────────────────────────
+        Text(
+            stringResource(R.string.tv_settings_section_virustotal),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        // 6. VirusTotal Scanner Enable/Disable Switch
+        TvSettingSwitchRow(
+            title = stringResource(R.string.tv_settings_virustotal_enable_title),
+            subtitle = stringResource(R.string.tv_settings_virustotal_enable_desc),
+            icon = Icons.Default.Security,
+            checked = !disableVirusTotal,
+            badgeText = if (!disableVirusTotal && virusTotalApiKey.isNotBlank()) "ACTIVE" else null,
+            badgeColor = MaterialTheme.colorScheme.primaryContainer,
+            onCheckedChange = { isEnabled ->
+                scope.launch {
+                    context.dataStore.edit { it[SharedPrefsKeys.DISABLE_VIRUSTOTAL] = !isEnabled }
+                }
+            }
+        )
+
+        if (!disableVirusTotal) {
+            VirusTotalDailyQuotaBadge()
+            VirusTotalUnlimitedOptionsSection(showOption1Card = false)
+
+            // 7. Strict VirusTotal Check Switch
+            TvSettingSwitchRow(
+                title = stringResource(R.string.tv_settings_virustotal_strict_title),
+                subtitle = stringResource(R.string.tv_settings_virustotal_strict_desc),
+                icon = Icons.Default.VerifiedUser,
+                checked = strictVirusTotal,
+                onCheckedChange = { checked ->
+                    scope.launch {
+                        context.dataStore.edit { it[SharedPrefsKeys.STRICT_VIRUSTOTAL_CHECK] = checked }
+                    }
+                }
+            )
+
+            // 8. VirusTotal API Key Row
+            val keyMasked = if (virusTotalApiKey.length >= 8) {
+                "${virusTotalApiKey.take(4)}...${virusTotalApiKey.takeLast(4)}"
+            } else {
+                virusTotalApiKey
+            }
+            val keySubtitle = if (virusTotalApiKey.isNotBlank()) {
+                stringResource(R.string.tv_settings_virustotal_key_configured, keyMasked)
+            } else {
+                stringResource(R.string.tv_settings_virustotal_key_not_set)
+            }
+
+            TvSettingRow(
+                title = stringResource(R.string.tv_settings_virustotal_key_title),
+                subtitle = keySubtitle,
+                icon = Icons.Default.VpnKey,
+                badgeText = if (virusTotalApiKey.isNotBlank()) "KEY SET" else "NO KEY",
+                badgeColor = if (virusTotalApiKey.isNotBlank()) MaterialTheme.colorScheme.primaryContainer
+                else MaterialTheme.colorScheme.errorContainer,
+                onClick = { showKeyDialog = true },
+                trailingContent = {
+                    Icon(
+                        Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            )
+        }
     }
 }

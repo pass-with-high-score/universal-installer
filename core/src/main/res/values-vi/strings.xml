@@ -129,4 +129,37 @@
     <!-- Permission Settings Fallback -->
     <string name="error_cannot_open_settings">Không thể tự động mở Cài đặt. Vui lòng mở Cài đặt trên máy &gt; Ứng dụng &gt; Universal Installer để cấp quyền.</string>
     <string name="onboarding_xiaomi_dev_options_hint">Tùy chọn nhà phát triển chưa được mở khóa. Vui lòng vào Cài đặt &gt; Giới thiệu điện thoại và nhấn 7 lần vào Số hiệu bản dựng.</string>
+
+    <!-- VirusTotal Daily Quota & Unlimited Options -->
+    <string name="vt_quota_daily_remaining">Lượt quét miễn phí hôm nay: còn %1$d/%2$d lượt</string>
+    <string name="vt_quota_daily_exhausted">Đã hết lượt miễn phí hôm nay (%1$d/%1$d lượt)</string>
+    <string name="vt_quota_unlimited_custom_key">Không giới hạn (Đang dùng API Key cá nhân)</string>
+    <string name="vt_quota_unlimited_pro">Không giới hạn (Đang dùng gói Pro)</string>
+    <string name="vt_unlock_unlimited_header">2 cách mở khóa quét Không giới hạn</string>
+    <string name="vt_unlock_option1_title">1. Dùng API Key cá nhân (Miễn phí 100%)</string>
+    <string name="vt_unlock_option1_desc">Tự tạo tài khoản VirusTotal và dán mã API key 64 ký tự của riêng bạn để quét không giới hạn.</string>
+    <string name="vt_unlock_option2_title">2. Nâng cấp gói Pro (Tự động &amp; Không cần cấu hình)</string>
+    <string name="vt_unlock_option2_desc">Quét tự động ngay lập tức qua hệ thống key tốc độ cao của ứng dụng mà không cần tự tạo API key, kèm mọi quyền lợi Pro.</string>
+    <string name="vt_unlock_pro_badge">PRO</string>
+    <string name="vt_unlock_pro_btn">Nâng cấp Pro</string>
+    <string name="vt_unlock_pro_coming_soon">Gói Universal Installer Pro sẽ sớm mở bán trên Google Play! Hiện tại bạn có thể nhập API Key VirusTotal cá nhân (miễn phí) để quét không giới hạn ngay lập tức.</string>
+
+    <!-- Pro Upgrade Sheet -->
+    <string name="pro_upgrade_sheet_title">Universal Installer Pro</string>
+    <string name="pro_upgrade_sheet_subtitle">Mở khóa bảo mật toàn diện và trải nghiệm cài đặt không giới hạn</string>
+    <string name="pro_benefit_vt_title">Quét VirusTotal Không Giới Hạn</string>
+    <string name="pro_benefit_vt_desc">Kiểm tra an toàn đám mây tự động mà không cần tự nhập API Key hoặc giới hạn hàng ngày</string>
+    <string name="pro_benefit_priority_title">Công Cụ Bảo Mật Ưu Tiên</string>
+    <string name="pro_benefit_priority_desc">Đánh giá rủi ro APK toàn diện và phát hiện phần mềm độc hại tức thì</string>
+    <string name="pro_benefit_support_title">Ủng Hộ Dự Án Mã Nguồn Mở</string>
+    <string name="pro_benefit_support_desc">Đồng hành và hỗ trợ phát triển các tính năng mới trong tương lai</string>
+    <string name="pro_plan_yearly_title">Gói 1 Năm</string>
+    <string name="pro_plan_yearly_tag">Phổ biến</string>
+    <string name="pro_plan_yearly_default">39.000 đ / năm</string>
+    <string name="pro_plan_lifetime_title">Gói Trọn Đời</string>
+    <string name="pro_plan_lifetime_tag">Tiết kiệm nhất</string>
+    <string name="pro_plan_lifetime_default">79.000 đ</string>
+    <string name="pro_plan_lifetime_desc">Thanh toán 1 lần duy nhất, dùng vĩnh viễn trên mọi thiết bị</string>
+    <string name="pro_purchase_success">Cảm ơn bạn đã ủng hộ! Gói Pro đã được kích hoạt thành công.</string>
+    <string name="pro_purchase_failed">Giao dịch bị hủy hoặc không thành công. Vui lòng thử lại.</string>
 </resources>

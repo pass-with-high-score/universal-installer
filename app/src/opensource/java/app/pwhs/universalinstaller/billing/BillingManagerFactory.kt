@@ -1,0 +1,22 @@
+package app.pwhs.universalinstaller.billing
+
+import android.app.Activity
+import android.content.Context
+import app.pwhs.core.billing.BillingManager
+import app.pwhs.core.billing.ProProductType
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+fun createBillingManager(context: Context): BillingManager = NoOpBillingManager()
+
+private class NoOpBillingManager : BillingManager {
+    override val isProUser: StateFlow<Boolean> = MutableStateFlow(false)
+    override val yearlyPrice: StateFlow<String?> = MutableStateFlow(null)
+    override val lifetimePrice: StateFlow<String?> = MutableStateFlow(null)
+    override val isAvailable: Boolean = false
+
+    override fun startConnection() {}
+    override fun launchBillingFlow(activity: Activity, productType: ProProductType, onResult: ((Boolean) -> Unit)?) {}
+    override fun queryPurchases() {}
+    override fun destroy() {}
+}

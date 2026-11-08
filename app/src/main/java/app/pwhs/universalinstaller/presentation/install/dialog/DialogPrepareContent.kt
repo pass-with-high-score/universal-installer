@@ -92,7 +92,7 @@ fun DialogPrepareContent(
     var showVtSetupDialog by remember { mutableStateOf(false) }
     var pendingInstallAfterVt by remember { mutableStateOf(false) }
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
-    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank()
+    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank() || apkInfo.vtResult?.let { it.status != app.pwhs.universalinstaller.domain.model.VtStatus.NO_API_KEY } == true
     val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
     val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
     val isUpdate = installedVersionCode != null && installedVersionCode > 0

@@ -133,4 +133,37 @@
     <!-- Permission Settings Fallback -->
     <string name="error_cannot_open_settings">Unable to open system settings. Please open Settings manually &gt; Apps &gt; Universal Installer to grant permission.</string>
     <string name="onboarding_xiaomi_dev_options_hint">Developer options not unlocked. Please open Settings &gt; About phone, and tap Build number 7 times.</string>
+
+    <!-- VirusTotal Daily Quota & Unlimited Options -->
+    <string name="vt_quota_daily_remaining">Free daily scans: %1$d/%2$d left today</string>
+    <string name="vt_quota_daily_exhausted">Daily free limit reached (%1$d/%1$d used today)</string>
+    <string name="vt_quota_unlimited_custom_key">Unlimited (Personal API Key active)</string>
+    <string name="vt_quota_unlimited_pro">Unlimited (Universal Installer Pro active)</string>
+    <string name="vt_unlock_unlimited_header">2 Ways to Unlock Unlimited Scans</string>
+    <string name="vt_unlock_option1_title">1. Use Your Own API Key (Free)</string>
+    <string name="vt_unlock_option1_desc">Sign up on VirusTotal and paste your personal 64-character API key for unlimited free checks.</string>
+    <string name="vt_unlock_option2_title">2. Upgrade to Pro (Zero-Config Unlimited)</string>
+    <string name="vt_unlock_option2_desc">Instant automatic cloud scanning with no API key setup required, plus all Pro supporter perks.</string>
+    <string name="vt_unlock_pro_badge">PRO</string>
+    <string name="vt_unlock_pro_btn">Upgrade to Pro</string>
+    <string name="vt_unlock_pro_coming_soon">Universal Installer Pro billing will be available soon! You can enter a free personal VirusTotal API key right now for unlimited scans.</string>
+
+    <!-- Pro Upgrade Sheet -->
+    <string name="pro_upgrade_sheet_title">Universal Installer Pro</string>
+    <string name="pro_upgrade_sheet_subtitle">Unlock the full power of security and seamless installations</string>
+    <string name="pro_benefit_vt_title">Unlimited VirusTotal Scans</string>
+    <string name="pro_benefit_vt_desc">Zero-config cloud safety inspection without requiring an API key or daily limit</string>
+    <string name="pro_benefit_priority_title">Priority Security Engine</string>
+    <string name="pro_benefit_priority_desc">Instant threat evaluation and comprehensive APK risk assessment</string>
+    <string name="pro_benefit_support_title">Support Open-Source</string>
+    <string name="pro_benefit_support_desc">Help sustain ongoing development and new features</string>
+    <string name="pro_plan_yearly_title">1 Year Subscription</string>
+    <string name="pro_plan_yearly_tag">Popular</string>
+    <string name="pro_plan_yearly_default">$1.99 / year</string>
+    <string name="pro_plan_lifetime_title">Lifetime Pro</string>
+    <string name="pro_plan_lifetime_tag">Best Value</string>
+    <string name="pro_plan_lifetime_default">$4.99</string>
+    <string name="pro_plan_lifetime_desc">Pay once, keep forever across all your devices</string>
+    <string name="pro_purchase_success">Thank you for supporting! Universal Installer Pro is now active.</string>
+    <string name="pro_purchase_failed">Purchase cancelled or failed. Please try again.</string>
 </resources>

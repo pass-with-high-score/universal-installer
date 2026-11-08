@@ -44,6 +44,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
+import app.pwhs.core.presentation.components.VirusTotalUnlimitedOptionsSection
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.VtEngineResult
 import app.pwhs.universalinstaller.domain.model.VtResult
@@ -59,6 +61,7 @@ fun VirusTotalCard(
     onOpenSettings: () -> Unit = {},
     onGetKey: () -> Unit = {},
     onOpenLink: () -> Unit = {},
+    onUpgradeProClick: (() -> Unit)? = null,
 ) {
     val extendedColors = LocalExtendedColors.current
     val status = vt?.status
@@ -136,6 +139,8 @@ fun VirusTotalCard(
                 Spacer(Modifier.height(8.dp))
                 Text(vtDesc, style = MaterialTheme.typography.bodySmall, color = vtColor)
             }
+            Spacer(Modifier.height(10.dp))
+            VirusTotalDailyQuotaBadge()
             if (hasResult && vt != null) {
                 val total = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
                 Spacer(Modifier.height(12.dp))
@@ -181,6 +186,11 @@ fun VirusTotalCard(
                 }
             }
             if (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY) {
+                Spacer(Modifier.height(10.dp))
+                VirusTotalUnlimitedOptionsSection(
+                    showOption1Card = false,
+                    onUpgradeProClick = onUpgradeProClick ?: onOpenSettings,
+                )
                 Spacer(Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     FilledTonalButton(
