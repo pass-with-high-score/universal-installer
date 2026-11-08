@@ -156,10 +156,11 @@
     <string name="pro_plan_yearly_title">Gói 1 Năm</string>
     <string name="pro_plan_yearly_tag">Phổ biến</string>
     <string name="pro_plan_yearly_default">39.000 đ / năm</string>
+    <string name="pro_plan_yearly_desc">Gia hạn hàng năm, hủy bất kỳ lúc nào</string>
     <string name="pro_plan_lifetime_title">Gói Trọn Đời</string>
     <string name="pro_plan_lifetime_tag">Tiết kiệm nhất</string>
     <string name="pro_plan_lifetime_default">79.000 đ</string>
-    <string name="pro_plan_lifetime_desc">Thanh toán 1 lần duy nhất, dùng vĩnh viễn trên mọi thiết bị</string>
+    <string name="pro_plan_lifetime_desc">Thanh toán 1 lần, dùng vĩnh viễn</string>
     <string name="pro_purchase_success">Cảm ơn bạn đã ủng hộ! Gói Pro đã được kích hoạt thành công.</string>
     <string name="pro_purchase_failed">Giao dịch bị hủy hoặc không thành công. Vui lòng thử lại.</string>
     <string name="pro_restore_btn">Khôi phục giao dịch</string>
@@ -191,9 +192,9 @@
     <!-- Pro Banner & VirusTotal Settings -->
     <string name="setting_pro_banner_title">Universal Installer Pro</string>
     <string name="setting_pro_banner_desc_inactive">Quét VirusTotal không giới hạn, bảo mật ưu tiên &amp; ủng hộ nhà phát triển</string>
-    <string name="setting_pro_banner_desc_active">Đã kích hoạt Pro • Cảm ơn bạn đã ủng hộ dự án mã nguồn mở!</string>
-    <string name="setting_pro_banner_badge_active">ĐÃ BẬT</string>
-    <string name="setting_pro_banner_badge_upgrade">NÂNG CẤP</string>
+    <string name="setting_pro_banner_desc_active">Cảm ơn bạn đã đồng hành cùng dự án!</string>
+    <string name="setting_pro_banner_badge_active">Đã kích hoạt</string>
+    <string name="setting_pro_banner_badge_upgrade">Nâng cấp</string>
     <string name="setting_virustotal_title">Quét đám mây VirusTotal</string>
     <string name="setting_virustotal_desc">Cấu hình quét mã độc, API Key và ngưỡng bảo mật</string>
     <string name="setting_virustotal_status_enabled">Đang bật</string>

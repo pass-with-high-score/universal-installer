@@ -160,10 +160,11 @@
     <string name="pro_plan_yearly_title">1 Year Subscription</string>
     <string name="pro_plan_yearly_tag">Popular</string>
     <string name="pro_plan_yearly_default">$1.99 / year</string>
+    <string name="pro_plan_yearly_desc">Billed annually, cancel anytime</string>
     <string name="pro_plan_lifetime_title">Lifetime Pro</string>
     <string name="pro_plan_lifetime_tag">Best Value</string>
     <string name="pro_plan_lifetime_default">$4.99</string>
-    <string name="pro_plan_lifetime_desc">Pay once, keep forever across all your devices</string>
+    <string name="pro_plan_lifetime_desc">Pay once, unlock forever</string>
     <string name="pro_purchase_success">Thank you for supporting! Universal Installer Pro is now active.</string>
     <string name="pro_purchase_failed">Purchase cancelled or failed. Please try again.</string>
     <string name="pro_restore_btn">Restore Purchases</string>
@@ -195,9 +196,9 @@
     <!-- Pro Banner & VirusTotal Settings -->
     <string name="setting_pro_banner_title">Universal Installer Pro</string>
     <string name="setting_pro_banner_desc_inactive">Unlimited VirusTotal scans, priority safety check &amp; support development</string>
-    <string name="setting_pro_banner_desc_active">Pro activated • Thank you for supporting open-source development!</string>
-    <string name="setting_pro_banner_badge_active">ACTIVE</string>
-    <string name="setting_pro_banner_badge_upgrade">UPGRADE</string>
+    <string name="setting_pro_banner_desc_active">Thank you for supporting our project!</string>
+    <string name="setting_pro_banner_badge_active">Active</string>
+    <string name="setting_pro_banner_badge_upgrade">Upgrade</string>
     <string name="setting_virustotal_title">VirusTotal Cloud Scan</string>
     <string name="setting_virustotal_desc">Configure cloud malware scanning, API key, and security thresholds</string>
     <string name="setting_virustotal_status_enabled">Active</string>
