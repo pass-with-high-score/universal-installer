@@ -193,11 +193,15 @@ private class PlayBillingManager(
                 inAppPurchases.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
                     .forEach { acknowledge(it) }
 
-                if (subsOk || inAppOk) {
+                if (subsOk && inAppOk) {
                     val isPro = hasValidSub || hasValidInApp
                     Timber.d("PlayBillingManager: queryPurchases result isPro=$isPro (subs=$hasValidSub, inApp=$hasValidInApp)")
                     updateProStatus(isPro)
                     onComplete?.invoke(isPro)
+                } else if (hasValidSub || hasValidInApp) {
+                    Timber.d("PlayBillingManager: Found valid purchase despite partial query failure (subs=$hasValidSub, inApp=$hasValidInApp)")
+                    updateProStatus(true)
+                    onComplete?.invoke(true)
                 } else {
                     Timber.w("PlayBillingManager: Failed to query purchases (subs=${subsResult.responseCode}, inApp=${inAppResult.responseCode})")
                     onComplete?.invoke(_isProUser.value)
