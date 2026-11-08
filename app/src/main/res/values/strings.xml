@@ -95,6 +95,7 @@
     <string name="stats_category_storage">Storage</string>
     <string name="stats_category_power">Power User</string>
     <string name="stats_category_security">Security</string>
+    <string name="stats_category_premium">Pro &amp; Supporter</string>
 
     <string name="milestone_badge_new">NEW</string>
     <string name="milestone_unlocked_label">Unlocked</string>
@@ -125,5 +126,11 @@
     <string name="milestone_debloat_warrior_desc">Successfully uninstall 10 apps</string>
     <string name="milestone_security_guardian_title">Security Guardian</string>
     <string name="milestone_security_guardian_desc">Scan 5 packages with VirusTotal or Tracker Scanner</string>
+    <string name="milestone_pro_supporter_title">Pro Supporter</string>
+    <string name="milestone_pro_supporter_desc">Unlock Universal Installer Pro and support open-source development</string>
+    <string name="milestone_pro_vt_guardian_title">Pro Cloud Sentinel</string>
+    <string name="milestone_pro_vt_guardian_desc">Perform 20 VirusTotal security scans with Pro unlimited quota</string>
+    <string name="milestone_pro_unlimited_champion_title">Pro Cyber Defender</string>
+    <string name="milestone_pro_unlimited_champion_desc">Perform 50 VirusTotal security scans with Pro unlimited quota</string>
     <string name="app_functions_display_description">Search installed apps, inspect install and uninstall history, view installer statistics, and scan storage for APK packages.</string>
 </resources>

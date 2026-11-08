@@ -49,6 +49,7 @@ enum class MilestoneCategory(@StringRes val labelRes: Int) {
     STORAGE(R.string.stats_category_storage),
     POWER_USER(R.string.stats_category_power),
     SECURITY(R.string.stats_category_security),
+    PREMIUM(R.string.stats_category_premium),
 }
 
 enum class MilestoneId(
@@ -131,6 +132,24 @@ enum class MilestoneId(
         titleRes = R.string.milestone_security_guardian_title,
         descRes = R.string.milestone_security_guardian_desc,
         targetValue = 5L,
+    ),
+    PRO_SUPPORTER(
+        category = MilestoneCategory.PREMIUM,
+        titleRes = R.string.milestone_pro_supporter_title,
+        descRes = R.string.milestone_pro_supporter_desc,
+        targetValue = 1L,
+    ),
+    PRO_VIRUSTOTAL_GUARDIAN(
+        category = MilestoneCategory.PREMIUM,
+        titleRes = R.string.milestone_pro_vt_guardian_title,
+        descRes = R.string.milestone_pro_vt_guardian_desc,
+        targetValue = 20L,
+    ),
+    PRO_UNLIMITED_CHAMPION(
+        category = MilestoneCategory.PREMIUM,
+        titleRes = R.string.milestone_pro_unlimited_champion_title,
+        descRes = R.string.milestone_pro_unlimited_champion_desc,
+        targetValue = 50L,
     ),
 }
 

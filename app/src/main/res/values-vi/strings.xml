@@ -95,6 +95,7 @@
     <string name="stats_category_storage">Dung lượng</string>
     <string name="stats_category_power">Nâng cao</string>
     <string name="stats_category_security">Bảo mật</string>
+    <string name="stats_category_premium">Gói Pro &amp; Ủng hộ</string>
 
     <string name="milestone_badge_new">MỚI</string>
     <string name="milestone_unlocked_label">Đã đạt</string>
@@ -125,5 +126,11 @@
     <string name="milestone_debloat_warrior_desc">Gỡ cài đặt thành công 10 ứng dụng</string>
     <string name="milestone_security_guardian_title">Lá chắn Bảo mật</string>
     <string name="milestone_security_guardian_desc">Quét bảo mật 5 gói bằng VirusTotal hoặc trình quét Tracker</string>
+    <string name="milestone_pro_supporter_title">Thành viên Pro</string>
+    <string name="milestone_pro_supporter_desc">Kích hoạt Universal Installer Pro và ủng hộ dự án mã nguồn mở</string>
+    <string name="milestone_pro_vt_guardian_title">Vệ sĩ đám mây Pro</string>
+    <string name="milestone_pro_vt_guardian_desc">Thực hiện 20 lần quét an toàn VirusTotal với gói Pro không giới hạn</string>
+    <string name="milestone_pro_unlimited_champion_title">Chiến binh bảo mật Pro</string>
+    <string name="milestone_pro_unlimited_champion_desc">Thực hiện 50 lần quét an toàn VirusTotal với gói Pro không giới hạn</string>
     <string name="app_functions_display_description">Tìm kiếm ứng dụng đã cài, xem lịch sử cài đặt và gỡ cài đặt, thống kê cài đặt và quét tìm file APK trên thiết bị.</string>
 </resources>

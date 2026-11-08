@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.AdminPanelSettings
+import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.EmojiEvents
@@ -36,9 +37,11 @@ import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MilitaryTech
 import androidx.compose.material.icons.rounded.Security
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.SportsEsports
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material.icons.rounded.Verified
+import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
@@ -286,4 +289,7 @@ fun MilestoneId.iconVector(): ImageVector = when (this) {
     MilestoneId.TIME_TRAVELER -> Icons.Rounded.History
     MilestoneId.DEBLOAT_WARRIOR -> Icons.Rounded.DeleteSweep
     MilestoneId.SECURITY_GUARDIAN -> Icons.Rounded.Security
+    MilestoneId.PRO_SUPPORTER -> Icons.Rounded.WorkspacePremium
+    MilestoneId.PRO_VIRUSTOTAL_GUARDIAN -> Icons.Rounded.Shield
+    MilestoneId.PRO_UNLIMITED_CHAMPION -> Icons.Rounded.AutoAwesome
 }

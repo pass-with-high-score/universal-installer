@@ -130,6 +130,10 @@ object UserStatsTracker {
         }
     }
 
+    suspend fun recordProStatusChanged(context: Context) {
+        updateAndCheckMilestones(context, emitPopup = true) {}
+    }
+
     suspend fun recordTrackerScan(context: Context, detectedTrackersCount: Int) {
         updateAndCheckMilestones(context, emitPopup = true) { prefs ->
             prefs[KEY_TRACKER_SCANS] = (prefs[KEY_TRACKER_SCANS] ?: 0) + 1
@@ -259,6 +263,9 @@ object UserStatsTracker {
         val unseenSet = prefs[KEY_UNSEEN_MILESTONES].orEmpty()
         val privilegedTotal = (shizukuCount + rootCount + dhizukuCount).toLong()
         val securityScansTotal = (vtScans + trackerScans).toLong()
+        val isProUser = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+        val proStatusVal = if (isProUser) 1L else 0L
+        val proVtScans = if (isProUser) vtScans.toLong() else 0L
 
         val milestones = MilestoneId.entries.map { id ->
             val currentVal = when (id) {
@@ -274,6 +281,9 @@ object UserStatsTracker {
                 MilestoneId.TIME_TRAVELER -> downgrades.toLong()
                 MilestoneId.DEBLOAT_WARRIOR -> totalUninstalls.toLong()
                 MilestoneId.SECURITY_GUARDIAN -> securityScansTotal
+                MilestoneId.PRO_SUPPORTER -> proStatusVal
+                MilestoneId.PRO_VIRUSTOTAL_GUARDIAN,
+                MilestoneId.PRO_UNLIMITED_CHAMPION -> proVtScans
             }
             MilestoneProgress(
                 id = id,
@@ -397,6 +407,9 @@ object UserStatsTracker {
                 val downgrades = (prefs[KEY_DOWNGRADES] ?: 0).toLong()
                 val uninstalls = (prefs[KEY_UNINSTALLS] ?: 0).toLong()
                 val securityScans = ((prefs[KEY_VT_SCANS] ?: 0) + (prefs[KEY_TRACKER_SCANS] ?: 0)).toLong()
+                val isProUser = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+                val proStatusVal = if (isProUser) 1L else 0L
+                val proVtScans = if (isProUser) (prefs[KEY_VT_SCANS] ?: 0).toLong() else 0L
 
                 for (id in MilestoneId.entries) {
                     val value = when (id) {
@@ -412,6 +425,9 @@ object UserStatsTracker {
                         MilestoneId.TIME_TRAVELER -> downgrades
                         MilestoneId.DEBLOAT_WARRIOR -> uninstalls
                         MilestoneId.SECURITY_GUARDIAN -> securityScans
+                        MilestoneId.PRO_SUPPORTER -> proStatusVal
+                        MilestoneId.PRO_VIRUSTOTAL_GUARDIAN,
+                        MilestoneId.PRO_UNLIMITED_CHAMPION -> proVtScans
                     }
                     if (value >= id.targetValue && id.name !in announced) {
                         announced += id.name

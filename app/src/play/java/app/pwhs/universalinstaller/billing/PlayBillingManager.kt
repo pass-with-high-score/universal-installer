@@ -8,6 +8,7 @@ import app.pwhs.core.billing.BillingPurchaseResult
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.universalinstaller.domain.stats.UserStatsTracker
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClientStateListener
@@ -312,6 +313,9 @@ private class PlayBillingManager(
                 prefs[SharedPrefsKeys.IS_PRO_USER] = isPro
             }
             _isProUser.value = isPro
+            if (isPro) {
+                UserStatsTracker.recordProStatusChanged(context)
+            }
         }
     }
 
