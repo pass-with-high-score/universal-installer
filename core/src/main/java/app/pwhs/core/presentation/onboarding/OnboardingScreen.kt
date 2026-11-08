@@ -62,8 +62,6 @@ import kotlinx.coroutines.launch
  * @param showXiaomiTip inserts an extra page warning about MIUI/HyperOS optimization silently
  *   blocking installs (issue #104). Callers gate it on [DeviceCompat.isXiaomi]; TV leaves it off
  *   because the toggle doesn't exist on Xiaomi's TV builds.
- * @param showVirusTotalTip inserts a page explaining the VirusTotal scan. Mobile-only — the
- *   scanner lives in the app module and TV has no Settings screen to paste an API key into.
  * @param showAnalyticsConsent inserts a page offering to turn anonymous reporting off. Callers
  *   pass true only on a build that has reporting to offer, which today is the phone app's `play`
  *   flavor; every other build has nothing to consent to and must not be asked.
@@ -74,7 +72,6 @@ fun OnboardingScreen(
     showAnalyticsConsent: Boolean = false,
     onRestoreBackup: (() -> Unit)? = null,
     showXiaomiTip: Boolean = false,
-    showVirusTotalTip: Boolean = false,
 ) {
     val context = LocalContext.current
     val activity = context as? android.app.Activity

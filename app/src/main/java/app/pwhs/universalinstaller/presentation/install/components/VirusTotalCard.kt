@@ -2,8 +2,6 @@ package app.pwhs.universalinstaller.presentation.install.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.CloudUpload
+import androidx.compose.material.icons.rounded.Dangerous
 import androidx.compose.material.icons.rounded.GppGood
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Security
@@ -30,28 +29,12 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.runtime.collectAsState
-import app.pwhs.core.network.VirusTotalKeyManager
-import app.pwhs.core.network.VtQuotaStatus
-import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
-import app.pwhs.core.presentation.components.VirusTotalUnlimitedOptionsSection
 import app.pwhs.universalinstaller.R
-import app.pwhs.universalinstaller.domain.model.VtEngineResult
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
@@ -67,10 +50,6 @@ fun VirusTotalCard(
     onOpenLink: () -> Unit = {},
     onUpgradeProClick: (() -> Unit)? = null,
 ) {
-    val context = LocalContext.current
-    val quotaFlow = remember(context) { VirusTotalKeyManager.observeQuotaStatus(context) }
-    val quota by quotaFlow.collectAsState(initial = VtQuotaStatus())
-    val isPro = quota.isProUser
     val extendedColors = LocalExtendedColors.current
     val status = vt?.status
     val inProgress = status == VtStatus.SCANNING ||
@@ -81,42 +60,25 @@ fun VirusTotalCard(
     val vtColor = when (status) {
         VtStatus.CLEAN -> MaterialTheme.colorScheme.primary
         VtStatus.MALICIOUS, VtStatus.ERROR -> MaterialTheme.colorScheme.error
-        VtStatus.SUSPICIOUS, VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY,
-        VtStatus.RATE_LIMITED, VtStatus.TOO_LARGE -> extendedColors.warning
+        VtStatus.SUSPICIOUS, VtStatus.RATE_LIMITED, VtStatus.TOO_LARGE -> extendedColors.warning
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
     val vtDesc = when (status) {
         VtStatus.CLEAN -> stringResource(R.string.apk_info_vt_clean)
-        VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vt.malicious)
-        VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vt.suspicious)
-        VtStatus.NOT_FOUND -> stringResource(R.string.apk_info_vt_not_found)
-        VtStatus.NO_API_KEY -> if (isPro) {
-            stringResource(R.string.vt_cloud_keys_temporary_unavailable)
-        } else {
-            stringResource(R.string.apk_info_vt_no_api_key)
-        }
-        VtStatus.INVALID_API_KEY -> if (isPro && !quota.hasPersonalKey) {
-            stringResource(R.string.vt_cloud_keys_temporary_unavailable)
-        } else {
-            stringResource(R.string.apk_info_vt_invalid_key)
-        }
-        VtStatus.RATE_LIMITED -> vt.errorMessage.takeIf { it.isNotBlank() }
-            ?.let { stringResource(R.string.apk_info_vt_rate_limited_retry, it) }
-            ?: stringResource(R.string.apk_info_vt_rate_limited)
-        VtStatus.ERROR -> when {
-            vt.errorMessage == app.pwhs.universalinstaller.data.remote.VirusTotalService.NETWORK_ERROR_TAG ->
-                stringResource(R.string.apk_info_vt_network_error)
-            vt.errorMessage.isNotBlank() && vt.errorMessage != "Unknown error" -> vt.errorMessage
-            else -> stringResource(R.string.apk_info_vt_error)
-        }
-        VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt.errorMessage.orEmpty())
-        VtStatus.SCANNING -> stringResource(R.string.apk_info_vt_scanning)
-        VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_uploading, vt.uploadProgress)
-        VtStatus.QUEUED -> stringResource(R.string.apk_info_vt_queued)
-        VtStatus.ANALYZING -> stringResource(R.string.apk_info_vt_analyzing)
-        null -> null
+        VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vt?.malicious ?: 0)
+        VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vt?.suspicious ?: 0)
+        VtStatus.NOT_FOUND -> "Chưa có kết quả phân tích trong cơ sở dữ liệu."
+        VtStatus.RATE_LIMITED -> "Tần suất yêu cầu quá nhanh, vui lòng chờ giây lát."
+        VtStatus.ERROR -> if (vt?.errorMessage.isNullOrBlank()) "Không thể kết nối đến dịch vụ bảo mật" else vt.errorMessage
+        VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt?.errorMessage.orEmpty())
+        VtStatus.SCANNING -> "Đang phân tích chữ ký và manifest..."
+        VtStatus.UPLOADING -> "Đang tải tệp lên để phân tích (${vt?.uploadProgress ?: 0}%)..."
+        VtStatus.QUEUED -> "Đang chờ hàng đợi phân tích..."
+        VtStatus.ANALYZING -> "Đang chạy quét DEX, BadPack & Call Graph..."
+        else -> null
     }
     val isAlarming = status == VtStatus.MALICIOUS
+
     OutlinedCard(
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
@@ -131,14 +93,20 @@ fun VirusTotalCard(
     ) {
         Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(R.drawable.ic_virustotal_logo),
+                Icon(
+                    imageVector = when (status) {
+                        VtStatus.CLEAN -> Icons.Rounded.GppGood
+                        VtStatus.MALICIOUS -> Icons.Rounded.Dangerous
+                        VtStatus.SUSPICIOUS -> Icons.Rounded.Warning
+                        else -> Icons.Rounded.Security
+                    },
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    tint = vtColor,
+                    modifier = Modifier.size(22.dp),
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = stringResource(R.string.apk_info_vt_scan_title),
+                    text = "Bảo mật VirusDetec",
                     style = MaterialTheme.typography.labelLarge,
                     color = vtColor,
                 )
@@ -151,12 +119,12 @@ fun VirusTotalCard(
                     )
                 }
             }
+
             if (vtDesc != null) {
                 Spacer(Modifier.height(8.dp))
                 Text(vtDesc, style = MaterialTheme.typography.bodySmall, color = vtColor)
             }
-            Spacer(Modifier.height(10.dp))
-            VirusTotalDailyQuotaBadge()
+
             if (hasResult && vt != null) {
                 val total = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
                 Spacer(Modifier.height(12.dp))
@@ -183,82 +151,24 @@ fun VirusTotalCard(
                         warningColor = extendedColors.warning,
                     )
                 }
-                if (sha256.isNotBlank()) {
-                    TextButton(
-                        onClick = onOpenLink,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.apk_info_vt_open_web),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                        )
-                    }
+                TextButton(
+                    onClick = onOpenLink,
+                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                ) {
+                    Text(
+                        text = "Xem chi tiết phát hiện",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
+                        contentDescription = null,
+                        modifier = Modifier.size(14.dp),
+                    )
                 }
             }
-            if (!isPro && (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY)) {
-                Spacer(Modifier.height(10.dp))
-                VirusTotalUnlimitedOptionsSection(
-                    showOption1Card = false,
-                    onUpgradeProClick = onUpgradeProClick ?: onOpenSettings,
-                )
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilledTonalButton(
-                        onClick = onOpenSettings,
-                        shape = MaterialTheme.shapes.medium,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.apk_info_vt_add_key),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                    TextButton(
-                        onClick = onGetKey,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.apk_info_vt_get_key),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                }
-            } else if (isPro && (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY)) {
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    FilledTonalButton(
-                        onClick = onCheck,
-                        shape = MaterialTheme.shapes.medium,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Refresh,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.dialog_failed_retry),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                    TextButton(
-                        onClick = onOpenSettings,
-                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.apk_info_vt_add_key),
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
-                }
-            } else if (status == VtStatus.NOT_FOUND) {
+
+            if (status == VtStatus.NOT_FOUND) {
                 Spacer(Modifier.height(8.dp))
                 FilledTonalButton(
                     onClick = onCheck,
@@ -272,7 +182,7 @@ fun VirusTotalCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = stringResource(R.string.apk_info_vt_upload_action),
+                        text = "Tải lên & Quét bảo mật",
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
@@ -301,14 +211,14 @@ fun VirusTotalCard(
                     shape = MaterialTheme.shapes.medium,
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                 ) {
-                    Image(
-                        painter = painterResource(R.drawable.ic_virustotal_logo),
+                    Icon(
+                        imageVector = Icons.Rounded.Security,
                         contentDescription = null,
                         modifier = Modifier.size(16.dp),
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = stringResource(R.string.scan_virustotal_btn),
+                        text = "Quét bảo mật",
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
@@ -316,4 +226,3 @@ fun VirusTotalCard(
         }
     }
 }
-

@@ -11,8 +11,6 @@ import app.pwhs.universalinstaller.presentation.install.controller.BackendSelfHe
 import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
-import app.pwhs.core.network.VirusTotalKeyManager
-import app.pwhs.universalinstaller.remoteconfig.createVtRemoteConfigSource
 import app.pwhs.universalinstaller.review.AppReview
 import app.pwhs.universalinstaller.review.ReviewGate
 import app.pwhs.universalinstaller.review.createReviewPrompter
@@ -108,7 +106,6 @@ class App : Application(), SingletonImageLoader.Factory {
         // which on `play` is Crashlytics'. Binding the sink first also means a crash during the
         // rest of onCreate is still reported.
         Telemetry.install(createTelemetrySink(this))
-        VirusTotalKeyManager.install(createVtRemoteConfigSource(BuildConfig.DEBUG))
         AppReview.install(createReviewPrompter(this))
         CrashHandler.install(this)
         registerActivityLifecycleCallbacks(app.pwhs.universalinstaller.presentation.setting.security.util.AppLockManager)

@@ -82,11 +82,7 @@ fun DialogPrepareContent(
     val context = LocalContext.current
     var showTrackersDialog by remember { mutableStateOf(false) }
     var showAbiWarningDialog by remember { mutableStateOf(false) }
-    var showVtSetupDialog by remember { mutableStateOf(false) }
-    var pendingInstallAfterVt by remember { mutableStateOf(false) }
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
-    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank() || apkInfo.vtResult?.status != app.pwhs.universalinstaller.domain.model.VtStatus.NO_API_KEY
-    val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
     val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
     val isUpdate = installedVersionCode != null && installedVersionCode > 0
     val isDowngrade = isUpdate && apkInfo.versionCode < installedVersionCode
@@ -297,13 +293,7 @@ fun DialogPrepareContent(
             }
             if (!vtDisabled) VirusTotalInstallPrompt(
                 apkInfo = apkInfo,
-                onScan = {
-                    if (!hasVtKey) {
-                        showVtSetupDialog = true
-                    } else {
-                        onCheckVirusTotal()
-                    }
-                },
+                onScan = onCheckVirusTotal,
             )
             if (apkInfo.isScanningTrackers) {
                 DialogPill(
@@ -415,9 +405,6 @@ fun DialogPrepareContent(
                 onClick = {
                     if (apkInfo.isAbiIncompatible) {
                         showAbiWarningDialog = true
-                    } else if (!vtDisabled && !hasVtKey && !dontAskAgain) {
-                        pendingInstallAfterVt = true
-                        showVtSetupDialog = true
                     } else {
                         onInstall()
                     }
@@ -463,23 +450,8 @@ fun DialogPrepareContent(
             onDismissAbiWarningDialog = { showAbiWarningDialog = false },
             onInstallAnyway = {
                 showAbiWarningDialog = false
-                if (!vtDisabled && !hasVtKey && !dontAskAgain) {
-                    pendingInstallAfterVt = true
-                    showVtSetupDialog = true
-                } else {
-                    onInstall()
-                }
+                onInstall()
             },
-            showVtSetupDialog = showVtSetupDialog && !vtDisabled,
-            onDismissVtSetupDialog = {
-                showVtSetupDialog = false
-                pendingInstallAfterVt = false
-            },
-            onSaveAndScanVt = {
-                onCheckVirusTotal()
-                pendingInstallAfterVt = false
-            },
-            onProceedInstallVt = if (pendingInstallAfterVt) onInstall else null,
         )
     }
 }

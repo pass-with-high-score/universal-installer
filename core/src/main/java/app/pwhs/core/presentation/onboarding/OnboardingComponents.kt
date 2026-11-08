@@ -1,7 +1,5 @@
 package app.pwhs.core.presentation.onboarding
 
-import android.content.ClipboardManager
-import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -19,12 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.CheckCircle
-import androidx.compose.material.icons.rounded.ContentPaste
 import androidx.compose.material.icons.rounded.DirectionsCar
 import androidx.compose.material.icons.rounded.PhoneAndroid
 import androidx.compose.material.icons.rounded.Security
@@ -32,34 +27,25 @@ import androidx.compose.material.icons.rounded.Tv
 import androidx.compose.material.icons.rounded.Watch
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.core.content.getSystemService
 import app.pwhs.core.R
-
-/** A VirusTotal API key is a 64-character hex string; used only to catch a half-finished paste. */
-private val VIRUSTOTAL_API_KEY_FORMAT = Regex("[0-9a-fA-F]{64}")
 
 internal data class OnboardingPage(
     val icon: ImageVector,
@@ -70,8 +56,6 @@ internal data class OnboardingPage(
     val deviceSupportList: Boolean = false,
     /** Renders a two-option security picker under the description. */
     val securityPicker: Boolean = false,
-    /** Renders the VirusTotal API key field under the action button. */
-    val virusTotalKeyField: Boolean = false,
     /** Renders the anonymous-reporting opt-out switch under the description. */
     val analyticsToggle: Boolean = false,
     /** Optional secondary action rendered under the description (e.g. "Open Developer options"). */
@@ -88,8 +72,6 @@ internal fun PageContent(
     onRequestPermission: () -> Unit,
     strictSecurity: Boolean = false,
     onStrictSecurityChange: (Boolean) -> Unit = {},
-    virusTotalKey: String = "",
-    onVirusTotalKeyChange: (String) -> Unit = {},
     analyticsEnabled: Boolean = true,
     onAnalyticsEnabledChange: (Boolean) -> Unit = {},
     pageOffset: Float = 0f,
@@ -151,31 +133,16 @@ internal fun PageContent(
                 )
             }
 
-            // The key block draws its own link, so the shared button would only duplicate it.
-            if (!page.virusTotalKeyField) {
-                page.onAction?.let { action ->
-                    val label = page.actionLabel ?: return@let
-                    Spacer(Modifier.height(32.dp))
-                    OutlinedButton(onClick = action) {
-                        page.actionIcon?.let { icon ->
-                            Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(Modifier.width(8.dp))
-                        }
-                        Text(label)
+            page.onAction?.let { action ->
+                val label = page.actionLabel ?: return@let
+                Spacer(Modifier.height(32.dp))
+                OutlinedButton(onClick = action) {
+                    page.actionIcon?.let { icon ->
+                        Icon(icon, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Spacer(Modifier.width(8.dp))
                     }
+                    Text(label)
                 }
-            }
-
-            // The key goes in right here, beside the link that fetches it. The page used to send the
-            // user to Settings to paste it, which is where the flow lost people.
-            if (page.virusTotalKeyField) {
-                Spacer(Modifier.height(24.dp))
-                VirusTotalKeySetup(
-                    value = virusTotalKey,
-                    onValueChange = onVirusTotalKeyChange,
-                    getKeyLabel = page.actionLabel.orEmpty(),
-                    onGetKey = page.onAction ?: {},
-                )
             }
 
             // Permission button on last page
@@ -212,83 +179,6 @@ internal fun PageContent(
             }
         }
     }
-}
-
-/**
- * The VirusTotal API key field shown during onboarding, with the link that produces a key.
- *
- * Every keystroke is persisted, so there is no Save button to miss — walking away mid-paste still
- * leaves the key stored. The 64-hex check is advisory: it catches a truncated paste without
- * refusing a key format VirusTotal might change later.
- */
-@Composable
-private fun VirusTotalKeySetup(
-    value: String,
-    onValueChange: (String) -> Unit,
-    getKeyLabel: String,
-    onGetKey: () -> Unit,
-) {
-    val context = LocalContext.current
-    val trimmed = value.trim()
-    val looksValid = VIRUSTOTAL_API_KEY_FORMAT.matches(trimmed)
-    val malformed = trimmed.isNotEmpty() && !looksValid
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text(stringResource(R.string.onboarding_virustotal_key_label)) },
-            trailingIcon = {
-                IconButton(onClick = { pasteFromClipboard(context)?.let(onValueChange) }) {
-                    Icon(
-                        Icons.Rounded.ContentPaste,
-                        contentDescription = stringResource(R.string.onboarding_virustotal_paste),
-                        modifier = Modifier.size(20.dp),
-                    )
-                }
-            },
-            singleLine = true,
-            isError = malformed,
-            keyboardOptions = KeyboardOptions(
-                autoCorrectEnabled = false,
-                imeAction = ImeAction.Done,
-            ),
-            supportingText = {
-                Text(
-                    text = stringResource(
-                        when {
-                            trimmed.isEmpty() -> R.string.onboarding_virustotal_key_hint
-                            looksValid -> R.string.onboarding_virustotal_key_saved
-                            else -> R.string.onboarding_virustotal_key_malformed
-                        }
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-            },
-        )
-        if (getKeyLabel.isNotEmpty()) {
-            TextButton(onClick = onGetKey) {
-                Text(getKeyLabel)
-                Spacer(Modifier.width(6.dp))
-                Icon(
-                    Icons.AutoMirrored.Rounded.OpenInNew,
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                )
-            }
-        }
-    }
-}
-
-private fun pasteFromClipboard(context: Context): String? {
-    val clipboard = context.getSystemService<ClipboardManager>() ?: return null
-    val clip = clipboard.primaryClip ?: return null
-    if (clip.itemCount == 0) return null
-    return clip.getItemAt(0).coerceToText(context)?.toString()?.trim()?.takeIf { it.isNotEmpty() }
 }
 
 /**

@@ -14,9 +14,8 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.DownloadHistoryDao
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
-import app.pwhs.universalinstaller.data.remote.VirusDetecService
+import app.pwhs.core.network.VirusDetecService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
-import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.domain.manager.InstallBlacklist
 import app.pwhs.universalinstaller.domain.model.InstallerProfile
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository

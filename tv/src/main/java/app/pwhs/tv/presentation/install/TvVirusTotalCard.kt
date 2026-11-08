@@ -40,7 +40,6 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import app.pwhs.core.domain.model.VtResult
 import app.pwhs.core.domain.model.VtStatus
-import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
 import app.pwhs.tv.R
 
 @OptIn(ExperimentalTvMaterial3Api::class)
@@ -84,10 +83,10 @@ fun TvVirusTotalCard(
         VtStatus.QUEUED -> stringResource(R.string.tv_vt_status_queued)
         VtStatus.ANALYZING -> stringResource(R.string.tv_vt_status_analyzing)
         VtStatus.NOT_FOUND -> stringResource(R.string.tv_vt_status_not_found)
-        VtStatus.NO_API_KEY -> stringResource(R.string.tv_vt_status_no_key)
-        VtStatus.INVALID_API_KEY -> stringResource(R.string.tv_vt_status_invalid_key)
-        VtStatus.RATE_LIMITED -> stringResource(R.string.tv_vt_status_rate_limited)
-        VtStatus.TOO_LARGE -> stringResource(R.string.tv_vt_status_too_large, vtResult.errorMessage)
+        VtStatus.NO_API_KEY,
+        VtStatus.INVALID_API_KEY,
+        VtStatus.RATE_LIMITED,
+        VtStatus.TOO_LARGE,
         VtStatus.ERROR -> stringResource(R.string.tv_vt_status_error)
     }
 
@@ -198,6 +197,5 @@ fun TvVirusTotalCard(
             }
         }
     }
-    VirusTotalDailyQuotaBadge()
     }
 }

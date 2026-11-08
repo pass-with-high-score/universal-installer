@@ -45,7 +45,6 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     isPro: Boolean = false,
     hasCustomKey: Boolean = false,
     onCheckVirusTotal: () -> Unit,
-    onConfigureVirusTotal: () -> Unit = {},
     onOpenDetail: (() -> Unit)? = null,
 ) {
     // 0. Update Inspector (Signature & Permission Diff)
@@ -84,7 +83,7 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
                 ?: stringResource(R.string.apk_info_vt_rate_limited)
             VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vtErrorMsg.orEmpty())
             VtStatus.ERROR -> when {
-                vtResult.errorMessage == app.pwhs.universalinstaller.data.remote.VirusTotalService.NETWORK_ERROR_TAG ->
+                vtResult.errorMessage == app.pwhs.core.network.VirusDetecService.NETWORK_ERROR_TAG ->
                     stringResource(R.string.apk_info_vt_network_error)
                 !vtErrorMsg.isNullOrBlank() && vtErrorMsg != "Unknown error" -> vtErrorMsg
                 else -> stringResource(R.string.apk_info_vt_error)
@@ -121,17 +120,7 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             onClick = {
                 when {
                     vtResult?.status in listOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS) -> {
-                        if (onOpenDetail != null) {
-                            onOpenDetail()
-                        } else if (apkInfo.sha256.isNotBlank()) {
-                            uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
-                        }
-                    }
-                    // Without a key, tapping Check only rewrites the same "no key" line the user
-                    // is already reading. Send them where the key is entered instead.
-                    (vtResult?.status == VtStatus.NO_API_KEY ||
-                        vtResult?.status == VtStatus.INVALID_API_KEY) && (!isPro || hasCustomKey) -> {
-                        onConfigureVirusTotal()
+                        onOpenDetail?.invoke()
                     }
                     else -> onCheckVirusTotal()
                 }

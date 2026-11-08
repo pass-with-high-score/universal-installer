@@ -7,7 +7,6 @@ import app.pwhs.universalinstaller.data.local.AppDatabase
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.data.remote.VirusDetecService
-import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.data.repository.SessionDataRepositoryImpl
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
 import app.pwhs.universalinstaller.presentation.download.DownloadHistoryViewModel
@@ -21,7 +20,6 @@ import app.pwhs.universalinstaller.presentation.manage.ManageViewModel
 import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsViewModel
 import app.pwhs.universalinstaller.presentation.setting.backup.BackupViewModel
 import app.pwhs.universalinstaller.presentation.setting.security.SecurityViewModel
-import app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingViewModel
 import app.pwhs.universalinstaller.presentation.stats.StatsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -93,7 +91,6 @@ val appModule = module {
             }
         }
     }
-    single { VirusTotalService(get()) }
     single { VirusDetecService(get()) }
     single { VirusTotalNotifier(get()) }
     single { PackageDownloadService(get()) }
@@ -121,7 +118,6 @@ val appModule = module {
     viewModelOf(::SyncViewModel)
     viewModelOf(::BackupViewModel)
     viewModelOf(::SecurityViewModel)
-    viewModelOf(::VirusTotalSettingViewModel)
     viewModelOf(::StatsViewModel)
 }
 

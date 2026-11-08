@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.GppGood
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
@@ -119,19 +120,26 @@ fun VirusTotalDetailSheet(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Image(
-                    painter = painterResource(R.drawable.ic_virustotal_logo),
-                    contentDescription = "VirusTotal",
+                Box(
                     modifier = Modifier
                         .size(38.dp)
-                        .clip(CircleShape),
-                )
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Shield,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp),
+                    )
+                }
 
                 Spacer(modifier = Modifier.width(12.dp))
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = stringResource(R.string.virustotal_detail_sheet_title),
+                        text = "Bảo mật & Quét mã độc (VirusDetec)",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,

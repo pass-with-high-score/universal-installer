@@ -18,10 +18,6 @@ fun DialogPrepareModals(
     showAbiWarningDialog: Boolean,
     onDismissAbiWarningDialog: () -> Unit,
     onInstallAnyway: () -> Unit,
-    showVtSetupDialog: Boolean,
-    onDismissVtSetupDialog: () -> Unit,
-    onSaveAndScanVt: () -> Unit,
-    onProceedInstallVt: (() -> Unit)?,
     billingManager: BillingManager = koinInject(),
 ) {
     var showUpgradeProSheet by remember { mutableStateOf(false) }
@@ -38,17 +34,6 @@ fun DialogPrepareModals(
             apkAbis = apkInfo.supportedAbis,
             onDismiss = onDismissAbiWarningDialog,
             onInstallAnyway = onInstallAnyway,
-        )
-    }
-
-    if (showVtSetupDialog) {
-        VirusTotalSetupDialog(
-            onDismiss = onDismissVtSetupDialog,
-            onSaveAndScan = { onSaveAndScanVt() },
-            onProceedInstall = onProceedInstallVt,
-            onUpgradeProClick = {
-                showUpgradeProSheet = true
-            },
         )
     }
 

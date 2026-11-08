@@ -35,7 +35,6 @@ fun ProIssueDialog(
     result: BillingPurchaseResult,
     onDismissRequest: () -> Unit,
     onRetry: () -> Unit,
-    onUsePersonalKey: () -> Unit,
     onContactSupport: () -> Unit,
 ) {
     when (result) {
@@ -63,18 +62,6 @@ fun ProIssueDialog(
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        FilledTonalButton(
-                            onClick = onUsePersonalKey,
-                            modifier = Modifier.fillMaxWidth(),
-                        ) {
-                            Icon(Icons.Rounded.Key, null)
-                            Spacer(Modifier.height(0.dp))
-                            Text(
-                                text = stringResource(R.string.pro_issue_action_vt_key),
-                                modifier = Modifier.weight(1f),
-                            )
-                        }
                         OutlinedButton(
                             onClick = onContactSupport,
                             modifier = Modifier.fillMaxWidth(),

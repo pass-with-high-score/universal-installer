@@ -11,6 +11,8 @@ import app.pwhs.core.domain.model.SeverityLevel
 import app.pwhs.core.domain.model.UploadTicketResponse
 import app.pwhs.core.domain.model.Verdict
 import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -38,7 +40,7 @@ import java.io.InputStream
 import java.security.MessageDigest
 
 class VirusDetecService(
-    private val client: HttpClient,
+    private val client: HttpClient = defaultClient,
     private val baseUrl: String = PRIMARY_BASE_URL,
     private val apiKey: String = DEFAULT_CLIENT_API_KEY,
 ) {
@@ -47,6 +49,16 @@ class VirusDetecService(
         const val FALLBACK_BASE_URL = "https://virusdetec.nguyenquangminh623.workers.dev"
         const val DEFAULT_CLIENT_API_KEY = "vd_client_live_u89b21f00a"
         const val NETWORK_ERROR_TAG = "__NETWORK_ERROR__"
+
+        val defaultClient: HttpClient by lazy {
+            HttpClient(CIO) {
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 60_000
+                    connectTimeoutMillis = 15_000
+                    socketTimeoutMillis = 60_000
+                }
+            }
+        }
     }
 
     suspend fun computeSha256(input: InputStream): String = withContext(Dispatchers.IO) {

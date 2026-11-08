@@ -30,11 +30,11 @@ import androidx.tv.material3.SurfaceDefaults
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.domain.ApkFile
+import app.pwhs.core.domain.model.LookupRequest
+import app.pwhs.core.domain.model.toVtResult
 import app.pwhs.core.domain.model.VtResult
 import app.pwhs.core.domain.model.VtStatus
-import app.pwhs.core.network.VirusTotalClientFactory
-import app.pwhs.core.network.VirusTotalKeyManager
-import app.pwhs.core.network.VirusTotalService
+import app.pwhs.core.network.VirusDetecService
 import app.pwhs.core.receiver.ReceivedApk
 import app.pwhs.tv.BuildConfig
 import app.pwhs.tv.presentation.receive.components.ApkOverviewPane
@@ -107,14 +107,7 @@ fun ApkDetailsDialog(
     var vtResult by remember { mutableStateOf<VtResult?>(null) }
     var sha256 by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    val vtHttpClient = remember { VirusTotalClientFactory.create(BuildConfig.DEBUG) }
-    val vtService = remember(vtHttpClient) { VirusTotalService(vtHttpClient) }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            vtHttpClient.close()
-        }
-    }
+    val virusDetecService = remember { VirusDetecService() }
 
     val runVtCheck: () -> Unit = {
         scope.launch {
@@ -125,8 +118,14 @@ fun ApkDetailsDialog(
             vtResult = VtResult(status = VtStatus.SCANNING)
             val hash = if (sha256.isNotBlank()) sha256 else withContext(Dispatchers.IO) {
                 runCatching {
-                    context.contentResolver.openInputStream(uri)?.use { input ->
-                        vtService.computeSha256(input)
+                    context.contentResolver.openInputStream(uri)?.use { stream ->
+                        val digest = java.security.MessageDigest.getInstance("SHA-256")
+                        val buffer = ByteArray(8192)
+                        var read: Int
+                        while (stream.read(buffer).also { read = it } != -1) {
+                            digest.update(buffer, 0, read)
+                        }
+                        digest.digest().joinToString("") { "%02x".format(it) }
                     }
                 }.getOrNull().orEmpty()
             }
@@ -136,11 +135,16 @@ fun ApkDetailsDialog(
                 return@launch
             }
             sha256 = hash
-            if (!VirusTotalKeyManager.canUseVirusTotal(context, hash)) {
-                vtResult = VtResult(status = VtStatus.NO_API_KEY)
-                return@launch
+
+            val lookupRes = virusDetecService.lookup(LookupRequest(sha256 = hash)).getOrNull()
+            val report = lookupRes?.report ?: lookupRes?.precheckReport
+            vtResult = if (report != null) {
+                report.toVtResult()
+            } else if (lookupRes?.needUpload == true) {
+                VtResult(status = VtStatus.NOT_FOUND, analysisId = hash)
+            } else {
+                VtResult(status = VtStatus.CLEAN)
             }
-            vtResult = VirusTotalKeyManager.checkFile(context, vtService, hash)
         }
     }
 
@@ -269,18 +273,15 @@ fun ApkDetailsDialog(
                         vtResult = vtResult,
                         onUploadAndScanVt = {
                             scope.launch {
-                                if (!VirusTotalKeyManager.canUseVirusTotal(context, sha256)) {
-                                    vtResult = VtResult(status = VtStatus.NO_API_KEY)
-                                    return@launch
-                                }
-                                if (size > VirusTotalService.SIZE_LIMIT_LARGE) {
-                                    vtResult = VtResult(status = VtStatus.TOO_LARGE, errorMessage = "${size / (1024 * 1024)} MB")
-                                    return@launch
-                                }
                                 vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = 0)
+                                val ticket = virusDetecService.createUploadTicket(sha256 = sha256, fileSize = size).getOrNull()
+                                if (ticket == null) {
+                                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Upload ticket creation failed")
+                                    return@launch
+                                }
                                 val tempFile = withContext(Dispatchers.IO) {
                                     runCatching {
-                                        val f = File(context.cacheDir, "vt_recv_${System.currentTimeMillis()}.apk")
+                                        val f = File(context.cacheDir, "vd_recv_${System.currentTimeMillis()}.apk")
                                         context.contentResolver.openInputStream(uri)?.use { input ->
                                             f.outputStream().use { output -> input.copyTo(output) }
                                         }
@@ -288,24 +289,34 @@ fun ApkDetailsDialog(
                                     }.getOrNull()
                                 } ?: return@launch
 
-                                try {
-                                    vtResult = VirusTotalKeyManager.uploadAndPoll(
-                                        context = context,
-                                        service = vtService,
-                                        sha256 = sha256,
-                                        file = tempFile,
-                                        onUploadProgress = { pct ->
-                                            vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = pct)
-                                        },
-                                        onQueued = { analysisId ->
-                                            vtResult = VtResult(status = VtStatus.QUEUED, analysisId = analysisId)
-                                        },
-                                        onPollProgress = { st, analysisId ->
-                                            vtResult = VtResult(status = st, analysisId = analysisId)
-                                        },
-                                    )
+                                val uploadOk = try {
+                                    virusDetecService.uploadBinary(ticket.uploadUrl, tempFile) { pct ->
+                                        vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = pct)
+                                    }.isSuccess
                                 } finally {
                                     tempFile.delete()
+                                }
+
+                                if (!uploadOk) {
+                                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Binary upload failed")
+                                    return@launch
+                                }
+
+                                val startRes = virusDetecService.startScan(ticket.jobId).getOrNull()
+                                if (startRes == null) {
+                                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Start scan failed")
+                                    return@launch
+                                }
+
+                                virusDetecService.watchScanStream(ticket.jobId).collect { update ->
+                                    val report = update.report
+                                    if (report != null) {
+                                        vtResult = report.toVtResult()
+                                    } else if (update.status == "FAILED") {
+                                        vtResult = VtResult(status = VtStatus.ERROR, errorMessage = update.message)
+                                    } else {
+                                        vtResult = VtResult(status = VtStatus.ANALYZING, uploadProgress = update.progressPercent)
+                                    }
                                 }
                             }
                         },

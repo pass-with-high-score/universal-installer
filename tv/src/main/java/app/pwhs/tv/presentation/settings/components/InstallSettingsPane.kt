@@ -47,8 +47,6 @@ import androidx.tv.material3.MaterialTheme
 import androidx.tv.material3.Text
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
-import app.pwhs.core.presentation.components.VirusTotalDailyQuotaBadge
-import app.pwhs.core.presentation.components.VirusTotalUnlimitedOptionsSection
 import app.pwhs.core.util.RootShell
 import app.pwhs.tv.R
 import app.pwhs.tv.install.TvShizuku
@@ -100,23 +98,6 @@ fun InstallSettingsPane(
     val strictVirusTotal by context.dataStore.data
         .map { it[SharedPrefsKeys.STRICT_VIRUSTOTAL_CHECK] ?: false }
         .collectAsState(initial = false)
-    val virusTotalApiKey by context.dataStore.data
-        .map { it[SharedPrefsKeys.VIRUSTOTAL_API_KEY] ?: "" }
-        .collectAsState(initial = "")
-
-    var showKeyDialog by remember { mutableStateOf(false) }
-
-    if (showKeyDialog) {
-        TvVirusTotalKeyDialog(
-            initialKey = virusTotalApiKey,
-            onSaveKey = { newKey ->
-                scope.launch {
-                    context.dataStore.edit { it[SharedPrefsKeys.VIRUSTOTAL_API_KEY] = newKey }
-                }
-            },
-            onDismiss = { showKeyDialog = false },
-        )
-    }
 
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -225,21 +206,21 @@ fun InstallSettingsPane(
 
         Spacer(Modifier.height(8.dp))
 
-        // ── VirusTotal Section ───────────────────────────────────────────────
+        // ── Security Section ───────────────────────────────────────────────
         Text(
-            stringResource(R.string.tv_settings_section_virustotal),
+            "Bảo mật VirusDetec",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
         )
 
-        // 6. VirusTotal Scanner Enable/Disable Switch
+        // VirusDetec Scanner Enable/Disable Switch
         TvSettingSwitchRow(
-            title = stringResource(R.string.tv_settings_virustotal_enable_title),
-            subtitle = stringResource(R.string.tv_settings_virustotal_enable_desc),
+            title = "Quét bảo mật APK tự động",
+            subtitle = "Tự động phân tích chữ ký, mã độc và hành vi bất thường",
             icon = Icons.Default.Security,
             checked = !disableVirusTotal,
-            badgeText = if (!disableVirusTotal && virusTotalApiKey.isNotBlank()) "ACTIVE" else null,
+            badgeText = if (!disableVirusTotal) "ACTIVE" else null,
             badgeColor = MaterialTheme.colorScheme.primaryContainer,
             onCheckedChange = { isEnabled ->
                 scope.launch {
@@ -249,10 +230,7 @@ fun InstallSettingsPane(
         )
 
         if (!disableVirusTotal) {
-            VirusTotalDailyQuotaBadge()
-            VirusTotalUnlimitedOptionsSection(showOption1Card = false)
-
-            // 7. Strict VirusTotal Check Switch
+            // Strict Security Check Switch
             TvSettingSwitchRow(
                 title = stringResource(R.string.tv_settings_virustotal_strict_title),
                 subtitle = stringResource(R.string.tv_settings_virustotal_strict_desc),
@@ -262,35 +240,6 @@ fun InstallSettingsPane(
                     scope.launch {
                         context.dataStore.edit { it[SharedPrefsKeys.STRICT_VIRUSTOTAL_CHECK] = checked }
                     }
-                }
-            )
-
-            // 8. VirusTotal API Key Row
-            val keyMasked = if (virusTotalApiKey.length >= 8) {
-                "${virusTotalApiKey.take(4)}...${virusTotalApiKey.takeLast(4)}"
-            } else {
-                virusTotalApiKey
-            }
-            val keySubtitle = if (virusTotalApiKey.isNotBlank()) {
-                stringResource(R.string.tv_settings_virustotal_key_configured, keyMasked)
-            } else {
-                stringResource(R.string.tv_settings_virustotal_key_not_set)
-            }
-
-            TvSettingRow(
-                title = stringResource(R.string.tv_settings_virustotal_key_title),
-                subtitle = keySubtitle,
-                icon = Icons.Default.VpnKey,
-                badgeText = if (virusTotalApiKey.isNotBlank()) "KEY SET" else "NO KEY",
-                badgeColor = if (virusTotalApiKey.isNotBlank()) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.errorContainer,
-                onClick = { showKeyDialog = true },
-                trailingContent = {
-                    Icon(
-                        Icons.Default.ChevronRight,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
                 }
             )
         }

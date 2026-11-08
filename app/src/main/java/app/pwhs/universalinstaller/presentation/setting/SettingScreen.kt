@@ -149,6 +149,7 @@ fun SettingScreen(
         },
         analyticsEnabled = analyticsEnabled,
         onAnalyticsEnabledChanged = viewModel::setAnalyticsEnabled,
+        onToggleSecurityScan = viewModel::setVirusTotalDisabled,
     )
 }
 
@@ -190,6 +191,7 @@ private fun SettingUi(
     onProfilesClick: () -> Unit = {},
     analyticsEnabled: Boolean = true,
     onAnalyticsEnabledChanged: (Boolean) -> Unit = {},
+    onToggleSecurityScan: (Boolean) -> Unit = {},
 ) {
     val context = androidx.compose.ui.platform.LocalContext.current
     val backupViewModel: BackupViewModel = koinViewModel()
@@ -311,7 +313,7 @@ private fun SettingUi(
             )
             val syncLabels = listOf("sync", "port", "pin")
             val backupLabels = listOf(stringResource(R.string.setting_section_backup), "backup", "restore", "export", "import")
-            val advancedLabels = listOf("advanced", "virustotal", "api key")
+            val advancedLabels = listOf("advanced", "security", "bảo mật", "virusdetec")
             val proLabels = listOf("pro", "premium", "upgrade", "subscription", "lifetime", "virustotal")
             val privacyLabels = listOf(
                 stringResource(R.string.setting_analytics_title),
@@ -421,15 +423,8 @@ private fun SettingUi(
                 AdvancedSection(
                     q = q,
                     advancedLabels = advancedLabels,
-                    virusTotalDisabled = uiState.virusTotalDisabled,
-                    onVirusTotalClick = {
-                        context.startActivity(
-                            android.content.Intent(
-                                context,
-                                app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingActivity::class.java,
-                            )
-                        )
-                    },
+                    securityScanDisabled = uiState.virusTotalDisabled,
+                    onToggleSecurityScan = onToggleSecurityScan,
                 )
 
                 // ── Backup & Restore Section ─────────────────

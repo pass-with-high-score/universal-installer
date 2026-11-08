@@ -11,13 +11,13 @@ import androidx.lifecycle.viewModelScope
 import app.pwhs.core.data.ApkMetadataReader
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.domain.model.LookupRequest
+import app.pwhs.core.domain.model.toVtResult
 import app.pwhs.core.domain.model.VtResult
 import app.pwhs.core.domain.model.VtStatus
 import app.pwhs.core.install.ApkInstaller
 import app.pwhs.core.install.RootInstaller
-import app.pwhs.core.network.VirusTotalClientFactory
-import app.pwhs.core.network.VirusTotalKeyManager
-import app.pwhs.core.network.VirusTotalService
+import app.pwhs.core.network.VirusDetecService
 import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.core.telemetry.TelemetryEvents
 import app.pwhs.core.util.RootShell
@@ -43,8 +43,7 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
     private val installer = ApkInstaller(context)
     private val rootInstaller = RootInstaller(context)
     private val shizukuInstaller = ShizukuInstaller(context)
-    private val vtHttpClient = VirusTotalClientFactory.create(BuildConfig.DEBUG)
-    private val virusTotalService = VirusTotalService(vtHttpClient)
+    private val virusDetecService = VirusDetecService()
 
     private val _state = MutableStateFlow<TvInstallState>(TvInstallState.Loading)
     val state: StateFlow<TvInstallState> = _state.asStateFlow()
@@ -54,7 +53,6 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
 
     override fun onCleared() {
         super.onCleared()
-        vtHttpClient.close()
     }
 
     fun loadApk(uri: Uri) {
@@ -112,11 +110,13 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
             if (isDisabled) return@launch
 
             val sha256 = withContext(Dispatchers.IO) {
-                runCatching {
+                try {
                     context.contentResolver.openInputStream(uri)?.use { input ->
-                        virusTotalService.computeSha256(input)
-                    }
-                }.getOrNull().orEmpty()
+                        virusDetecService.computeSha256(input)
+                    }.orEmpty()
+                } catch (e: Exception) {
+                    ""
+                }
             }
 
             val current = _state.value as? TvInstallState.Ready ?: return@launch
@@ -127,62 +127,52 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
                 return@launch
             }
 
-            if (!VirusTotalKeyManager.canUseVirusTotal(context, sha256)) {
-                _state.value = current.copy(
-                    sha256 = sha256,
-                    vtResult = VtResult(status = VtStatus.NO_API_KEY)
-                )
-                return@launch
-            }
-
             _state.value = current.copy(
                 sha256 = sha256,
                 vtResult = VtResult(status = VtStatus.SCANNING)
             )
 
-            val checkResult = VirusTotalKeyManager.checkFile(context, virusTotalService, sha256)
+            val lookupRes = virusDetecService.lookup(LookupRequest(sha256 = sha256)).getOrNull()
+            val report = lookupRes?.report ?: lookupRes?.precheckReport
+            val result = if (report != null) {
+                report.toVtResult()
+            } else if (lookupRes?.needUpload == true) {
+                VtResult(status = VtStatus.NOT_FOUND, analysisId = sha256)
+            } else {
+                VtResult(status = VtStatus.CLEAN)
+            }
             val updatedReady = _state.value as? TvInstallState.Ready ?: return@launch
-            _state.value = updatedReady.copy(vtResult = checkResult)
+            _state.value = updatedReady.copy(vtResult = result)
         }
     }
 
     fun uploadAndScanVirusTotal() {
         val current = _state.value as? TvInstallState.Ready ?: return
-        val sizeBytes = current.sizeBytes
+        val sha256 = current.sha256
         val uri = current.uri
+        val sizeBytes = current.sizeBytes
 
         vtJob?.cancel()
         vtJob = viewModelScope.launch {
-            if (!VirusTotalKeyManager.canUseVirusTotal(context, current.sha256)) {
-                _state.value = current.copy(vtResult = VtResult(status = VtStatus.NO_API_KEY))
-                return@launch
-            }
-
-            if (sizeBytes > VirusTotalService.SIZE_LIMIT_LARGE) {
-                _state.value = current.copy(
-                    vtResult = VtResult(
-                        status = VtStatus.TOO_LARGE,
-                        errorMessage = "${sizeBytes / (1024 * 1024)} MB"
-                    )
-                )
-                return@launch
-            }
-
             _state.value = current.copy(
                 isUploadingVt = true,
                 vtUploadProgress = 0,
                 vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = 0)
             )
 
-            val fileToUpload = if (uri.scheme == "file") {
-                uri.path?.let(::File)
-            } else {
-                null
+            val ticket = virusDetecService.createUploadTicket(sha256 = sha256, fileSize = sizeBytes).getOrNull()
+            if (ticket == null) {
+                val ready = _state.value as? TvInstallState.Ready ?: return@launch
+                _state.value = ready.copy(
+                    isUploadingVt = false,
+                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Could not create upload ticket")
+                )
+                return@launch
             }
 
-            val tempFile = fileToUpload ?: withContext(Dispatchers.IO) {
+            val tempFile = withContext(Dispatchers.IO) {
                 runCatching {
-                    val f = File(context.cacheDir, "vt_upload_${System.currentTimeMillis()}.apk")
+                    val f = File(context.cacheDir, "vd_upload_${System.currentTimeMillis()}.apk")
                     context.contentResolver.openInputStream(uri)?.use { input ->
                         f.outputStream().use { output -> input.copyTo(output) }
                     }
@@ -199,37 +189,51 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
                 return@launch
             }
 
-            try {
-                val pollResult = VirusTotalKeyManager.uploadAndPoll(
-                    context = context,
-                    service = virusTotalService,
-                    sha256 = current.sha256,
-                    file = tempFile,
-                    onUploadProgress = { pct ->
-                        val ready = _state.value as? TvInstallState.Ready ?: return@uploadAndPoll
-                        _state.value = ready.copy(
-                            vtUploadProgress = pct,
-                            vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = pct)
-                        )
-                    },
-                    onQueued = { analysisId ->
-                        val ready = _state.value as? TvInstallState.Ready ?: return@uploadAndPoll
-                        _state.value = ready.copy(
-                            isUploadingVt = false,
-                            vtResult = VtResult(status = VtStatus.QUEUED, analysisId = analysisId)
-                        )
-                    },
-                    onPollProgress = { status, analysisId ->
-                        val r = _state.value as? TvInstallState.Ready ?: return@uploadAndPoll
-                        _state.value = r.copy(vtResult = VtResult(status = status, analysisId = analysisId))
-                    },
-                )
-
-                val finalReady = _state.value as? TvInstallState.Ready ?: return@launch
-                _state.value = finalReady.copy(isUploadingVt = false, vtResult = pollResult)
+            val uploadOk = try {
+                virusDetecService.uploadBinary(ticket.uploadUrl, tempFile) { pct ->
+                    val ready = _state.value as? TvInstallState.Ready ?: return@uploadBinary
+                    _state.value = ready.copy(
+                        vtUploadProgress = pct,
+                        vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = pct)
+                    )
+                }.isSuccess
             } finally {
-                if (fileToUpload == null && tempFile.exists()) {
-                    tempFile.delete()
+                tempFile.delete()
+            }
+
+            if (!uploadOk) {
+                val ready = _state.value as? TvInstallState.Ready ?: return@launch
+                _state.value = ready.copy(
+                    isUploadingVt = false,
+                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Binary upload failed")
+                )
+                return@launch
+            }
+
+            val startRes = virusDetecService.startScan(ticket.jobId).getOrNull()
+            if (startRes == null) {
+                val ready = _state.value as? TvInstallState.Ready ?: return@launch
+                _state.value = ready.copy(
+                    isUploadingVt = false,
+                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Start scan failed")
+                )
+                return@launch
+            }
+
+            virusDetecService.watchScanStream(ticket.jobId).collect { update ->
+                val ready = _state.value as? TvInstallState.Ready ?: return@collect
+                val report = update.report
+                if (report != null) {
+                    _state.value = ready.copy(isUploadingVt = false, vtResult = report.toVtResult())
+                } else if (update.status == "FAILED") {
+                    _state.value = ready.copy(
+                        isUploadingVt = false,
+                        vtResult = VtResult(status = VtStatus.ERROR, errorMessage = update.message)
+                    )
+                } else {
+                    _state.value = ready.copy(
+                        vtResult = VtResult(status = VtStatus.ANALYZING, uploadProgress = update.progressPercent)
+                    )
                 }
             }
         }

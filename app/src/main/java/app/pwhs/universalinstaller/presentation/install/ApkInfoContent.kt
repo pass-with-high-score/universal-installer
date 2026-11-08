@@ -83,7 +83,6 @@ import app.pwhs.universalinstaller.presentation.install.components.VtStatusChip
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogKeepApkOption
 import app.pwhs.universalinstaller.presentation.install.dialog.InstallSupportBottomSheet
 import app.pwhs.universalinstaller.presentation.install.dialog.VirusTotalDetailSheet
-import app.pwhs.universalinstaller.presentation.install.dialog.VirusTotalSetupDialog
 import app.pwhs.universalinstaller.presentation.setting.SettingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -127,14 +126,9 @@ internal fun ApkInfoContent(
     var showTrackersDialog by rememberSaveable { mutableStateOf(false) }
     var showAbiWarningDialog by rememberSaveable { mutableStateOf(false) }
     var showSupportSheet by rememberSaveable { mutableStateOf(false) }
-    var showVtSetupDialog by rememberSaveable { mutableStateOf(false) }
     var showVtDetailSheet by rememberSaveable { mutableStateOf(false) }
-    var pendingInstallAfterVt by rememberSaveable { mutableStateOf(false) }
 
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
-    val hasVtKey = !storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_API_KEY).isNullOrBlank() ||
-        apkInfo.vtResult?.status != app.pwhs.universalinstaller.domain.model.VtStatus.NO_API_KEY
-    val dontAskAgain = storedPrefs?.get(SharedPrefsKeys.VIRUSTOTAL_DONT_ASK_AGAIN) ?: false
     val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
 
     androidx.compose.runtime.LaunchedEffect(installError) {
@@ -185,7 +179,7 @@ internal fun ApkInfoContent(
                 onCheckVirusTotal = onCheckVirusTotal,
                 onShowTrackers = { showTrackersDialog = true },
                 onExpand = { isExpanded = true },
-                onOpenSettings = { showVtSetupDialog = true },
+                onOpenSettings = { showVtDetailSheet = true },
                 onOpenDetail = { showVtDetailSheet = true },
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -242,10 +236,6 @@ internal fun ApkInfoContent(
                     fileSizeBytes = apkInfo.fileSizeBytes,
                     sha256 = apkInfo.sha256,
                     onCheck = onCheckVirusTotal,
-                    onOpenSettings = { showVtSetupDialog = true },
-                    onGetKey = {
-                        uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/my-apikey")
-                    },
                     onOpenLink = {
                         if (apkInfo.vtResult?.status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)) {
                             showVtDetailSheet = true
@@ -344,9 +334,6 @@ internal fun ApkInfoContent(
             onInstall = {
                 if (apkInfo.isAbiIncompatible) {
                     showAbiWarningDialog = true
-                } else if (!vtDisabled && !hasVtKey && !dontAskAgain) {
-                    pendingInstallAfterVt = true
-                    showVtSetupDialog = true
                 } else {
                     onInstall()
                 }
@@ -371,12 +358,7 @@ internal fun ApkInfoContent(
                 onDismiss = { showAbiWarningDialog = false },
                 onInstallAnyway = {
                     showAbiWarningDialog = false
-                    if (!vtDisabled && !hasVtKey && !dontAskAgain) {
-                        pendingInstallAfterVt = true
-                        showVtSetupDialog = true
-                    } else {
-                        onInstall()
-                    }
+                    onInstall()
                 },
             )
         }
@@ -395,20 +377,6 @@ internal fun ApkInfoContent(
                 target = target,
                 errorMessage = installError,
                 onDismiss = { showSupportSheet = false },
-            )
-        }
-
-        if (showVtSetupDialog && !vtDisabled) {
-            VirusTotalSetupDialog(
-                onDismiss = {
-                    showVtSetupDialog = false
-                    pendingInstallAfterVt = false
-                },
-                onSaveAndScan = {
-                    onCheckVirusTotal()
-                    pendingInstallAfterVt = false
-                },
-                onProceedInstall = if (pendingInstallAfterVt) onInstall else null,
             )
         }
 

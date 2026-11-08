@@ -40,14 +40,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.collectAsState
-import app.pwhs.core.data.local.SharedPrefsKeys
-import app.pwhs.core.data.local.dataStore
-import app.pwhs.core.util.openUriSafely
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtStatus
-import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
 
 /**
@@ -67,9 +62,6 @@ fun VirusTotalInstallPrompt(
     val extendedColors = LocalExtendedColors.current
     val uriHandler = LocalUriHandler.current
     val context = LocalContext.current
-    val prefs by context.dataStore.data.collectAsState(initial = null)
-    val isPro = prefs?.get(SharedPrefsKeys.IS_PRO_USER) ?: false
-    val hasCustomKey = !prefs?.get(PreferencesKeys.VIRUSTOTAL_API_KEY).isNullOrBlank()
     val vt = apkInfo.vtResult
     val status = vt?.status
     var showDetailSheet by remember { mutableStateOf(false) }
@@ -233,32 +225,8 @@ fun VirusTotalInstallPrompt(
                 }
             }
 
-            (currentStatus == VtStatus.NO_API_KEY || currentStatus == VtStatus.INVALID_API_KEY) && (!isPro || hasCustomKey) -> {
-                Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(50))
-                        .clickable(onClick = onScan)
-                        .background(extendedColors.warningContainer.copy(alpha = 0.7f))
-                        .padding(horizontal = 10.dp, vertical = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Security,
-                        contentDescription = null,
-                        tint = extendedColors.warning,
-                        modifier = Modifier.size(14.dp),
-                    )
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = stringResource(R.string.virustotal_prompt_needs_key),
-                        style = MaterialTheme.typography.labelSmall,
-                        color = extendedColors.warning,
-                    )
-                }
-            }
-
             else -> {
-                // Prompt to scan with VirusTotal
+                // Prompt to scan with VirusDetec
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))

@@ -142,7 +142,6 @@ fun DialogMenuContent(
 ) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
-    var showVtSetupDialog by remember { mutableStateOf(false) }
     var showVtDetailSheet by remember { mutableStateOf(false) }
     
     val prefs by context.dataStore.data.collectAsState(initial = null)
@@ -356,7 +355,6 @@ fun DialogMenuContent(
                         isPro = isPro,
                         hasCustomKey = hasCustomKey,
                         onCheckVirusTotal = onCheckVirusTotal,
-                        onConfigureVirusTotal = { showVtSetupDialog = true },
                         onOpenDetail = { showVtDetailSheet = true },
                     )
                     2 -> advancedTab(
@@ -446,13 +444,6 @@ fun DialogMenuContent(
         }
         
         Spacer(modifier = Modifier.height(16.dp)) // Padding from card bottom
-        
-        if (showVtSetupDialog && !vtDisabled) {
-            VirusTotalSetupDialog(
-                onDismiss = { showVtSetupDialog = false },
-                onSaveAndScan = { onCheckVirusTotal() },
-            )
-        }
 
         if (showVtDetailSheet && !vtDisabled && apkInfo.vtResult != null) {
             VirusTotalDetailSheet(

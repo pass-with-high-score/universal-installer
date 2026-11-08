@@ -30,7 +30,6 @@ import app.pwhs.universalinstaller.presentation.pro.components.PaywallContent
 import app.pwhs.universalinstaller.presentation.pro.components.ProCelebrationContent
 import app.pwhs.universalinstaller.presentation.pro.components.ProIssueDialog
 import app.pwhs.universalinstaller.presentation.pro.components.ProSupporterView
-import app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingActivity
 
 private const val SUPPORT_COMMUNITY_URL = "https://t.me/blockads_android"
 private const val GOOGLE_PLAY_SUBS_URL = "https://play.google.com/store/account/subscriptions"
@@ -190,11 +189,6 @@ fun UpgradeProBottomSheet(
                         }
                     }
                 }
-            },
-            onUsePersonalKey = {
-                activeIssueResult = null
-                onDismissRequest()
-                context.startActivity(Intent(context, VirusTotalSettingActivity::class.java))
             },
             onContactSupport = {
                 activeIssueResult = null

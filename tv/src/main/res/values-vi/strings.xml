@@ -207,38 +207,23 @@
     <string name="found_chip_new">Mới</string>
     <string name="dialog_chip_downgrade">Hạ cấp</string>
 
-    <!-- TV VirusTotal & Security -->
-    <string name="tv_settings_section_virustotal">Bảo mật VirusTotal</string>
-    <string name="tv_settings_virustotal_enable_title">Trình quét VirusTotal</string>
-    <string name="tv_settings_virustotal_enable_desc">Quét gói cài đặt với hơn 70 công cụ diệt virus trước khi cài</string>
+    <!-- TV VirusDetec & Security -->
+    <string name="tv_settings_section_virustotal">Bảo mật VirusDetec</string>
+    <string name="tv_settings_virustotal_enable_title">Trình quét bảo mật tích hợp</string>
+    <string name="tv_settings_virustotal_enable_desc">Quét các gói ứng dụng bằng công nghệ VirusDetec trước khi cài đặt</string>
     <string name="tv_settings_virustotal_strict_title">Kiểm tra bảo mật nghiêm ngặt</string>
     <string name="tv_settings_virustotal_strict_desc">Cảnh báo và yêu cầu xác nhận nếu phát hiện mã độc</string>
-    <string name="tv_settings_virustotal_key_title">Khóa API VirusTotal</string>
-    <string name="tv_settings_virustotal_key_configured">Đã cấu hình (%s)</string>
-    <string name="tv_settings_virustotal_key_not_set">Chưa cấu hình — chọn để cài đặt</string>
-    <string name="tv_settings_virustotal_dialog_title">Khóa API VirusTotal</string>
-    <string name="tv_settings_virustotal_dialog_desc">Quét mã QR bằng điện thoại để lấy khóa API miễn phí, hoặc dán vào bên dưới:</string>
-    <string name="tv_settings_virustotal_dialog_hint">Nhập khóa API 64 ký tự</string>
-    <string name="tv_settings_virustotal_dialog_paste">Dán từ bộ nhớ tạm</string>
-    <string name="tv_settings_virustotal_dialog_save">Lưu khóa</string>
-    <string name="tv_settings_virustotal_dialog_clear">Xóa khóa</string>
-    <string name="tv_settings_virustotal_dialog_close">Đóng</string>
-    <string name="tv_vt_status_clean">VirusTotal: Sạch (0/70)</string>
-    <string name="tv_vt_status_malicious">VirusTotal: %d công cụ phát hiện mã độc!</string>
-    <string name="tv_vt_status_suspicious">VirusTotal: %d công cụ nghi ngờ</string>
-    <string name="tv_vt_status_scanning">VirusTotal: Đang quét tệp…</string>
-    <string name="tv_vt_status_uploading">VirusTotal: Đang tải lên… %d%%</string>
-    <string name="tv_vt_status_queued">VirusTotal: Đang chờ xử lý…</string>
-    <string name="tv_vt_status_analyzing">VirusTotal: Đang phân tích…</string>
-    <string name="tv_vt_status_not_found">VirusTotal: Chưa có trong cơ sở dữ liệu</string>
-    <string name="tv_vt_status_no_key">VirusTotal: Chưa có khóa API</string>
-    <string name="tv_vt_status_invalid_key">VirusTotal: Khóa API không hợp lệ</string>
-    <string name="tv_vt_status_rate_limited">VirusTotal: Đã đạt giới hạn yêu cầu</string>
-    <string name="tv_vt_status_too_large">VirusTotal: Tệp quá lớn (%s)</string>
-    <string name="tv_vt_status_error">VirusTotal: Lỗi quét</string>
+    <string name="tv_vt_status_clean">VirusDetec: An toàn (0 nguy cơ)</string>
+    <string name="tv_vt_status_malicious">VirusDetec: Phát hiện %d mối đe dọa!</string>
+    <string name="tv_vt_status_suspicious">VirusDetec: %d cảnh báo đáng ngờ</string>
+    <string name="tv_vt_status_scanning">VirusDetec: Đang quét tệp…</string>
+    <string name="tv_vt_status_uploading">VirusDetec: Đang tải lên… %d%%</string>
+    <string name="tv_vt_status_queued">VirusDetec: Đang chờ xử lý…</string>
+    <string name="tv_vt_status_analyzing">VirusDetec: Đang phân tích…</string>
+    <string name="tv_vt_status_not_found">VirusDetec: Chưa có trong cơ sở dữ liệu</string>
+    <string name="tv_vt_status_error">VirusDetec: Lỗi quét</string>
     <string name="tv_vt_action_upload">Tải lên &amp; Quét</string>
     <string name="tv_vt_action_retry">Thử lại</string>
-    <string name="tv_vt_action_setup">Cấu hình khóa API</string>
     <string name="tv_vt_strict_warning_title">Cảnh báo bảo mật</string>
-    <string name="tv_vt_strict_warning_desc">VirusTotal phát hiện rủi ro trong gói cài đặt này (%d công cụ cảnh báo). Bạn có chắc chắn muốn cài đặt?</string>
+    <string name="tv_vt_strict_warning_desc">VirusDetec phát hiện mối đe dọa trong gói cài đặt này (%d nguy cơ). Bạn có chắc chắn muốn cài đặt?</string>
 </resources>
