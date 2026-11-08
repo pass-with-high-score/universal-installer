@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import app.pwhs.core.billing.BillingManager
+import app.pwhs.core.billing.BillingPurchaseResult
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
@@ -51,7 +52,7 @@ private class PlayBillingManager(
     private var subscriptionDetails: ProductDetails? = null
     private var lifetimeDetails: ProductDetails? = null
 
-    private var pendingPurchaseCallback: ((Boolean) -> Unit)? = null
+    private var pendingPurchaseCallback: ((BillingPurchaseResult) -> Unit)? = null
 
     private val billingClient = BillingClient.newBuilder(context)
         .setListener(this)
@@ -154,26 +155,24 @@ private class PlayBillingManager(
         }
     }
 
-    override fun queryPurchases() {
-        if (!billingClient.isReady) return
+    override fun queryPurchases(onComplete: ((Boolean) -> Unit)?) {
+        if (!billingClient.isReady) {
+            onComplete?.invoke(_isProUser.value)
+            return
+        }
 
-        // Check Subscriptions
         val subsParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.SUBS)
             .build()
-        billingClient.queryPurchasesAsync(subsParams) { result, purchases ->
-            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                handlePurchases(purchases)
-            }
-        }
-
-        // Check In-App (Lifetime)
         val inAppParams = QueryPurchasesParams.newBuilder()
             .setProductType(BillingClient.ProductType.INAPP)
             .build()
-        billingClient.queryPurchasesAsync(inAppParams) { result, purchases ->
-            if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                handlePurchases(purchases)
+
+        billingClient.queryPurchasesAsync(subsParams) { _, subsPurchases ->
+            handlePurchases(subsPurchases)
+            billingClient.queryPurchasesAsync(inAppParams) { _, inAppPurchases ->
+                handlePurchases(inAppPurchases)
+                onComplete?.invoke(_isProUser.value)
             }
         }
     }
@@ -181,7 +180,7 @@ private class PlayBillingManager(
     override fun launchBillingFlow(
         activity: Activity,
         productType: ProProductType,
-        onResult: ((Boolean) -> Unit)?
+        onResult: ((BillingPurchaseResult) -> Unit)?
     ) {
         pendingPurchaseCallback = onResult
 
@@ -193,7 +192,13 @@ private class PlayBillingManager(
         if (details == null) {
             Timber.w("PlayBillingManager: Details for $productType not loaded yet")
             queryProductDetails()
-            onResult?.invoke(false)
+            onResult?.invoke(
+                BillingPurchaseResult.Error(
+                    BillingClient.BillingResponseCode.ITEM_UNAVAILABLE,
+                    "Product details not loaded yet"
+                )
+            )
+            pendingPurchaseCallback = null
             return
         }
 
@@ -223,18 +228,49 @@ private class PlayBillingManager(
         val response = billingClient.launchBillingFlow(activity, flowParams)
         if (response.responseCode != BillingClient.BillingResponseCode.OK) {
             Timber.e("PlayBillingManager: launchBillingFlow failed: ${response.debugMessage}")
-            onResult?.invoke(false)
+            onResult?.invoke(
+                BillingPurchaseResult.Error(response.responseCode, response.debugMessage)
+            )
             pendingPurchaseCallback = null
         }
     }
 
     override fun onPurchasesUpdated(billingResult: BillingResult, purchases: List<Purchase>?) {
-        if (billingResult.responseCode == BillingClient.BillingResponseCode.OK && purchases != null) {
-            handlePurchases(purchases)
-            pendingPurchaseCallback?.invoke(true)
-        } else {
-            Timber.w("PlayBillingManager: onPurchasesUpdated response=${billingResult.responseCode}, msg=${billingResult.debugMessage}")
-            pendingPurchaseCallback?.invoke(false)
+        Timber.i("PlayBillingManager: onPurchasesUpdated response=${billingResult.responseCode}, msg=${billingResult.debugMessage}")
+        when (billingResult.responseCode) {
+            BillingClient.BillingResponseCode.OK -> {
+                if (!purchases.isNullOrEmpty()) {
+                    val hasPending = purchases.any { it.purchaseState == Purchase.PurchaseState.PENDING }
+                    handlePurchases(purchases)
+                    if (hasPending && !_isProUser.value) {
+                        pendingPurchaseCallback?.invoke(BillingPurchaseResult.Pending)
+                    } else {
+                        pendingPurchaseCallback?.invoke(BillingPurchaseResult.Success)
+                    }
+                } else {
+                    pendingPurchaseCallback?.invoke(BillingPurchaseResult.Success)
+                }
+            }
+            BillingClient.BillingResponseCode.USER_CANCELED -> {
+                pendingPurchaseCallback?.invoke(
+                    BillingPurchaseResult.UserCanceled(billingResult.debugMessage)
+                )
+            }
+            BillingClient.BillingResponseCode.ITEM_ALREADY_OWNED -> {
+                queryPurchases {
+                    pendingPurchaseCallback?.invoke(BillingPurchaseResult.AlreadyOwned)
+                    pendingPurchaseCallback = null
+                }
+                return
+            }
+            else -> {
+                pendingPurchaseCallback?.invoke(
+                    BillingPurchaseResult.Error(
+                        billingResult.responseCode,
+                        billingResult.debugMessage
+                    )
+                )
+            }
         }
         pendingPurchaseCallback = null
     }

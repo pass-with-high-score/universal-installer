@@ -8,6 +8,14 @@ enum class ProProductType {
     LIFETIME
 }
 
+sealed interface BillingPurchaseResult {
+    data object Success : BillingPurchaseResult
+    data class UserCanceled(val message: String? = null) : BillingPurchaseResult
+    data class Error(val code: Int, val message: String) : BillingPurchaseResult
+    data object Pending : BillingPurchaseResult
+    data object AlreadyOwned : BillingPurchaseResult
+}
+
 interface BillingManager {
     val isProUser: StateFlow<Boolean>
     val yearlyPrice: StateFlow<String?>
@@ -15,7 +23,11 @@ interface BillingManager {
     val isAvailable: Boolean
 
     fun startConnection()
-    fun launchBillingFlow(activity: Activity, productType: ProProductType, onResult: ((Boolean) -> Unit)? = null)
-    fun queryPurchases()
+    fun launchBillingFlow(
+        activity: Activity,
+        productType: ProProductType,
+        onResult: ((BillingPurchaseResult) -> Unit)? = null,
+    )
+    fun queryPurchases(onComplete: ((Boolean) -> Unit)? = null)
     fun destroy()
 }

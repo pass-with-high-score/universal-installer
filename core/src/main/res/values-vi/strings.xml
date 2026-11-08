@@ -162,6 +162,31 @@
     <string name="pro_plan_lifetime_desc">Thanh toán 1 lần duy nhất, dùng vĩnh viễn trên mọi thiết bị</string>
     <string name="pro_purchase_success">Cảm ơn bạn đã ủng hộ! Gói Pro đã được kích hoạt thành công.</string>
     <string name="pro_purchase_failed">Giao dịch bị hủy hoặc không thành công. Vui lòng thử lại.</string>
+    <string name="pro_restore_btn">Khôi phục giao dịch</string>
+    <string name="pro_restore_success">Đã khôi phục gói Pro thành công!</string>
+    <string name="pro_restore_not_found">Không tìm thấy giao dịch Pro nào trên tài khoản Google này.</string>
+    <string name="pro_thank_you_title">Cảm ơn bạn đã nâng cấp!</string>
+    <string name="pro_thank_you_subtitle">Universal Installer Pro đã được kích hoạt toàn diện trên thiết bị của bạn.</string>
+    <string name="pro_thank_you_perk1">Quét mã độc đám mây VirusTotal không giới hạn</string>
+    <string name="pro_thank_you_perk2">Kiểm tra an toàn tự động, không cần nhập API Key</string>
+    <string name="pro_thank_you_perk3">Ưu tiên xử lý bảo mật &amp; tiếp sức dự án mã nguồn mở</string>
+    <string name="pro_thank_you_author_note">Sự đóng góp của bạn là nguồn động lực to lớn giúp dự án duy trì độc lập, an toàn và phát triển các tính năng hữu ích tiếp theo. Cảm ơn bạn rất nhiều! ❤️</string>
+    <string name="pro_thank_you_btn">Bắt đầu trải nghiệm</string>
+    <string name="pro_issue_canceled_title">Bạn gặp khó khăn khi thanh toán?</string>
+    <string name="pro_issue_canceled_desc">Nếu gặp sự cố với Google Play hoặc muốn một giải pháp khác, bạn có thể tham khảo:</string>
+    <string name="pro_issue_action_vt_key">Dùng API Key cá nhân (Miễn phí)</string>
+    <string name="pro_issue_action_contact">Liên hệ hỗ trợ (Telegram / Cộng đồng)</string>
+    <string name="pro_issue_action_dismiss">Để sau</string>
+    <string name="pro_issue_error_title">Lỗi thanh toán</string>
+    <string name="pro_issue_error_desc">Đã có lỗi xảy ra trong quá trình xử lý giao dịch (%1$s - Mã lỗi: %2$d). Bạn có muốn thử lại hoặc báo cáo sự cố không?</string>
+    <string name="pro_issue_action_retry">Thử lại</string>
+    <string name="pro_issue_pending_title">Giao dịch đang xử lý</string>
+    <string name="pro_issue_pending_desc">Google Play đang xử lý thanh toán của bạn. Gói Pro sẽ tự động kích hoạt ngay khi hoàn tất.</string>
+    <string name="pro_issue_already_owned_title">Đã sở hữu gói Pro</string>
+    <string name="pro_issue_already_owned_desc">Tài khoản Google này đã sở hữu gói Pro! Chúng tôi đã tự động khôi phục và kích hoạt lại cho bạn.</string>
+    <string name="pro_supporter_active_title">Universal Installer Pro</string>
+    <string name="pro_supporter_active_desc">Gói Pro đang hoạt động trên thiết bị này. Cảm ơn bạn đã đồng hành cùng dự án!</string>
+    <string name="pro_manage_subscription">Quản lý gói đăng ký trên Google Play</string>
 
     <!-- Pro Banner & VirusTotal Settings -->
     <string name="setting_pro_banner_title">Universal Installer Pro</string>

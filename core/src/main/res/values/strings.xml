@@ -166,6 +166,31 @@
     <string name="pro_plan_lifetime_desc">Pay once, keep forever across all your devices</string>
     <string name="pro_purchase_success">Thank you for supporting! Universal Installer Pro is now active.</string>
     <string name="pro_purchase_failed">Purchase cancelled or failed. Please try again.</string>
+    <string name="pro_restore_btn">Restore Purchases</string>
+    <string name="pro_restore_success">Universal Installer Pro restored successfully!</string>
+    <string name="pro_restore_not_found">No active Pro purchase found for this Google account.</string>
+    <string name="pro_thank_you_title">Thank You for Supporting!</string>
+    <string name="pro_thank_you_subtitle">Universal Installer Pro is now fully unlocked on your device.</string>
+    <string name="pro_thank_you_perk1">Unlimited cloud VirusTotal scans</string>
+    <string name="pro_thank_you_perk2">Zero-config automated safety verification</string>
+    <string name="pro_thank_you_perk3">Priority engine and ongoing open-source support</string>
+    <string name="pro_thank_you_author_note">Your contribution makes a huge difference in keeping this tool independent, secure, and actively developed. Enjoy the experience! ❤️</string>
+    <string name="pro_thank_you_btn">Explore Pro Features</string>
+    <string name="pro_issue_canceled_title">Need help with checkout?</string>
+    <string name="pro_issue_canceled_desc">If you encountered an issue on Google Play or prefer another option, here is what you can do:</string>
+    <string name="pro_issue_action_vt_key">Use Free Personal API Key</string>
+    <string name="pro_issue_action_contact">Contact Support (Telegram / Community)</string>
+    <string name="pro_issue_action_dismiss">Maybe Later</string>
+    <string name="pro_issue_error_title">Payment Error</string>
+    <string name="pro_issue_error_desc">An issue occurred during transaction processing (%1$s - Code: %2$d). Would you like to retry or report it?</string>
+    <string name="pro_issue_action_retry">Retry</string>
+    <string name="pro_issue_pending_title">Payment In Progress</string>
+    <string name="pro_issue_pending_desc">Google Play is currently processing your payment. Pro will automatically activate upon confirmation.</string>
+    <string name="pro_issue_already_owned_title">Already Subscribed</string>
+    <string name="pro_issue_already_owned_desc">Your Google account already owns Pro! We have restored and activated it for you.</string>
+    <string name="pro_supporter_active_title">Universal Installer Pro</string>
+    <string name="pro_supporter_active_desc">Pro is currently active on this device. Thank you for making our open-source journey possible!</string>
+    <string name="pro_manage_subscription">Manage Subscription on Google Play</string>
 
     <!-- Pro Banner & VirusTotal Settings -->
     <string name="setting_pro_banner_title">Universal Installer Pro</string>
