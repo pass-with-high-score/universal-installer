@@ -70,6 +70,7 @@ private class PlayBillingManager(
                 _isProUser.value = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
             }
         }
+        startConnection()
     }
 
     override fun startConnection() {
@@ -169,11 +170,38 @@ private class PlayBillingManager(
             .setProductType(BillingClient.ProductType.INAPP)
             .build()
 
-        billingClient.queryPurchasesAsync(subsParams) { _, subsPurchases ->
-            handlePurchases(subsPurchases)
-            billingClient.queryPurchasesAsync(inAppParams) { _, inAppPurchases ->
-                handlePurchases(inAppPurchases)
-                onComplete?.invoke(_isProUser.value)
+        billingClient.queryPurchasesAsync(subsParams) { subsResult, subsPurchases ->
+            val subsOk = subsResult.responseCode == BillingClient.BillingResponseCode.OK
+            for (p in subsPurchases) {
+                Timber.d("PlayBillingManager: SUBS purchase details: state=${p.purchaseState}, autoRenew=${p.isAutoRenewing}, time=${p.purchaseTime}, json=${p.originalJson}")
+            }
+            val hasValidSub = subsOk && subsPurchases.any { purchase ->
+                purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                        purchase.products.contains(SUBSCRIPTION_PRODUCT_ID)
+            }
+
+            subsPurchases.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
+                .forEach { acknowledge(it) }
+
+            billingClient.queryPurchasesAsync(inAppParams) { inAppResult, inAppPurchases ->
+                val inAppOk = inAppResult.responseCode == BillingClient.BillingResponseCode.OK
+                val hasValidInApp = inAppOk && inAppPurchases.any { purchase ->
+                    purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                            purchase.products.contains(LIFETIME_PRODUCT_ID)
+                }
+
+                inAppPurchases.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
+                    .forEach { acknowledge(it) }
+
+                if (subsOk || inAppOk) {
+                    val isPro = hasValidSub || hasValidInApp
+                    Timber.d("PlayBillingManager: queryPurchases result isPro=$isPro (subs=$hasValidSub, inApp=$hasValidInApp)")
+                    updateProStatus(isPro)
+                    onComplete?.invoke(isPro)
+                } else {
+                    Timber.w("PlayBillingManager: Failed to query purchases (subs=${subsResult.responseCode}, inApp=${inAppResult.responseCode})")
+                    onComplete?.invoke(_isProUser.value)
+                }
             }
         }
     }

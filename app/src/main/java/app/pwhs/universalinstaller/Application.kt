@@ -100,6 +100,7 @@ class App : Application(), SingletonImageLoader.Factory {
     }
 
     private val backendFactory: InstallerBackendFactory by inject()
+    private val billingManager: app.pwhs.core.billing.BillingManager by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -122,6 +123,7 @@ class App : Application(), SingletonImageLoader.Factory {
             androidContext(this@App)
             modules(appModule, flavorModule)
         }
+        billingManager.startConnection()
         // Once connected, a running Porter serves the Shizuku API, so the self-heal below and every
         // Shizuku backend see it as their Shizuku server.
         PorterShizukuBridge.start(CoroutineScope(SupervisorJob() + Dispatchers.Default))

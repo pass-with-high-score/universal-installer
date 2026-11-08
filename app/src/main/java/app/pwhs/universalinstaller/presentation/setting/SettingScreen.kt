@@ -200,6 +200,10 @@ private fun SettingUi(
     var showUpgradeProSheet by rememberSaveable { mutableStateOf(false) }
     val billingManager: BillingManager = koinInject()
     val isProUser by billingManager.isProUser.collectAsState()
+
+    LaunchedEffect(Unit) {
+        billingManager.startConnection()
+    }
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
