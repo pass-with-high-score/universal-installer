@@ -87,7 +87,6 @@ fun SettingScreen(
     val uiState by viewModel.uiState.collectAsState()
     val dhizukuState by viewModel.dhizukuState.collectAsState()
     val useDhizuku by viewModel.useDhizuku.collectAsState()
-    val securityLevel by viewModel.securityLevel.collectAsState()
     val externalOpenMode by viewModel.externalOpenMode.collectAsState()
     val installUiStyle by viewModel.installUiStyle.collectAsState()
     val analyticsEnabled by viewModel.analyticsEnabled.collectAsState()
@@ -111,14 +110,10 @@ fun SettingScreen(
         modifier = modifier,
         uiState = uiState,
         onInstallModeChanged = viewModel::setInstallMode,
-        onVirusTotalKeyChanged = viewModel::setVirusTotalApiKey,
-        onVirusTotalDisabledChanged = viewModel::setVirusTotalDisabled,
-        securityLevel = securityLevel,
         externalOpenMode = externalOpenMode,
         onExternalOpenModeChanged = viewModel::setExternalOpenMode,
         installUiStyle = installUiStyle,
         onInstallUiStyleChanged = viewModel::setInstallUiStyle,
-        onSecurityLevelChanged = viewModel::setSecurityLevel,
         onShizukuOptionChanged = viewModel::setShizukuOption,
         dhizukuState = dhizukuState,
         useDhizuku = useDhizuku,
@@ -163,14 +158,10 @@ private fun SettingUi(
     modifier: Modifier = Modifier,
     uiState: SettingUiState = SettingUiState(),
     onInstallModeChanged: (InstallMode) -> Unit = {},
-    onVirusTotalKeyChanged: (String) -> Unit = {},
-    onVirusTotalDisabledChanged: (Boolean) -> Unit = {},
-    securityLevel: SecurityLevel = SecurityLevel.Normal,
     externalOpenMode: ExternalOpenMode = ExternalOpenMode.Dialog,
     onExternalOpenModeChanged: (ExternalOpenMode) -> Unit = {},
     installUiStyle: InstallUiStyle = InstallUiStyle.Dialog,
     onInstallUiStyleChanged: (InstallUiStyle) -> Unit = {},
-    onSecurityLevelChanged: (SecurityLevel) -> Unit = {},
     onShizukuOptionChanged: (Preferences.Key<Boolean>, Boolean) -> Unit = { _, _ -> },
     onReplayTutorial: () -> Unit = {},
     // Not in SettingUiState: that is built by an index-based combine() and extending it means
@@ -208,6 +199,7 @@ private fun SettingUi(
     var showSyncOptionsSheet by rememberSaveable { mutableStateOf(false) }
     var showUpgradeProSheet by rememberSaveable { mutableStateOf(false) }
     val billingManager: BillingManager = koinInject()
+    val isProUser by billingManager.isProUser.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
 
@@ -316,6 +308,7 @@ private fun SettingUi(
             val syncLabels = listOf("sync", "port", "pin")
             val backupLabels = listOf(stringResource(R.string.setting_section_backup), "backup", "restore", "export", "import")
             val advancedLabels = listOf("advanced", "virustotal", "api key")
+            val proLabels = listOf("pro", "premium", "upgrade", "subscription", "lifetime", "virustotal")
             val privacyLabels = listOf(
                 stringResource(R.string.setting_analytics_title),
                 "privacy", "analytics", "crash", "data", "telemetry",
@@ -327,7 +320,8 @@ private fun SettingUi(
 
             // Whether any (currently-applicable) section survives the filter — drives the
             // "no results" state. Shizuku/Root only count when they'd be shown at all.
-            val anyVisible = matchesQuery(q, installLabels) ||
+            val anyVisible = ((billingManager.isAvailable || isProUser) && matchesQuery(q, proLabels)) ||
+                    matchesQuery(q, installLabels) ||
                     matchesQuery(q, profileLabels) ||
                     matchesQuery(q, interfaceLabels) ||
                     matchesQuery(q, securityLabels) ||
@@ -350,6 +344,15 @@ private fun SettingUi(
                         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = navBarPadding + 16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                     ) {
+                // ── Pro Banner ───────────────────────────────
+                if (matchesQuery(q, proLabels)) item {
+                    SettingProBanner(
+                        isProUser = isProUser,
+                        isBillingAvailable = billingManager.isAvailable,
+                        onUpgradeClick = { showUpgradeProSheet = true },
+                    )
+                }
+
                 // ── Installation Section ─────────────────────
                 InstallSection(
                     q = q,
@@ -414,13 +417,15 @@ private fun SettingUi(
                 AdvancedSection(
                     q = q,
                     advancedLabels = advancedLabels,
-                    virusTotalApiKey = uiState.virusTotalApiKey,
-                    onVirusTotalKeyChanged = onVirusTotalKeyChanged,
                     virusTotalDisabled = uiState.virusTotalDisabled,
-                    onVirusTotalDisabledChanged = onVirusTotalDisabledChanged,
-                    securityLevel = securityLevel,
-                    onSecurityLevelChanged = onSecurityLevelChanged,
-                    onUpgradeProClick = { showUpgradeProSheet = true },
+                    onVirusTotalClick = {
+                        context.startActivity(
+                            android.content.Intent(
+                                context,
+                                app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingActivity::class.java,
+                            )
+                        )
+                    },
                 )
 
                 // ── Backup & Restore Section ─────────────────

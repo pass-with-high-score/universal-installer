@@ -166,4 +166,16 @@
     <string name="pro_plan_lifetime_desc">Pay once, keep forever across all your devices</string>
     <string name="pro_purchase_success">Thank you for supporting! Universal Installer Pro is now active.</string>
     <string name="pro_purchase_failed">Purchase cancelled or failed. Please try again.</string>
+
+    <!-- Pro Banner & VirusTotal Settings -->
+    <string name="setting_pro_banner_title">Universal Installer Pro</string>
+    <string name="setting_pro_banner_desc_inactive">Unlimited VirusTotal scans, priority safety check &amp; support development</string>
+    <string name="setting_pro_banner_desc_active">Pro activated • Thank you for supporting open-source development!</string>
+    <string name="setting_pro_banner_badge_active">ACTIVE</string>
+    <string name="setting_pro_banner_badge_upgrade">UPGRADE</string>
+    <string name="setting_virustotal_title">VirusTotal Cloud Scan</string>
+    <string name="setting_virustotal_desc">Configure cloud malware scanning, API key, and security thresholds</string>
+    <string name="setting_virustotal_status_enabled">Active</string>
+    <string name="setting_virustotal_status_disabled">Disabled</string>
+    <string name="setting_virustotal_status_unlimited">Unlimited</string>
 </resources>

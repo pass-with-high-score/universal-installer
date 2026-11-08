@@ -162,4 +162,16 @@
     <string name="pro_plan_lifetime_desc">Thanh toán 1 lần duy nhất, dùng vĩnh viễn trên mọi thiết bị</string>
     <string name="pro_purchase_success">Cảm ơn bạn đã ủng hộ! Gói Pro đã được kích hoạt thành công.</string>
     <string name="pro_purchase_failed">Giao dịch bị hủy hoặc không thành công. Vui lòng thử lại.</string>
+
+    <!-- Pro Banner & VirusTotal Settings -->
+    <string name="setting_pro_banner_title">Universal Installer Pro</string>
+    <string name="setting_pro_banner_desc_inactive">Quét VirusTotal không giới hạn, bảo mật ưu tiên &amp; ủng hộ nhà phát triển</string>
+    <string name="setting_pro_banner_desc_active">Đã kích hoạt Pro • Cảm ơn bạn đã ủng hộ dự án mã nguồn mở!</string>
+    <string name="setting_pro_banner_badge_active">ĐÃ BẬT</string>
+    <string name="setting_pro_banner_badge_upgrade">NÂNG CẤP</string>
+    <string name="setting_virustotal_title">Quét đám mây VirusTotal</string>
+    <string name="setting_virustotal_desc">Cấu hình quét mã độc, API Key và ngưỡng bảo mật</string>
+    <string name="setting_virustotal_status_enabled">Đang bật</string>
+    <string name="setting_virustotal_status_disabled">Đã tắt</string>
+    <string name="setting_virustotal_status_unlimited">Không giới hạn</string>
 </resources>

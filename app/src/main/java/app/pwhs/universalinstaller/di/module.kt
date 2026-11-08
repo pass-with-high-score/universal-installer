@@ -20,6 +20,7 @@ import app.pwhs.universalinstaller.presentation.manage.ManageViewModel
 import app.pwhs.universalinstaller.presentation.manage.logs.UninstallLogsViewModel
 import app.pwhs.universalinstaller.presentation.setting.backup.BackupViewModel
 import app.pwhs.universalinstaller.presentation.setting.security.SecurityViewModel
+import app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingViewModel
 import app.pwhs.universalinstaller.presentation.stats.StatsViewModel
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.cio.CIO
@@ -118,6 +119,7 @@ val appModule = module {
     viewModelOf(::SyncViewModel)
     viewModelOf(::BackupViewModel)
     viewModelOf(::SecurityViewModel)
+    viewModelOf(::VirusTotalSettingViewModel)
     viewModelOf(::StatsViewModel)
 }
 
