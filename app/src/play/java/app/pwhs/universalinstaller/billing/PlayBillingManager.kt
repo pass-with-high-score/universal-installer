@@ -159,7 +159,9 @@ private class PlayBillingManager(
 
     override fun queryPurchases(onComplete: ((Boolean) -> Unit)?) {
         if (!billingClient.isReady) {
-            onComplete?.invoke(_isProUser.value)
+            scope.launch(Dispatchers.Main) {
+                onComplete?.invoke(_isProUser.value)
+            }
             return
         }
 
@@ -193,18 +195,24 @@ private class PlayBillingManager(
                 inAppPurchases.filter { it.purchaseState == Purchase.PurchaseState.PURCHASED && !it.isAcknowledged }
                     .forEach { acknowledge(it) }
 
+                val deliver = { res: Boolean ->
+                    scope.launch(Dispatchers.Main) {
+                        onComplete?.invoke(res)
+                    }
+                }
+
                 if (subsOk && inAppOk) {
                     val isPro = hasValidSub || hasValidInApp
                     Timber.d("PlayBillingManager: queryPurchases result isPro=$isPro (subs=$hasValidSub, inApp=$hasValidInApp)")
                     updateProStatus(isPro)
-                    onComplete?.invoke(isPro)
+                    deliver(isPro)
                 } else if (hasValidSub || hasValidInApp) {
                     Timber.d("PlayBillingManager: Found valid purchase despite partial query failure (subs=$hasValidSub, inApp=$hasValidInApp)")
                     updateProStatus(true)
-                    onComplete?.invoke(true)
+                    deliver(true)
                 } else {
                     Timber.w("PlayBillingManager: Failed to query purchases (subs=${subsResult.responseCode}, inApp=${inAppResult.responseCode})")
-                    onComplete?.invoke(_isProUser.value)
+                    deliver(_isProUser.value)
                 }
             }
         }

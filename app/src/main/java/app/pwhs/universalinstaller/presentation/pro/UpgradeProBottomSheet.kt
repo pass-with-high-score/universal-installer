@@ -142,9 +142,9 @@ fun UpgradeProBottomSheet(
                                 AnalyticsHelper.logPurchaseRestored(hasPro)
                                 if (hasPro) {
                                     justPurchased = true
-                                    Toast.makeText(context, restoreSuccessMsg, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context.applicationContext, restoreSuccessMsg, Toast.LENGTH_SHORT).show()
                                 } else {
-                                    Toast.makeText(context, restoreNotFoundMsg, Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context.applicationContext, restoreNotFoundMsg, Toast.LENGTH_SHORT).show()
                                 }
                             }
                         },
