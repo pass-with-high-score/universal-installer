@@ -4,6 +4,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,13 +42,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import app.pwhs.core.R
 import app.pwhs.core.billing.BillingManager
 import app.pwhs.core.billing.ProProductType
+import app.pwhs.core.util.openUriSafely
+import app.pwhs.universalinstaller.R as AppR
+
+private const val PRIVACY_URL = "https://universal-installer.pwhs.app/privacy"
+private const val TERMS_URL = "https://universal-installer.pwhs.app/terms"
 
 @Composable
 fun PaywallContent(
@@ -62,6 +71,9 @@ fun PaywallContent(
     onRestore: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
+
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -239,6 +251,42 @@ fun PaywallContent(
                 Text(
                     text = stringResource(R.string.pro_restore_btn),
                     style = MaterialTheme.typography.labelMedium,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Terms of Service and Privacy Policy Links
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(AppR.string.setting_terms_title),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { uriHandler.openUriSafely(context, TERMS_URL) }
+                        .padding(horizontal = 6.dp, vertical = 4.dp),
+                )
+                Text(
+                    text = "•",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                    modifier = Modifier.padding(horizontal = 2.dp),
+                )
+                Text(
+                    text = stringResource(AppR.string.setting_privacy_title),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(4.dp))
+                        .clickable { uriHandler.openUriSafely(context, PRIVACY_URL) }
+                        .padding(horizontal = 6.dp, vertical = 4.dp),
                 )
             }
         }
