@@ -27,6 +27,7 @@ import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.GppGood
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.BottomSheetDefaults
@@ -42,7 +43,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -55,6 +59,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
+import app.pwhs.core.domain.model.Verdict
 import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.core.util.openUriSafely
 import app.pwhs.universalinstaller.R
@@ -62,6 +67,7 @@ import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtEngineResult
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
+import app.pwhs.universalinstaller.presentation.install.components.SecurityFindingsSection
 import app.pwhs.universalinstaller.presentation.install.components.VtBreakdownSection
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
 
@@ -84,6 +90,7 @@ fun VirusTotalDetailSheet(
     val totalEngines = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
     val threatCount = vt.malicious + vt.suspicious
     val isClean = vt.status == VtStatus.CLEAN || (vt.malicious == 0 && vt.suspicious == 0)
+    var showFpDialog by remember { mutableStateOf(false) }
 
     val sortedEngines = remember(vt.engineResults) {
         vt.engineResults.sortedWith(
@@ -147,168 +154,173 @@ fun VirusTotalDetailSheet(
                 }
             }
 
-            // ── Status Banner Card ──
-            Surface(
-                shape = RoundedCornerShape(16.dp),
-                color = if (isClean) {
-                    extendedColors.success.copy(alpha = 0.12f)
-                } else {
-                    MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
-                },
-                border = androidx.compose.foundation.BorderStroke(
-                    width = 1.dp,
+            val report = vt.report
+            if (report != null) {
+                SecurityFindingsSection(report = report)
+            } else {
+                // ── Status Banner Card ──
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
                     color = if (isClean) {
-                        extendedColors.success.copy(alpha = 0.35f)
+                        extendedColors.success.copy(alpha = 0.12f)
                     } else {
-                        MaterialTheme.colorScheme.error.copy(alpha = 0.4f)
+                        MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
                     },
-                ),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    border = androidx.compose.foundation.BorderStroke(
+                        width = 1.dp,
+                        color = if (isClean) {
+                            extendedColors.success.copy(alpha = 0.35f)
+                        } else {
+                            MaterialTheme.colorScheme.error.copy(alpha = 0.4f)
+                        },
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
-                    Icon(
-                        imageVector = if (isClean) Icons.Rounded.GppGood else Icons.Rounded.Warning,
-                        contentDescription = null,
-                        tint = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
-                        modifier = Modifier.size(36.dp),
-                    )
-
-                    Spacer(modifier = Modifier.width(14.dp))
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = if (isClean) {
-                                stringResource(R.string.virustotal_detail_clean_title)
-                            } else {
-                                stringResource(R.string.virustotal_detail_flagged_title, threatCount)
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
+                    Row(
+                        modifier = Modifier.padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = if (isClean) Icons.Rounded.GppGood else Icons.Rounded.Warning,
+                            contentDescription = null,
+                            tint = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
+                            modifier = Modifier.size(36.dp),
                         )
-                        Spacer(modifier = Modifier.height(2.dp))
-                        Text(
-                            text = if (isClean) {
-                                stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
-                            } else {
-                                stringResource(R.string.virustotal_detail_flagged_desc)
-                            },
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
+
+                        Spacer(modifier = Modifier.width(14.dp))
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = if (isClean) {
+                                    stringResource(R.string.virustotal_detail_clean_title)
+                                } else {
+                                    stringResource(R.string.virustotal_detail_flagged_title, threatCount)
+                                },
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
+                            )
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = if (isClean) {
+                                    stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
+                                } else {
+                                    stringResource(R.string.virustotal_detail_flagged_desc)
+                                },
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
                     }
                 }
-            }
 
-            // ── Engine Stats Counter & Breakdown Bar ──
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                Row(
+                // ── Engine Stats Counter & Breakdown Bar ──
+                Column(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    VtCounterBadge(
-                        label = stringResource(R.string.virustotal_detail_stat_clean),
-                        count = vt.harmless + vt.undetected,
-                        color = extendedColors.success,
-                    )
-                    VtCounterBadge(
-                        label = stringResource(R.string.virustotal_detail_stat_suspicious),
-                        count = vt.suspicious,
-                        color = extendedColors.warning,
-                    )
-                    VtCounterBadge(
-                        label = stringResource(R.string.virustotal_detail_stat_malicious),
-                        count = vt.malicious,
-                        color = MaterialTheme.colorScheme.error,
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        VtCounterBadge(
+                            label = stringResource(R.string.virustotal_detail_stat_clean),
+                            count = vt.harmless + vt.undetected,
+                            color = extendedColors.success,
+                        )
+                        VtCounterBadge(
+                            label = stringResource(R.string.virustotal_detail_stat_suspicious),
+                            count = vt.suspicious,
+                            color = extendedColors.warning,
+                        )
+                        VtCounterBadge(
+                            label = stringResource(R.string.virustotal_detail_stat_malicious),
+                            count = vt.malicious,
+                            color = MaterialTheme.colorScheme.error,
+                        )
+                    }
+
+                    VtBreakdownSection(
+                        vt = vt,
+                        warningColor = extendedColors.warning,
+                        cleanColor = extendedColors.success,
                     )
                 }
 
-                VtBreakdownSection(
-                    vt = vt,
-                    warningColor = extendedColors.warning,
-                    cleanColor = extendedColors.success,
-                )
-            }
+                // ── Scrollable Antivirus Engine Results List ──
+                if (sortedEngines.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.virustotal_detail_engine_title, sortedEngines.size),
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
 
-            // ── Scrollable Antivirus Engine Results List ──
-            if (sortedEngines.isNotEmpty()) {
-                Text(
-                    text = stringResource(R.string.virustotal_detail_engine_title, sortedEngines.size),
-                    style = MaterialTheme.typography.titleSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-
-                Surface(
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 220.dp),
-                ) {
-                    LazyColumn(
-                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                    Surface(
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 220.dp),
                     ) {
-                        items(sortedEngines, key = { it.engineName }) { engine ->
-                            val isThreat = engine.category == "malicious" || engine.category == "suspicious"
-                            val engineColor = when (engine.category) {
-                                "malicious" -> MaterialTheme.colorScheme.error
-                                "suspicious" -> extendedColors.warning
-                                else -> extendedColors.success
-                            }
+                        LazyColumn(
+                            contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                        ) {
+                            items(sortedEngines, key = { it.engineName }) { engine ->
+                                val isThreat = engine.category == "malicious" || engine.category == "suspicious"
+                                val engineColor = when (engine.category) {
+                                    "malicious" -> MaterialTheme.colorScheme.error
+                                    "suspicious" -> extendedColors.warning
+                                    else -> extendedColors.success
+                                }
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 6.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                Text(
-                                    text = engine.engineName,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    modifier = Modifier.weight(1f),
-                                    maxLines = 1,
-                                    overflow = TextOverflow.Ellipsis,
-                                )
-
-                                Spacer(modifier = Modifier.width(8.dp))
-
-                                if (isThreat) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 6.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
                                     Text(
-                                        text = engine.result ?: engine.category,
-                                        style = MaterialTheme.typography.labelSmall,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = engineColor,
+                                        text = engine.engineName,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        modifier = Modifier.weight(1f),
                                         maxLines = 1,
                                         overflow = TextOverflow.Ellipsis,
                                     )
-                                } else {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = Icons.Rounded.Check,
-                                            contentDescription = null,
-                                            tint = extendedColors.success,
-                                            modifier = Modifier.size(14.dp),
-                                        )
-                                        Spacer(modifier = Modifier.width(4.dp))
+
+                                    Spacer(modifier = Modifier.width(8.dp))
+
+                                    if (isThreat) {
                                         Text(
-                                            text = stringResource(R.string.virustotal_detail_engine_clean),
+                                            text = engine.result ?: engine.category,
                                             style = MaterialTheme.typography.labelSmall,
-                                            color = extendedColors.success,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = engineColor,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis,
                                         )
+                                    } else {
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Icon(
+                                                imageVector = Icons.Rounded.Check,
+                                                contentDescription = null,
+                                                tint = extendedColors.success,
+                                                modifier = Modifier.size(14.dp),
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                text = stringResource(R.string.virustotal_detail_engine_clean),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                color = extendedColors.success,
+                                            )
+                                        }
                                     }
                                 }
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
+                                    thickness = 0.5.dp,
+                                )
                             }
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.3f),
-                                thickness = 0.5.dp,
-                            )
                         }
                     }
                 }
@@ -367,6 +379,26 @@ fun VirusTotalDetailSheet(
                 }
             }
 
+            // ── False Positive Dispute Button ──
+            if (apkInfo.sha256.isNotBlank() && (!isClean || vt.report?.verdict == Verdict.RISKWARE)) {
+                OutlinedButton(
+                    onClick = { showFpDialog = true },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Flag,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = "Báo cáo nhận diện nhầm (False Positive)",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            }
+
             // ── Footer Action Buttons ──
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -405,6 +437,15 @@ fun VirusTotalDetailSheet(
                 }
             }
         }
+    }
+
+    if (showFpDialog) {
+        ReportFalsePositiveDialog(
+            sha256 = apkInfo.sha256,
+            packageName = apkInfo.packageName,
+            appName = apkInfo.appName,
+            onDismiss = { showFpDialog = false },
+        )
     }
 }
 

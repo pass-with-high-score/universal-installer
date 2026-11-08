@@ -6,6 +6,7 @@ import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.data.local.AppDatabase
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
+import app.pwhs.universalinstaller.data.remote.VirusDetecService
 import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.data.repository.SessionDataRepositoryImpl
 import app.pwhs.universalinstaller.domain.repository.SessionDataRepository
@@ -93,6 +94,7 @@ val appModule = module {
         }
     }
     single { VirusTotalService(get()) }
+    single { VirusDetecService(get()) }
     single { VirusTotalNotifier(get()) }
     single { PackageDownloadService(get()) }
     single { InstallProgressNotifier(get(), get(), get()) }

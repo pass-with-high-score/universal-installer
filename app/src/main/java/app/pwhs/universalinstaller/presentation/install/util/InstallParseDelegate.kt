@@ -3,8 +3,8 @@ package app.pwhs.universalinstaller.presentation.install.util
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import app.pwhs.core.network.VirusDetecService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
-import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.InstallerProfile
 import app.pwhs.universalinstaller.domain.model.SplitType
@@ -28,7 +28,7 @@ import timber.log.Timber
 class InstallParseDelegate(
     private val application: Application,
     private val scope: CoroutineScope,
-    private val virusTotalService: VirusTotalService,
+    private val virusDetecService: VirusDetecService,
     private val virusTotalNotifier: VirusTotalNotifier,
     private val obbDelegate: InstallObbDelegate,
     private val onProfileMatched: (String) -> Unit,
@@ -232,7 +232,7 @@ class InstallParseDelegate(
                 uri = uri,
                 fileName = fileName,
                 current = current,
-                virusTotalService = virusTotalService,
+                virusDetecService = virusDetecService,
                 virusTotalNotifier = virusTotalNotifier,
                 onUpdateSha256 = { sha256 ->
                     _pendingApkInfo.value = _pendingApkInfo.value?.copy(sha256 = sha256)
@@ -262,7 +262,8 @@ class InstallParseDelegate(
             val result = InstallVirusTotalHelper.launchHashLookupOnly(
                 context = context,
                 originalUri = originalUri,
-                virusTotalService = virusTotalService,
+                virusDetecService = virusDetecService,
+                apkInfo = _pendingApkInfo.value,
                 onAutoLookupStart = {
                     if (isStillCurrent()) {
                         _pendingApkInfo.value = _pendingApkInfo.value?.copy(

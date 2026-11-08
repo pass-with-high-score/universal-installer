@@ -218,6 +218,7 @@ object InstallApkSplitsHelper {
         var minSdk = 0
         var targetSdk = 0
         var signatureMismatch: Boolean? = null
+        var certSha256 = ""
         var isAndroidAutoSupported = false
         var isWearOsSupported = false
 
@@ -261,6 +262,7 @@ object InstallApkSplitsHelper {
                 minSdk = packageInfo.applicationInfo?.minSdkVersion ?: 0
                 targetSdk = packageInfo.applicationInfo?.targetSdkVersion ?: 0
                 signatureMismatch = SignatureCheck.isMismatch(context, packageInfo.packageName, packageInfo)
+                certSha256 = SignatureCheck.extractCertSha256(packageInfo)
 
                 val metaData = packageInfo.applicationInfo?.metaData
                 val hasCarMeta = metaData?.containsKey("com.google.android.gms.car.application") == true ||
@@ -340,6 +342,7 @@ object InstallApkSplitsHelper {
             splitCount = splitCount,
             fileFormat = fileFormat,
             supportedAbis = supportedAbis.distinct(),
+            certSha256 = certSha256,
             splitEntries = splitEntries,
             signatureMismatch = signatureMismatch,
             isBlocked = isBlocked,

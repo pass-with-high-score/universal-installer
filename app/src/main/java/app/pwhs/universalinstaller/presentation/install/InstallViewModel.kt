@@ -14,6 +14,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.DownloadHistoryDao
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
+import app.pwhs.universalinstaller.data.remote.VirusDetecService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.data.remote.VirusTotalService
 import app.pwhs.universalinstaller.domain.manager.InstallBlacklist
@@ -63,7 +64,7 @@ class InstallViewModel(
     private val application: Application,
     packageInstaller: PackageInstaller,
     private val sessionDataRepository: SessionDataRepository,
-    virusTotalService: VirusTotalService,
+    virusDetecService: VirusDetecService,
     virusTotalNotifier: VirusTotalNotifier,
     packageDownloadService: PackageDownloadService,
     private val historyDao: InstallHistoryDao,
@@ -113,7 +114,7 @@ class InstallViewModel(
     private val parseDelegate = InstallParseDelegate(
         application = application,
         scope = viewModelScope,
-        virusTotalService = virusTotalService,
+        virusDetecService = virusDetecService,
         virusTotalNotifier = virusTotalNotifier,
         obbDelegate = obbDelegate,
         onProfileMatched = { _selectedProfileId.value = it },

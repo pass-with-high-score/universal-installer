@@ -40,4 +40,5 @@ data class VtResult(
     val uploadProgress: Int = 0,   // 0..100, meaningful only when status = UPLOADING
     val analysisId: String = "",
     val engineResults: List<VtEngineResult> = emptyList(),
+    val report: ScanReport? = null,
 )

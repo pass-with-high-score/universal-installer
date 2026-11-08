@@ -27,6 +27,7 @@ data class ApkInfo(
     val fileFormat: String = "APK",
     val supportedAbis: List<String> = emptyList(),
     val sha256: String = "",
+    val certSha256: String = "",
     val vtResult: VtResult? = null,
     val obbFileNames: List<String> = emptyList(),
     val obbTotalBytes: Long = 0L,

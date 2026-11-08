@@ -2,12 +2,12 @@ package app.pwhs.universalinstaller.presentation.install.util
 
 import android.content.Context
 import android.net.Uri
-import androidx.datastore.preferences.core.stringPreferencesKey
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.domain.model.LookupRequest
+import app.pwhs.core.domain.model.toVtResult
+import app.pwhs.core.network.VirusDetecService
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
-import app.pwhs.core.network.VirusTotalKeyManager
-import app.pwhs.core.network.VirusTotalService
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
@@ -22,28 +22,16 @@ import java.io.File
 
 object InstallVirusTotalHelper {
 
-    /**
-     * Whether the user has turned the whole VirusTotal integration off in Settings. Every
-     * entry point into VirusTotal checks this first; when it is true nothing should touch the
-     * VirusTotal API or surface any VirusTotal UI.
-     */
     suspend fun isDisabled(context: Context): Boolean {
         return try {
             context.dataStore.data.first()[PreferencesKeys.DISABLE_VIRUSTOTAL] ?: false
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
-            // Fail closed: if the preference can't be read, assume VirusTotal is disabled so a
-            // flaky read can never let a lookup/upload through behind the user's back.
             true
         }
     }
 
-    /**
-     * Local SHA-256 of the file, with no VirusTotal interaction. Used even when VirusTotal is
-     * disabled — the hash is shown in the APK info (with its copy action) regardless of the
-     * feature toggle.
-     */
     suspend fun computeSha256(context: Context, uri: Uri): String = withContext(Dispatchers.IO) {
         try {
             context.contentResolver.openInputStream(uri)?.use { input ->
@@ -51,8 +39,6 @@ object InstallVirusTotalHelper {
                 val buffer = ByteArray(8192)
                 var read = input.read(buffer)
                 while (read >= 0) {
-                    // A dismissed APK must stop its read loop; blocking reads can't be
-                    // interrupted, so check cancellation between chunks.
                     ensureActive()
                     digest.update(buffer, 0, read)
                     read = input.read(buffer)
@@ -60,18 +46,7 @@ object InstallVirusTotalHelper {
                 digest.digest().joinToString("") { "%02x".format(it) }
             } ?: ""
         } catch (e: CancellationException) {
-            // Never swallow cancellation into an empty hash — propagate so the job dies.
             throw e
-        } catch (_: Exception) {
-            // Ordinary read failure: empty hash, caller decides what to show.
-            ""
-        }
-    }
-
-    suspend fun readVirusTotalApiKey(context: Context): String {
-        return try {
-            val prefs = context.dataStore.data.first()
-            prefs[stringPreferencesKey("virustotal_api_key")] ?: ""
         } catch (_: Exception) {
             ""
         }
@@ -80,39 +55,50 @@ object InstallVirusTotalHelper {
     suspend fun launchHashLookupOnly(
         context: Context,
         originalUri: Uri,
-        virusTotalService: VirusTotalService,
+        virusDetecService: VirusDetecService,
+        apkInfo: ApkInfo? = null,
         onAutoLookupStart: () -> Unit = {},
     ): Pair<String, VtResult?> = withContext(Dispatchers.IO) {
-        if (isDisabled(context)) return@withContext "" to VtResult(status = VtStatus.NO_API_KEY)
+        if (isDisabled(context)) return@withContext "" to null
         return@withContext try {
-            val sha256 = context.contentResolver.openInputStream(originalUri)?.use { input ->
-                virusTotalService.computeSha256(input)
-            } ?: ""
-
+            val sha256 = computeSha256(context, originalUri)
             if (sha256.isBlank()) {
                 "" to VtResult(status = VtStatus.ERROR, errorMessage = "Could not hash file")
-            } else if (VirusTotalKeyManager.shouldAutoLookupHash(context, sha256)) {
-                onAutoLookupStart()
-                val vtResult = VirusTotalKeyManager.checkFile(context, virusTotalService, sha256)
-                if (vtResult.status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)) {
-                    app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
-                }
-                sha256 to vtResult
-            } else if (!VirusTotalKeyManager.canUseVirusTotal(context, sha256)) {
-                sha256 to VtResult(status = VtStatus.NO_API_KEY)
             } else {
-                sha256 to null
+                onAutoLookupStart()
+                val req = LookupRequest(
+                    sha256 = sha256,
+                    packageName = apkInfo?.packageName.orEmpty(),
+                    appName = apkInfo?.appName.orEmpty(),
+                    versionName = apkInfo?.versionName.orEmpty(),
+                    versionCode = apkInfo?.versionCode ?: 0L,
+                    minSdk = apkInfo?.minSdkVersion ?: 0,
+                    targetSdk = apkInfo?.targetSdkVersion ?: 0,
+                    certSha256 = apkInfo?.certSha256.orEmpty(),
+                    permissions = apkInfo?.permissions.orEmpty(),
+                )
+                val lookupResult = virusDetecService.lookup(req)
+                if (lookupResult.isSuccess) {
+                    val resp = lookupResult.getOrThrow()
+                    val report = resp.report ?: resp.precheckReport
+                    if (report != null) {
+                        app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
+                        sha256 to report.toVtResult()
+                    } else if (resp.needUpload) {
+                        sha256 to VtResult(status = VtStatus.NOT_FOUND)
+                    } else {
+                        sha256 to null
+                    }
+                } else {
+                    Timber.w(lookupResult.exceptionOrNull(), "VirusDetec lookup failed")
+                    sha256 to null
+                }
             }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            Timber.e(e, "VirusTotal hash lookup error")
-            val message = when {
-                VirusTotalService.isNetworkError(e) -> VirusTotalService.NETWORK_ERROR_TAG
-                !e.message.isNullOrBlank() -> e.message.orEmpty()
-                else -> ""
-            }
-            "" to VtResult(status = VtStatus.ERROR, errorMessage = message)
+            Timber.e(e, "VirusDetec lookup error")
+            "" to VtResult(status = VtStatus.ERROR, errorMessage = e.message.orEmpty())
         }
     }
 
@@ -121,16 +107,14 @@ object InstallVirusTotalHelper {
         uri: Uri,
         fileName: String,
         current: ApkInfo,
-        virusTotalService: VirusTotalService,
+        virusDetecService: VirusDetecService,
         virusTotalNotifier: VirusTotalNotifier,
         onUpdateSha256: (String) -> Unit,
         onProgress: (VtResult) -> Unit,
     ) {
         if (isDisabled(context)) return
-        val canUseVt = VirusTotalKeyManager.canUseVirusTotal(context, current.sha256)
         val sizeBytes = current.fileSizeBytes
-
-        if (canUseVt && sizeBytes > VirusTotalService.SIZE_LIMIT_LARGE) {
+        if (sizeBytes > 300L * 1024 * 1024) {
             onProgress(
                 VtResult(
                     status = VtStatus.TOO_LARGE,
@@ -140,71 +124,51 @@ object InstallVirusTotalHelper {
             return
         }
 
-        if (!canUseVt) {
-            onProgress(VtResult(status = VtStatus.NO_API_KEY))
-            return
-        }
-
-        val isDirectUpload = current.vtResult?.status == VtStatus.NOT_FOUND && current.sha256.isNotBlank()
-
-        val scanNotifId = if (isDirectUpload) {
-            virusTotalNotifier.notifyUploadingStart(fileName)
-        } else {
-            virusTotalNotifier.notifyHashing(fileName)
-        }
-
+        val scanNotifId = virusTotalNotifier.notifyHashing(fileName)
         var scanFinished = false
+
         try {
-            if (isDirectUpload) {
-                onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
-            } else {
-                onProgress(VtResult(status = VtStatus.SCANNING))
-            }
+            onProgress(VtResult(status = VtStatus.SCANNING))
 
             val sha256 = current.sha256.ifBlank {
-                try {
-                    withContext(Dispatchers.IO) {
-                        context.contentResolver.openInputStream(uri)?.use { input ->
-                            virusTotalService.computeSha256(input)
-                        } ?: ""
-                    }
-                } catch (e: CancellationException) {
-                    // Rethrow so the scan job dies and the notification is properly cancelled
-                    // below instead of being reported as "Could not hash file".
-                    throw e
-                } catch (_: Exception) {
-                    ""
-                }
+                computeSha256(context, uri)
             }
-
             if (sha256.isBlank()) {
                 scanFinished = true
                 finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, "Could not hash file", sha256, onProgress)
                 return
             }
-
             onUpdateSha256(sha256)
 
-            if (!VirusTotalKeyManager.canUseVirusTotal(context, sha256)) {
-                onProgress(VtResult(status = VtStatus.NO_API_KEY))
-                return
-            }
-
-            if (!isDirectUpload) {
-                val hashResult = VirusTotalKeyManager.checkFile(context, virusTotalService, sha256)
-                if (hashResult.status != VtStatus.NOT_FOUND) {
+            // 1. Try fast precheck/cache lookup first
+            val req = LookupRequest(
+                sha256 = sha256,
+                packageName = current.packageName,
+                appName = current.appName,
+                versionName = current.versionName,
+                versionCode = current.versionCode,
+                minSdk = current.minSdkVersion,
+                targetSdk = current.targetSdkVersion,
+                certSha256 = current.certSha256,
+                permissions = current.permissions,
+            )
+            val lookupResult = virusDetecService.lookup(req)
+            if (lookupResult.isSuccess) {
+                val resp = lookupResult.getOrThrow()
+                val report = resp.report ?: resp.precheckReport
+                if (report != null) {
                     scanFinished = true
-                    finishScan(context, virusTotalNotifier, scanNotifId, fileName, hashResult, sha256, onProgress)
+                    app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
+                    finishScan(context, virusTotalNotifier, scanNotifId, fileName, report.toVtResult(), sha256, onProgress)
                     return
                 }
-                onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
-                virusTotalNotifier.notifyUploading(scanNotifId, fileName, 0)
             }
 
+            // 2. File needs upload -> copy to temp file and upload ticket
             val tempFile = runCatching {
                 withContext(Dispatchers.IO) {
                     val ext = fileName.substringAfterLast('.', "apk").ifBlank { "apk" }
-                    val f = File(context.cacheDir, "vt_${System.currentTimeMillis()}_upload.$ext")
+                    val f = File(context.cacheDir, "sec_${System.currentTimeMillis()}.$ext")
                     context.contentResolver.openInputStream(uri)?.use { input ->
                         f.outputStream().use { output -> input.copyTo(output) }
                     } ?: return@withContext null
@@ -222,33 +186,66 @@ object InstallVirusTotalHelper {
                 onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = 0))
                 virusTotalNotifier.notifyUploading(scanNotifId, fileName, 0)
 
-                val finalResult = VirusTotalKeyManager.uploadAndPoll(
-                    context = context,
-                    service = virusTotalService,
-                    sha256 = sha256,
-                    file = tempFile,
-                    onUploadProgress = { pct ->
-                        onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = pct))
-                        virusTotalNotifier.notifyUploading(scanNotifId, fileName, pct)
-                    },
-                    onQueued = { analysisId ->
-                        onProgress(VtResult(status = VtStatus.QUEUED, analysisId = analysisId))
-                        virusTotalNotifier.notifyQueued(scanNotifId, fileName)
-                    },
-                    onPollProgress = { status, analysisId ->
-                        onProgress(VtResult(status = status, analysisId = analysisId))
-                        when (status) {
-                            VtStatus.ANALYZING -> virusTotalNotifier.notifyAnalyzing(scanNotifId, fileName)
-                            VtStatus.QUEUED -> virusTotalNotifier.notifyQueued(scanNotifId, fileName)
-                            else -> {}
+                val ticketRes = virusDetecService.createUploadTicket(sha256, tempFile.length())
+                if (ticketRes.isFailure) {
+                    scanFinished = true
+                    finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, ticketRes.exceptionOrNull()?.message ?: "Upload ticket failed", sha256, onProgress)
+                    return
+                }
+                val ticket = ticketRes.getOrThrow()
+
+                val uploadRes = virusDetecService.uploadBinary(ticket.uploadUrl, tempFile) { pct ->
+                    onProgress(VtResult(status = VtStatus.UPLOADING, uploadProgress = pct))
+                    virusTotalNotifier.notifyUploading(scanNotifId, fileName, pct)
+                }
+                if (uploadRes.isFailure) {
+                    scanFinished = true
+                    finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, "Upload failed", sha256, onProgress)
+                    return
+                }
+
+                val startRes = virusDetecService.startScan(ticket.jobId)
+                if (startRes.isFailure) {
+                    scanFinished = true
+                    finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, "Start scan failed", sha256, onProgress)
+                    return
+                }
+
+                onProgress(VtResult(status = VtStatus.ANALYZING, uploadProgress = 100))
+                virusTotalNotifier.notifyAnalyzing(scanNotifId, fileName)
+
+                virusDetecService.watchScanStream(ticket.jobId).collect { update ->
+                    when (update.status) {
+                        "COMPLETED" -> {
+                            val finalResult = update.report?.toVtResult() ?: VtResult(status = VtStatus.CLEAN)
+                            scanFinished = true
+                            app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
+                            finishScan(context, virusTotalNotifier, scanNotifId, fileName, finalResult, sha256, onProgress)
                         }
-                    },
-                )
-                scanFinished = true
-                finishScan(context, virusTotalNotifier, scanNotifId, fileName, finalResult, sha256, onProgress)
+                        "FAILED" -> {
+                            scanFinished = true
+                            finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, update.errorCode ?: "Scan failed", sha256, onProgress)
+                        }
+                        else -> {
+                            onProgress(
+                                VtResult(
+                                    status = VtStatus.ANALYZING,
+                                    uploadProgress = update.progressPercent,
+                                    errorMessage = update.message,
+                                )
+                            )
+                        }
+                    }
+                }
             } finally {
                 runCatching { tempFile.delete() }
             }
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Timber.e(e, "VirusDetec scan error")
+            scanFinished = true
+            finishScanWithError(context, virusTotalNotifier, scanNotifId, fileName, e.message.orEmpty(), current.sha256, onProgress)
         } finally {
             if (!scanFinished) {
                 virusTotalNotifier.cancel(scanNotifId)

@@ -73,6 +73,24 @@ object SignatureCheck {
     fun isInstalled(context: Context, packageName: String): Boolean =
         packageName.isNotBlank() && isInstalled(context.packageManager, packageName)
 
+    /** Computes the lowercase hex SHA-256 hash of the first signing certificate in [archive]. */
+    fun extractCertSha256(archive: PackageInfo?): String {
+        return try {
+            val signers = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                archive?.signingInfo?.apkContentsSigners
+            } else {
+                @Suppress("DEPRECATION")
+                archive?.signatures
+            }
+            val rawCert = signers?.firstOrNull()?.toByteArray() ?: return ""
+            val digest = java.security.MessageDigest.getInstance("SHA-256")
+            digest.digest(rawCert).joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            Timber.w(e, "Could not extract cert SHA-256")
+            ""
+        }
+    }
+
     private fun isInstalled(pm: PackageManager, packageName: String): Boolean = try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             pm.getPackageInfo(packageName, PackageManager.PackageInfoFlags.of(0L))
