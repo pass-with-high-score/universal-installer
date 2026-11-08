@@ -458,41 +458,31 @@ fun DialogPrepareContent(
             Text(stringResource(R.string.dialog_cancel_btn))
         }
 
-        if (showTrackersDialog && apkInfo.trackers.isNotEmpty()) {
-            TrackersDetailDialog(
-                trackers = apkInfo.trackers,
-                onDismiss = { showTrackersDialog = false },
-            )
-        }
-
-        if (showAbiWarningDialog) {
-            AbiIncompatibleDialog(
-                apkAbis = apkInfo.supportedAbis,
-                onDismiss = { showAbiWarningDialog = false },
-                onInstallAnyway = {
-                    showAbiWarningDialog = false
-                    if (!vtDisabled && !hasVtKey && !dontAskAgain) {
-                        pendingInstallAfterVt = true
-                        showVtSetupDialog = true
-                    } else {
-                        onInstall()
-                    }
-                },
-            )
-        }
-
-        if (showVtSetupDialog && !vtDisabled) {
-            VirusTotalSetupDialog(
-                onDismiss = {
-                    showVtSetupDialog = false
-                    pendingInstallAfterVt = false
-                },
-                onSaveAndScan = {
-                    onCheckVirusTotal()
-                    pendingInstallAfterVt = false
-                },
-                onProceedInstall = if (pendingInstallAfterVt) onInstall else null,
-            )
-        }
+        DialogPrepareModals(
+            apkInfo = apkInfo,
+            showTrackersDialog = showTrackersDialog,
+            onDismissTrackersDialog = { showTrackersDialog = false },
+            showAbiWarningDialog = showAbiWarningDialog,
+            onDismissAbiWarningDialog = { showAbiWarningDialog = false },
+            onInstallAnyway = {
+                showAbiWarningDialog = false
+                if (!vtDisabled && !hasVtKey && !dontAskAgain) {
+                    pendingInstallAfterVt = true
+                    showVtSetupDialog = true
+                } else {
+                    onInstall()
+                }
+            },
+            showVtSetupDialog = showVtSetupDialog && !vtDisabled,
+            onDismissVtSetupDialog = {
+                showVtSetupDialog = false
+                pendingInstallAfterVt = false
+            },
+            onSaveAndScanVt = {
+                onCheckVirusTotal()
+                pendingInstallAfterVt = false
+            },
+            onProceedInstallVt = if (pendingInstallAfterVt) onInstall else null,
+        )
     }
 }

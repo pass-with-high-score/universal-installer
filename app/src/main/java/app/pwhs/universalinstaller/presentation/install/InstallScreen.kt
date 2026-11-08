@@ -11,6 +11,10 @@ import app.pwhs.universalinstaller.presentation.install.util.PackageFileFilter
 import app.pwhs.universalinstaller.presentation.install.wear.WearApkSender
 import app.pwhs.universalinstaller.util.BiometricGate
 import app.pwhs.universalinstaller.util.SystemIntentInstaller
+import app.pwhs.core.billing.BillingManager
+import app.pwhs.universalinstaller.presentation.install.components.InstallTopBarActions
+import app.pwhs.universalinstaller.presentation.pro.UpgradeProBottomSheet
+import org.koin.compose.koinInject
 import kotlinx.coroutines.flow.map
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -539,6 +543,10 @@ private fun InstallUi(
         }
     }
 
+    val billingManager: BillingManager = koinInject()
+    val isProUser by billingManager.isProUser.collectAsState()
+    var showUpgradeProSheet by rememberSaveable { mutableStateOf(false) }
+
     var selectedTab by rememberSaveable { mutableStateOf(SourceTab.Local) }
 
     // Consume URIs delivered via ACTION_VIEW (Chrome downloads, file managers, Gmail). We
@@ -756,6 +764,13 @@ private fun InstallUi(
         onDismiss = { showPermissions = false },
     )
 
+    if (showUpgradeProSheet) {
+        UpgradeProBottomSheet(
+            billingManager = billingManager,
+            onDismissRequest = { showUpgradeProSheet = false },
+        )
+    }
+
     val isSyncRunning = uiState.syncState == app.pwhs.universalinstaller.presentation.sync.SyncState.RUNNING
 
     Scaffold(
@@ -787,43 +802,19 @@ private fun InstallUi(
                     CommunityActionButtons()
                 },
                 actions = {
-                    if (WearApkSender.isAvailable) {
-                        IconButton(
-                            onClick = {
-                                showWatchSheet = true
-                                onRefreshWatch()
-                                onScanApksForWatch(false)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Watch,
-                                contentDescription = stringResource(R.string.watch_send_title),
-                            )
-                        }
-                    }
-
-                    IconButton(
-                        onClick = onOpenSendToTv,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Tv,
-                            contentDescription = stringResource(R.string.tv_sync_screen_title),
-                        )
-                    }
-
-                    IconButton(
-                        onClick = onOpenSyncServer,
-                        modifier = if (isSyncRunning) Modifier.background(
-                            MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f),
-                            CircleShape
-                        ) else Modifier
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.WifiTethering,
-                            contentDescription = stringResource(R.string.setting_section_sync),
-                            tint = if (isSyncRunning) MaterialTheme.colorScheme.primary else LocalContentColor.current
-                        )
-                    }
+                    InstallTopBarActions(
+                        isProUser = isProUser,
+                        isSyncRunning = isSyncRunning,
+                        showWatch = WearApkSender.isAvailable,
+                        onOpenPro = { showUpgradeProSheet = true },
+                        onOpenWatch = {
+                            showWatchSheet = true
+                            onRefreshWatch()
+                            onScanApksForWatch(false)
+                        },
+                        onOpenSendToTv = onOpenSendToTv,
+                        onOpenSyncServer = onOpenSyncServer,
+                    )
                 },
                 scrollBehavior = scrollBehavior,
                 colors = TopAppBarDefaults.topAppBarColors(
