@@ -126,11 +126,21 @@ object TelemetryEvents {
 
     // ── Giai đoạn 5: Chuyển đổi & Đơn hàng (Monetization) ──────────────────
     const val EVENT_PAYWALL_VIEWED = "paywall_viewed"
+    const val EVENT_PAYWALL_PLAN_SELECTED = "paywall_plan_selected"
+    const val EVENT_CHECKOUT_STARTED = "checkout_started"
     const val EVENT_IN_APP_PURCHASE = "in_app_purchase"
+    const val EVENT_PURCHASE_FAILED = "purchase_failed"
+    const val EVENT_PURCHASE_RESTORED = "purchase_restored"
 
     const val PARAM_PRODUCT_ID = "product_id"
     const val PARAM_VALUE = "value"
     const val PARAM_CURRENCY = "currency"
+    const val PARAM_PLAN_TYPE = "plan_type"
+
+    const val SOURCE_HOME_TOP_BAR = "home_top_bar"
+    const val SOURCE_INSTALL_DIALOG = "install_dialog"
+    const val SOURCE_SETTINGS_BANNER = "settings_banner"
+    const val SOURCE_VIRUSTOTAL_SETTINGS = "virustotal_settings"
 
     // ── Giai đoạn 6: Wear OS Transfer (Send to Watch) ────────────────────
     const val EVENT_WATCH_SEND_STARTED = "watch_send_started"
@@ -146,6 +156,7 @@ object TelemetryEvents {
     // ── User Properties (User Scopes) ────────────────────────────────────
     const val PROPERTY_INSTALLER_MODE = "installer_mode"
     const val PROPERTY_IS_DEFAULT_INSTALLER = "is_default_installer"
+    const val PROPERTY_IS_PRO_USER = "is_pro_user"
     const val PROPERTY_TOTAL_INSTALLS_TIER = "total_installs_tier"
     const val PROPERTY_PREFERRED_FILE_TYPE = "preferred_file_type"
 

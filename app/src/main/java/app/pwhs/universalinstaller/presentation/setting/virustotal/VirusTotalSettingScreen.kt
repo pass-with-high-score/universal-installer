@@ -216,6 +216,7 @@ fun VirusTotalSettingScreen(
         UpgradeProBottomSheet(
             billingManager = viewModel.billingManager,
             onDismissRequest = { showUpgradeProSheet = false },
+            source = app.pwhs.core.telemetry.TelemetryEvents.SOURCE_VIRUSTOTAL_SETTINGS,
         )
     }
 }

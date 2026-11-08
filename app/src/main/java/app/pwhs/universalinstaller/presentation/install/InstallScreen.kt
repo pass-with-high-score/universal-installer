@@ -768,6 +768,7 @@ private fun InstallUi(
         UpgradeProBottomSheet(
             billingManager = billingManager,
             onDismissRequest = { showUpgradeProSheet = false },
+            source = app.pwhs.core.telemetry.TelemetryEvents.SOURCE_HOME_TOP_BAR,
         )
     }
 

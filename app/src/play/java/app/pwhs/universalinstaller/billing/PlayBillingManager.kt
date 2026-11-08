@@ -314,6 +314,9 @@ private class PlayBillingManager(
                         purchase.products.contains(LIFETIME_PRODUCT_ID)
                 if (matchesProduct) {
                     hasValidPro = true
+                    val productId = purchase.products.firstOrNull { it == SUBSCRIPTION_PRODUCT_ID || it == LIFETIME_PRODUCT_ID } ?: "unknown"
+                    val value = if (productId == SUBSCRIPTION_PRODUCT_ID) 1.99 else 4.99
+                    app.pwhs.core.telemetry.AnalyticsHelper.logInAppPurchase(productId, value)
                     if (!purchase.isAcknowledged) {
                         acknowledge(purchase)
                     }
@@ -341,6 +344,7 @@ private class PlayBillingManager(
                 prefs[SharedPrefsKeys.IS_PRO_USER] = isPro
             }
             _isProUser.value = isPro
+            app.pwhs.core.telemetry.AnalyticsHelper.updateIsProUser(isPro)
             if (isPro) {
                 UserStatsTracker.recordProStatusChanged(context)
             }

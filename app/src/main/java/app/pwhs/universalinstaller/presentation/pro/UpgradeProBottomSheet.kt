@@ -25,6 +25,7 @@ import app.pwhs.core.billing.BillingManager
 import app.pwhs.core.billing.BillingPurchaseResult
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.util.openUriSafely
+import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.universalinstaller.presentation.pro.components.PaywallContent
 import app.pwhs.universalinstaller.presentation.pro.components.ProCelebrationContent
 import app.pwhs.universalinstaller.presentation.pro.components.ProIssueDialog
@@ -39,6 +40,7 @@ private const val GOOGLE_PLAY_SUBS_URL = "https://play.google.com/store/account/
 fun UpgradeProBottomSheet(
     billingManager: BillingManager,
     onDismissRequest: () -> Unit,
+    source: String = "unknown",
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val context = LocalContext.current
@@ -60,6 +62,7 @@ fun UpgradeProBottomSheet(
 
     LaunchedEffect(Unit) {
         billingManager.startConnection()
+        AnalyticsHelper.logPaywallViewed(source)
     }
 
     ModalBottomSheet(
@@ -96,18 +99,34 @@ fun UpgradeProBottomSheet(
                         selectedPlan = selectedPlan,
                         isProcessing = isProcessing,
                         isRestoring = isRestoring,
-                        onPlanSelected = { selectedPlan = it },
+                        onPlanSelected = {
+                            selectedPlan = it
+                            AnalyticsHelper.logPaywallPlanSelected(it.name.lowercase())
+                        },
                         onPurchase = {
                             activity?.let { act ->
+                                AnalyticsHelper.logCheckoutStarted(selectedPlan.name.lowercase(), source)
                                 isProcessing = true
                                 billingManager.launchBillingFlow(act, selectedPlan) { result ->
                                     isProcessing = false
                                     when (result) {
                                         is BillingPurchaseResult.Success -> {
                                             justPurchased = true
+                                            val value = if (selectedPlan == ProProductType.YEARLY) 1.99 else 4.99
+                                            AnalyticsHelper.logInAppPurchase(selectedPlan.name.lowercase(), value)
                                         }
                                         is BillingPurchaseResult.AlreadyOwned -> {
                                             justPurchased = true
+                                            val value = if (selectedPlan == ProProductType.YEARLY) 1.99 else 4.99
+                                            AnalyticsHelper.logInAppPurchase(selectedPlan.name.lowercase(), value)
+                                        }
+                                        is BillingPurchaseResult.UserCanceled -> {
+                                            AnalyticsHelper.logPurchaseFailed(selectedPlan.name.lowercase(), -1, "USER_CANCELED")
+                                            activeIssueResult = result
+                                        }
+                                        is BillingPurchaseResult.Error -> {
+                                            AnalyticsHelper.logPurchaseFailed(selectedPlan.name.lowercase(), result.code, result.message)
+                                            activeIssueResult = result
                                         }
                                         else -> {
                                             activeIssueResult = result
@@ -120,6 +139,7 @@ fun UpgradeProBottomSheet(
                             isRestoring = true
                             billingManager.queryPurchases { hasPro ->
                                 isRestoring = false
+                                AnalyticsHelper.logPurchaseRestored(hasPro)
                                 if (hasPro) {
                                     justPurchased = true
                                     Toast.makeText(context, restoreSuccessMsg, Toast.LENGTH_SHORT).show()
@@ -141,13 +161,32 @@ fun UpgradeProBottomSheet(
             onRetry = {
                 activeIssueResult = null
                 activity?.let { act ->
+                    AnalyticsHelper.logCheckoutStarted(selectedPlan.name.lowercase(), source)
                     isProcessing = true
                     billingManager.launchBillingFlow(act, selectedPlan) { result ->
                         isProcessing = false
-                        if (result is BillingPurchaseResult.Success || result is BillingPurchaseResult.AlreadyOwned) {
-                            justPurchased = true
-                        } else {
-                            activeIssueResult = result
+                        when (result) {
+                            is BillingPurchaseResult.Success -> {
+                                justPurchased = true
+                                val value = if (selectedPlan == ProProductType.YEARLY) 1.99 else 4.99
+                                AnalyticsHelper.logInAppPurchase(selectedPlan.name.lowercase(), value)
+                            }
+                            is BillingPurchaseResult.AlreadyOwned -> {
+                                justPurchased = true
+                                val value = if (selectedPlan == ProProductType.YEARLY) 1.99 else 4.99
+                                AnalyticsHelper.logInAppPurchase(selectedPlan.name.lowercase(), value)
+                            }
+                            is BillingPurchaseResult.UserCanceled -> {
+                                AnalyticsHelper.logPurchaseFailed(selectedPlan.name.lowercase(), -1, "USER_CANCELED")
+                                activeIssueResult = result
+                            }
+                            is BillingPurchaseResult.Error -> {
+                                AnalyticsHelper.logPurchaseFailed(selectedPlan.name.lowercase(), result.code, result.message)
+                                activeIssueResult = result
+                            }
+                            else -> {
+                                activeIssueResult = result
+                            }
                         }
                     }
                 }

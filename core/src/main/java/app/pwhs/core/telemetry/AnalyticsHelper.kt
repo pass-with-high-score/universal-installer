@@ -281,12 +281,45 @@ object AnalyticsHelper {
         )
     }
 
+    fun logPaywallPlanSelected(planType: String) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_PAYWALL_PLAN_SELECTED,
+            TelemetryEvents.PARAM_PLAN_TYPE to planType
+        )
+    }
+
+    fun logCheckoutStarted(productId: String, source: String) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_CHECKOUT_STARTED,
+            TelemetryEvents.PARAM_PRODUCT_ID to productId,
+            TelemetryEvents.PARAM_SOURCE to source
+        )
+    }
+
     fun logInAppPurchase(productId: String, value: Double, currency: String = "USD") {
         Telemetry.event(
             TelemetryEvents.EVENT_IN_APP_PURCHASE,
             TelemetryEvents.PARAM_PRODUCT_ID to productId,
             TelemetryEvents.PARAM_VALUE to value,
             TelemetryEvents.PARAM_CURRENCY to currency
+        )
+    }
+
+    fun logPurchaseFailed(productId: String, errorCode: Int, errorMessage: String?) {
+        val params = mutableMapOf<String, Any?>(
+            TelemetryEvents.PARAM_PRODUCT_ID to productId,
+            TelemetryEvents.PARAM_ERROR_CODE to errorCode
+        )
+        if (!errorMessage.isNullOrBlank()) {
+            params[TelemetryEvents.PARAM_ERROR_MESSAGE] = errorMessage.take(50)
+        }
+        Telemetry.event(TelemetryEvents.EVENT_PURCHASE_FAILED, params)
+    }
+
+    fun logPurchaseRestored(success: Boolean) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_PURCHASE_RESTORED,
+            TelemetryEvents.PARAM_STATUS to if (success) TelemetryEvents.STATUS_GRANTED else "not_found"
         )
     }
 
@@ -329,6 +362,10 @@ object AnalyticsHelper {
 
     fun updateIsDefaultInstaller(isDefault: Boolean) {
         Telemetry.setUserProperty(TelemetryEvents.PROPERTY_IS_DEFAULT_INSTALLER, isDefault.toString())
+    }
+
+    fun updateIsProUser(isPro: Boolean) {
+        Telemetry.setUserProperty(TelemetryEvents.PROPERTY_IS_PRO_USER, isPro.toString())
     }
 
     fun updateTotalInstallsTier(totalInstalls: Int) {

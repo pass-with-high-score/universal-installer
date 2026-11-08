@@ -56,6 +56,7 @@ fun DialogPrepareModals(
         UpgradeProBottomSheet(
             billingManager = billingManager,
             onDismissRequest = { showUpgradeProSheet = false },
+            source = app.pwhs.core.telemetry.TelemetryEvents.SOURCE_INSTALL_DIALOG,
         )
     }
 }

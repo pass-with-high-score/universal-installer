@@ -68,6 +68,7 @@ fun SettingSheetsHost(
         UpgradeProBottomSheet(
             billingManager = billingManager,
             onDismissRequest = onDismissUpgradeProSheet,
+            source = app.pwhs.core.telemetry.TelemetryEvents.SOURCE_SETTINGS_BANNER,
         )
     }
 }
