@@ -22,7 +22,7 @@ import app.pwhs.universalinstaller.presentation.setting.backup.BackupViewModel
 import app.pwhs.universalinstaller.presentation.setting.security.SecurityViewModel
 import app.pwhs.universalinstaller.presentation.stats.StatsViewModel
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
@@ -69,7 +69,7 @@ val appModule = module {
     // Ktor HttpClient. Uploads to VirusTotal can take minutes on slow connections, so we bump
     // the request timeout well past Ktor's default and leave the socket/connect timeouts sane.
     single {
-        HttpClient(CIO) {
+        HttpClient(OkHttp) {
             install(HttpTimeout) {
                 requestTimeoutMillis = 5 * 60 * 1000L   // 5 minutes — covers 32 MB upload over 3G
                 connectTimeoutMillis = 30_000L

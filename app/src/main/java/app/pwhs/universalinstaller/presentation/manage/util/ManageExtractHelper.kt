@@ -43,7 +43,7 @@ object ManageExtractHelper {
                 withContext(Dispatchers.Main) {
                     CustomTabsHelper.openUrl(
                         context,
-                        "https://www.virustotal.com/gui/file/$sha256/detection",
+                        "https://virusdetect.pwhs.app",
                     )
                 }
             }

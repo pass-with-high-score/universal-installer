@@ -53,8 +53,9 @@ dependencies {
     // Coil — api so :app and :wearos can register ApkFileIconFetcher on their image loaders.
     api(libs.coil.compose)
 
-    // Ktor for network services (VirusTotal, etc.)
+    // Ktor for network services
     api(libs.ktor.client.core)
+    api(libs.ktor.client.okhttp)
     api(libs.ktor.client.cio)
     api(libs.ktor.client.logging)
     api(libs.timber)

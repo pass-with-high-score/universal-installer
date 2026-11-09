@@ -173,7 +173,7 @@
     <string name="manage_action_install_secure_folder_done">Installed %s into Secure Folder</string>
     <string name="manage_action_install_secure_folder_failed">Failed to install into Secure Folder: %s</string>
     <string name="manage_action_install_secure_folder_already">Installed · Tap to reinstall</string>
-    <string name="manage_action_check_vt">Check VirusTotal</string>
+    <string name="manage_action_check_vt">Security Scan</string>
     <string name="manage_action_installer_source">Installed by %1$s</string>
     <string name="manage_action_add_to_server">Sync &amp; Share</string>
     <string name="manage_action_add_to_server_sub">Share on local Wi-Fi</string>

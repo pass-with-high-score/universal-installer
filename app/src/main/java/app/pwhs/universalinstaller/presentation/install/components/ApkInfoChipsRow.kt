@@ -135,11 +135,7 @@ fun ApkInfoChipsRow(
             VtStatusChip(
                 vt = apkInfo.vtResult,
                 onClick = onCheckVirusTotal,
-                onOpenWeb = onOpenDetail ?: {
-                    if (apkInfo.sha256.isNotBlank()) {
-                        uriHandler.openUriSafely(context, "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection")
-                    }
-                },
+                onOpenWeb = onOpenDetail ?: onCheckVirusTotal,
                 onOpenSettings = onOpenSettings,
             )
         }

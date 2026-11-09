@@ -408,41 +408,11 @@ fun VirusTotalDetailSheet(
             }
 
             // ── Footer Action Buttons ──
-            Row(
+            Button(
+                onClick = onDismiss,
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                if (apkInfo.sha256.isNotBlank()) {
-                    OutlinedButton(
-                        onClick = {
-                            AnalyticsHelper.logVirusTotalAction("open_web_from_detail_sheet")
-                            uriHandler.openUriSafely(
-                                context,
-                                "https://www.virustotal.com/gui/file/${apkInfo.sha256}/detection"
-                            )
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.OpenInNew,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                        )
-                        Spacer(Modifier.width(6.dp))
-                        Text(
-                            text = stringResource(R.string.apk_info_vt_open_web),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                }
-
-                Button(
-                    onClick = onDismiss,
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Text(stringResource(R.string.virustotal_detail_close))
-                }
+                Text(stringResource(R.string.virustotal_detail_close))
             }
         }
     }

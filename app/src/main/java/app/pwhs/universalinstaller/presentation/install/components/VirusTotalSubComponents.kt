@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.GppGood
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -216,25 +217,14 @@ fun VtStatusChip(
             contentColor = MaterialTheme.colorScheme.error,
             onClick = onClick,
         )
-        VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY -> InfoChip(
-            label = stringResource(R.string.apk_info_vt_add_key),
-            leadingIcon = {
-                Image(
-                    painter = painterResource(R.drawable.ic_virustotal_logo),
-                    contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                )
-            },
-            contentColor = extendedColors.warning,
-            onClick = onOpenSettings,
-        )
         else -> InfoChip(
             label = stringResource(R.string.scan_virustotal_btn),
             leadingIcon = {
-                Image(
-                    painter = painterResource(R.drawable.ic_virustotal_logo),
+                Icon(
+                    imageVector = Icons.Rounded.Shield,
                     contentDescription = null,
                     modifier = Modifier.size(16.dp),
+                    tint = MaterialTheme.colorScheme.primary,
                 )
             },
             contentColor = MaterialTheme.colorScheme.primary,

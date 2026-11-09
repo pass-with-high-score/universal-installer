@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -291,9 +292,10 @@ private fun AnimatedBadgeIcon(
                 label = "scanSweep",
             )
             Box(contentAlignment = Alignment.Center) {
-                Image(
-                    painter = painterResource(app.pwhs.core.R.drawable.ic_virustotal_logo),
+                Icon(
+                    imageVector = Icons.Rounded.Security,
                     contentDescription = null,
+                    tint = primaryColor,
                     modifier = Modifier.size(48.dp),
                 )
                 Canvas(modifier = Modifier.size(54.dp)) {

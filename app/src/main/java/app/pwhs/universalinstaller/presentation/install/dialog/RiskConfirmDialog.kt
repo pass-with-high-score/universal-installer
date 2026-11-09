@@ -281,7 +281,6 @@ private fun RiskAction(
             onExistingAppUninstalled()
         }
     }
-    val report = { sha: String -> uriHandler.openUriSafely(context, "$VT_FILE_REPORT_URL$sha") }
 
     val label: Int
     val actionIcon: ImageVector
@@ -301,21 +300,11 @@ private fun RiskAction(
                 Unit
             }
         }
-        is InstallRisk.VtMalicious -> {
-            if (risk.sha256.isBlank()) return
-            label = R.string.dialog_risk_action_view_report
-            actionIcon = Icons.AutoMirrored.Rounded.OpenInNew
-            onClick = { report(risk.sha256) }
-        }
-        is InstallRisk.VtSuspicious -> {
-            if (risk.sha256.isBlank()) return
-            label = R.string.dialog_risk_action_view_report
-            actionIcon = Icons.AutoMirrored.Rounded.OpenInNew
-            onClick = { report(risk.sha256) }
-        }
-        // Downgrade is consented to right here and carried into the session; unscanned has no
-        // action beyond running the scan, which the install screen already offers.
-        is InstallRisk.Downgrade, InstallRisk.VtUnscanned, is InstallRisk.TrackersDetected -> return
+        is InstallRisk.Downgrade,
+        InstallRisk.VtUnscanned,
+        is InstallRisk.VtMalicious,
+        is InstallRisk.VtSuspicious,
+        is InstallRisk.TrackersDetected -> return
     }
 
     Spacer(modifier = Modifier.height(4.dp))
@@ -329,5 +318,3 @@ private fun RiskAction(
         Text(stringResource(label), style = MaterialTheme.typography.labelLarge)
     }
 }
-
-private const val VT_FILE_REPORT_URL = "https://www.virustotal.com/gui/file/"
