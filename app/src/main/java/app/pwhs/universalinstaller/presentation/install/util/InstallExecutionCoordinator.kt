@@ -4,6 +4,7 @@ import android.app.Application
 import android.net.Uri
 import android.widget.Toast
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.security.GhostMapPregate
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.manager.ProfileManager
 import app.pwhs.universalinstaller.domain.model.ApkInfo
@@ -55,6 +56,18 @@ object InstallExecutionCoordinator {
         onAbort: (() -> Unit)? = null,
         onFailed: ((String) -> Unit)? = null,
     ) {
+        val ext = fileName.substringAfterLast('.', "").lowercase()
+        if (ext == "apk") {
+            val checkTargetUri = originalUri ?: uris.firstOrNull()
+            if (checkTargetUri != null) {
+                val pregateCheck = GhostMapPregate.validateUri(application, checkTargetUri)
+                if (pregateCheck is GhostMapPregate.ValidationResult.Invalid) {
+                    Timber.w("Refusing single install of $fileName due to GhostMap vulnerability: ${pregateCheck.reason}")
+                    onAbort?.invoke()
+                    throw GhostMapPregate.GhostMapSecurityException(pregateCheck.reason, pregateCheck.entryName)
+                }
+            }
+        }
         val prefs = try { application.dataStore.data.first() } catch (_: Exception) { null }
         val profiles = ProfileManager.parseProfiles(prefs?.get(PreferencesKeys.INSTALLER_PROFILES))
         val profile = profiles.find { it.id == currentProfileId }
@@ -238,6 +251,14 @@ object InstallExecutionCoordinator {
         val isPrivilegedBackend = backendName == "Shizuku" || backendName == "Root"
 
         for (entry in picked) {
+            val ext = entry.fileName.substringAfterLast('.', "").lowercase()
+            if (ext == "apk") {
+                val pregateCheck = GhostMapPregate.validateUri(application, entry.uri)
+                if (pregateCheck is GhostMapPregate.ValidationResult.Invalid) {
+                    Timber.w("Refusing to install ${entry.fileName} due to GhostMap vulnerability: ${pregateCheck.reason}")
+                    continue
+                }
+            }
             val iconPath = InstallSessionManager.cacheIcon(application, entry.apkInfo)
             val opType = when {
                 entry.apkInfo.installedVersionCode == null || entry.apkInfo.installedVersionCode == 0L -> "INSTALL"
@@ -301,6 +322,14 @@ object InstallExecutionCoordinator {
         resolveActiveController: suspend () -> BaseInstallController,
         onSuccess: () -> Unit,
     ) {
+        val ext = fileName.substringAfterLast('.', "").lowercase()
+        if (ext == "apk") {
+            val pregateCheck = GhostMapPregate.validateUri(application, uri)
+            if (pregateCheck is GhostMapPregate.ValidationResult.Invalid) {
+                Timber.w("Refusing skip single install of $fileName due to GhostMap vulnerability: ${pregateCheck.reason}")
+                throw GhostMapPregate.GhostMapSecurityException(pregateCheck.reason, pregateCheck.entryName)
+            }
+        }
         val deleteAfterInstall = InstallSessionManager.readDeleteApkPref(application)
         val controller = resolveActiveController()
         val sessionData = SessionData(
@@ -329,6 +358,14 @@ object InstallExecutionCoordinator {
         val controller = resolveActiveController()
         for (uri in uris) {
             val fileName = application.contentResolver.getDisplayName(uri)
+            val ext = fileName.substringAfterLast('.', "").lowercase()
+            if (ext == "apk") {
+                val pregateCheck = GhostMapPregate.validateUri(application, uri)
+                if (pregateCheck is GhostMapPregate.ValidationResult.Invalid) {
+                    Timber.w("Refusing skip batch install of $fileName due to GhostMap vulnerability: ${pregateCheck.reason}")
+                    continue
+                }
+            }
             val sessionData = SessionData(
                 id = UUID.randomUUID(),
                 name = fileName,

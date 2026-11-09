@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.install.util
 
 import android.content.Context
 import android.net.Uri
+import app.pwhs.core.security.GhostMapPregate
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.SplitType
@@ -65,6 +66,32 @@ object BatchInstallHelper {
                 return@forEachIndexed
             }
             val extension = displayName.substringAfterLast('.', "").lowercase()
+            if (extension == "apk") {
+                val pregateCheck = GhostMapPregate.validateUri(context, uri)
+                if (pregateCheck is GhostMapPregate.ValidationResult.Invalid) {
+                    Timber.w("Batch parse: GhostMap threat detected in $displayName: ${pregateCheck.reason}")
+                    entries += BatchApkEntry(
+                        uri = uri,
+                        fileName = displayName,
+                        apkInfo = ApkInfo(
+                            appName = displayName.substringBeforeLast('.'),
+                            packageName = "Unknown",
+                            versionName = "",
+                            versionCode = 0L,
+                            icon = null,
+                            minSdkVersion = 0,
+                            targetSdkVersion = 0,
+                            fileSizeBytes = 0,
+                            permissions = emptyList(),
+                        ),
+                        splitUris = emptyList(),
+                        selected = false,
+                        parseError = "GhostMap: ${pregateCheck.reason}",
+                    )
+                    onProgress(index + 1, uris.size)
+                    return@forEachIndexed
+                }
+            }
             try {
                 val (info, splitUris) = parseSingleForBatch(uri, displayName, extension)
                 entries += BatchApkEntry(

@@ -29,6 +29,7 @@ import androidx.compose.material.icons.rounded.CheckBoxOutlineBlank
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.automirrored.rounded.MergeType
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.AssistChip
@@ -452,8 +453,9 @@ private fun EntryRow(
                 contentAlignment = Alignment.Center,
             ) {
                 if (failed) {
+                    val isGhostMapThreat = entry.parseError.contains("GhostMap", ignoreCase = true)
                     Icon(
-                        imageVector = Icons.Rounded.ErrorOutline,
+                        imageVector = if (isGhostMapThreat) Icons.Rounded.Security else Icons.Rounded.ErrorOutline,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.error,
                     )

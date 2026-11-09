@@ -204,7 +204,9 @@ fun DialogFailedContent(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        if (InstallErrorHelper.shouldSuggestShizuku(errorMessage)) {
+        val isGhostMap = errorMessage.contains("GhostMap", ignoreCase = true)
+
+        if (!isGhostMap && InstallErrorHelper.shouldSuggestShizuku(errorMessage)) {
             FilledTonalButton(
                 onClick = {
                     context.startActivity(Intent(context, SettingActivity::class.java))
@@ -227,7 +229,7 @@ fun DialogFailedContent(
             Spacer(modifier = Modifier.height(8.dp))
         }
 
-        if (onFallbackInstall != null) {
+        if (!isGhostMap && onFallbackInstall != null) {
             Button(
                 onClick = onFallbackInstall,
                 modifier = Modifier.fillMaxWidth(),

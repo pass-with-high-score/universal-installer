@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.install.util
 
 import android.content.Context
 import android.net.Uri
+import app.pwhs.core.security.GhostMapPregate
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.InstallerProfile
 import app.pwhs.universalinstaller.presentation.install.ObbEntry
@@ -29,6 +30,14 @@ object InstallParseCoordinator {
         currentProfiles: List<InstallerProfile>,
         appProfileMapping: Map<String, String>,
     ): ParseResult = withContext(Dispatchers.IO) {
+        val ext = fileName.substringAfterLast('.', "").lowercase()
+        if (ext == "apk") {
+            val pregateCheck = GhostMapPregate.validateUri(context, uri)
+            if (pregateCheck is GhostMapPregate.ValidationResult.Invalid) {
+                throw GhostMapPregate.GhostMapSecurityException(pregateCheck.reason, pregateCheck.entryName)
+            }
+        }
+
         var splitUris: List<Uri>? = null
         val info = InstallApkSplitsHelper.extractApkInfoAndCacheUris(
             context = context,
@@ -38,7 +47,6 @@ object InstallParseCoordinator {
             isBlocked = false,
         ) { splitUris = it }
 
-        val ext = fileName.substringAfterLast('.', "").lowercase()
         val obbEntries = if (ext in setOf("apks", "xapk", "apkm", "zip")) ObbExtractor.scan(context, uri) else emptyList()
         val installed = InstallSessionManager.lookupInstalledVersion(context, info.packageName)
         val installedPermissions = if (installed != null) {
