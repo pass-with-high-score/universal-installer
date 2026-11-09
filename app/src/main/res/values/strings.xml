@@ -13,7 +13,7 @@
     <string name="permission_storage_title">All-files access</string>
     <string name="permission_storage_desc">Lets Find Automatic scan your device for packages and copy OBB data on Android 11+. Optional — Browse-picker still works without it.</string>
     <string name="permission_notifications_title">Notifications</string>
-    <string name="permission_notifications_desc">Shows download, OBB copy and VirusTotal scan progress so you can leave the app during long jobs.</string>
+    <string name="permission_notifications_desc">Shows download, OBB copy and security scan progress so you can leave the app during long jobs.</string>
     <string name="permission_usage_title">Usage access</string>
     <string name="permission_usage_desc">Optional — lets the Uninstall screen sort apps by last used and show individual app usage times.</string>
     <string name="back_cd">Back</string>
@@ -78,7 +78,7 @@
     <string name="stats_mode_shizuku">Shizuku</string>
     <string name="stats_mode_root">Root</string>
     <string name="stats_mode_dhizuku">Dhizuku</string>
-    <string name="stats_vt_scans">VirusTotal Scans</string>
+    <string name="stats_vt_scans">VirusDetec Scans</string>
     <string name="stats_tracker_scans">Tracker Scans</string>
     <string name="stats_trackers_found">%1$d trackers spotted</string>
 
@@ -125,13 +125,13 @@
     <string name="milestone_debloat_warrior_title">Debloat Warrior</string>
     <string name="milestone_debloat_warrior_desc">Successfully uninstall 10 apps</string>
     <string name="milestone_security_guardian_title">Security Guardian</string>
-    <string name="milestone_security_guardian_desc">Scan 5 packages with VirusTotal or Tracker Scanner</string>
+    <string name="milestone_security_guardian_desc">Scan 5 packages with VirusDetec or Tracker Scanner</string>
     <string name="milestone_pro_supporter_title">Pro Supporter</string>
     <string name="milestone_pro_supporter_desc">Unlock Universal Installer Pro and support open-source development</string>
-    <string name="milestone_pro_vt_guardian_title">Pro Cloud Sentinel</string>
-    <string name="milestone_pro_vt_guardian_desc">Perform 20 VirusTotal security scans with Pro unlimited quota</string>
-    <string name="milestone_pro_unlimited_champion_title">Pro Cyber Defender</string>
-    <string name="milestone_pro_unlimited_champion_desc">Perform 50 VirusTotal security scans with Pro unlimited quota</string>
+    <string name="milestone_pro_vt_guardian_title">Pro VirusDetec Guardian</string>
+    <string name="milestone_pro_vt_guardian_desc">Perform 20 VirusDetec security scans with Pro features</string>
+    <string name="milestone_pro_unlimited_champion_title">Pro VirusDetec Champion</string>
+    <string name="milestone_pro_unlimited_champion_desc">Perform 50 VirusDetec security scans with Pro features</string>
     <string name="app_functions_display_description">Search installed apps, inspect install and uninstall history, view installer statistics, and scan storage for APK packages.</string>
 
     <string name="update_diff_card_title">Update &amp; Signature Inspector</string>

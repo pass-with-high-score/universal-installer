@@ -99,7 +99,7 @@ fun StorageFormatsCard(
                             text = stringResource(R.string.stats_bytes_installed),
                             style = MaterialTheme.typography.labelMedium,
                             color = colors.onSurfaceVariant,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
@@ -149,7 +149,7 @@ fun StorageFormatsCard(
                             text = stringResource(R.string.stats_bytes_cleaned),
                             style = MaterialTheme.typography.labelMedium,
                             color = colors.onSurfaceVariant,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
@@ -166,7 +166,7 @@ fun StorageFormatsCard(
                             text = stringResource(R.string.stats_files_cleaned_sub, animCleanedFiles),
                             style = MaterialTheme.typography.labelSmall,
                             color = colors.onSurfaceVariant,
-                            maxLines = 1,
+                            maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
@@ -380,7 +380,7 @@ fun ModesAndSecurityCard(
                                 ),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = colors.error,
-                                maxLines = 1,
+                                maxLines = 2,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }

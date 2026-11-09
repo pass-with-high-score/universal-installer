@@ -88,8 +88,6 @@ fun StatsScreen(
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding()),
             contentPadding = PaddingValues(
-                start = 16.dp,
-                end = 16.dp,
                 top = 4.dp,
                 bottom = 24.dp,
             ),
@@ -98,7 +96,9 @@ fun StatsScreen(
             item(key = "rank_banner") {
                 UserRankBannerCard(
                     summary = summary,
-                    modifier = Modifier.animateItem(),
+                    modifier = Modifier
+                        .padding(horizontal = 16.dp)
+                        .animateItem(),
                 )
             }
 
@@ -106,6 +106,7 @@ fun StatsScreen(
                 SingleChoiceSegmentedButtonRow(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
                         .animateItem(),
                 ) {
                     SegmentedButton(
@@ -161,19 +162,25 @@ fun StatsScreen(
                 item(key = "install_uninstall_card") {
                     InstallUninstallOverviewCard(
                         summary = summary,
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .animateItem(),
                     )
                 }
                 item(key = "storage_formats_card") {
                     StorageFormatsCard(
                         summary = summary,
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .animateItem(),
                     )
                 }
                 item(key = "modes_security_card") {
                     ModesAndSecurityCard(
                         summary = summary,
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .animateItem(),
                     )
                 }
                 item(key = "activity_timeline_card") {
@@ -181,14 +188,18 @@ fun StatsScreen(
                         summary = summary,
                         selectedDays = selectedDays,
                         onSelectDays = viewModel::selectPeriodDays,
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .animateItem(),
                     )
                 }
                 if (summary.topUpdatedApps.isNotEmpty()) {
                     item(key = "top_apps_card") {
                         TopInstalledAppsCard(
                             topApps = summary.topUpdatedApps,
-                            modifier = Modifier.animateItem(),
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
                         )
                     }
                 }
@@ -215,7 +226,9 @@ fun StatsScreen(
                 ) { milestone ->
                     MilestoneItemCard(
                         item = milestone,
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .animateItem(),
                         onClick = {
                             AnalyticsHelper.logMilestoneClicked(milestone.id.name, milestone.isUnlocked)
                         },

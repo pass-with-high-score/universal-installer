@@ -59,6 +59,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -81,7 +82,8 @@ fun MilestoneCategoryFilterRow(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
+            .horizontalScroll(rememberScrollState())
+            .padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         FilterChip(
@@ -147,7 +149,7 @@ fun MilestoneItemCard(
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.elevatedCardColors(
             containerColor = if (item.isUnlocked) {
-                colors.secondaryContainer.copy(alpha = 0.55f)
+                colors.secondaryContainer.copy(alpha = 0.55f).compositeOver(colors.surface)
             } else {
                 colors.surfaceContainerLow
             },
@@ -260,6 +262,8 @@ fun MilestoneItemCard(
                         color = if (item.isUnlocked) colors.primary else colors.secondary,
                         trackColor = colors.surfaceContainerHighest,
                         strokeCap = StrokeCap.Round,
+                        gapSize = 0.dp,
+                        drawStopIndicator = {},
                     )
                     Text(
                         text = progressText,

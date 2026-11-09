@@ -198,6 +198,8 @@ fun UserRankBannerCard(
                 color = colors.primary,
                 trackColor = colors.onPrimaryContainer.copy(alpha = 0.15f),
                 strokeCap = StrokeCap.Round,
+                gapSize = 0.dp,
+                drawStopIndicator = {},
             )
 
             Spacer(modifier = Modifier.height(8.dp))
