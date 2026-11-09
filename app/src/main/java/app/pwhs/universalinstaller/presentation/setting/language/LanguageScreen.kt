@@ -103,6 +103,7 @@ private fun LanguageUi(
             "uk" to "Українська",
             "vi" to "Tiếng Việt",
             "zh" to "中文",
+            "zh-TW" to "繁體中文",
         )
     }
 
