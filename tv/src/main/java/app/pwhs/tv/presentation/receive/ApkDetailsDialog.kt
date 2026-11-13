@@ -30,11 +30,16 @@ import androidx.tv.material3.SurfaceDefaults
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.domain.ApkFile
-import app.pwhs.core.domain.model.LookupRequest
-import app.pwhs.core.domain.model.toVtResult
 import app.pwhs.core.domain.model.VtResult
 import app.pwhs.core.domain.model.VtStatus
-import app.pwhs.core.network.VirusDetecService
+import app.pwhs.core.domain.scanner.ScanApkMetadata
+import app.pwhs.core.domain.scanner.ScanOptions
+import app.pwhs.core.domain.scanner.ScannerProviderId
+import app.pwhs.core.domain.scanner.SecurityScannerOrchestrator
+import app.pwhs.core.domain.scanner.impl.OfflineStaticScanner
+import app.pwhs.core.domain.scanner.impl.VirusDetecScanner
+import app.pwhs.core.domain.scanner.impl.VirusTotalScanner
+import app.pwhs.core.domain.scanner.toVtResult
 import app.pwhs.core.receiver.ReceivedApk
 import app.pwhs.tv.BuildConfig
 import app.pwhs.tv.presentation.receive.components.ApkOverviewPane
@@ -107,67 +112,14 @@ fun ApkDetailsDialog(
     var vtResult by remember { mutableStateOf<VtResult?>(null) }
     var sha256 by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
-    val virusDetecService = remember { VirusDetecService() }
-
-    val runVtCheck: () -> Unit = {
-        scope.launch {
-            val prefs = context.dataStore.data.first()
-            val isDisabled = prefs[SharedPrefsKeys.DISABLE_VIRUSTOTAL] ?: false
-            if (isDisabled) return@launch
-
-            vtResult = VtResult(status = VtStatus.SCANNING)
-            val hash = if (sha256.isNotBlank()) sha256 else withContext(Dispatchers.IO) {
-                runCatching {
-                    context.contentResolver.openInputStream(uri)?.use { stream ->
-                        val digest = java.security.MessageDigest.getInstance("SHA-256")
-                        val buffer = ByteArray(8192)
-                        var read: Int
-                        while (stream.read(buffer).also { read = it } != -1) {
-                            digest.update(buffer, 0, read)
-                        }
-                        digest.digest().joinToString("") { "%02x".format(it) }
-                    }
-                }.getOrNull().orEmpty()
-            }
-
-            if (hash.isBlank()) {
-                vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Could not hash file")
-                return@launch
-            }
-            sha256 = hash
-
-            val lookupRes = virusDetecService.lookup(LookupRequest(sha256 = hash)).getOrNull()
-            val report = lookupRes?.report ?: lookupRes?.precheckReport
-            vtResult = if (report != null) {
-                report.toVtResult()
-            } else if (lookupRes?.needUpload == true) {
-                VtResult(status = VtStatus.NOT_FOUND, analysisId = hash)
-            } else {
-                VtResult(status = VtStatus.CLEAN)
-            }
-        }
-    }
-
-    LaunchedEffect(uri) {
-        runVtCheck()
-    }
-
-    val installedPkgInfo = remember(pkg) {
-        if (pkg.isBlank()) null
-        else runCatching {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                context.packageManager.getPackageInfo(pkg, PackageManager.PackageInfoFlags.of(0))
-            } else {
-                @Suppress("DEPRECATION")
-                context.packageManager.getPackageInfo(pkg, 0)
-            }
-        }.getOrNull()
-    }
-
-    val installedVersion = installedPkgInfo?.versionName
-    val installedVersionCode = installedPkgInfo?.let {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.longVersionCode
-        else @Suppress("DEPRECATION") it.versionCode.toLong()
+    val scannerOrchestrator = remember {
+        SecurityScannerOrchestrator(
+            scanners = mapOf(
+                ScannerProviderId.VIRUSDETEC to VirusDetecScanner(),
+                ScannerProviderId.VIRUSTOTAL to VirusTotalScanner(),
+                ScannerProviderId.OFFLINE_STATIC to OfflineStaticScanner(),
+            )
+        )
     }
 
     val permissions: List<String> = remember(apkItem) {
@@ -198,6 +150,70 @@ fun ApkDetailsDialog(
                 } else emptyList()
             }.getOrDefault(emptyList())
         }
+    }
+
+    val runVtCheck: () -> Unit = {
+        scope.launch {
+            if (scannerOrchestrator.isScanningDisabled(context)) return@launch
+
+            vtResult = VtResult(status = VtStatus.SCANNING)
+            val hash = if (sha256.isNotBlank()) sha256 else withContext(Dispatchers.IO) {
+                runCatching {
+                    context.contentResolver.openInputStream(uri)?.use { stream ->
+                        val digest = java.security.MessageDigest.getInstance("SHA-256")
+                        val buffer = ByteArray(8192)
+                        var read: Int
+                        while (stream.read(buffer).also { read = it } != -1) {
+                            digest.update(buffer, 0, read)
+                        }
+                        digest.digest().joinToString("") { "%02x".format(it) }
+                    }
+                }.getOrNull().orEmpty()
+            }
+
+            if (hash.isBlank()) {
+                vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Could not hash file")
+                return@launch
+            }
+            sha256 = hash
+
+            val scanMeta = ScanApkMetadata(
+                sha256 = hash,
+                packageName = pkg,
+                appName = name,
+                versionName = version,
+                versionCode = versionCode,
+                minSdk = minSdk,
+                targetSdk = targetSdk,
+                fileSizeBytes = size,
+                permissions = permissions,
+            )
+            val lookupRes = scannerOrchestrator.lookupHash(context, hash, scanMeta)
+            vtResult = lookupRes.getOrNull()?.toVtResult()
+                ?: VtResult(status = VtStatus.NOT_FOUND, analysisId = hash)
+        }
+    }
+
+    LaunchedEffect(uri) {
+        runVtCheck()
+    }
+
+    val installedPkgInfo = remember(pkg) {
+        if (pkg.isBlank()) null
+        else runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                context.packageManager.getPackageInfo(pkg, PackageManager.PackageInfoFlags.of(0))
+            } else {
+                @Suppress("DEPRECATION")
+                context.packageManager.getPackageInfo(pkg, 0)
+            }
+        }.getOrNull()
+    }
+
+    val installedVersion = installedPkgInfo?.versionName
+    val installedVersionCode = installedPkgInfo?.let {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) it.longVersionCode
+        else @Suppress("DEPRECATION") it.versionCode.toLong()
     }
 
     BackHandler(enabled = showPermissions) {
@@ -274,49 +290,24 @@ fun ApkDetailsDialog(
                         onUploadAndScanVt = {
                             scope.launch {
                                 vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = 0)
-                                val ticket = virusDetecService.createUploadTicket(sha256 = sha256, fileSize = size).getOrNull()
-                                if (ticket == null) {
-                                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Upload ticket creation failed")
-                                    return@launch
-                                }
-                                val tempFile = withContext(Dispatchers.IO) {
-                                    runCatching {
-                                        val f = File(context.cacheDir, "vd_recv_${System.currentTimeMillis()}.apk")
-                                        context.contentResolver.openInputStream(uri)?.use { input ->
-                                            f.outputStream().use { output -> input.copyTo(output) }
-                                        }
-                                        f
-                                    }.getOrNull()
-                                } ?: return@launch
-
-                                val uploadOk = try {
-                                    virusDetecService.uploadBinary(ticket.uploadUrl, tempFile) { pct ->
-                                        vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = pct)
-                                    }.isSuccess
-                                } finally {
-                                    tempFile.delete()
-                                }
-
-                                if (!uploadOk) {
-                                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Binary upload failed")
-                                    return@launch
-                                }
-
-                                val startRes = virusDetecService.startScan(ticket.jobId).getOrNull()
-                                if (startRes == null) {
-                                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Start scan failed")
-                                    return@launch
-                                }
-
-                                virusDetecService.watchScanStream(ticket.jobId).collect { update ->
-                                    val report = update.report
-                                    if (report != null) {
-                                        vtResult = report.toVtResult()
-                                    } else if (update.status == "FAILED") {
-                                        vtResult = VtResult(status = VtStatus.ERROR, errorMessage = update.message)
-                                    } else {
-                                        vtResult = VtResult(status = VtStatus.ANALYZING, uploadProgress = update.progressPercent)
-                                    }
+                                val scanMeta = ScanApkMetadata(
+                                    sha256 = sha256,
+                                    packageName = pkg,
+                                    appName = name,
+                                    versionName = version,
+                                    versionCode = versionCode,
+                                    minSdk = minSdk,
+                                    targetSdk = targetSdk,
+                                    fileSizeBytes = size,
+                                    permissions = permissions,
+                                )
+                                val options = ScanOptions(
+                                    allowUpload = true,
+                                    enableFallback = true,
+                                )
+                                val fileName = name.ifBlank { "package.apk" }
+                                scannerOrchestrator.scan(context, uri, fileName, scanMeta, options).collect { step ->
+                                    vtResult = step.toVtResult(sha256)
                                 }
                             }
                         },

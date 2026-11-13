@@ -61,6 +61,12 @@ object SharedPrefsKeys {
     /** Comma-separated SHA-256 hashes scanned today using Remote Config fallback keys. */
     val VT_TRIAL_SCANNED_HASHES = stringPreferencesKey("vt_trial_scanned_hashes")
 
+    /** Local day string (YYYY-MM-DD) for tracking daily free AppShield built-in scans. */
+    val APPSHIELD_USAGE_DAY = stringPreferencesKey("appshield_usage_day")
+
+    /** Comma-separated SHA-256 hashes scanned today using the built-in AppShield engine. */
+    val APPSHIELD_SCANNED_HASHES = stringPreferencesKey("appshield_scanned_hashes")
+
     /** Whether the user has unlocked Universal Installer Pro (unlimited built-in VirusTotal). */
     val IS_PRO_USER = booleanPreferencesKey("is_pro_user")
 
@@ -97,4 +103,44 @@ object SharedPrefsKeys {
 
     /** Count of newly unlocked milestones not yet viewed in the Stats tab. */
     val UNSEEN_MILESTONE_COUNT = intPreferencesKey("stats_unseen_milestone_count")
+
+    // --- Security & Malware Scanner Preferences ---
+
+    /** Selected primary security scanner ("virusdetec", "virustotal", etc.). Default: "virusdetec" */
+    val SECURITY_PRIMARY_SCANNER = stringPreferencesKey("security_primary_scanner")
+
+    /** Selected backup security scanner ("virustotal", etc.). Default: "virustotal" */
+    val SECURITY_BACKUP_SCANNER = stringPreferencesKey("security_backup_scanner")
+
+    /** Whether to automatically fallback to backup scanner when primary fails (rate limit, offline, error). Default: true */
+    val SECURITY_AUTO_FALLBACK = booleanPreferencesKey("security_auto_fallback")
+
+    /** Whether to run offline static checks concurrently with cloud scanner. Default: false */
+    val SECURITY_RUN_OFFLINE_CHECKS = booleanPreferencesKey("security_run_offline_checks")
+
+    // --- Backward Compatibility Helpers ---
+
+    /**
+     * Backward-compatible helper to check whether security scanning is globally disabled.
+     */
+    fun isSecurityScanningDisabled(preferences: Preferences): Boolean =
+        preferences[DISABLE_VIRUSTOTAL] ?: false
+
+    /**
+     * Resolves the primary scanner ID from preferences, defaulting to "virusdetec".
+     */
+    fun getPrimaryScannerId(preferences: Preferences): String =
+        preferences[SECURITY_PRIMARY_SCANNER] ?: "virusdetec"
+
+    /**
+     * Resolves the backup scanner ID from preferences, defaulting to "virustotal".
+     */
+    fun getBackupScannerId(preferences: Preferences): String =
+        preferences[SECURITY_BACKUP_SCANNER] ?: "virustotal"
+
+    /**
+     * Resolves whether automatic fallback is enabled, defaulting to true.
+     */
+    fun isAutoFallbackEnabled(preferences: Preferences): Boolean =
+        preferences[SECURITY_AUTO_FALLBACK] ?: true
 }

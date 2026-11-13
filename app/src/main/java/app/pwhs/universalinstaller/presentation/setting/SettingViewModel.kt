@@ -320,6 +320,9 @@ class SettingViewModel(
     fun setExtractorOutputPath(path: String) = preferencesDelegate.setExtractorOutputPath(path)
     fun setExtractorFilenameTemplate(template: String) = preferencesDelegate.setExtractorFilenameTemplate(template)
     fun setAnalyticsEnabled(enabled: Boolean) = preferencesDelegate.setAnalyticsEnabled(enabled)
+    fun setPrimaryScanner(scannerId: String) = preferencesDelegate.setPrimaryScanner(scannerId)
+    fun setAutoFallbackEnabled(enabled: Boolean) = preferencesDelegate.setAutoFallbackEnabled(enabled)
+    fun setOfflineChecksEnabled(enabled: Boolean) = preferencesDelegate.setOfflineChecksEnabled(enabled)
     val githubPatToken: StateFlow<String> = preferencesDelegate.githubPatToken
     fun setGithubPatToken(token: String) = preferencesDelegate.setGithubPatToken(token)
 

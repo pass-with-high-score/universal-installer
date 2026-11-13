@@ -11,13 +11,19 @@ import androidx.lifecycle.viewModelScope
 import app.pwhs.core.data.ApkMetadataReader
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
-import app.pwhs.core.domain.model.LookupRequest
-import app.pwhs.core.domain.model.toVtResult
 import app.pwhs.core.domain.model.VtResult
 import app.pwhs.core.domain.model.VtStatus
+import app.pwhs.core.domain.scanner.ScanApkMetadata
+import app.pwhs.core.domain.scanner.ScanOptions
+import app.pwhs.core.domain.scanner.ScanStep
+import app.pwhs.core.domain.scanner.ScannerProviderId
+import app.pwhs.core.domain.scanner.SecurityScannerOrchestrator
+import app.pwhs.core.domain.scanner.impl.OfflineStaticScanner
+import app.pwhs.core.domain.scanner.impl.VirusDetecScanner
+import app.pwhs.core.domain.scanner.impl.VirusTotalScanner
+import app.pwhs.core.domain.scanner.toVtResult
 import app.pwhs.core.install.ApkInstaller
 import app.pwhs.core.install.RootInstaller
-import app.pwhs.core.network.VirusDetecService
 import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.core.telemetry.TelemetryEvents
 import app.pwhs.core.util.RootShell
@@ -43,7 +49,13 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
     private val installer = ApkInstaller(context)
     private val rootInstaller = RootInstaller(context)
     private val shizukuInstaller = ShizukuInstaller(context)
-    private val virusDetecService = VirusDetecService()
+    private val scannerOrchestrator = SecurityScannerOrchestrator(
+        scanners = mapOf(
+            ScannerProviderId.VIRUSDETEC to VirusDetecScanner(),
+            ScannerProviderId.VIRUSTOTAL to VirusTotalScanner(),
+            ScannerProviderId.OFFLINE_STATIC to OfflineStaticScanner(),
+        )
+    )
 
     private val _state = MutableStateFlow<TvInstallState>(TvInstallState.Loading)
     val state: StateFlow<TvInstallState> = _state.asStateFlow()
@@ -105,14 +117,18 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
     private fun startVirusTotalScan(uri: Uri, appName: String, sizeBytes: Long) {
         vtJob?.cancel()
         vtJob = viewModelScope.launch {
-            val prefs = context.dataStore.data.first()
-            val isDisabled = prefs[SharedPrefsKeys.DISABLE_VIRUSTOTAL] ?: false
-            if (isDisabled) return@launch
+            if (scannerOrchestrator.isScanningDisabled(context)) return@launch
 
             val sha256 = withContext(Dispatchers.IO) {
                 try {
                     context.contentResolver.openInputStream(uri)?.use { input ->
-                        virusDetecService.computeSha256(input)
+                        val digest = java.security.MessageDigest.getInstance("SHA-256")
+                        val buffer = ByteArray(8192)
+                        var read: Int
+                        while (input.read(buffer).also { read = it } != -1) {
+                            digest.update(buffer, 0, read)
+                        }
+                        digest.digest().joinToString("") { "%02x".format(it) }
                     }.orEmpty()
                 } catch (e: Exception) {
                     ""
@@ -132,15 +148,22 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
                 vtResult = VtResult(status = VtStatus.SCANNING)
             )
 
-            val lookupRes = virusDetecService.lookup(LookupRequest(sha256 = sha256)).getOrNull()
-            val report = lookupRes?.report ?: lookupRes?.precheckReport
-            val result = if (report != null) {
-                report.toVtResult()
-            } else if (lookupRes?.needUpload == true) {
-                VtResult(status = VtStatus.NOT_FOUND, analysisId = sha256)
-            } else {
-                VtResult(status = VtStatus.CLEAN)
-            }
+            val meta = current.metadata
+            val scanMeta = ScanApkMetadata(
+                sha256 = sha256,
+                packageName = meta.packageName,
+                appName = appName,
+                versionName = meta.versionName,
+                versionCode = meta.versionCode,
+                minSdk = meta.minSdk,
+                targetSdk = meta.targetSdk,
+                fileSizeBytes = sizeBytes,
+                permissions = meta.permissions,
+            )
+
+            val lookupRes = scannerOrchestrator.lookupHash(context, sha256, scanMeta)
+            val result = lookupRes.getOrNull()?.toVtResult()
+                ?: VtResult(status = VtStatus.NOT_FOUND, analysisId = sha256)
             val updatedReady = _state.value as? TvInstallState.Ready ?: return@launch
             _state.value = updatedReady.copy(vtResult = result)
         }
@@ -151,6 +174,7 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
         val sha256 = current.sha256
         val uri = current.uri
         val sizeBytes = current.sizeBytes
+        val meta = current.metadata
 
         vtJob?.cancel()
         vtJob = viewModelScope.launch {
@@ -160,80 +184,44 @@ class TvDialogInstallViewModel(application: Application) : AndroidViewModel(appl
                 vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = 0)
             )
 
-            val ticket = virusDetecService.createUploadTicket(sha256 = sha256, fileSize = sizeBytes).getOrNull()
-            if (ticket == null) {
-                val ready = _state.value as? TvInstallState.Ready ?: return@launch
-                _state.value = ready.copy(
-                    isUploadingVt = false,
-                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Could not create upload ticket")
-                )
-                return@launch
-            }
+            val scanMeta = ScanApkMetadata(
+                sha256 = sha256,
+                packageName = meta.packageName,
+                appName = meta.appName,
+                versionName = meta.versionName,
+                versionCode = meta.versionCode,
+                minSdk = meta.minSdk,
+                targetSdk = meta.targetSdk,
+                fileSizeBytes = sizeBytes,
+                permissions = meta.permissions,
+            )
+            val options = ScanOptions(
+                allowUpload = true,
+                enableFallback = true,
+            )
+            val fileName = meta.appName.ifBlank { "package.apk" }
 
-            val tempFile = withContext(Dispatchers.IO) {
-                runCatching {
-                    val f = File(context.cacheDir, "vd_upload_${System.currentTimeMillis()}.apk")
-                    context.contentResolver.openInputStream(uri)?.use { input ->
-                        f.outputStream().use { output -> input.copyTo(output) }
-                    }
-                    f
-                }.getOrNull()
-            }
-
-            if (tempFile == null || !tempFile.exists()) {
-                val ready = _state.value as? TvInstallState.Ready ?: return@launch
-                _state.value = ready.copy(
-                    isUploadingVt = false,
-                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Could not prepare file for upload")
-                )
-                return@launch
-            }
-
-            val uploadOk = try {
-                virusDetecService.uploadBinary(ticket.uploadUrl, tempFile) { pct ->
-                    val ready = _state.value as? TvInstallState.Ready ?: return@uploadBinary
-                    _state.value = ready.copy(
-                        vtUploadProgress = pct,
-                        vtResult = VtResult(status = VtStatus.UPLOADING, uploadProgress = pct)
-                    )
-                }.isSuccess
-            } finally {
-                tempFile.delete()
-            }
-
-            if (!uploadOk) {
-                val ready = _state.value as? TvInstallState.Ready ?: return@launch
-                _state.value = ready.copy(
-                    isUploadingVt = false,
-                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Binary upload failed")
-                )
-                return@launch
-            }
-
-            val startRes = virusDetecService.startScan(ticket.jobId).getOrNull()
-            if (startRes == null) {
-                val ready = _state.value as? TvInstallState.Ready ?: return@launch
-                _state.value = ready.copy(
-                    isUploadingVt = false,
-                    vtResult = VtResult(status = VtStatus.ERROR, errorMessage = "Start scan failed")
-                )
-                return@launch
-            }
-
-            virusDetecService.watchScanStream(ticket.jobId).collect { update ->
+            scannerOrchestrator.scan(context, uri, fileName, scanMeta, options).collect { step ->
                 val ready = _state.value as? TvInstallState.Ready ?: return@collect
-                val report = update.report
-                if (report != null) {
-                    _state.value = ready.copy(isUploadingVt = false, vtResult = report.toVtResult())
-                } else if (update.status == "FAILED") {
-                    _state.value = ready.copy(
-                        isUploadingVt = false,
-                        vtResult = VtResult(status = VtStatus.ERROR, errorMessage = update.message)
-                    )
-                } else {
-                    _state.value = ready.copy(
-                        vtResult = VtResult(status = VtStatus.ANALYZING, uploadProgress = update.progressPercent)
-                    )
+                val vtRes = step.toVtResult(sha256)
+                when (step) {
+                    is ScanStep.Uploading -> {
+                        _state.value = ready.copy(
+                            isUploadingVt = true,
+                            vtUploadProgress = step.progressPercent,
+                            vtResult = vtRes
+                        )
+                    }
+                    is ScanStep.Completed,
+                    is ScanStep.Failed -> {
+                        _state.value = ready.copy(
+                            isUploadingVt = false,
+                            vtResult = vtRes
+                        )
+                    }
+                    else -> {
+                        _state.value = ready.copy(vtResult = vtRes)
+                    }
                 }
             }
         }

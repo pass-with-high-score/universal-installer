@@ -307,4 +307,33 @@ class SettingPreferencesDelegate(
             dataStore.edit { prefs -> prefs[SharedPrefsKeys.ANALYTICS_ENABLED] = enabled }
         }
     }
+
+    fun setPrimaryScanner(scannerId: String) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                prefs[SharedPrefsKeys.SECURITY_PRIMARY_SCANNER] = scannerId
+                if (scannerId == "virustotal") {
+                    prefs[SharedPrefsKeys.SECURITY_BACKUP_SCANNER] = "virusdetec"
+                } else {
+                    prefs[SharedPrefsKeys.SECURITY_BACKUP_SCANNER] = "virustotal"
+                }
+            }
+        }
+    }
+
+    fun setAutoFallbackEnabled(enabled: Boolean) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                prefs[SharedPrefsKeys.SECURITY_AUTO_FALLBACK] = enabled
+            }
+        }
+    }
+
+    fun setOfflineChecksEnabled(enabled: Boolean) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                prefs[SharedPrefsKeys.SECURITY_RUN_OFFLINE_CHECKS] = enabled
+            }
+        }
+    }
 }

@@ -153,6 +153,8 @@
     <string name="pro_benefit_priority_desc">Cảnh báo quyền nhạy cảm mới phát sinh khi cài đè, kiểm tra chữ ký gốc và lọc bỏ ngôn ngữ/cấu hình thừa chỉ với 1 chạm</string>
     <string name="pro_benefit_support_title">Ủng Hộ Dự Án Mã Nguồn Mở</string>
     <string name="pro_benefit_support_desc">Đồng hành và hỗ trợ phát triển các tính năng mới trong tương lai</string>
+    <string name="pro_benefit_private_support_title">Hỗ Trợ Riêng (Private Support)</string>
+    <string name="pro_benefit_private_support_desc">Hỗ trợ trực tiếp 1-1 ưu tiên khi gặp lỗi cài đặt, báo cáo sự cố hoặc đề xuất tính năng</string>
     <string name="pro_plan_yearly_title">Gói 1 Năm</string>
     <string name="pro_plan_yearly_tag">Phổ biến</string>
     <string name="pro_plan_yearly_default">39.000 đ / năm</string>

@@ -157,6 +157,8 @@
     <string name="pro_benefit_priority_desc">Inspect newly added permissions &amp; signature match on updates, and strip unused split APK languages/ABIs in 1 tap</string>
     <string name="pro_benefit_support_title">Support Open-Source</string>
     <string name="pro_benefit_support_desc">Help sustain ongoing development and new features</string>
+    <string name="pro_benefit_private_support_title">Private Support</string>
+    <string name="pro_benefit_private_support_desc">Direct 1-on-1 priority assistance for troubleshooting, bug reports, and feature requests</string>
     <string name="pro_plan_yearly_title">1 Year Subscription</string>
     <string name="pro_plan_yearly_tag">Popular</string>
     <string name="pro_plan_yearly_default">$1.99 / year</string>

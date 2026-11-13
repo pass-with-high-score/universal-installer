@@ -208,7 +208,7 @@ fun InstallSettingsPane(
 
         // ── Security Section ───────────────────────────────────────────────
         Text(
-            "Bảo mật VirusDetec",
+            "Bảo mật AppShield",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary

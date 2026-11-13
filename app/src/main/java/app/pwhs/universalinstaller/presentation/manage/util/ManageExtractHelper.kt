@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import androidx.documentfile.provider.DocumentFile
+import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.install.ApkExtractor
 import app.pwhs.universalinstaller.domain.model.InstalledApp
@@ -40,11 +41,16 @@ object ManageExtractHelper {
                 }
                 val sha256 = digest.digest().joinToString("") { "%02x".format(it) }
 
+                val prefs = context.dataStore.data.first()
+                val primary = SharedPrefsKeys.getPrimaryScannerId(prefs)
+                val targetUrl = if (primary == "virustotal") {
+                    "https://www.virustotal.com/gui/file/$sha256/detection"
+                } else {
+                    "https://virusdetect.pwhs.app"
+                }
+
                 withContext(Dispatchers.Main) {
-                    CustomTabsHelper.openUrl(
-                        context,
-                        "https://virusdetect.pwhs.app",
-                    )
+                    CustomTabsHelper.openUrl(context, targetUrl)
                 }
             }
         } catch (e: Exception) {

@@ -237,23 +237,23 @@
     <string name="found_chip_new">New</string>
     <string name="dialog_chip_downgrade">Downgrade</string>
 
-    <!-- TV VirusDetec & Security -->
-    <string name="tv_settings_section_virustotal">VirusDetec Security</string>
+    <!-- TV AppShield & Security -->
+    <string name="tv_settings_section_virustotal">AppShield Security</string>
     <string name="tv_settings_virustotal_enable_title">Built-in Security Scanner</string>
-    <string name="tv_settings_virustotal_enable_desc">Scan packages with built-in VirusDetec security engine before installing</string>
+    <string name="tv_settings_virustotal_enable_desc">Scan packages with built-in AppShield security engine before installing</string>
     <string name="tv_settings_virustotal_strict_title">Strict security check</string>
     <string name="tv_settings_virustotal_strict_desc">Warn and require confirmation if threats are detected</string>
-    <string name="tv_vt_status_clean">VirusDetec: Clean (0 threats)</string>
-    <string name="tv_vt_status_malicious">VirusDetec: %d threat(s) flagged!</string>
-    <string name="tv_vt_status_suspicious">VirusDetec: %d warning(s)</string>
-    <string name="tv_vt_status_scanning">VirusDetec: Scanning file…</string>
-    <string name="tv_vt_status_uploading">VirusDetec: Uploading… %d%%</string>
-    <string name="tv_vt_status_queued">VirusDetec: Queued…</string>
-    <string name="tv_vt_status_analyzing">VirusDetec: Analyzing…</string>
-    <string name="tv_vt_status_not_found">VirusDetec: File not found in database</string>
-    <string name="tv_vt_status_error">VirusDetec: Scan error</string>
+    <string name="tv_vt_status_clean">AppShield: Clean (0 threats)</string>
+    <string name="tv_vt_status_malicious">AppShield: %d threat(s) flagged!</string>
+    <string name="tv_vt_status_suspicious">AppShield: %d warning(s)</string>
+    <string name="tv_vt_status_scanning">AppShield: Scanning file…</string>
+    <string name="tv_vt_status_uploading">AppShield: Uploading… %d%%</string>
+    <string name="tv_vt_status_queued">AppShield: Queued…</string>
+    <string name="tv_vt_status_analyzing">AppShield: Analyzing…</string>
+    <string name="tv_vt_status_not_found">AppShield: File not found in database</string>
+    <string name="tv_vt_status_error">AppShield: Scan error</string>
     <string name="tv_vt_action_upload">Upload &amp; Scan</string>
     <string name="tv_vt_action_retry">Retry Scan</string>
     <string name="tv_vt_strict_warning_title">Security Warning</string>
-    <string name="tv_vt_strict_warning_desc">VirusDetec detected threats in this package (%d threat(s)). Do you still want to install?</string>
+    <string name="tv_vt_strict_warning_desc">AppShield detected threats in this package (%d threat(s)). Do you still want to install?</string>
 </resources>

@@ -18,7 +18,7 @@
     <string name="apk_info_splits_count">%d Splits</string>
     <string name="apk_info_section_architectures">Kiến trúc Hỗ trợ</string>
     <string name="apk_info_section_permissions">Quyền (%d)</string>
-    <string name="apk_info_vt_scan_title">Bảo mật &amp; Quét mã độc (VirusDetec)</string>
+    <string name="apk_info_vt_scan_title">Bảo mật &amp; Quét mã độc (AppShield)</string>
     <string name="apk_info_vt_scanning">Đang quét tệp…</string>
     <string name="apk_info_vt_clean">Không phát hiện mối đe dọa nào</string>
     <string name="apk_info_vt_malicious">%d công cụ đã phát hiện mối đe dọa!</string>

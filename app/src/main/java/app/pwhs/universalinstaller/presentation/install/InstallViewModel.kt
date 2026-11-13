@@ -14,6 +14,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.DownloadHistoryDao
 import app.pwhs.universalinstaller.data.local.InstallHistoryDao
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
+import app.pwhs.core.domain.scanner.SecurityScannerOrchestrator
 import app.pwhs.core.network.VirusDetecService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.domain.manager.InstallBlacklist
@@ -63,7 +64,7 @@ class InstallViewModel(
     private val application: Application,
     packageInstaller: PackageInstaller,
     private val sessionDataRepository: SessionDataRepository,
-    virusDetecService: VirusDetecService,
+    securityScannerOrchestrator: SecurityScannerOrchestrator,
     virusTotalNotifier: VirusTotalNotifier,
     packageDownloadService: PackageDownloadService,
     private val historyDao: InstallHistoryDao,
@@ -73,6 +74,36 @@ class InstallViewModel(
     private val appScope: CoroutineScope,
     private val installNotifier: InstallProgressNotifier,
 ) : ViewModel() {
+
+    constructor(
+        application: Application,
+        packageInstaller: PackageInstaller,
+        sessionDataRepository: SessionDataRepository,
+        virusDetecService: VirusDetecService,
+        virusTotalNotifier: VirusTotalNotifier,
+        packageDownloadService: PackageDownloadService,
+        historyDao: InstallHistoryDao,
+        downloadHistoryDao: DownloadHistoryDao,
+        backendFactory: InstallerBackendFactory,
+        packageUninstaller: PackageUninstaller,
+        appScope: CoroutineScope,
+        installNotifier: InstallProgressNotifier,
+    ) : this(
+        application = application,
+        packageInstaller = packageInstaller,
+        sessionDataRepository = sessionDataRepository,
+        securityScannerOrchestrator = SecurityScannerOrchestrator(
+            mapOf(app.pwhs.core.domain.scanner.ScannerProviderId.VIRUSDETEC to app.pwhs.core.domain.scanner.impl.VirusDetecScanner(virusDetecService))
+        ),
+        virusTotalNotifier = virusTotalNotifier,
+        packageDownloadService = packageDownloadService,
+        historyDao = historyDao,
+        downloadHistoryDao = downloadHistoryDao,
+        backendFactory = backendFactory,
+        packageUninstaller = packageUninstaller,
+        appScope = appScope,
+        installNotifier = installNotifier,
+    )
 
     private val defaultController = DefaultInstallController(
         application, packageInstaller, sessionDataRepository, historyDao,
@@ -113,7 +144,7 @@ class InstallViewModel(
     private val parseDelegate = InstallParseDelegate(
         application = application,
         scope = viewModelScope,
-        virusDetecService = virusDetecService,
+        securityScannerOrchestrator = securityScannerOrchestrator,
         virusTotalNotifier = virusTotalNotifier,
         obbDelegate = obbDelegate,
         onProfileMatched = { _selectedProfileId.value = it },

@@ -24,6 +24,7 @@ import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.SupportAgent
 import androidx.compose.material.icons.rounded.WorkspacePremium
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -154,6 +155,11 @@ fun PaywallContent(
                     icon = Icons.Rounded.Favorite,
                     title = stringResource(R.string.pro_benefit_support_title),
                     desc = stringResource(R.string.pro_benefit_support_desc),
+                )
+                PaywallBenefitRow(
+                    icon = Icons.Rounded.SupportAgent,
+                    title = stringResource(R.string.pro_benefit_private_support_title),
+                    desc = stringResource(R.string.pro_benefit_private_support_desc),
                 )
             }
         }

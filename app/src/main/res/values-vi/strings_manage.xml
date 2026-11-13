@@ -170,7 +170,7 @@
     <string name="manage_action_install_secure_folder_done">Đã cài đặt %s vào Thư mục bảo mật</string>
     <string name="manage_action_install_secure_folder_failed">Cài vào Thư mục bảo mật thất bại: %s</string>
     <string name="manage_action_install_secure_folder_already">Đã cài đặt · Nhấn để cài lại</string>
-    <string name="manage_action_check_vt">Quét bảo mật VirusDetec</string>
+    <string name="manage_action_check_vt">Quét bảo mật AppShield</string>
     <string name="manage_action_installer_source">Được cài bởi %1$s</string>
     <string name="manage_action_add_to_server">Sync &amp; Share</string>
     <string name="manage_action_add_to_server_sub">Chia sẻ qua Wi-Fi</string>

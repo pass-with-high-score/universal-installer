@@ -106,7 +106,7 @@ fun VirusTotalCard(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Bảo mật VirusDetec",
+                    text = "Bảo mật AppShield",
                     style = MaterialTheme.typography.labelLarge,
                     color = vtColor,
                 )

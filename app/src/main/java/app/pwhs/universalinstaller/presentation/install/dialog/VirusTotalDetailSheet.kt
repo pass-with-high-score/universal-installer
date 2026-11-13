@@ -139,7 +139,7 @@ fun VirusTotalDetailSheet(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Bảo mật & Quét mã độc (VirusDetec)",
+                        text = "Bảo mật & Quét mã độc (AppShield)",
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,

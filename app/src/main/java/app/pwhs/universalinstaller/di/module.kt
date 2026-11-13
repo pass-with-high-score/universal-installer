@@ -4,6 +4,16 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.room.Room
 import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.data.local.AppDatabase
+import app.pwhs.core.domain.scanner.DefaultSecurityPreferencesDataSource
+import app.pwhs.core.domain.scanner.ScannerProviderId
+import app.pwhs.core.domain.scanner.SecurityPreferencesDataSource
+import app.pwhs.core.domain.scanner.SecurityScannerOrchestrator
+import app.pwhs.core.domain.scanner.impl.MockSecurityScanner
+import app.pwhs.core.domain.scanner.impl.OfflineStaticScanner
+import app.pwhs.core.domain.scanner.impl.VirusDetecScanner
+import app.pwhs.core.domain.scanner.impl.VirusTotalScanner
+import app.pwhs.core.network.VirusTotalService
+import app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingViewModel
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.data.remote.VirusDetecService
@@ -92,6 +102,23 @@ val appModule = module {
         }
     }
     single { VirusDetecService(get()) }
+    single { VirusTotalService(get()) }
+    single { VirusDetecScanner(get<VirusDetecService>()) }
+    single { VirusTotalScanner(get<VirusTotalService>()) }
+    single { OfflineStaticScanner() }
+    single { MockSecurityScanner() }
+    single<SecurityPreferencesDataSource> { DefaultSecurityPreferencesDataSource() }
+    single {
+        SecurityScannerOrchestrator(
+            scanners = mapOf(
+                ScannerProviderId.VIRUSDETEC to get<VirusDetecScanner>(),
+                ScannerProviderId.VIRUSTOTAL to get<VirusTotalScanner>(),
+                ScannerProviderId.OFFLINE_STATIC to get<OfflineStaticScanner>(),
+                ScannerProviderId.MOCK to get<MockSecurityScanner>(),
+            ),
+            preferencesDataSource = get(),
+        )
+    }
     single { VirusTotalNotifier(get()) }
     single { PackageDownloadService(get()) }
     single { InstallProgressNotifier(get(), get(), get()) }
@@ -104,11 +131,14 @@ val appModule = module {
 
     viewModel {
         InstallViewModel(
-            get(), get(), get(), get(), get(), get(), get(), get(), get(), get(),
+            get(), get(), get(),
+            get<SecurityScannerOrchestrator>(),
+            get(), get(), get(), get(), get(), get(),
             get(qualifier = org.koin.core.qualifier.named("appScope")),
             get(),
         )
     }
+    viewModelOf(::VirusTotalSettingViewModel)
     viewModelOf(::ManageViewModel)
     viewModelOf(::BackupsViewModel)
     viewModelOf(::AppPermissionsViewModel)

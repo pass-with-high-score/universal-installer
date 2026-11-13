@@ -131,6 +131,10 @@ android {
             keepDebugSymbols.add("**/*.so")
         }
     }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 kotlin {

@@ -39,7 +39,7 @@ import java.io.File
 import java.io.InputStream
 import java.security.MessageDigest
 
-class VirusDetecService(
+open class VirusDetecService(
     private val client: HttpClient = defaultClient,
     private val baseUrl: String = PRIMARY_BASE_URL,
     private val apiKey: String = DEFAULT_CLIENT_API_KEY,
@@ -78,7 +78,7 @@ class VirusDetecService(
         }
     }
 
-    suspend fun lookup(request: LookupRequest, language: String = "vi"): Result<LookupResponse> = withContext(Dispatchers.IO) {
+    open suspend fun lookup(request: LookupRequest, language: String = "vi"): Result<LookupResponse> = withContext(Dispatchers.IO) {
         runCatching {
             val payload = JSONObject().apply {
                 put("sha256", request.sha256)
@@ -111,7 +111,7 @@ class VirusDetecService(
         }
     }
 
-    suspend fun createUploadTicket(sha256: String, fileSize: Long, language: String = "vi"): Result<UploadTicketResponse> = withContext(Dispatchers.IO) {
+    open suspend fun createUploadTicket(sha256: String, fileSize: Long, language: String = "vi"): Result<UploadTicketResponse> = withContext(Dispatchers.IO) {
         runCatching {
             val payload = JSONObject().apply {
                 put("sha256", sha256)
@@ -142,7 +142,7 @@ class VirusDetecService(
         }
     }
 
-    suspend fun uploadBinary(
+    open suspend fun uploadBinary(
         uploadUrl: String,
         file: File,
         onProgress: (Int) -> Unit = {},
@@ -164,7 +164,7 @@ class VirusDetecService(
         }
     }
 
-    suspend fun startScan(jobId: String, language: String = "vi"): Result<String> = withContext(Dispatchers.IO) {
+    open suspend fun startScan(jobId: String, language: String = "vi"): Result<String> = withContext(Dispatchers.IO) {
         runCatching {
             val payload = JSONObject().apply { put("job_id", jobId) }
             val response = executeWithFallback { url ->
@@ -182,7 +182,7 @@ class VirusDetecService(
         }
     }
 
-    fun watchScanStream(jobId: String, language: String = "vi"): Flow<ScanStepUpdate> = flow {
+    open fun watchScanStream(jobId: String, language: String = "vi"): Flow<ScanStepUpdate> = flow {
         val streamUrl = "$baseUrl/api/v1/scan/jobs/$jobId/stream?lang=$language"
         val response: HttpResponse = client.get(streamUrl) {
             header("X-API-Key", apiKey)
@@ -192,23 +192,27 @@ class VirusDetecService(
         val channel = response.bodyAsChannel()
         while (!channel.isClosedForRead) {
             val line = channel.readUTF8Line() ?: break
-            if (line.startsWith("data:")) {
-                val dataContent = line.removePrefix("data:").trim()
-                if (dataContent.isNotEmpty() && dataContent != "{}") {
-                    runCatching {
-                        val json = JSONObject(dataContent)
-                        val update = parseScanStepUpdate(json)
-                        emit(update)
-                        if (update.status == "COMPLETED" || update.status == "FAILED") {
-                            return@flow
-                        }
-                    }.onFailure {
-                        Timber.w(it, "Failed to parse SSE line: $dataContent")
-                    }
+            val update = parseSseLine(line)
+            if (update != null) {
+                emit(update)
+                if (update.status == "COMPLETED" || update.status == "FAILED") {
+                    return@flow
                 }
             }
         }
     }.flowOn(Dispatchers.IO)
+
+    internal fun parseSseLine(line: String): ScanStepUpdate? {
+        if (!line.startsWith("data:")) return null
+        val dataContent = line.removePrefix("data:").trim()
+        if (dataContent.isEmpty() || dataContent == "{}") return null
+        return runCatching {
+            val json = JSONObject(dataContent)
+            parseScanStepUpdate(json)
+        }.onFailure {
+            Timber.w(it, "Failed to parse SSE line: $dataContent")
+        }.getOrNull()
+    }
 
     suspend fun submitFalsePositive(
         request: FalsePositiveRequest,
@@ -255,7 +259,7 @@ class VirusDetecService(
         }
     }
 
-    private fun parseLookupResponse(json: JSONObject): LookupResponse {
+    internal fun parseLookupResponse(json: JSONObject): LookupResponse {
         val cached = json.optBoolean("cached", false)
         val needUpload = json.optBoolean("need_upload", false)
         val reportObj = json.optJSONObject("report")
@@ -269,7 +273,7 @@ class VirusDetecService(
         )
     }
 
-    private fun parseScanStepUpdate(json: JSONObject): ScanStepUpdate {
+    internal fun parseScanStepUpdate(json: JSONObject): ScanStepUpdate {
         return ScanStepUpdate(
             jobId = json.optString("job_id"),
             status = json.optString("status"),
@@ -281,7 +285,7 @@ class VirusDetecService(
         )
     }
 
-    private fun parseScanReport(json: JSONObject): ScanReport {
+    internal fun parseScanReport(json: JSONObject): ScanReport {
         val findingsArray = json.optJSONArray("findings") ?: JSONArray()
         val findings = mutableListOf<Finding>()
         for (i in 0 until findingsArray.length()) {

@@ -207,23 +207,23 @@
     <string name="found_chip_new">Mới</string>
     <string name="dialog_chip_downgrade">Hạ cấp</string>
 
-    <!-- TV VirusDetec & Security -->
-    <string name="tv_settings_section_virustotal">Bảo mật VirusDetec</string>
+    <!-- TV AppShield & Security -->
+    <string name="tv_settings_section_virustotal">Bảo mật AppShield</string>
     <string name="tv_settings_virustotal_enable_title">Trình quét bảo mật tích hợp</string>
-    <string name="tv_settings_virustotal_enable_desc">Quét các gói ứng dụng bằng công nghệ VirusDetec trước khi cài đặt</string>
+    <string name="tv_settings_virustotal_enable_desc">Quét các gói ứng dụng bằng công nghệ AppShield trước khi cài đặt</string>
     <string name="tv_settings_virustotal_strict_title">Kiểm tra bảo mật nghiêm ngặt</string>
     <string name="tv_settings_virustotal_strict_desc">Cảnh báo và yêu cầu xác nhận nếu phát hiện mã độc</string>
-    <string name="tv_vt_status_clean">VirusDetec: An toàn (0 nguy cơ)</string>
-    <string name="tv_vt_status_malicious">VirusDetec: Phát hiện %d mối đe dọa!</string>
-    <string name="tv_vt_status_suspicious">VirusDetec: %d cảnh báo đáng ngờ</string>
-    <string name="tv_vt_status_scanning">VirusDetec: Đang quét tệp…</string>
-    <string name="tv_vt_status_uploading">VirusDetec: Đang tải lên… %d%%</string>
-    <string name="tv_vt_status_queued">VirusDetec: Đang chờ xử lý…</string>
-    <string name="tv_vt_status_analyzing">VirusDetec: Đang phân tích…</string>
-    <string name="tv_vt_status_not_found">VirusDetec: Chưa có trong cơ sở dữ liệu</string>
-    <string name="tv_vt_status_error">VirusDetec: Lỗi quét</string>
+    <string name="tv_vt_status_clean">AppShield: An toàn (0 nguy cơ)</string>
+    <string name="tv_vt_status_malicious">AppShield: Phát hiện %d mối đe dọa!</string>
+    <string name="tv_vt_status_suspicious">AppShield: %d cảnh báo đáng ngờ</string>
+    <string name="tv_vt_status_scanning">AppShield: Đang quét tệp…</string>
+    <string name="tv_vt_status_uploading">AppShield: Đang tải lên… %d%%</string>
+    <string name="tv_vt_status_queued">AppShield: Đang chờ xử lý…</string>
+    <string name="tv_vt_status_analyzing">AppShield: Đang phân tích…</string>
+    <string name="tv_vt_status_not_found">AppShield: Chưa có trong cơ sở dữ liệu</string>
+    <string name="tv_vt_status_error">AppShield: Lỗi quét</string>
     <string name="tv_vt_action_upload">Tải lên &amp; Quét</string>
     <string name="tv_vt_action_retry">Thử lại</string>
     <string name="tv_vt_strict_warning_title">Cảnh báo bảo mật</string>
-    <string name="tv_vt_strict_warning_desc">VirusDetec phát hiện mối đe dọa trong gói cài đặt này (%d nguy cơ). Bạn có chắc chắn muốn cài đặt?</string>
+    <string name="tv_vt_strict_warning_desc">AppShield phát hiện mối đe dọa trong gói cài đặt này (%d nguy cơ). Bạn có chắc chắn muốn cài đặt?</string>
 </resources>

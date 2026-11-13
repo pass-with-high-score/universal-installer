@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.install.util
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import app.pwhs.core.domain.scanner.SecurityScannerOrchestrator
 import app.pwhs.core.network.VirusDetecService
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.domain.model.ApkInfo
@@ -28,12 +29,31 @@ import timber.log.Timber
 class InstallParseDelegate(
     private val application: Application,
     private val scope: CoroutineScope,
-    private val virusDetecService: VirusDetecService,
+    private val securityScannerOrchestrator: SecurityScannerOrchestrator,
     private val virusTotalNotifier: VirusTotalNotifier,
     private val obbDelegate: InstallObbDelegate,
     private val onProfileMatched: (String) -> Unit,
     private val onParseFailed: ((String) -> Unit)? = null,
 ) {
+    constructor(
+        application: Application,
+        scope: CoroutineScope,
+        virusDetecService: VirusDetecService,
+        virusTotalNotifier: VirusTotalNotifier,
+        obbDelegate: InstallObbDelegate,
+        onProfileMatched: (String) -> Unit,
+        onParseFailed: ((String) -> Unit)? = null,
+    ) : this(
+        application = application,
+        scope = scope,
+        securityScannerOrchestrator = SecurityScannerOrchestrator(
+            mapOf(app.pwhs.core.domain.scanner.ScannerProviderId.VIRUSDETEC to app.pwhs.core.domain.scanner.impl.VirusDetecScanner(virusDetecService))
+        ),
+        virusTotalNotifier = virusTotalNotifier,
+        obbDelegate = obbDelegate,
+        onProfileMatched = onProfileMatched,
+        onParseFailed = onParseFailed,
+    )
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
@@ -224,7 +244,7 @@ class InstallParseDelegate(
         val current = _pendingApkInfo.value ?: return
         scanJob?.cancel()
         scanJob = scope.launch {
-            if (InstallVirusTotalHelper.isDisabled(context)) return@launch
+            if (InstallVirusTotalHelper.isDisabled(context, securityScannerOrchestrator)) return@launch
             Telemetry.feature(TelemetryEvents.FEATURE_VIRUSTOTAL)
             app.pwhs.universalinstaller.domain.stats.UserStatsTracker.recordVirusTotalScan(context)
             InstallVirusTotalHelper.scanVirusTotal(
@@ -232,7 +252,7 @@ class InstallParseDelegate(
                 uri = uri,
                 fileName = fileName,
                 current = current,
-                virusDetecService = virusDetecService,
+                scannerOrchestrator = securityScannerOrchestrator,
                 virusTotalNotifier = virusTotalNotifier,
                 onUpdateSha256 = { sha256 ->
                     _pendingApkInfo.value = _pendingApkInfo.value?.copy(sha256 = sha256)
@@ -250,7 +270,7 @@ class InstallParseDelegate(
         hashJob?.cancel()
         hashJob = scope.launch {
             fun isStillCurrent() = pendingOriginalUri == originalUri
-            if (InstallVirusTotalHelper.isDisabled(context)) {
+            if (InstallVirusTotalHelper.isDisabled(context, securityScannerOrchestrator)) {
                 // VirusTotal is off: still populate the SHA-256 (it is shown with a copy action
                 // in the APK info) but skip every VirusTotal lookup.
                 val sha256 = InstallVirusTotalHelper.computeSha256(context, originalUri)
@@ -262,7 +282,7 @@ class InstallParseDelegate(
             val result = InstallVirusTotalHelper.launchHashLookupOnly(
                 context = context,
                 originalUri = originalUri,
-                virusDetecService = virusDetecService,
+                scannerOrchestrator = securityScannerOrchestrator,
                 apkInfo = _pendingApkInfo.value,
                 onAutoLookupStart = {
                     if (isStillCurrent()) {

@@ -11,6 +11,8 @@ import app.pwhs.universalinstaller.presentation.install.controller.BackendSelfHe
 import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.network.VirusTotalKeyManager
+import app.pwhs.universalinstaller.remoteconfig.createVtRemoteConfigSource
 import app.pwhs.universalinstaller.review.AppReview
 import app.pwhs.universalinstaller.review.ReviewGate
 import app.pwhs.universalinstaller.review.createReviewPrompter
@@ -107,6 +109,7 @@ class App : Application(), SingletonImageLoader.Factory {
         // rest of onCreate is still reported.
         Telemetry.install(createTelemetrySink(this))
         AppReview.install(createReviewPrompter(this))
+        VirusTotalKeyManager.install(createVtRemoteConfigSource(BuildConfig.DEBUG))
         CrashHandler.install(this)
         registerActivityLifecycleCallbacks(app.pwhs.universalinstaller.presentation.setting.security.util.AppLockManager)
         // Release builds used to plant nothing, so Settings -> Diagnostics collected a logcat

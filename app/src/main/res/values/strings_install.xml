@@ -108,7 +108,7 @@
     <string name="apk_info_section_architectures">Supported Architectures</string>
     <string name="apk_info_section_permissions">Permissions (%d)</string>
     <string name="apk_info_section_splits">Splits (%d)</string>
-    <string name="apk_info_vt_scan_title">Security Scan (VirusDetec)</string>
+    <string name="apk_info_vt_scan_title">Security Scan (AppShield)</string>
     <string name="apk_info_vt_scanning">Scanning file…</string>
     <string name="apk_info_vt_clean">No threats detected</string>
     <string name="apk_info_vt_malicious">%d engine(s) detected threats!</string>
