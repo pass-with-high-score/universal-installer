@@ -78,7 +78,10 @@ import app.pwhs.universalinstaller.presentation.install.components.PermissionsCa
 import app.pwhs.universalinstaller.presentation.install.components.ProfilePickerCard
 import app.pwhs.universalinstaller.presentation.install.components.SplitsCard
 import app.pwhs.universalinstaller.presentation.install.components.UpdateDiffCard
+import app.pwhs.universalinstaller.presentation.install.components.AppShieldDailyQuotaBadge
+import app.pwhs.universalinstaller.presentation.install.components.SecurityQuotaExhaustedSection
 import app.pwhs.universalinstaller.presentation.install.components.VirusTotalCard
+import app.pwhs.universalinstaller.presentation.install.components.VirusTotalQuickKeyDialog
 import app.pwhs.universalinstaller.presentation.install.components.VtStatusChip
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogKeepApkOption
 import app.pwhs.universalinstaller.presentation.install.dialog.InstallSupportBottomSheet
@@ -118,6 +121,7 @@ internal fun ApkInfoContent(
     onKeepApkChanged: (Boolean) -> Unit = {},
     onMergeSplits: (() -> Unit)? = null,
     installError: String? = null,
+    onUpgradeProClick: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -127,6 +131,8 @@ internal fun ApkInfoContent(
     var showAbiWarningDialog by rememberSaveable { mutableStateOf(false) }
     var showSupportSheet by rememberSaveable { mutableStateOf(false) }
     var showVtDetailSheet by rememberSaveable { mutableStateOf(false) }
+    var showVtKeyDialog by rememberSaveable { mutableStateOf(false) }
+    var showQuotaUnlockDialog by rememberSaveable { mutableStateOf(false) }
 
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
     val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
@@ -179,7 +185,7 @@ internal fun ApkInfoContent(
                 onCheckVirusTotal = onCheckVirusTotal,
                 onShowTrackers = { showTrackersDialog = true },
                 onExpand = { isExpanded = true },
-                onOpenSettings = { showVtDetailSheet = true },
+                onOpenSettings = { showQuotaUnlockDialog = true },
                 onOpenDetail = { showVtDetailSheet = true },
                 modifier = Modifier.fillMaxWidth(),
             )
@@ -236,6 +242,9 @@ internal fun ApkInfoContent(
                     fileSizeBytes = apkInfo.fileSizeBytes,
                     sha256 = apkInfo.sha256,
                     onCheck = onCheckVirusTotal,
+                    onOpenSettings = { showVtKeyDialog = true },
+                    onGetKey = { uriHandler.openUri("https://www.virustotal.com/gui/my-apikey") },
+                    onUpgradeProClick = onUpgradeProClick,
                     onOpenLink = {
                         if (apkInfo.vtResult?.status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)) {
                             showVtDetailSheet = true
@@ -385,6 +394,50 @@ internal fun ApkInfoContent(
                 vt = apkInfo.vtResult,
                 apkInfo = apkInfo,
                 onDismiss = { showVtDetailSheet = false },
+            )
+        }
+
+        if (showQuotaUnlockDialog) {
+            androidx.compose.material3.AlertDialog(
+                onDismissRequest = { showQuotaUnlockDialog = false },
+                title = { androidx.compose.material3.Text("Giới hạn quét AppShield") },
+                text = {
+                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        AppShieldDailyQuotaBadge()
+                        SecurityQuotaExhaustedSection(
+                            onAddKey = {
+                                showQuotaUnlockDialog = false
+                                showVtKeyDialog = true
+                            },
+                            onGetKey = {
+                                uriHandler.openUri("https://www.virustotal.com/gui/my-apikey")
+                            },
+                            onUpgradeProClick = onUpgradeProClick?.let { upgrade ->
+                                {
+                                    showQuotaUnlockDialog = false
+                                    upgrade()
+                                }
+                            },
+                        )
+                    }
+                },
+                confirmButton = {
+                    androidx.compose.material3.TextButton(
+                        onClick = { showQuotaUnlockDialog = false },
+                    ) {
+                        androidx.compose.material3.Text(stringResource(android.R.string.ok))
+                    }
+                },
+            )
+        }
+
+        if (showVtKeyDialog) {
+            VirusTotalQuickKeyDialog(
+                onDismiss = { showVtKeyDialog = false },
+                onSaved = {
+                    showVtKeyDialog = false
+                    onCheckVirusTotal()
+                },
             )
         }
     }

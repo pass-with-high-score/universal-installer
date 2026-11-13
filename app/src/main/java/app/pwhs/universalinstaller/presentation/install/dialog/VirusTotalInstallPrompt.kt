@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -24,10 +25,12 @@ import androidx.compose.material.icons.rounded.GppGood
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Warning
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -40,10 +43,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.billing.BillingManager
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtStatus
+import app.pwhs.universalinstaller.presentation.install.components.AppShieldDailyQuotaBadge
+import app.pwhs.universalinstaller.presentation.install.components.SecurityQuotaExhaustedSection
+import app.pwhs.universalinstaller.presentation.install.components.VirusTotalQuickKeyDialog
+import app.pwhs.universalinstaller.presentation.pro.UpgradeProBottomSheet
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
+import org.koin.compose.koinInject
 
 /**
  * Compact VirusTotal status badge and scan prompt displayed on the installation dialog & bottomsheet.
@@ -58,6 +67,7 @@ fun VirusTotalInstallPrompt(
     apkInfo: ApkInfo,
     onScan: () -> Unit,
     modifier: Modifier = Modifier,
+    billingManager: BillingManager = koinInject(),
 ) {
     val extendedColors = LocalExtendedColors.current
     val uriHandler = LocalUriHandler.current
@@ -65,6 +75,9 @@ fun VirusTotalInstallPrompt(
     val vt = apkInfo.vtResult
     val status = vt?.status
     var showDetailSheet by remember { mutableStateOf(false) }
+    var showQuotaDialog by remember { mutableStateOf(false) }
+    var showKeyDialog by remember { mutableStateOf(false) }
+    var showUpgradeProSheet by remember { mutableStateOf(false) }
 
     val inProgress = status in setOf(
         VtStatus.SCANNING,
@@ -201,6 +214,38 @@ fun VirusTotalInstallPrompt(
                 }
             }
 
+            currentStatus == VtStatus.RATE_LIMITED ||
+                currentStatus == VtStatus.NO_API_KEY ||
+                currentStatus == VtStatus.INVALID_API_KEY -> {
+                val chipText = when (currentStatus) {
+                    VtStatus.RATE_LIMITED -> "Hết lượt miễn phí · Mở khóa"
+                    VtStatus.INVALID_API_KEY -> "API Key không hợp lệ"
+                    else -> "Cần API Key / Pro"
+                }
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .clickable { showQuotaDialog = true }
+                        .background(extendedColors.warningContainer)
+                        .border(BorderStroke(0.5.dp, extendedColors.warning), RoundedCornerShape(50))
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Warning,
+                        contentDescription = null,
+                        tint = extendedColors.warning,
+                        modifier = Modifier.size(14.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = chipText,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = extendedColors.warning,
+                    )
+                }
+            }
+
             currentStatus == VtStatus.ERROR -> {
                 Row(
                     modifier = Modifier
@@ -257,6 +302,54 @@ fun VirusTotalInstallPrompt(
             vt = vt,
             apkInfo = apkInfo,
             onDismiss = { showDetailSheet = false },
+        )
+    }
+
+    if (showQuotaDialog) {
+        AlertDialog(
+            onDismissRequest = { showQuotaDialog = false },
+            title = { Text("Giới hạn quét AppShield") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    AppShieldDailyQuotaBadge()
+                    SecurityQuotaExhaustedSection(
+                        onAddKey = {
+                            showQuotaDialog = false
+                            showKeyDialog = true
+                        },
+                        onGetKey = {
+                            uriHandler.openUri("https://www.virustotal.com/gui/my-apikey")
+                        },
+                        onUpgradeProClick = {
+                            showQuotaDialog = false
+                            showUpgradeProSheet = true
+                        },
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showQuotaDialog = false }) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            },
+        )
+    }
+
+    if (showKeyDialog) {
+        VirusTotalQuickKeyDialog(
+            onDismiss = { showKeyDialog = false },
+            onSaved = {
+                showKeyDialog = false
+                onScan()
+            },
+        )
+    }
+
+    if (showUpgradeProSheet) {
+        UpgradeProBottomSheet(
+            billingManager = billingManager,
+            onDismissRequest = { showUpgradeProSheet = false },
+            source = app.pwhs.core.telemetry.TelemetryEvents.SOURCE_INSTALL_DIALOG,
         )
     }
 }

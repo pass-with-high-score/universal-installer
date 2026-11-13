@@ -203,6 +203,27 @@ fun VtStatusChip(
             contentColor = MaterialTheme.colorScheme.primary,
             onClick = onClick,
         )
+        VtStatus.RATE_LIMITED, VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY -> {
+            val label = when (vt.status) {
+                VtStatus.RATE_LIMITED -> "Hết lượt miễn phí · Mở khóa"
+                VtStatus.INVALID_API_KEY -> "API Key không hợp lệ"
+                else -> "Cần API Key / Pro"
+            }
+            InfoChip(
+                label = label,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Warning,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = extendedColors.warning,
+                    )
+                },
+                containerColor = extendedColors.warningContainer,
+                contentColor = extendedColors.warning,
+                onClick = onOpenSettings ?: onClick,
+            )
+        }
         VtStatus.ERROR -> InfoChip(
             label = stringResource(R.string.dialog_failed_retry),
             leadingIcon = {

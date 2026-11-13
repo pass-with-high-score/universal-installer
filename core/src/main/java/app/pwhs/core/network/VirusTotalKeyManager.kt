@@ -94,7 +94,7 @@ object VirusTotalKeyManager {
         return context.dataStore.data.map { prefs ->
             val hasPersonalKey = !prefs[SharedPrefsKeys.VIRUSTOTAL_API_KEY]?.trim().isNullOrBlank()
             val isPro = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
-            val usedToday = VirusTotalQuotaStore.parseScannedHashesToday(prefs).size
+            val usedToday = VirusTotalQuotaStore.parseAppShieldHashesToday(prefs).size
             val poolNonEmpty = parseKeyPool(remoteSource.getRawKeys()).isNotEmpty()
             val fallbackActive = remoteSource.isFallbackEnabled() && poolNonEmpty
             val limit = remoteSource.getDailyLimit().takeIf { it > 0 } ?: DEFAULT_TRIAL_DAILY_LIMIT

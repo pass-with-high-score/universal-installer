@@ -722,6 +722,7 @@ private fun InstallUi(
                 strictSecurity = strictSecurity,
                 onMergeSplits = onMergeSplits,
                 installError = installError,
+                onUpgradeProClick = { showUpgradeProSheet = true },
             )
         }
     }

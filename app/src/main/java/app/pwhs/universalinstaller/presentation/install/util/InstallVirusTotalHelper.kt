@@ -4,11 +4,13 @@ import android.content.Context
 import android.net.Uri
 import app.pwhs.core.domain.scanner.DefaultSecurityPreferencesDataSource
 import app.pwhs.core.domain.scanner.ScanApkMetadata
+import app.pwhs.core.domain.scanner.ScanError
 import app.pwhs.core.domain.scanner.ScanOptions
 import app.pwhs.core.domain.scanner.ScanStep
 import app.pwhs.core.domain.scanner.ScannerProviderId
 import app.pwhs.core.domain.scanner.SecurityScannerOrchestrator
 import app.pwhs.core.domain.scanner.impl.VirusDetecScanner
+import app.pwhs.core.domain.scanner.impl.VirusTotalScanner
 import app.pwhs.core.domain.scanner.toVtResult
 import app.pwhs.core.network.VirusDetecService
 import app.pwhs.universalinstaller.R
@@ -92,8 +94,17 @@ object InstallVirusTotalHelper {
                         sha256 to VtResult(status = VtStatus.NOT_FOUND)
                     }
                 } else {
-                    Timber.w(lookupResult.exceptionOrNull(), "SecurityScanner lookup failed")
-                    sha256 to null
+                    val err = lookupResult.exceptionOrNull()
+                    Timber.w(err, "SecurityScanner lookup failed")
+                    val scanError = when (err) {
+                        is VirusDetecScanner.ScanErrorException -> err.error
+                        is VirusTotalScanner.ScanErrorException -> err.error
+                        else -> null
+                    }
+                    val surfaceable = scanError is ScanError.RateLimited ||
+                        scanError is ScanError.NoApiKey ||
+                        scanError is ScanError.InvalidApiKey
+                    sha256 to if (surfaceable) scanError?.toVtResult(sha256) else null
                 }
             }
         } catch (e: CancellationException) {

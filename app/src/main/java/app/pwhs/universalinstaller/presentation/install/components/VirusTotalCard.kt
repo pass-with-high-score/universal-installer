@@ -29,11 +29,17 @@ import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.network.VirusTotalKeyManager
+import app.pwhs.core.network.VtQuotaStatus
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
@@ -50,6 +56,10 @@ fun VirusTotalCard(
     onOpenLink: () -> Unit = {},
     onUpgradeProClick: (() -> Unit)? = null,
 ) {
+    val context = LocalContext.current
+    val quotaFlow = remember(context) { VirusTotalKeyManager.observeQuotaStatus(context) }
+    val quota by quotaFlow.collectAsState(initial = VtQuotaStatus())
+    val isPro = quota.isProUser
     val extendedColors = LocalExtendedColors.current
     val status = vt?.status
     val inProgress = status == VtStatus.SCANNING ||
@@ -57,10 +67,16 @@ fun VirusTotalCard(
         status == VtStatus.QUEUED ||
         status == VtStatus.ANALYZING
     val hasResult = status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)
+    val needsQuotaOrKeyResolution = status in setOf(
+        VtStatus.RATE_LIMITED,
+        VtStatus.NO_API_KEY,
+        VtStatus.INVALID_API_KEY,
+    ) || (!quota.isUnlimited && quota.remainingToday == 0 && !hasResult && !inProgress)
     val vtColor = when (status) {
         VtStatus.CLEAN -> MaterialTheme.colorScheme.primary
         VtStatus.MALICIOUS, VtStatus.ERROR -> MaterialTheme.colorScheme.error
-        VtStatus.SUSPICIOUS, VtStatus.RATE_LIMITED, VtStatus.TOO_LARGE -> extendedColors.warning
+        VtStatus.SUSPICIOUS, VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY,
+        VtStatus.RATE_LIMITED, VtStatus.TOO_LARGE -> extendedColors.warning
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
     val vtDesc = when (status) {
@@ -68,7 +84,10 @@ fun VirusTotalCard(
         VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vt?.malicious ?: 0)
         VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vt?.suspicious ?: 0)
         VtStatus.NOT_FOUND -> "Chưa có kết quả phân tích trong cơ sở dữ liệu."
-        VtStatus.RATE_LIMITED -> "Tần suất yêu cầu quá nhanh, vui lòng chờ giây lát."
+        VtStatus.NO_API_KEY -> "Chưa cấu hình API Key hoặc dịch vụ quét khả dụng."
+        VtStatus.INVALID_API_KEY -> "VirusTotal API Key không hợp lệ hoặc đã bị thu hồi."
+        VtStatus.RATE_LIMITED -> vt?.errorMessage?.takeIf { it.isNotBlank() }
+            ?: "Đã hết lượt quét miễn phí hôm nay hoặc bị giới hạn tần suất."
         VtStatus.ERROR -> if (vt?.errorMessage.isNullOrBlank()) "Không thể kết nối đến dịch vụ bảo mật" else vt.errorMessage
         VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt?.errorMessage.orEmpty())
         VtStatus.SCANNING -> "Đang phân tích chữ ký và manifest..."
@@ -125,6 +144,9 @@ fun VirusTotalCard(
                 Text(vtDesc, style = MaterialTheme.typography.bodySmall, color = vtColor)
             }
 
+            Spacer(Modifier.height(10.dp))
+            AppShieldDailyQuotaBadge()
+
             if (hasResult && vt != null) {
                 val total = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
                 Spacer(Modifier.height(12.dp))
@@ -168,7 +190,43 @@ fun VirusTotalCard(
                 }
             }
 
-            if (status == VtStatus.NOT_FOUND) {
+            if (!isPro && needsQuotaOrKeyResolution) {
+                Spacer(Modifier.height(10.dp))
+                SecurityQuotaExhaustedSection(
+                    onAddKey = onOpenSettings,
+                    onGetKey = onGetKey,
+                    onUpgradeProClick = onUpgradeProClick ?: onOpenSettings,
+                )
+            } else if (isPro && (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY || status == VtStatus.RATE_LIMITED)) {
+                Spacer(Modifier.height(8.dp))
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    FilledTonalButton(
+                        onClick = onCheck,
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Spacer(Modifier.width(6.dp))
+                        Text(
+                            text = stringResource(R.string.dialog_failed_retry),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                    TextButton(
+                        onClick = onOpenSettings,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                    ) {
+                        Text(
+                            text = "Nhập API Key",
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
+                }
+            } else if (status == VtStatus.NOT_FOUND) {
                 Spacer(Modifier.height(8.dp))
                 FilledTonalButton(
                     onClick = onCheck,
