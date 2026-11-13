@@ -47,9 +47,7 @@ import app.pwhs.core.billing.BillingManager
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.VtStatus
-import app.pwhs.universalinstaller.presentation.install.components.AppShieldDailyQuotaBadge
-import app.pwhs.universalinstaller.presentation.install.components.SecurityQuotaExhaustedSection
-import app.pwhs.universalinstaller.presentation.install.components.VirusTotalQuickKeyDialog
+import app.pwhs.universalinstaller.presentation.install.components.SecurityQuotaUnlockSheet
 import app.pwhs.universalinstaller.presentation.pro.UpgradeProBottomSheet
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
 import org.koin.compose.koinInject
@@ -75,8 +73,7 @@ fun VirusTotalInstallPrompt(
     val vt = apkInfo.vtResult
     val status = vt?.status
     var showDetailSheet by remember { mutableStateOf(false) }
-    var showQuotaDialog by remember { mutableStateOf(false) }
-    var showKeyDialog by remember { mutableStateOf(false) }
+    var showQuotaSheet by remember { mutableStateOf(false) }
     var showUpgradeProSheet by remember { mutableStateOf(false) }
 
     val inProgress = status in setOf(
@@ -225,7 +222,7 @@ fun VirusTotalInstallPrompt(
                 Row(
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
-                        .clickable { showQuotaDialog = true }
+                        .clickable { showQuotaSheet = true }
                         .background(extendedColors.warningContainer)
                         .border(BorderStroke(0.5.dp, extendedColors.warning), RoundedCornerShape(50))
                         .padding(horizontal = 10.dp, vertical = 4.dp),
@@ -305,43 +302,14 @@ fun VirusTotalInstallPrompt(
         )
     }
 
-    if (showQuotaDialog) {
-        AlertDialog(
-            onDismissRequest = { showQuotaDialog = false },
-            title = { Text("Giới hạn quét AppShield") },
-            text = {
-                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    AppShieldDailyQuotaBadge()
-                    SecurityQuotaExhaustedSection(
-                        onAddKey = {
-                            showQuotaDialog = false
-                            showKeyDialog = true
-                        },
-                        onGetKey = {
-                            uriHandler.openUri("https://www.virustotal.com/gui/my-apikey")
-                        },
-                        onUpgradeProClick = {
-                            showQuotaDialog = false
-                            showUpgradeProSheet = true
-                        },
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = { showQuotaDialog = false }) {
-                    Text(stringResource(android.R.string.ok))
-                }
-            },
-        )
-    }
-
-    if (showKeyDialog) {
-        VirusTotalQuickKeyDialog(
-            onDismiss = { showKeyDialog = false },
-            onSaved = {
-                showKeyDialog = false
+    if (showQuotaSheet) {
+        SecurityQuotaUnlockSheet(
+            onDismiss = { showQuotaSheet = false },
+            onKeySaved = {
+                showQuotaSheet = false
                 onScan()
             },
+            onUpgradeProClick = { showUpgradeProSheet = true },
         )
     }
 

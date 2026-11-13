@@ -78,8 +78,7 @@ import app.pwhs.universalinstaller.presentation.install.components.PermissionsCa
 import app.pwhs.universalinstaller.presentation.install.components.ProfilePickerCard
 import app.pwhs.universalinstaller.presentation.install.components.SplitsCard
 import app.pwhs.universalinstaller.presentation.install.components.UpdateDiffCard
-import app.pwhs.universalinstaller.presentation.install.components.AppShieldDailyQuotaBadge
-import app.pwhs.universalinstaller.presentation.install.components.SecurityQuotaExhaustedSection
+import app.pwhs.universalinstaller.presentation.install.components.SecurityQuotaUnlockSheet
 import app.pwhs.universalinstaller.presentation.install.components.VirusTotalCard
 import app.pwhs.universalinstaller.presentation.install.components.VirusTotalQuickKeyDialog
 import app.pwhs.universalinstaller.presentation.install.components.VtStatusChip
@@ -398,36 +397,13 @@ internal fun ApkInfoContent(
         }
 
         if (showQuotaUnlockDialog) {
-            androidx.compose.material3.AlertDialog(
-                onDismissRequest = { showQuotaUnlockDialog = false },
-                title = { androidx.compose.material3.Text("Giới hạn quét AppShield") },
-                text = {
-                    Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        AppShieldDailyQuotaBadge()
-                        SecurityQuotaExhaustedSection(
-                            onAddKey = {
-                                showQuotaUnlockDialog = false
-                                showVtKeyDialog = true
-                            },
-                            onGetKey = {
-                                uriHandler.openUri("https://www.virustotal.com/gui/my-apikey")
-                            },
-                            onUpgradeProClick = onUpgradeProClick?.let { upgrade ->
-                                {
-                                    showQuotaUnlockDialog = false
-                                    upgrade()
-                                }
-                            },
-                        )
-                    }
+            SecurityQuotaUnlockSheet(
+                onDismiss = { showQuotaUnlockDialog = false },
+                onKeySaved = {
+                    showQuotaUnlockDialog = false
+                    onCheckVirusTotal()
                 },
-                confirmButton = {
-                    androidx.compose.material3.TextButton(
-                        onClick = { showQuotaUnlockDialog = false },
-                    ) {
-                        androidx.compose.material3.Text(stringResource(android.R.string.ok))
-                    }
-                },
+                onUpgradeProClick = onUpgradeProClick,
             )
         }
 
