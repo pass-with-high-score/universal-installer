@@ -59,3 +59,4 @@ Use direct register: `vi` uses "bạn", `pt-BR` uses "você".
 - `uk` — Ukrainian
 - `vi` — Vietnamese (uses pronoun "bạn", "cài đặt" for install, "gỡ cài đặt" for uninstall)
 - `zh` — Simplified Chinese (简体中文: uses "安装", "设置", "卸载")
+- `zh-TW` — Traditional Chinese, Taiwan (繁體中文: uses "安裝", "設定", "解除安裝", "正在解除安裝…")

@@ -14,7 +14,7 @@ object AppLocale {
 
     val TAGS = listOf(
         SYSTEM, "ar", "bn", "de", "el", "en", "es", "fr", "hi", "in", "it",
-        "ja", "ko", "pl", "pt-BR", "ro", "ru", "tr", "uk", "vi", "zh",
+        "ja", "ko", "pl", "pt-BR", "ro", "ru", "tr", "uk", "vi", "zh", "zh-TW",
     )
 
     /** Endonym — a language is easiest to find written the way its own speakers write it. */
