@@ -37,6 +37,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -114,337 +115,358 @@ fun ReportFalsePositiveDialog(
         modifier = Modifier.imePadding(),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
-                .navigationBarsPadding()
-                .padding(bottom = 24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxWidth(),
         ) {
-            // Header Icon Badge
-            Box(
-                modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
-                contentAlignment = Alignment.Center,
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Flag,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(28.dp),
-                )
-            }
-
-            Spacer(Modifier.height(12.dp))
-
-            Text(
-                text = stringResource(R.string.fp_sheet_title),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
-            )
-
-            Spacer(Modifier.height(4.dp))
-
-            Text(
-                text = stringResource(R.string.fp_sheet_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center,
-            )
-
-            Spacer(Modifier.height(16.dp))
-
-            // Target APK Information Card
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                ),
-                modifier = Modifier.fillMaxWidth(),
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(42.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Android,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text(
-                            text = appName.ifBlank { packageName },
-                            style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Bold,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                        if (packageName.isNotBlank() && appName.isNotBlank()) {
-                            Text(
-                                text = packageName,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                            )
-                        }
-                        if (sha256.isNotBlank()) {
-                            Text(
-                                text = "SHA: ${sha256.take(16)}...",
-                                style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-
-                    if (sha256.isNotBlank()) {
-                        IconButton(
-                            onClick = {
-                                val cm = context.getSystemService<ClipboardManager>()
-                                cm?.setPrimaryClip(ClipData.newPlainText("SHA-256", sha256))
-                                Toast.makeText(
-                                    context,
-                                    context.getString(R.string.virustotal_detail_sha256_copied),
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            },
-                            modifier = Modifier.size(36.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.ContentCopy,
-                                contentDescription = stringResource(R.string.virustotal_detail_copy_sha256),
-                                modifier = Modifier.size(18.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Quick Preset Reasons
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f, fill = false)
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = 24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Header Icon Badge
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Flag,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(28.dp),
+                    )
+                }
+
+                Spacer(Modifier.height(12.dp))
+
                 Text(
-                    text = stringResource(R.string.fp_quick_reason_header),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
+                    text = stringResource(R.string.fp_sheet_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState()),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    QUICK_REASON_RES.forEach { resId ->
-                        val preset = stringResource(resId)
-                        FilterChip(
-                            selected = reason.contains(preset),
-                            onClick = {
-                                reason = if (reason.isBlank()) {
-                                    preset
-                                } else if (!reason.contains(preset)) {
-                                    "$reason. $preset"
-                                } else {
-                                    reason
-                                }
-                                errorMessage = null
-                            },
-                            label = { Text(preset, style = MaterialTheme.typography.labelSmall) },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                                labelColor = MaterialTheme.colorScheme.onSurface,
-                            ),
-                        )
-                    }
-                }
-            }
+                Spacer(Modifier.height(4.dp))
 
-            Spacer(Modifier.height(12.dp))
+                Text(
+                    text = stringResource(R.string.fp_sheet_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    textAlign = TextAlign.Center,
+                )
 
-            // Reason Input Field
-            OutlinedTextField(
-                value = reason,
-                onValueChange = {
-                    reason = it
-                    errorMessage = null
-                },
-                label = { Text(stringResource(R.string.fp_reason_label)) },
-                placeholder = { Text(stringResource(R.string.fp_reason_placeholder)) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Description,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp),
-                    )
-                },
-                isError = reason.isNotBlank() && !isReasonValid,
-                supportingText = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                    ) {
-                        if (reason.isNotBlank() && !isReasonValid) {
-                            Text(
-                                text = stringResource(R.string.fp_reason_min_length_error),
-                                color = MaterialTheme.colorScheme.error,
-                            )
-                        } else {
-                            Text("")
-                        }
-                        Text(stringResource(R.string.fp_reason_char_count, reason.trim().length))
-                    }
-                },
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth(),
-                minLines = 3,
-                maxLines = 5,
-                enabled = !isSubmitting,
-            )
+                Spacer(Modifier.height(16.dp))
 
-            Spacer(Modifier.height(8.dp))
-
-            // Email Input Field
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text(stringResource(R.string.fp_email_label)) },
-                placeholder = { Text(stringResource(R.string.fp_email_placeholder)) },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.size(20.dp),
-                    )
-                },
-                singleLine = true,
-                shape = RoundedCornerShape(14.dp),
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isSubmitting,
-            )
-
-            // Error Message Banner if submit failed
-            if (errorMessage != null) {
-                Spacer(Modifier.height(10.dp))
-                Surface(
-                    shape = RoundedCornerShape(10.dp),
-                    color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                // Target APK Information Card
+                Card(
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
                     modifier = Modifier.fillMaxWidth(),
                 ) {
                     Row(
-                        modifier = Modifier.padding(10.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
-                        Icon(
-                            imageVector = Icons.Rounded.ErrorOutline,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(20.dp),
-                        )
-                        Text(
-                            text = errorMessage.orEmpty(),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onErrorContainer,
-                        )
-                    }
-                }
-            }
-
-            Spacer(Modifier.height(20.dp))
-
-            // Action Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                OutlinedButton(
-                    onClick = dismissWithAnim,
-                    enabled = !isSubmitting,
-                    shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(48.dp),
-                ) {
-                    Text(stringResource(R.string.fp_btn_cancel))
-                }
-
-                Button(
-                    onClick = {
-                        if (!isReasonValid) return@Button
-                        isSubmitting = true
-                        errorMessage = null
-                        scope.launch {
-                            val req = FalsePositiveRequest(
-                                sha256 = sha256,
-                                packageName = packageName,
-                                appName = appName,
-                                reason = reason.trim(),
-                                contactEmail = email.trim(),
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Android,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(24.dp),
                             )
-                            virusDetecService.submitFalsePositive(req)
-                                .onSuccess { res ->
-                                    isSubmitting = false
+                        }
+
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = appName.ifBlank { packageName },
+                                style = MaterialTheme.typography.titleSmall,
+                                fontWeight = FontWeight.Bold,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                            if (packageName.isNotBlank() && appName.isNotBlank()) {
+                                Text(
+                                    text = packageName,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                            if (sha256.isNotBlank()) {
+                                Text(
+                                    text = "SHA: ${sha256.take(16)}...",
+                                    style = MaterialTheme.typography.labelSmall.copy(fontFamily = FontFamily.Monospace),
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+
+                        if (sha256.isNotBlank()) {
+                            IconButton(
+                                onClick = {
+                                    val cm = context.getSystemService<ClipboardManager>()
+                                    cm?.setPrimaryClip(ClipData.newPlainText("SHA-256", sha256))
                                     Toast.makeText(
                                         context,
-                                        res.message.ifBlank { context.getString(R.string.fp_success_toast) },
-                                        Toast.LENGTH_LONG
+                                        context.getString(R.string.virustotal_detail_sha256_copied),
+                                        Toast.LENGTH_SHORT
                                     ).show()
-                                    dismissWithAnim()
-                                }
-                                .onFailure { err ->
-                                    isSubmitting = false
-                                    errorMessage = err.message ?: context.getString(R.string.fp_error_submit_failed)
-                                }
+                                },
+                                modifier = Modifier.size(36.dp),
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.ContentCopy,
+                                    contentDescription = stringResource(R.string.virustotal_detail_copy_sha256),
+                                    modifier = Modifier.size(18.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                // Quick Preset Reasons
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(
+                        text = stringResource(R.string.fp_quick_reason_header),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState()),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        QUICK_REASON_RES.forEach { resId ->
+                            val preset = stringResource(resId)
+                            FilterChip(
+                                selected = reason.contains(preset),
+                                onClick = {
+                                    reason = if (reason.isBlank()) {
+                                        preset
+                                    } else if (!reason.contains(preset)) {
+                                        "$reason. $preset"
+                                    } else {
+                                        reason
+                                    }
+                                    errorMessage = null
+                                },
+                                label = { Text(preset, style = MaterialTheme.typography.labelSmall) },
+                                shape = RoundedCornerShape(10.dp),
+                                colors = FilterChipDefaults.filterChipColors(
+                                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                                    labelColor = MaterialTheme.colorScheme.onSurface,
+                                ),
+                            )
+                        }
+                    }
+                }
+
+                Spacer(Modifier.height(12.dp))
+
+                // Reason Input Field
+                OutlinedTextField(
+                    value = reason,
+                    onValueChange = {
+                        reason = it
+                        errorMessage = null
+                    },
+                    label = { Text(stringResource(R.string.fp_reason_label)) },
+                    placeholder = { Text(stringResource(R.string.fp_reason_placeholder)) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Description,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    },
+                    isError = reason.isNotBlank() && !isReasonValid,
+                    supportingText = {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            if (reason.isNotBlank() && !isReasonValid) {
+                                Text(
+                                    text = stringResource(R.string.fp_reason_min_length_error),
+                                    color = MaterialTheme.colorScheme.error,
+                                )
+                            } else {
+                                Text("")
+                            }
+                            Text(stringResource(R.string.fp_reason_char_count, reason.trim().length))
                         }
                     },
-                    enabled = isReasonValid && !isSubmitting,
                     shape = RoundedCornerShape(14.dp),
-                    modifier = Modifier
-                        .weight(1.4f)
-                        .height(48.dp),
-                ) {
-                    if (isSubmitting) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        )
-                        Spacer(Modifier.width(8.dp))
-                    } else {
+                    modifier = Modifier.fillMaxWidth(),
+                    minLines = 3,
+                    maxLines = 5,
+                    enabled = !isSubmitting,
+                )
+
+                Spacer(Modifier.height(8.dp))
+
+                // Email Input Field
+                OutlinedTextField(
+                    value = email,
+                    onValueChange = { email = it },
+                    label = { Text(stringResource(R.string.fp_email_label)) },
+                    placeholder = { Text(stringResource(R.string.fp_email_placeholder)) },
+                    leadingIcon = {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Rounded.Send,
+                            imageVector = Icons.Rounded.Person,
                             contentDescription = null,
-                            modifier = Modifier.size(18.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(20.dp),
                         )
-                        Spacer(Modifier.width(8.dp))
+                    },
+                    singleLine = true,
+                    shape = RoundedCornerShape(14.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isSubmitting,
+                )
+
+                // Error Message Banner if submit failed
+                if (errorMessage != null) {
+                    Spacer(Modifier.height(10.dp))
+                    Surface(
+                        shape = RoundedCornerShape(10.dp),
+                        color = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f),
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(10.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.ErrorOutline,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(20.dp),
+                            )
+                            Text(
+                                text = errorMessage.orEmpty(),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onErrorContainer,
+                            )
+                        }
                     }
-                    Text(stringResource(R.string.fp_btn_submit))
+                }
+
+                Spacer(Modifier.height(16.dp))
+            }
+
+            // Pinned Bottom Action Bar
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surfaceContainerLow,
+                tonalElevation = 2.dp,
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding(),
+                ) {
+                    HorizontalDivider(
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f),
+                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        OutlinedButton(
+                            onClick = dismissWithAnim,
+                            enabled = !isSubmitting,
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(48.dp),
+                        ) {
+                            Text(stringResource(R.string.fp_btn_cancel))
+                        }
+
+                        Button(
+                            onClick = {
+                                if (!isReasonValid) return@Button
+                                isSubmitting = true
+                                errorMessage = null
+                                scope.launch {
+                                    val req = FalsePositiveRequest(
+                                        sha256 = sha256,
+                                        packageName = packageName,
+                                        appName = appName,
+                                        reason = reason.trim(),
+                                        contactEmail = email.trim(),
+                                    )
+                                    virusDetecService.submitFalsePositive(req)
+                                        .onSuccess { res ->
+                                            isSubmitting = false
+                                            Toast.makeText(
+                                                context,
+                                                res.message.ifBlank { context.getString(R.string.fp_success_toast) },
+                                                Toast.LENGTH_LONG
+                                            ).show()
+                                            dismissWithAnim()
+                                        }
+                                        .onFailure { err ->
+                                            isSubmitting = false
+                                            errorMessage = err.message ?: context.getString(R.string.fp_error_submit_failed)
+                                        }
+                                }
+                            },
+                            enabled = isReasonValid && !isSubmitting,
+                            shape = RoundedCornerShape(14.dp),
+                            modifier = Modifier
+                                .weight(1.4f)
+                                .height(48.dp),
+                        ) {
+                            if (isSubmitting) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(18.dp),
+                                    strokeWidth = 2.dp,
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                )
+                                Spacer(Modifier.width(8.dp))
+                            } else {
+                                Icon(
+                                    imageVector = Icons.AutoMirrored.Rounded.Send,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                                Spacer(Modifier.width(8.dp))
+                            }
+                            Text(stringResource(R.string.fp_btn_submit))
+                        }
+                    }
                 }
             }
         }
