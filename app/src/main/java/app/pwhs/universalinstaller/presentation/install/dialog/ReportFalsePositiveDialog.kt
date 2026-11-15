@@ -4,8 +4,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,7 +31,6 @@ import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -46,7 +43,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -60,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -68,14 +65,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
 import app.pwhs.core.domain.model.FalsePositiveRequest
 import app.pwhs.core.network.VirusDetecService
+import app.pwhs.universalinstaller.R
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-private val QUICK_REASONS = listOf(
-    "Mã nguồn mở chính thức",
-    "Tải từ trang chủ nhà phát triển",
-    "Bản mod an toàn không mã độc",
-    "Công cụ tiện ích hệ thống",
+private val QUICK_REASON_RES = listOf(
+    R.string.fp_preset_open_source,
+    R.string.fp_preset_official_site,
+    R.string.fp_preset_safe_mod,
+    R.string.fp_preset_utility_tool,
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -143,7 +141,7 @@ fun ReportFalsePositiveDialog(
             Spacer(Modifier.height(12.dp))
 
             Text(
-                text = "Báo cáo nhận diện nhầm",
+                text = stringResource(R.string.fp_sheet_title),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
@@ -152,7 +150,7 @@ fun ReportFalsePositiveDialog(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text = "Gửi khiếu nại nếu bạn tin rằng ứng dụng này an toàn và việc cảnh báo là do nhầm lẫn (False Positive).",
+                text = stringResource(R.string.fp_sheet_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center,
@@ -221,13 +219,17 @@ fun ReportFalsePositiveDialog(
                             onClick = {
                                 val cm = context.getSystemService<ClipboardManager>()
                                 cm?.setPrimaryClip(ClipData.newPlainText("SHA-256", sha256))
-                                Toast.makeText(context, "Đã sao chép SHA-256", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(
+                                    context,
+                                    context.getString(R.string.virustotal_detail_sha256_copied),
+                                    Toast.LENGTH_SHORT
+                                ).show()
                             },
                             modifier = Modifier.size(36.dp),
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.ContentCopy,
-                                contentDescription = "Sao chép SHA-256",
+                                contentDescription = stringResource(R.string.virustotal_detail_copy_sha256),
                                 modifier = Modifier.size(18.dp),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -244,7 +246,7 @@ fun ReportFalsePositiveDialog(
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Text(
-                    text = "Gợi ý lý do nhanh:",
+                    text = stringResource(R.string.fp_quick_reason_header),
                     style = MaterialTheme.typography.labelMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontWeight = FontWeight.SemiBold,
@@ -256,7 +258,8 @@ fun ReportFalsePositiveDialog(
                         .horizontalScroll(rememberScrollState()),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    QUICK_REASONS.forEach { preset ->
+                    QUICK_REASON_RES.forEach { resId ->
+                        val preset = stringResource(resId)
                         FilterChip(
                             selected = reason.contains(preset),
                             onClick = {
@@ -289,8 +292,8 @@ fun ReportFalsePositiveDialog(
                     reason = it
                     errorMessage = null
                 },
-                label = { Text("Lý do khiếu nại *") },
-                placeholder = { Text("Mô tả chi tiết tại sao APK này an toàn (tối thiểu 5 ký tự)...") },
+                label = { Text(stringResource(R.string.fp_reason_label)) },
+                placeholder = { Text(stringResource(R.string.fp_reason_placeholder)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.Description,
@@ -307,13 +310,13 @@ fun ReportFalsePositiveDialog(
                     ) {
                         if (reason.isNotBlank() && !isReasonValid) {
                             Text(
-                                text = "Cần tối thiểu 5 ký tự",
+                                text = stringResource(R.string.fp_reason_min_length_error),
                                 color = MaterialTheme.colorScheme.error,
                             )
                         } else {
                             Text("")
                         }
-                        Text("${reason.trim().length} ký tự")
+                        Text(stringResource(R.string.fp_reason_char_count, reason.trim().length))
                     }
                 },
                 shape = RoundedCornerShape(14.dp),
@@ -329,8 +332,8 @@ fun ReportFalsePositiveDialog(
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email liên hệ (Tùy chọn)") },
-                placeholder = { Text("name@example.com (để nhận kết quả duyệt)") },
+                label = { Text(stringResource(R.string.fp_email_label)) },
+                placeholder = { Text(stringResource(R.string.fp_email_placeholder)) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.Person,
@@ -388,7 +391,7 @@ fun ReportFalsePositiveDialog(
                         .weight(1f)
                         .height(48.dp),
                 ) {
-                    Text("Hủy")
+                    Text(stringResource(R.string.fp_btn_cancel))
                 }
 
                 Button(
@@ -409,14 +412,14 @@ fun ReportFalsePositiveDialog(
                                     isSubmitting = false
                                     Toast.makeText(
                                         context,
-                                        res.message.ifBlank { "Đã gửi báo cáo khiếu nại tới Quản trị viên!" },
+                                        res.message.ifBlank { context.getString(R.string.fp_success_toast) },
                                         Toast.LENGTH_LONG
                                     ).show()
                                     dismissWithAnim()
                                 }
                                 .onFailure { err ->
                                     isSubmitting = false
-                                    errorMessage = err.message ?: "Gửi báo cáo thất bại, vui lòng thử lại."
+                                    errorMessage = err.message ?: context.getString(R.string.fp_error_submit_failed)
                                 }
                         }
                     },
@@ -441,7 +444,7 @@ fun ReportFalsePositiveDialog(
                         )
                         Spacer(Modifier.width(8.dp))
                     }
-                    Text("Gửi khiếu nại")
+                    Text(stringResource(R.string.fp_btn_submit))
                 }
             }
         }

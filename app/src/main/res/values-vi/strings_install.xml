@@ -470,4 +470,25 @@
     <string name="porter_promo_action_open">Mở Porter</string>
     <string name="action_change_installer_engine">Đổi engine cài đặt</string>
     <string name="action_open_advanced_settings">Cài đặt nâng cao</string>
+
+    <!-- False Positive Dispute Sheet -->
+    <string name="fp_dispute_button_title">Báo cáo nhận diện nhầm (False Positive)</string>
+    <string name="fp_sheet_title">Báo cáo nhận diện nhầm</string>
+    <string name="fp_sheet_subtitle">Gửi khiếu nại nếu bạn tin rằng ứng dụng này an toàn và việc cảnh báo là do nhầm lẫn (False Positive).</string>
+    <string name="fp_quick_reason_header">Gợi ý lý do nhanh:</string>
+    <string name="fp_preset_open_source">Mã nguồn mở chính thức</string>
+    <string name="fp_preset_official_site">Tải từ trang chủ nhà phát triển</string>
+    <string name="fp_preset_safe_mod">Bản mod an toàn không mã độc</string>
+    <string name="fp_preset_utility_tool">Công cụ tiện ích hệ thống</string>
+    <string name="fp_reason_label">Lý do khiếu nại *</string>
+    <string name="fp_reason_placeholder">Mô tả chi tiết tại sao APK này an toàn (tối thiểu 5 ký tự)…</string>
+    <string name="fp_reason_min_length_error">Cần tối thiểu 5 ký tự</string>
+    <string name="fp_reason_char_count">%1$d ký tự</string>
+    <string name="fp_email_label">Email liên hệ (Tùy chọn)</string>
+    <string name="fp_email_placeholder">name@example.com (để nhận kết quả duyệt)</string>
+    <string name="fp_btn_cancel">Hủy</string>
+    <string name="fp_btn_submit">Gửi khiếu nại</string>
+    <string name="fp_success_toast">Đã gửi báo cáo khiếu nại tới Quản trị viên!</string>
+    <string name="fp_error_submit_failed">Gửi báo cáo thất bại, vui lòng thử lại.</string>
+    <string name="security_detail_sheet_title">Bảo mật &amp; Quét mã độc (AppShield)</string>
 </resources>

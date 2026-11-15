@@ -139,7 +139,7 @@ fun VirusTotalDetailSheet(
 
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Bảo mật & Quét mã độc (AppShield)",
+                        text = stringResource(R.string.security_detail_sheet_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onSurface,
@@ -400,7 +400,7 @@ fun VirusTotalDetailSheet(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = "Báo cáo nhận diện nhầm (False Positive)",
+                        text = stringResource(R.string.fp_dispute_button_title),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                     )

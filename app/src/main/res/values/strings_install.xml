@@ -470,4 +470,25 @@
     <string name="install_running_in_background">Installing in the background…</string>
     <string name="action_change_installer_engine">Change Installer Engine</string>
     <string name="action_open_advanced_settings">Advanced Settings</string>
+
+    <!-- False Positive Dispute Sheet -->
+    <string name="fp_dispute_button_title">Report False Positive</string>
+    <string name="fp_sheet_title">Report False Positive</string>
+    <string name="fp_sheet_subtitle">Submit a dispute report if you believe this app is safe and flagged by mistake.</string>
+    <string name="fp_quick_reason_header">Quick suggestions:</string>
+    <string name="fp_preset_open_source">Official open-source release</string>
+    <string name="fp_preset_official_site">Downloaded from official website</string>
+    <string name="fp_preset_safe_mod">Safe mod / Verified clean</string>
+    <string name="fp_preset_utility_tool">System utility / Developer tool</string>
+    <string name="fp_reason_label">Dispute reason *</string>
+    <string name="fp_reason_placeholder">Explain why this APK is safe (min 5 characters)…</string>
+    <string name="fp_reason_min_length_error">Minimum 5 characters required</string>
+    <string name="fp_reason_char_count">%1$d characters</string>
+    <string name="fp_email_label">Contact email (Optional)</string>
+    <string name="fp_email_placeholder">name@example.com (to receive review verdict)</string>
+    <string name="fp_btn_cancel">Cancel</string>
+    <string name="fp_btn_submit">Submit Dispute</string>
+    <string name="fp_success_toast">Dispute report submitted to administrator!</string>
+    <string name="fp_error_submit_failed">Failed to submit report. Please try again.</string>
+    <string name="security_detail_sheet_title">Security &amp; Malware Scan (AppShield)</string>
 </resources>
