@@ -139,6 +139,17 @@ class ApkInstaller(private val context: Context) {
                     entry = zip.nextEntry
                 }
             }
+
+            if (entries.isEmpty()) {
+                val inspection = ZipPackageInspector.inspect(context, bundle)
+                if (inspection.hasRootManifest) {
+                    openInput(bundle).use { input ->
+                        writeEntry(session, "base.apk", input, -1L, progress)
+                    }
+                    return
+                }
+            }
+
             require(entries.isNotEmpty()) { "No APK entries found in bundle" }
 
             val baseIndex = entries.indexOfFirst { it.first.equals("base.apk", ignoreCase = true) }

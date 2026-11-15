@@ -20,6 +20,17 @@ object BaseApkExtractor {
         val file = File(apkPath)
         if (!file.name.isBundleFileName()) return Extracted(apkPath, temp = null)
 
+        val ext = file.extension.lowercase()
+        if (ext == "zip") {
+            val inspection = ZipPackageInspector.inspect(file)
+            if (inspection.type is ZipPackageType.SingleApk) {
+                return Extracted(apkPath, temp = null)
+            }
+            if (inspection.type is ZipPackageType.NotAPackage) {
+                return null
+            }
+        }
+
         return runCatching {
             val apks = ZippedApkSplits.getApksForUri(Uri.fromFile(file), context)
             val baseUri = try {

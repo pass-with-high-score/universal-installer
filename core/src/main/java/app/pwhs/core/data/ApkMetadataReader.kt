@@ -6,6 +6,8 @@ import android.net.Uri
 import android.os.Build
 import androidx.core.graphics.drawable.toBitmap
 import app.pwhs.core.domain.PackageMetadata
+import app.pwhs.core.install.ZipPackageInspector
+import app.pwhs.core.install.ZipPackageType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import ru.solrudev.ackpine.splits.Apk
@@ -19,6 +21,13 @@ import java.io.File
 class ApkMetadataReader(private val context: Context) {
 
     suspend fun readMetadata(uri: Uri, isBundle: Boolean): PackageMetadata? = withContext(Dispatchers.IO) {
+        val inspection = ZipPackageInspector.inspect(context, uri)
+        if (inspection.type is ZipPackageType.SingleApk) {
+            return@withContext readSingleApkMetadata(uri, isBundle = false)
+        }
+        if (inspection.type is ZipPackageType.NotAPackage && isBundle) {
+            return@withContext null
+        }
         if (isBundle) {
             readBundleMetadata(uri)
         } else {

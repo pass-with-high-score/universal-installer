@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.sync
 
 import android.content.Context
 import android.os.Environment
+import app.pwhs.core.install.ZipPackageInspector
 import fi.iki.elonen.NanoHTTPD
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -155,6 +156,15 @@ class ApkHttpServer(
                     Response.Status.BAD_REQUEST,
                     MIME_PLAINTEXT,
                     "Unsupported file format. Please upload APK, APKS, XAPK, APKM, or ZIP."
+                )
+            }
+
+            if (ext == "zip" && !ZipPackageInspector.isZipPackage(savedFile)) {
+                savedFile.delete()
+                return newFixedLengthResponse(
+                    Response.Status.BAD_REQUEST,
+                    MIME_PLAINTEXT,
+                    "ZIP archive does not contain an Android package (no AndroidManifest.xml or APK entries found)."
                 )
             }
 

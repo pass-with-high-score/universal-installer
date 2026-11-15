@@ -442,25 +442,11 @@ private fun InstallUi(
                     ).show()
                 } else {
                     Timber.d("Selected file: $uri, MIME type: $mimeType, strict: $strictPickerMode")
-                    val isApkMime = mimeType == "application/vnd.android.package-archive"
-                    val apks = when {
-                        (isApkMime || extension == "apk") -> SingletonApkSequence(
-                            uri,
-                            context
-                        ).toSplitPackage()
-
-                        extension in listOf("apks", "xapk", "apkm", "apk+", "zip") -> ZippedApkSplits.getApksForUri(
-                            uri,
-                            context
-                        )
-                            .validate()
-                            .toSplitPackage()
-                            .filterCompatible(context)
-
-                        else -> {
-                            SingletonApkSequence(uri, context).toSplitPackage()
-                        }
-                    }
+                    val apks = app.pwhs.universalinstaller.presentation.install.util.InstallApkSplitsHelper.buildSplitProvider(
+                        context,
+                        uri,
+                        extension
+                    )
                     app.pwhs.core.telemetry.AnalyticsHelper.logFilePicked(extension, 1, app.pwhs.core.telemetry.TelemetryEvents.SOURCE_SYSTEM_FILE_PICKER)
                     onFilePicked(uri, apks, displayName)
                 }
@@ -573,14 +559,11 @@ private fun InstallUi(
                 return@LaunchedEffect
             }
             val effectiveExt = if (extension in validExtensions) extension else "apk"
-            val apks = when {
-                (isApkMime || effectiveExt == "apk") -> SingletonApkSequence(uri, context).toSplitPackage()
-                effectiveExt in listOf("apks", "xapk", "apkm", "apk+", "zip") -> ZippedApkSplits.getApksForUri(uri, context)
-                    .validate()
-                    .toSplitPackage()
-                    .filterCompatible(context)
-                else -> SingletonApkSequence(uri, context).toSplitPackage()
-            }
+            val apks = app.pwhs.universalinstaller.presentation.install.util.InstallApkSplitsHelper.buildSplitProvider(
+                context,
+                uri,
+                effectiveExt
+            )
             app.pwhs.core.telemetry.AnalyticsHelper.logFilePicked(extension, 1, app.pwhs.core.telemetry.TelemetryEvents.SOURCE_EXTERNAL_INTENT)
             onFilePicked(uri, apks, displayName)
         } catch (e: Exception) {

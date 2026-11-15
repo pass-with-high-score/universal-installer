@@ -136,7 +136,8 @@ class InstallParseDelegate(
                 )
 
                 if (result.info.packageName.isEmpty() ||
-                    (result.info.packageName == "Unknown" && result.splitUris.isNullOrEmpty() && result.info.versionCode == 0L)
+                    result.info.packageName == "Unknown" ||
+                    (result.splitUris.isNullOrEmpty() && result.info.versionCode == 0L)
                 ) {
                     _isLoading.value = false
                     _pendingApkInfo.value = null

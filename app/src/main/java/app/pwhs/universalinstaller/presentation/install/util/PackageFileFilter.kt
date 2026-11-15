@@ -2,6 +2,7 @@ package app.pwhs.universalinstaller.presentation.install.util
 
 import android.content.Context
 import android.net.Uri
+import app.pwhs.core.install.ZipPackageInspector
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import timber.log.Timber
 import java.io.File
@@ -78,10 +79,21 @@ object PackageFileFilter {
         }
 
         val hasValidExt = ext in SUPPORTED_PACKAGE_EXTENSIONS
-        val hasApkMime = mimeType == "application/vnd.android.package-archive" ||
+        val isZipFormat = ext == "zip" ||
                 mimeType == "application/zip" ||
                 mimeType == "application/x-zip-compressed" ||
-                mimeType == "application/x-zip" ||
+                mimeType == "application/x-zip"
+
+        if (isZipFormat) {
+            val isPkg = ZipPackageInspector.isZipPackage(context, uri)
+            if (!isPkg) {
+                Timber.w("Rejecting non-package ZIP archive: %s", resolvedName)
+                return false
+            }
+            return true
+        }
+
+        val hasApkMime = mimeType == "application/vnd.android.package-archive" ||
                 mimeType == "application/octet-stream"
 
         // Validate ZIP magic bytes (PK\x03\x04 or 0x50, 0x4B)
@@ -107,6 +119,10 @@ object PackageFileFilter {
 
         if (ext.isNotEmpty() && ext in KNOWN_NON_PACKAGE_EXTENSIONS) {
             return false
+        }
+
+        if (ext == "zip") {
+            return ZipPackageInspector.isZipPackage(file)
         }
 
         val hasValidExt = ext in SUPPORTED_PACKAGE_EXTENSIONS

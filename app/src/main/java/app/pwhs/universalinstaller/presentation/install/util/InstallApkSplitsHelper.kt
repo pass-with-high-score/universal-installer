@@ -5,10 +5,13 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.OpenableColumns
+import app.pwhs.core.install.ZipPackageInspector
+import app.pwhs.core.install.ZipPackageType
 import app.pwhs.core.util.WatchAppCheck
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.domain.model.SplitEntry
 import app.pwhs.universalinstaller.domain.model.SplitType
+import app.pwhs.universalinstaller.presentation.install.EmptySplitSequence
 import app.pwhs.universalinstaller.presentation.install.SingletonApkSequence
 import app.pwhs.universalinstaller.util.SignatureCheck
 import kotlinx.coroutines.Dispatchers
@@ -46,7 +49,18 @@ object InstallApkSplitsHelper {
                     context.contentResolver.getType(uri)?.lowercase() ==
                     "application/vnd.android.package-archive" ->
                 SingletonApkSequence(uri, context).toSplitPackage()
-            ext in listOf("apks", "xapk", "apkm", "zip") ->
+            ext == "zip" -> {
+                val inspection = ZipPackageInspector.inspect(context, uri)
+                when (inspection.type) {
+                    is ZipPackageType.SingleApk -> SingletonApkSequence(uri, context).toSplitPackage()
+                    is ZipPackageType.SplitBundle -> ZippedApkSplits.getApksForUri(uri, context)
+                        .validate()
+                        .toSplitPackage()
+                        .filterCompatible(context)
+                    is ZipPackageType.NotAPackage -> EmptySplitSequence().toSplitPackage()
+                }
+            }
+            ext in listOf("apks", "xapk", "apkm") ->
                 ZippedApkSplits.getApksForUri(uri, context)
                     .validate()
                     .toSplitPackage()
@@ -87,9 +101,38 @@ object InstallApkSplitsHelper {
             0L
         }
 
-        var ackpinePackageName = ""
-        var ackpineVersionName = ""
-        var ackpineVersionCode = 0L
+        val zipInspection = if (extension == "zip") {
+            ZipPackageInspector.inspect(context, originalUri)
+        } else null
+
+        if (zipInspection != null && !zipInspection.isInstallable) {
+            Timber.w("ZIP file is not an installable package: %s", fileName)
+            return ApkInfo(
+                appName = fileName.substringBeforeLast('.'),
+                packageName = "",
+                versionName = "",
+                versionCode = 0L,
+                icon = null,
+                minSdkVersion = 0,
+                targetSdkVersion = 0,
+                fileSizeBytes = fileSize,
+                permissions = emptyList(),
+                splitCount = 0,
+                fileFormat = "ZIP Archive",
+                supportedAbis = emptyList(),
+                certSha256 = "",
+                splitEntries = emptyList(),
+                signatureMismatch = null,
+                isBlocked = isBlocked,
+                isAndroidAutoSupported = false,
+                isWearOsSupported = false,
+                trackers = emptyList(),
+            )
+        }
+
+        var ackpinePackageName = zipInspection?.manifestPackageName ?: ""
+        var ackpineVersionName = zipInspection?.manifestVersionName ?: ""
+        var ackpineVersionCode = zipInspection?.manifestVersionCode ?: 0L
         var ackpineSize = 0L
         var splitCount = 0
         var baseApkUri: Uri? = null
@@ -114,17 +157,15 @@ object InstallApkSplitsHelper {
                 }
             }
             splitCount = entries.size
-            if (entries.isEmpty()) {
-                Timber.w("SplitPackage enumerated 0 entries for $originalUri (fileName=$fileName ext=$extension) — adding fallback base APK entry")
+            if (entries.isEmpty() && baseApkUri != null) {
                 splitEntries.add(
                     SplitEntry(
-                        name = "Base APK (Unparsed)",
+                        name = "Base APK",
                         type = SplitType.Base,
-                        uri = originalUri,
+                        uri = baseApkUri,
                         sizeBytes = fileSize.coerceAtLeast(0L),
                     )
                 )
-                baseApkUri = originalUri
             }
 
             for (entry in entries) {
@@ -331,7 +372,7 @@ object InstallApkSplitsHelper {
 
         return ApkInfo(
             appName = appName,
-            packageName = ackpinePackageName.ifEmpty { "Unknown" },
+            packageName = ackpinePackageName,
             versionName = ackpineVersionName,
             versionCode = ackpineVersionCode,
             icon = icon,

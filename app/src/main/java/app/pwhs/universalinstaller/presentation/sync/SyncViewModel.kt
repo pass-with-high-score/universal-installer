@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.install.ZipPackageInspector
 import app.pwhs.universalinstaller.presentation.install.DialogInstallActivity
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.SyncOptions
@@ -182,6 +183,10 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
                     val displayName = getDisplayName(uri)
                     val ext = displayName.substringAfterLast('.', "").lowercase()
                     if (ext !in validExtensions && !displayName.endsWith(".apk+", true)) {
+                        skippedCount++
+                        return@forEach
+                    }
+                    if (ext == "zip" && !ZipPackageInspector.isZipPackage(app, uri)) {
                         skippedCount++
                         return@forEach
                     }

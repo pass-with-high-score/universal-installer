@@ -117,6 +117,18 @@ class RootInstaller(private val context: Context) {
                         entry = zip.nextEntry
                     }
                 }
+
+                if (tempFiles.isEmpty()) {
+                    val inspection = ZipPackageInspector.inspect(context, uri)
+                    if (inspection.hasRootManifest) {
+                        val baseFile = File(dir, "base.apk")
+                        openInput(uri).use { input ->
+                            baseFile.outputStream().use { input.copyTo(it) }
+                        }
+                        return listOf(baseFile)
+                    }
+                }
+
                 require(tempFiles.isNotEmpty()) { "No APK found in archive" }
 
                 val baseIndex = tempFiles.indexOfFirst { it.first.equals("base.apk", ignoreCase = true) }
