@@ -8,6 +8,7 @@ import app.pwhs.core.billing.BillingPurchaseResult
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.network.VirusTotalQuotaStore
 import app.pwhs.universalinstaller.domain.stats.UserStatsTracker
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
@@ -67,7 +68,10 @@ private class PlayBillingManager(
     init {
         scope.launch {
             context.dataStore.data.collectLatest { prefs ->
-                _isProUser.value = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+                val isPurchasedPro = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+                val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
+                val isTrial = trialExp > VirusTotalQuotaStore.currentTrueTimeMillis()
+                _isProUser.value = isPurchasedPro || isTrial
             }
         }
         startConnection()

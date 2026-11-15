@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -76,6 +77,15 @@ object SharedPrefsKeys {
 
     /** Whether the user has unlocked Universal Installer Pro (unlimited built-in VirusTotal). */
     val IS_PRO_USER = booleanPreferencesKey("is_pro_user")
+
+    /** Whether the 3-day new user Pro trial has already been claimed on this device. */
+    val NEW_USER_TRIAL_CLAIMED = booleanPreferencesKey("new_user_trial_claimed")
+
+    /** Timestamp in ms when temporary Pro trial expires. 0 or absent if no trial active. */
+    val PRO_TRIAL_EXPIRATION_TIMESTAMP = longPreferencesKey("pro_trial_expiration_timestamp")
+
+    /** Set of milestone IDs that have already granted their Pro trial hours. */
+    val PRO_TRIAL_CLAIMED_MILESTONES = stringSetPreferencesKey("pro_trial_claimed_milestones")
 
     /**
      * Whether the Play build may report anonymous install statistics and crashes. Absent means

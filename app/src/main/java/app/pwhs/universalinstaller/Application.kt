@@ -136,6 +136,7 @@ class App : Application(), SingletonImageLoader.Factory {
             ReviewGate.rememberFirstLaunch(this@App)
             BackendSelfHeal.runOnce(this@App, backendFactory)
             app.pwhs.universalinstaller.domain.scanner.DexTrackerScanner.getOrLoadRules(this@App)
+            app.pwhs.universalinstaller.domain.pro.ProTrialManager.checkAndGrantNewUserTrial(this@App)
         }
     }
 

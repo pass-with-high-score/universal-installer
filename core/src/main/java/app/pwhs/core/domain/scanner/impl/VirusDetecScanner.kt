@@ -55,6 +55,8 @@ class VirusDetecScanner(
         return try {
             val prefs = context.dataStore.data.first()
             if (prefs[SharedPrefsKeys.IS_PRO_USER] == true) return true
+            val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
+            if (trialExp > VirusTotalQuotaStore.currentTrueTimeMillis()) return true
             val hashes = VirusTotalQuotaStore.parseAppShieldHashesToday(prefs)
             val normalized = sha256.trim().lowercase(Locale.US)
             if (normalized.isNotBlank() && normalized in hashes) true

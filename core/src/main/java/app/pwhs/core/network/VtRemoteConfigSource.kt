@@ -17,6 +17,10 @@ interface VtRemoteConfigSource {
     fun isFallbackEnabled(): Boolean
     fun getRawKeys(): String
     fun getDailyLimit(): Int
+    fun isNewUserProTrialEnabled(): Boolean = true
+    fun getNewUserProTrialDays(): Int = 3
+    fun isMilestoneProTrialEnabled(): Boolean = true
+    fun getMilestoneProTrialHours(): Int = 24
 }
 
 object NoOpVtRemoteConfigSource : VtRemoteConfigSource {
@@ -24,4 +28,8 @@ object NoOpVtRemoteConfigSource : VtRemoteConfigSource {
     override fun isFallbackEnabled(): Boolean = false
     override fun getRawKeys(): String = ""
     override fun getDailyLimit(): Int = 0
+    override fun isNewUserProTrialEnabled(): Boolean = false
+    override fun getNewUserProTrialDays(): Int = 0
+    override fun isMilestoneProTrialEnabled(): Boolean = false
+    override fun getMilestoneProTrialHours(): Int = 0
 }

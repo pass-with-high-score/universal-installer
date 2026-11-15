@@ -20,7 +20,16 @@ object VirusTotalKeyManager {
     const val RC_KEY_FALLBACK_ENABLED = "virustotal_fallback_enabled"
     const val RC_KEY_FALLBACK_KEYS = "virustotal_fallback_keys"
     const val RC_KEY_TRIAL_DAILY_LIMIT = "virustotal_trial_daily_limit"
+    const val RC_KEY_NEW_USER_PRO_TRIAL_ENABLED = "new_user_pro_trial_enabled"
+    const val RC_KEY_NEW_USER_PRO_TRIAL_DAYS = "new_user_pro_trial_days"
+    const val RC_KEY_MILESTONE_PRO_TRIAL_ENABLED = "milestone_pro_trial_enabled"
+    const val RC_KEY_MILESTONE_PRO_TRIAL_HOURS = "milestone_pro_trial_hours"
     const val DEFAULT_TRIAL_DAILY_LIMIT = 3
+
+    fun isNewUserProTrialEnabled(): Boolean = remoteSource.isNewUserProTrialEnabled()
+    fun getNewUserProTrialDays(): Int = remoteSource.getNewUserProTrialDays()
+    fun isMilestoneProTrialEnabled(): Boolean = remoteSource.isMilestoneProTrialEnabled()
+    fun getMilestoneProTrialHours(): Int = remoteSource.getMilestoneProTrialHours()
 
     private val VT_KEY_REGEX = Regex("""\b[0-9a-fA-F]{64}\b""")
     internal const val RATE_LIMIT_COOLDOWN_MS = 65_000L
@@ -82,7 +91,9 @@ object VirusTotalKeyManager {
     suspend fun isProUser(context: Context): Boolean {
         return try {
             val prefs = context.dataStore.data.first()
-            prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+            if (prefs[SharedPrefsKeys.IS_PRO_USER] == true) return true
+            val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
+            trialExp > VirusTotalQuotaStore.currentTrueTimeMillis()
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
@@ -93,7 +104,9 @@ object VirusTotalKeyManager {
     fun observeQuotaStatus(context: Context): Flow<VtQuotaStatus> {
         return context.dataStore.data.map { prefs ->
             val hasPersonalKey = !prefs[SharedPrefsKeys.VIRUSTOTAL_API_KEY]?.trim().isNullOrBlank()
-            val isPro = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+            val isPurchasedPro = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+            val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
+            val isPro = isPurchasedPro || (trialExp > VirusTotalQuotaStore.currentTrueTimeMillis())
             val usedToday = VirusTotalQuotaStore.parseAppShieldHashesToday(prefs).size
             val poolNonEmpty = parseKeyPool(remoteSource.getRawKeys()).isNotEmpty()
             val fallbackActive = remoteSource.isFallbackEnabled() && poolNonEmpty

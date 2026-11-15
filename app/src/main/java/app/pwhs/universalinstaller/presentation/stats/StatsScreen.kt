@@ -31,14 +31,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import app.pwhs.core.telemetry.AnalyticsHelper
+import app.pwhs.core.util.InstallationSourceHelper
+import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.stats.components.ActivityTimelineCard
 import app.pwhs.universalinstaller.presentation.stats.components.InstallUninstallOverviewCard
@@ -58,14 +62,20 @@ fun StatsScreen(
     val summary by viewModel.summary.collectAsState()
     val selectedDays by viewModel.selectedPeriodDays.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
-    var activeTab by rememberSaveable { mutableIntStateOf(initialTab) }
+    val context = LocalContext.current
+    val isStoreUser = remember(context) {
+        InstallationSourceHelper.isInstalledFromStore(context, isStoreFlavor = BuildConfig.FLAVOR == "play")
+    }
+    var activeTab by rememberSaveable { mutableIntStateOf(if (isStoreUser) initialTab else 0) }
 
-    LaunchedEffect(Unit) {
-        if (initialTab == 1) {
-            AnalyticsHelper.logStatsTabChanged("milestones")
+    LaunchedEffect(isStoreUser) {
+        if (isStoreUser) {
+            if (initialTab == 1) {
+                AnalyticsHelper.logStatsTabChanged("milestones")
+            }
+            delay(2_500L)
+            viewModel.markMilestonesSeen()
         }
-        delay(2_500L)
-        viewModel.markMilestonesSeen()
     }
 
     Scaffold(
@@ -93,72 +103,74 @@ fun StatsScreen(
             ),
             verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
-            item(key = "rank_banner") {
-                UserRankBannerCard(
-                    summary = summary,
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .animateItem(),
-                )
-            }
+            if (isStoreUser) {
+                item(key = "rank_banner") {
+                    UserRankBannerCard(
+                        summary = summary,
+                        modifier = Modifier
+                            .padding(horizontal = 16.dp)
+                            .animateItem(),
+                    )
+                }
 
-            item(key = "tab_selector") {
-                SingleChoiceSegmentedButtonRow(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .animateItem(),
-                ) {
-                    SegmentedButton(
-                        selected = activeTab == 0,
-                        onClick = {
-                            if (activeTab != 0) {
-                                activeTab = 0
-                                AnalyticsHelper.logStatsTabChanged("overview")
-                            }
-                        },
-                        shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Rounded.QueryStats,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
-                            )
-                        },
+                item(key = "tab_selector") {
+                    SingleChoiceSegmentedButtonRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                            .animateItem(),
                     ) {
-                        Text(
-                            text = stringResource(R.string.stats_tab_overview),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
-                    }
-                    SegmentedButton(
-                        selected = activeTab == 1,
-                        onClick = {
-                            if (activeTab != 1) {
-                                activeTab = 1
-                                AnalyticsHelper.logStatsTabChanged("milestones")
-                            }
-                        },
-                        shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
-                        icon = {
-                            Icon(
-                                imageVector = Icons.Rounded.EmojiEvents,
-                                contentDescription = null,
-                                modifier = Modifier.size(18.dp),
+                        SegmentedButton(
+                            selected = activeTab == 0,
+                            onClick = {
+                                if (activeTab != 0) {
+                                    activeTab = 0
+                                    AnalyticsHelper.logStatsTabChanged("overview")
+                                }
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.QueryStats,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            },
+                        ) {
+                            Text(
+                                text = stringResource(R.string.stats_tab_overview),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
                             )
-                        },
-                    ) {
-                        Text(
-                            text = "${stringResource(R.string.stats_tab_milestones)} (${summary.unlockedCount}/${summary.totalMilestones})",
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                        )
+                        }
+                        SegmentedButton(
+                            selected = activeTab == 1,
+                            onClick = {
+                                if (activeTab != 1) {
+                                    activeTab = 1
+                                    AnalyticsHelper.logStatsTabChanged("milestones")
+                                }
+                            },
+                            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Rounded.EmojiEvents,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            },
+                        ) {
+                            Text(
+                                text = "${stringResource(R.string.stats_tab_milestones)} (${summary.unlockedCount}/${summary.totalMilestones})",
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                            )
+                        }
                     }
                 }
             }
 
-            if (activeTab == 0) {
+            if (!isStoreUser || activeTab == 0) {
                 item(key = "install_uninstall_card") {
                     InstallUninstallOverviewCard(
                         summary = summary,

@@ -35,6 +35,10 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
                     VirusTotalKeyManager.RC_KEY_FALLBACK_ENABLED to true,
                     VirusTotalKeyManager.RC_KEY_FALLBACK_KEYS to "",
                     VirusTotalKeyManager.RC_KEY_TRIAL_DAILY_LIMIT to VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT.toLong(),
+                    VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED to true,
+                    VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_DAYS to 3L,
+                    VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_ENABLED to true,
+                    VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_HOURS to 24L,
                 )
             )
             rc.fetchAndActivate().addOnCompleteListener {
@@ -75,5 +79,29 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
             remoteConfig?.getLong(VirusTotalKeyManager.RC_KEY_TRIAL_DAILY_LIMIT)?.toInt()
                 ?: VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT
         }.getOrDefault(VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT)
+    }
+
+    override fun isNewUserProTrialEnabled(): Boolean {
+        return runCatching {
+            remoteConfig?.getBoolean(VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED) ?: true
+        }.getOrDefault(true)
+    }
+
+    override fun getNewUserProTrialDays(): Int {
+        return runCatching {
+            remoteConfig?.getLong(VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_DAYS)?.toInt()?.takeIf { it > 0 } ?: 3
+        }.getOrDefault(3)
+    }
+
+    override fun isMilestoneProTrialEnabled(): Boolean {
+        return runCatching {
+            remoteConfig?.getBoolean(VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_ENABLED) ?: true
+        }.getOrDefault(true)
+    }
+
+    override fun getMilestoneProTrialHours(): Int {
+        return runCatching {
+            remoteConfig?.getLong(VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_HOURS)?.toInt()?.takeIf { it > 0 } ?: 24
+        }.getOrDefault(24)
     }
 }

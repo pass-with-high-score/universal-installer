@@ -445,6 +445,9 @@ object UserStatsTracker {
         }
 
         if (emitPopup) {
+            if (newlyUnlocked.isNotEmpty()) {
+                app.pwhs.universalinstaller.domain.pro.ProTrialManager.grantMilestoneTrial(context, newlyUnlocked)
+            }
             newlyUnlocked.forEach { milestone ->
                 _milestoneEvents.tryEmit(milestone)
                 app.pwhs.core.telemetry.AnalyticsHelper.logMilestoneUnlocked(milestone.name, milestone.category.name)
