@@ -15,12 +15,13 @@ import java.util.Locale
 
 object VirusTotalKeyManager {
 
-    const val RC_KEY_TRIAL_DAILY_LIMIT = "virustotal_trial_daily_limit"
+    const val RC_KEY_APPSHIELD_DAILY_LIMIT = "appshield_daily_free_limit"
     const val RC_KEY_NEW_USER_PRO_TRIAL_ENABLED = "new_user_pro_trial_enabled"
     const val RC_KEY_NEW_USER_PRO_TRIAL_DAYS = "new_user_pro_trial_days"
     const val RC_KEY_MILESTONE_PRO_TRIAL_ENABLED = "milestone_pro_trial_enabled"
     const val RC_KEY_MILESTONE_PRO_TRIAL_HOURS = "milestone_pro_trial_hours"
-    const val DEFAULT_TRIAL_DAILY_LIMIT = 3
+    const val DEFAULT_APPSHIELD_DAILY_LIMIT = 3
+    const val DEFAULT_TRIAL_DAILY_LIMIT = DEFAULT_APPSHIELD_DAILY_LIMIT
 
     fun isNewUserProTrialEnabled(): Boolean = remoteSource.isNewUserProTrialEnabled()
     fun getNewUserProTrialDays(): Int = remoteSource.getNewUserProTrialDays()

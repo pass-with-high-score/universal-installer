@@ -12,7 +12,7 @@ Tài liệu này tổng hợp chiến lược định giá, bài toán quota Vir
 | :--- | :--- | :--- | :--- |
 | **Chi phí** | **Miễn phí** | **Miễn phí 100%** | **Trả phí (Mua 1 lần hoặc Thuê bao)** |
 | **Cấu hình** | Không cần cấu hình | Tự đăng ký VirusTotal & dán API key 64 ký tự | **Tự động 100%**, không cần tạo tài khoản VT |
-| **Quota mỗi ngày** | **3 APK / ngày** (điều chỉnh qua Remote Config `virustotal_trial_daily_limit`) | **Unlimited** (500 req/ngày theo quota key cá nhân của user) | **Unlimited** (dùng pool 10–20 key tốc độ cao của hệ thống, tự động xoay vòng né lỗi 429) |
+| **Quota mỗi ngày** | **3 APK / ngày** (điều chỉnh qua Remote Config `appshield_daily_free_limit`) | **Unlimited** (500 req/ngày theo quota key cá nhân của user) | **Unlimited** (dùng pool 10–20 key tốc độ cao của hệ thống, tự động xoay vòng né lỗi 429) |
 | **Đối tượng phù hợp** | Người dùng cài 1–2 APK/ngày | Dân công nghệ, vọc sĩ sẵn sàng tạo key | Người dùng muốn sự tiện lợi tức thì + ủng hộ nhà phát triển |
 
 ---

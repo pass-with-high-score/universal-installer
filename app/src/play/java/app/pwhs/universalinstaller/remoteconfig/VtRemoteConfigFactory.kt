@@ -32,7 +32,7 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
             rc.setConfigSettingsAsync(settings)
             rc.setDefaultsAsync(
                 mapOf(
-                    VirusTotalKeyManager.RC_KEY_TRIAL_DAILY_LIMIT to VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT.toLong(),
+                    VirusTotalKeyManager.RC_KEY_APPSHIELD_DAILY_LIMIT to VirusTotalKeyManager.DEFAULT_APPSHIELD_DAILY_LIMIT.toLong(),
                     VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED to true,
                     VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_DAYS to 3L,
                     VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_ENABLED to true,
@@ -62,9 +62,9 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
 
     override fun getDailyLimit(): Int {
         return runCatching {
-            remoteConfig?.getLong(VirusTotalKeyManager.RC_KEY_TRIAL_DAILY_LIMIT)?.toInt()
-                ?: VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT
-        }.getOrDefault(VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT)
+            remoteConfig?.getLong(VirusTotalKeyManager.RC_KEY_APPSHIELD_DAILY_LIMIT)?.toInt()
+                ?: VirusTotalKeyManager.DEFAULT_APPSHIELD_DAILY_LIMIT
+        }.getOrDefault(VirusTotalKeyManager.DEFAULT_APPSHIELD_DAILY_LIMIT)
     }
 
     override fun isNewUserProTrialEnabled(): Boolean {

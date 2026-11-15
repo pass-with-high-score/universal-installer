@@ -60,7 +60,7 @@ class VirusDetecScanner(
             val hashes = VirusTotalQuotaStore.parseAppShieldHashesToday(prefs)
             val normalized = sha256.trim().lowercase(Locale.US)
             if (normalized.isNotBlank() && normalized in hashes) true
-            else hashes.size < VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT
+            else hashes.size < VirusTotalKeyManager.DEFAULT_APPSHIELD_DAILY_LIMIT
         } catch (e: CancellationException) {
             throw e
         } catch (_: Exception) {
