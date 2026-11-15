@@ -38,22 +38,22 @@ internal fun LazyListScope.AdvancedSection(
         ) {
             SearchableItem(
                 q,
-                "Quét bảo mật APK (AppShield / VirusTotal)",
+                stringResource(R.string.setting_advanced_security_title),
                 "appshield virusdetec virustotal scan malware security bao mat ma doc nguy hiem api key fallback",
             ) {
                 ListItem(
                     headlineContent = {
                         Text(
-                            text = "Quét bảo mật APK",
+                            text = stringResource(R.string.setting_advanced_security_title),
                             style = MaterialTheme.typography.bodyLarge,
                         )
                     },
                     supportingContent = {
                         Text(
                             text = if (securityScanDisabled) {
-                                "Đã tắt quét bảo mật"
+                                stringResource(R.string.setting_advanced_security_desc_disabled)
                             } else {
-                                "Cấu hình bộ quét chính, dự phòng và khóa API"
+                                stringResource(R.string.setting_advanced_security_desc_enabled)
                             },
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,

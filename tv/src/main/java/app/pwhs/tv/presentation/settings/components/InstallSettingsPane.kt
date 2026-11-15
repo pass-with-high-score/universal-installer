@@ -104,7 +104,7 @@ fun InstallSettingsPane(
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text(
-            "Installation Backends & Permissions",
+            stringResource(R.string.tv_settings_section_backends),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -179,7 +179,7 @@ fun InstallSettingsPane(
         // 4. Auto Delete APK Row
         TvSettingSwitchRow(
             title = stringResource(R.string.tv_settings_delete_apk_title),
-            subtitle = "Automatically clean up APK files after successful installation",
+            subtitle = stringResource(if (deleteApkEnabled) R.string.tv_settings_delete_apk_on else R.string.tv_settings_delete_apk_off),
             icon = Icons.Default.Delete,
             checked = deleteApkEnabled,
             onCheckedChange = { checked ->
@@ -191,8 +191,8 @@ fun InstallSettingsPane(
 
         // 5. Advanced Flags
         TvSettingRow(
-            title = "Advanced Install Options",
-            subtitle = "Configure replacement, downgrade, and user permission flags",
+            title = stringResource(R.string.tv_settings_install_options_title),
+            subtitle = stringResource(R.string.tv_settings_install_options_desc),
             icon = Icons.Default.Tune,
             onClick = onOpenInstallOptions,
             trailingContent = {
@@ -208,7 +208,7 @@ fun InstallSettingsPane(
 
         // ── Security Section ───────────────────────────────────────────────
         Text(
-            "Bảo mật AppShield",
+            stringResource(R.string.tv_settings_section_virustotal),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
@@ -216,8 +216,8 @@ fun InstallSettingsPane(
 
         // VirusDetec Scanner Enable/Disable Switch
         TvSettingSwitchRow(
-            title = "Quét bảo mật APK tự động",
-            subtitle = "Tự động phân tích chữ ký, mã độc và hành vi bất thường",
+            title = stringResource(R.string.tv_settings_virustotal_enable_title),
+            subtitle = stringResource(R.string.tv_settings_virustotal_enable_desc),
             icon = Icons.Default.Security,
             checked = !disableVirusTotal,
             badgeText = if (!disableVirusTotal) "ACTIVE" else null,

@@ -46,6 +46,7 @@ import androidx.core.content.getSystemService
 import androidx.datastore.preferences.core.edit
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingActivity
 import kotlinx.coroutines.launch
 
@@ -91,7 +92,7 @@ fun SecurityQuotaUnlockSheet(
         ) {
             if (!isEnteringKey) {
                 Text(
-                    text = "Giới hạn quét AppShield",
+                    text = stringResource(R.string.quota_unlock_sheet_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                 )
@@ -114,28 +115,35 @@ fun SecurityQuotaUnlockSheet(
                     IconButton(onClick = { isEnteringKey = false }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
-                            contentDescription = "Quay lại",
+                            contentDescription = stringResource(R.string.logs_back_cd),
                         )
                     }
                     Text(
-                        text = "VirusTotal API Key cá nhân",
+                        text = stringResource(R.string.quota_unlock_vt_key_title),
                         style = MaterialTheme.typography.titleLarge,
                         fontWeight = FontWeight.Bold,
                     )
                 }
                 Text(
-                    text = "Nhập API Key miễn phí từ virustotal.com (64 ký tự hex) để quét dự phòng không giới hạn.",
+                    text = stringResource(R.string.quota_unlock_vt_key_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedTextField(
                     value = keyInput,
                     onValueChange = { keyInput = it },
-                    label = { Text("API Key (64 ký tự)") },
+                    label = { Text(stringResource(R.string.quota_unlock_key_label)) },
                     singleLine = true,
                     isError = !isValidLength,
                     supportingText = if (!isValidLength) {
-                        { Text("API Key phải đúng 64 ký tự (${trimmed.length}/64)") }
+                        {
+                            Text(
+                                stringResource(
+                                    R.string.quota_unlock_key_length_error,
+                                    trimmed.length,
+                                )
+                            )
+                        }
                     } else null,
                     trailingIcon = {
                         IconButton(
@@ -149,7 +157,7 @@ fun SecurityQuotaUnlockSheet(
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.ContentPaste,
-                                contentDescription = "Dán",
+                                contentDescription = stringResource(R.string.source_download_paste),
                             )
                         }
                     },
@@ -163,7 +171,10 @@ fun SecurityQuotaUnlockSheet(
                         onClick = { uriHandler.openUri(VT_API_KEY_GUIDE_URL) },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     ) {
-                        Text("Lấy Key miễn phí", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = stringResource(R.string.quota_unlock_get_free_key),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
                     }
                     TextButton(
                         onClick = {
@@ -172,7 +183,10 @@ fun SecurityQuotaUnlockSheet(
                         },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     ) {
-                        Text("Cài đặt nâng cao", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = stringResource(R.string.quota_unlock_advanced_settings),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
                     }
                 }
                 Button(
@@ -189,7 +203,7 @@ fun SecurityQuotaUnlockSheet(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                 ) {
-                    Text("Lưu & Quét ngay")
+                    Text(stringResource(R.string.quota_unlock_btn_save_and_scan))
                 }
             }
         }
@@ -224,7 +238,7 @@ fun VirusTotalQuickKeyDialog(
         },
         title = {
             Text(
-                text = "VirusTotal API Key cá nhân",
+                text = stringResource(R.string.quota_unlock_vt_key_title),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
@@ -232,18 +246,25 @@ fun VirusTotalQuickKeyDialog(
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(
-                    text = "Nhập API Key miễn phí từ virustotal.com (64 ký tự hex) để quét dự phòng không giới hạn.",
+                    text = stringResource(R.string.quota_unlock_vt_key_desc),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 OutlinedTextField(
                     value = keyInput,
                     onValueChange = { keyInput = it },
-                    label = { Text("API Key (64 ký tự)") },
+                    label = { Text(stringResource(R.string.quota_unlock_key_label)) },
                     singleLine = true,
                     isError = !isValidLength,
                     supportingText = if (!isValidLength) {
-                        { Text("API Key phải đúng 64 ký tự (${trimmed.length}/64)") }
+                        {
+                            Text(
+                                stringResource(
+                                    R.string.quota_unlock_key_length_error,
+                                    trimmed.length,
+                                )
+                            )
+                        }
                     } else null,
                     trailingIcon = {
                         IconButton(
@@ -257,7 +278,7 @@ fun VirusTotalQuickKeyDialog(
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.ContentPaste,
-                                contentDescription = "Dán",
+                                contentDescription = stringResource(R.string.source_download_paste),
                             )
                         }
                     },
@@ -271,7 +292,10 @@ fun VirusTotalQuickKeyDialog(
                         onClick = { uriHandler.openUri(VT_API_KEY_GUIDE_URL) },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     ) {
-                        Text("Lấy Key miễn phí", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = stringResource(R.string.quota_unlock_get_free_key),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
                     }
                     TextButton(
                         onClick = {
@@ -280,7 +304,10 @@ fun VirusTotalQuickKeyDialog(
                         },
                         contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
                     ) {
-                        Text("Cài đặt nâng cao", style = MaterialTheme.typography.labelMedium)
+                        Text(
+                            text = stringResource(R.string.quota_unlock_advanced_settings),
+                            style = MaterialTheme.typography.labelMedium,
+                        )
                     }
                 }
             }
@@ -298,7 +325,7 @@ fun VirusTotalQuickKeyDialog(
                     }
                 },
             ) {
-                Text("Lưu & Quét ngay")
+                Text(stringResource(R.string.quota_unlock_btn_save_and_scan))
             }
         },
         dismissButton = {

@@ -238,6 +238,9 @@
     <string name="dialog_chip_downgrade">Downgrade</string>
 
     <!-- TV AppShield & Security -->
+    <string name="tv_settings_section_backends">Installation Backends &amp; Permissions</string>
+    <string name="tv_settings_install_options_title">Advanced Install Options</string>
+    <string name="tv_settings_install_options_desc">Configure replacement, downgrade, and user permission flags</string>
     <string name="tv_settings_section_virustotal">AppShield Security</string>
     <string name="tv_settings_virustotal_enable_title">Built-in Security Scanner</string>
     <string name="tv_settings_virustotal_enable_desc">Scan packages with built-in AppShield security engine before installing</string>

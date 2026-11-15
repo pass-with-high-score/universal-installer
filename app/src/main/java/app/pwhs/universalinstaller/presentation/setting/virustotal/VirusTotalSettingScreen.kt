@@ -43,6 +43,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
+import app.pwhs.universalinstaller.R
 import org.koin.androidx.compose.koinViewModel
 
 private const val VIRUSTOTAL_API_KEY_URL = "https://www.virustotal.com/gui/my-apikey"
@@ -64,7 +65,7 @@ fun VirusTotalSettingScreen(
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Quét bảo mật APK",
+                        text = stringResource(R.string.setting_security_scan_title),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                     )
@@ -129,16 +130,18 @@ fun VirusTotalSettingScreen(
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Bảo vệ & Quét mã độc",
+                                text = stringResource(R.string.setting_security_protection_title),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                             )
                             Text(
-                                text = if (!uiState.scanningDisabled) {
-                                    "Đang bật bảo vệ tự động khi cài đặt APK"
-                                } else {
-                                    "Đã tắt hoàn toàn tính năng quét bảo mật"
-                                },
+                                text = stringResource(
+                                    if (!uiState.scanningDisabled) {
+                                        R.string.setting_security_protection_on
+                                    } else {
+                                        R.string.setting_security_protection_off
+                                    }
+                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -155,7 +158,7 @@ fun VirusTotalSettingScreen(
                 // ── 2. Primary Scanner Selection ─────────────────────────────
                 item {
                     Text(
-                        text = "Bộ quét chính",
+                        text = stringResource(R.string.setting_primary_scanner_header),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -169,14 +172,14 @@ fun VirusTotalSettingScreen(
                     ) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             ScannerOptionItem(
-                                title = "AppShield (Tích hợp sẵn • Khuyên dùng)",
-                                subtitle = "Công nghệ quét đám mây tích hợp sẵn (3 lượt miễn phí/ngày, không giới hạn với Pro).",
+                                title = stringResource(R.string.setting_scanner_appshield_title),
+                                subtitle = stringResource(R.string.setting_scanner_appshield_desc),
                                 isSelected = uiState.primaryScanner != "virustotal",
                                 onClick = { viewModel.setPrimaryScanner("virusdetec") },
                             )
                             ScannerOptionItem(
-                                title = "VirusTotal",
-                                subtitle = "Đối chiếu hơn 70 bộ máy diệt virus quốc tế bằng khóa API cá nhân của bạn.",
+                                title = stringResource(R.string.setting_scanner_virustotal_title),
+                                subtitle = stringResource(R.string.setting_scanner_virustotal_desc),
                                 isSelected = uiState.primaryScanner == "virustotal",
                                 onClick = { viewModel.setPrimaryScanner("virustotal") },
                             )
@@ -187,7 +190,7 @@ fun VirusTotalSettingScreen(
                 // ── 3. Orchestration & Fallback Options ─────────────────────
                 item {
                     Text(
-                        text = "Cơ chế dự phòng & Ngoại tuyến",
+                        text = stringResource(R.string.setting_fallback_section_header),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -213,12 +216,15 @@ fun VirusTotalSettingScreen(
                                 )
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Tự động chuyển bộ quét dự phòng",
+                                        text = stringResource(R.string.setting_auto_fallback_title),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                     Text(
-                                        text = "Tự động chuyển sang ${if (uiState.primaryScanner == "virustotal") "AppShield" else "VirusTotal"} khi hết lượt miễn phí hoặc gặp lỗi máy chủ.",
+                                        text = stringResource(
+                                            R.string.setting_auto_fallback_desc,
+                                            if (uiState.primaryScanner == "virustotal") "AppShield" else "VirusTotal",
+                                        ),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -242,12 +248,12 @@ fun VirusTotalSettingScreen(
                                 )
                                 Column(modifier = Modifier.weight(1f)) {
                                     Text(
-                                        text = "Phân tích tĩnh ngoại tuyến (DEX)",
+                                        text = stringResource(R.string.setting_offline_analysis_title),
                                         style = MaterialTheme.typography.bodyLarge,
                                         fontWeight = FontWeight.SemiBold,
                                     )
                                     Text(
-                                        text = "Kiểm tra quyền hạn và trình theo dõi Exodus cục bộ không cần mạng.",
+                                        text = stringResource(R.string.setting_offline_analysis_desc),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                     )
@@ -264,7 +270,7 @@ fun VirusTotalSettingScreen(
                 // ── 4. Personal VirusTotal API Key ───────────────────────────
                 item {
                     Text(
-                        text = "Khóa API VirusTotal (Tùy chọn)",
+                        text = stringResource(R.string.setting_vt_key_section_header),
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary,
@@ -318,16 +324,23 @@ fun VirusTotalSettingScreen(
                             )
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
-                                    text = "Hạn mức AppShield (Tích hợp sẵn)",
+                                    text = stringResource(R.string.setting_appshield_quota_header),
                                     style = MaterialTheme.typography.bodyLarge,
                                     fontWeight = FontWeight.Bold,
                                 )
                                 Text(
                                     text = if (quota.isProUser) {
-                                        "Không giới hạn lượt quét (Đang kích hoạt gói Pro)"
+                                        stringResource(R.string.setting_quota_pro_unlimited)
                                     } else {
-                                        "Đã dùng ${quota.usedToday}/${quota.dailyLimit} lượt miễn phí hôm nay" +
-                                            if (quota.hasPersonalKey) " • Đã có khóa VirusTotal dự phòng" else ""
+                                        stringResource(
+                                            R.string.setting_quota_used_format,
+                                            quota.usedToday,
+                                            quota.dailyLimit,
+                                        ) + if (quota.hasPersonalKey) {
+                                            stringResource(R.string.setting_quota_has_vt_backup)
+                                        } else {
+                                            ""
+                                        }
                                     },
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,

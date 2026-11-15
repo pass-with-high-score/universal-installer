@@ -208,6 +208,9 @@
     <string name="dialog_chip_downgrade">Hạ cấp</string>
 
     <!-- TV AppShield & Security -->
+    <string name="tv_settings_section_backends">Công cụ cài đặt &amp; Quyền hạn</string>
+    <string name="tv_settings_install_options_title">Tùy chọn cài đặt nâng cao</string>
+    <string name="tv_settings_install_options_desc">Cấu hình ghi đè, hạ cấp và cờ quyền hạn người dùng</string>
     <string name="tv_settings_section_virustotal">Bảo mật AppShield</string>
     <string name="tv_settings_virustotal_enable_title">Trình quét bảo mật tích hợp</string>
     <string name="tv_settings_virustotal_enable_desc">Quét các gói ứng dụng bằng công nghệ AppShield trước khi cài đặt</string>

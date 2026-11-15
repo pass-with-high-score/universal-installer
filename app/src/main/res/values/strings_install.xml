@@ -509,4 +509,20 @@
     <string name="finding_evidence_header">Technical Evidence:</string>
     <string name="finding_copy_evidence_desc">Copy evidence</string>
     <string name="findings_section_title">Technical Findings (%1$d)</string>
+
+    <!-- AppShield / VirusTotal Card & Prompt Strings -->
+    <string name="apk_info_vt_desc_not_found">No scan results found in database.</string>
+    <string name="apk_info_vt_desc_no_api_key">No scanner or API key configured.</string>
+    <string name="apk_info_vt_desc_invalid_key">VirusTotal API key is invalid or revoked.</string>
+    <string name="apk_info_vt_desc_rate_limited_default">Daily free limit reached or rate limited.</string>
+    <string name="apk_info_vt_desc_error_default">Unable to connect to security service.</string>
+    <string name="apk_info_vt_desc_scanning">Analyzing signature and manifest…</string>
+    <string name="apk_info_vt_desc_uploading">Uploading file for analysis (%1$d%%)…</string>
+    <string name="apk_info_vt_desc_queued">Waiting in analysis queue…</string>
+    <string name="apk_info_vt_desc_analyzing">Running DEX, BadPack &amp; Call Graph scan…</string>
+    <string name="apk_info_vt_view_details">View detection details</string>
+    <string name="apk_info_vt_btn_upload_and_scan">Upload &amp; Scan</string>
+    <string name="apk_info_vt_chip_rate_limited">Free limit reached · Unlock</string>
+    <string name="apk_info_vt_chip_invalid_key">Invalid API key</string>
+    <string name="apk_info_vt_chip_need_key">Need API Key / Pro</string>
 </resources>

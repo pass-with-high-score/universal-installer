@@ -105,7 +105,7 @@ internal fun ApiKeySection(
                     modifier = Modifier.size(18.dp),
                 )
                 Text(
-                    text = "Khóa API 64 ký tự",
+                    text = stringResource(R.string.setting_vt_key_label_64char),
                     style = MaterialTheme.typography.labelLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -171,7 +171,7 @@ internal fun ApiKeySection(
                     IconButton(onClick = onPasteClick) {
                         Icon(
                             imageVector = Icons.Rounded.ContentPaste,
-                            contentDescription = "Paste",
+                            contentDescription = stringResource(R.string.source_download_paste),
                             modifier = Modifier.size(20.dp),
                         )
                     }

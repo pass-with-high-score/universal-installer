@@ -80,7 +80,7 @@ class VirusDetecScanner(
                 ScanErrorException(
                     ScanError.RateLimited(
                         provider = providerId,
-                        message = "Đã hết lượt quét AppShield miễn phí hôm nay (3/3)",
+                        message = "Daily free AppShield scan limit reached (3/3)",
                     )
                 )
             )

@@ -99,10 +99,18 @@ fun AppShieldDailyQuotaBadge(
         else -> Icons.Rounded.Security
     }
     val label = when {
-        quota.isProUser -> "AppShield Pro · Quét không giới hạn"
-        quota.hasPersonalKey -> "VirusTotal Key cá nhân · Dự phòng không giới hạn"
-        quota.remainingToday > 0 -> "AppShield miễn phí: còn ${quota.remainingToday}/${quota.dailyLimit} lượt hôm nay"
-        else -> "Đã hết ${quota.dailyLimit}/${quota.dailyLimit} lượt AppShield miễn phí hôm nay"
+        quota.isProUser -> stringResource(R.string.quota_badge_pro_unlimited)
+        quota.hasPersonalKey -> stringResource(R.string.quota_badge_personal_key)
+        quota.remainingToday > 0 -> stringResource(
+            R.string.quota_badge_remaining,
+            quota.remainingToday,
+            quota.dailyLimit,
+        )
+        else -> stringResource(
+            R.string.quota_badge_exhausted,
+            quota.dailyLimit,
+            quota.dailyLimit,
+        )
     }
 
     Surface(
@@ -169,7 +177,7 @@ fun SecurityQuotaExhaustedSection(
         verticalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         Text(
-            text = "Mở khóa quét không giới hạn",
+            text = stringResource(R.string.quota_unlock_unlimited_header),
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary,
@@ -205,13 +213,13 @@ fun SecurityQuotaExhaustedSection(
                         verticalArrangement = Arrangement.spacedBy(2.dp),
                     ) {
                         Text(
-                            text = "Dùng VirusTotal API Key cá nhân (Miễn phí)",
+                            text = stringResource(R.string.quota_unlock_vt_key_option_title),
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.SemiBold,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Text(
-                            text = "Phù hợp cho người dùng open-source hoặc dự phòng khi hết lượt AppShield miễn phí.",
+                            text = stringResource(R.string.quota_unlock_vt_key_option_desc),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
@@ -227,7 +235,7 @@ fun SecurityQuotaExhaustedSection(
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     ) {
                         Text(
-                            text = "Nhập API Key",
+                            text = stringResource(R.string.quota_unlock_enter_key),
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
@@ -236,7 +244,7 @@ fun SecurityQuotaExhaustedSection(
                         contentPadding = PaddingValues(horizontal = 10.dp, vertical = 6.dp),
                     ) {
                         Text(
-                            text = "Lấy Key miễn phí",
+                            text = stringResource(R.string.quota_unlock_get_free_key),
                             style = MaterialTheme.typography.labelMedium,
                         )
                         Spacer(Modifier.width(4.dp))
@@ -287,13 +295,13 @@ fun SecurityQuotaExhaustedSection(
                             verticalArrangement = Arrangement.spacedBy(2.dp),
                         ) {
                             Text(
-                                text = "Nâng cấp Universal Installer Pro",
+                                text = stringResource(R.string.quota_unlock_pro_title),
                                 style = MaterialTheme.typography.titleSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
-                                text = "Quét AppShield không giới hạn, không cần cấu hình API key, kèm hỗ trợ riêng 1-1.",
+                                text = stringResource(R.string.quota_unlock_pro_desc),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
@@ -317,7 +325,7 @@ fun SecurityQuotaExhaustedSection(
                         )
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Nâng cấp Pro",
+                            text = stringResource(R.string.quota_unlock_pro_badge_btn),
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold,
                         )

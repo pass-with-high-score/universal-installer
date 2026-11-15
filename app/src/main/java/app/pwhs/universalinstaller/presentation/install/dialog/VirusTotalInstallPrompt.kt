@@ -215,9 +215,9 @@ fun VirusTotalInstallPrompt(
                 currentStatus == VtStatus.NO_API_KEY ||
                 currentStatus == VtStatus.INVALID_API_KEY -> {
                 val chipText = when (currentStatus) {
-                    VtStatus.RATE_LIMITED -> "Hết lượt miễn phí · Mở khóa"
-                    VtStatus.INVALID_API_KEY -> "API Key không hợp lệ"
-                    else -> "Cần API Key / Pro"
+                    VtStatus.RATE_LIMITED -> stringResource(R.string.apk_info_vt_chip_rate_limited)
+                    VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_chip_invalid_key)
+                    else -> stringResource(R.string.apk_info_vt_chip_need_key)
                 }
                 Row(
                     modifier = Modifier

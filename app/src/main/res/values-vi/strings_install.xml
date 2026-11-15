@@ -509,4 +509,20 @@
     <string name="finding_evidence_header">Bằng chứng kỹ thuật (Evidence):</string>
     <string name="finding_copy_evidence_desc">Sao chép bằng chứng</string>
     <string name="findings_section_title">Phát hiện kỹ thuật (%1$d)</string>
+
+    <!-- AppShield / VirusTotal Card & Prompt Strings -->
+    <string name="apk_info_vt_desc_not_found">Chưa có kết quả phân tích trong cơ sở dữ liệu.</string>
+    <string name="apk_info_vt_desc_no_api_key">Chưa cấu hình API Key hoặc dịch vụ quét khả dụng.</string>
+    <string name="apk_info_vt_desc_invalid_key">VirusTotal API Key không hợp lệ hoặc đã bị thu hồi.</string>
+    <string name="apk_info_vt_desc_rate_limited_default">Đã hết lượt quét miễn phí hôm nay hoặc bị giới hạn tần suất.</string>
+    <string name="apk_info_vt_desc_error_default">Không thể kết nối đến dịch vụ bảo mật.</string>
+    <string name="apk_info_vt_desc_scanning">Đang phân tích chữ ký và manifest…</string>
+    <string name="apk_info_vt_desc_uploading">Đang tải tệp lên để phân tích (%1$d%%)…</string>
+    <string name="apk_info_vt_desc_queued">Đang chờ hàng đợi phân tích…</string>
+    <string name="apk_info_vt_desc_analyzing">Đang chạy quét DEX, BadPack &amp; Call Graph…</string>
+    <string name="apk_info_vt_view_details">Xem chi tiết phát hiện</string>
+    <string name="apk_info_vt_btn_upload_and_scan">Tải lên &amp; Quét bảo mật</string>
+    <string name="apk_info_vt_chip_rate_limited">Hết lượt miễn phí · Mở khóa</string>
+    <string name="apk_info_vt_chip_invalid_key">API Key không hợp lệ</string>
+    <string name="apk_info_vt_chip_need_key">Cần API Key / Pro</string>
 </resources>

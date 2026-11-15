@@ -83,17 +83,21 @@ fun VirusTotalCard(
         VtStatus.CLEAN -> stringResource(R.string.apk_info_vt_clean)
         VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vt?.malicious ?: 0)
         VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vt?.suspicious ?: 0)
-        VtStatus.NOT_FOUND -> "Chưa có kết quả phân tích trong cơ sở dữ liệu."
-        VtStatus.NO_API_KEY -> "Chưa cấu hình API Key hoặc dịch vụ quét khả dụng."
-        VtStatus.INVALID_API_KEY -> "VirusTotal API Key không hợp lệ hoặc đã bị thu hồi."
+        VtStatus.NOT_FOUND -> stringResource(R.string.apk_info_vt_desc_not_found)
+        VtStatus.NO_API_KEY -> stringResource(R.string.apk_info_vt_desc_no_api_key)
+        VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_desc_invalid_key)
         VtStatus.RATE_LIMITED -> vt?.errorMessage?.takeIf { it.isNotBlank() }
-            ?: "Đã hết lượt quét miễn phí hôm nay hoặc bị giới hạn tần suất."
-        VtStatus.ERROR -> if (vt?.errorMessage.isNullOrBlank()) "Không thể kết nối đến dịch vụ bảo mật" else vt.errorMessage
+            ?: stringResource(R.string.apk_info_vt_desc_rate_limited_default)
+        VtStatus.ERROR -> if (vt?.errorMessage.isNullOrBlank()) {
+            stringResource(R.string.apk_info_vt_desc_error_default)
+        } else {
+            vt.errorMessage
+        }
         VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt?.errorMessage.orEmpty())
-        VtStatus.SCANNING -> "Đang phân tích chữ ký và manifest..."
-        VtStatus.UPLOADING -> "Đang tải tệp lên để phân tích (${vt?.uploadProgress ?: 0}%)..."
-        VtStatus.QUEUED -> "Đang chờ hàng đợi phân tích..."
-        VtStatus.ANALYZING -> "Đang chạy quét DEX, BadPack & Call Graph..."
+        VtStatus.SCANNING -> stringResource(R.string.apk_info_vt_desc_scanning)
+        VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_desc_uploading, vt?.uploadProgress ?: 0)
+        VtStatus.QUEUED -> stringResource(R.string.apk_info_vt_desc_queued)
+        VtStatus.ANALYZING -> stringResource(R.string.apk_info_vt_desc_analyzing)
         else -> null
     }
     val isAlarming = status == VtStatus.MALICIOUS
@@ -125,7 +129,7 @@ fun VirusTotalCard(
                 )
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    text = "Bảo mật AppShield",
+                    text = stringResource(R.string.apk_info_vt_scan_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = vtColor,
                 )
@@ -178,7 +182,7 @@ fun VirusTotalCard(
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                 ) {
                     Text(
-                        text = "Xem chi tiết phát hiện",
+                        text = stringResource(R.string.apk_info_vt_view_details),
                         style = MaterialTheme.typography.labelMedium,
                     )
                     Spacer(Modifier.width(6.dp))
@@ -221,7 +225,7 @@ fun VirusTotalCard(
                         contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     ) {
                         Text(
-                            text = "Nhập API Key",
+                            text = stringResource(R.string.quota_unlock_enter_key),
                             style = MaterialTheme.typography.labelMedium,
                         )
                     }
@@ -240,7 +244,7 @@ fun VirusTotalCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = "Tải lên & Quét bảo mật",
+                        text = stringResource(R.string.apk_info_vt_btn_upload_and_scan),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
@@ -276,7 +280,7 @@ fun VirusTotalCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = "Quét bảo mật",
+                        text = stringResource(R.string.scan_virustotal_btn),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }
