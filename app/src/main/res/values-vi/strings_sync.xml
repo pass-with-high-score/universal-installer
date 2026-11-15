@@ -125,4 +125,35 @@
     <string name="watch_sheet_pick_file">Chọn tệp khác…</string>
     <string name="watch_sheet_send">Gửi</string>
     <string name="watch_chip_wear_os">Wear OS</string>
+
+    <!-- Sync Tabs & Modern Mobile Redesign -->
+    <string name="sync_tab_send">Chia sẻ</string>
+    <string name="sync_tab_receive">Nhận file</string>
+    <string name="sync_server_status_online">Máy chủ đang hoạt động</string>
+    <string name="sync_server_status_offline">Máy chủ đang tắt</string>
+    <string name="sync_server_copy_url">Sao chép liên kết</string>
+    <string name="sync_server_qr_btn">Mã QR</string>
+    <string name="sync_web_access_title">Truy cập &amp; chuyển file qua Web</string>
+    <string name="sync_web_access_desc">Mở liên kết này trên trình duyệt máy tính để tải lên hoặc tải xuống các gói cài đặt</string>
+    <string name="sync_receive_title">Nhận APK qua Wi-Fi</string>
+    <string name="sync_receive_subtitle">Chuyển gói cài đặt từ máy tính hoặc thiết bị khác qua trình duyệt web</string>
+    <string name="sync_receive_incoming_transfer">Đang nhận tệp đến</string>
+    <string name="sync_receive_packages_header">Gói cài đặt đã nhận (%1$d)</string>
+    <string name="sync_receive_empty_title">Chưa có gói nào được nhận</string>
+    <string name="sync_receive_empty_desc">Bật máy chủ và mở liên kết Web trên máy tính để gửi file APK trực tiếp sang điện thoại.</string>
+    <string name="sync_receive_how_it_works">Cách nhận gói cài đặt</string>
+    <string name="sync_receive_step1">Đảm bảo điện thoại và máy tính kết nối cùng mạng Wi-Fi</string>
+    <string name="sync_receive_step2">Mở liên kết phía trên bằng trình duyệt web trên máy tính</string>
+    <string name="sync_receive_step3">Kéo &amp; thả file APK, APKS, XAPK hoặc ZIP để tải lên</string>
+    <string name="sync_receive_btn_install">Cài đặt</string>
+    <string name="sync_receive_file_received_toast">Đã nhận: %s</string>
+    <string name="sync_send_empty_title">Chưa chia sẻ gói nào</string>
+    <string name="sync_send_empty_desc">Thêm tệp APK để chia sẻ cho các thiết bị khác trong cùng mạng Wi-Fi.</string>
+    <string name="sync_send_how_it_works">Cách chia sẻ gói cài đặt</string>
+    <string name="sync_send_step1">Nhấn \&quot;+ Thêm tệp\&quot; để chọn các file APK muốn chia sẻ</string>
+    <string name="sync_send_step2">Bật máy chủ để các thiết bị khác có thể truy cập qua Wi-Fi</string>
+    <string name="sync_send_step3">Mở liên kết máy chủ hoặc quét mã QR trên máy tính để tải về</string>
+    <string name="sync_server_url_copied">Đã sao chép liên kết máy chủ</string>
+    <string name="sync_server_settings_btn">Cài đặt máy chủ</string>
+    <string name="sync_receive_start_server_btn">Bật máy chủ</string>
 </resources>

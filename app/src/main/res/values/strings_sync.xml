@@ -125,4 +125,35 @@
     <string name="watch_sheet_pick_file">Choose another file…</string>
     <string name="watch_sheet_send">Send</string>
     <string name="watch_chip_wear_os">Wear OS</string>
+
+    <!-- Sync Tabs & Modern Mobile Redesign -->
+    <string name="sync_tab_send">Share</string>
+    <string name="sync_tab_receive">Receive</string>
+    <string name="sync_server_status_online">Server Online</string>
+    <string name="sync_server_status_offline">Server Offline</string>
+    <string name="sync_server_copy_url">Copy Link</string>
+    <string name="sync_server_qr_btn">QR Code</string>
+    <string name="sync_web_access_title">Web Access &amp; Transfer</string>
+    <string name="sync_web_access_desc">Open this link in your computer browser to upload or download packages</string>
+    <string name="sync_receive_title">Receive APKs over Wi-Fi</string>
+    <string name="sync_receive_subtitle">Transfer packages from PC, Mac or other devices via web browser</string>
+    <string name="sync_receive_incoming_transfer">Incoming Transfer</string>
+    <string name="sync_receive_packages_header">Received Packages (%1$d)</string>
+    <string name="sync_receive_empty_title">No packages received yet</string>
+    <string name="sync_receive_empty_desc">Turn on the server and open the Web link on your computer to send APK files directly to your phone.</string>
+    <string name="sync_receive_how_it_works">How to receive packages</string>
+    <string name="sync_receive_step1">Ensure phone and computer are on the same Wi-Fi</string>
+    <string name="sync_receive_step2">Open the link above in your computer\'s web browser</string>
+    <string name="sync_receive_step3">Drag &amp; drop APK, APKS, XAPK or ZIP files to upload</string>
+    <string name="sync_receive_btn_install">Install</string>
+    <string name="sync_receive_file_received_toast">Received: %s</string>
+    <string name="sync_send_empty_title">No packages shared yet</string>
+    <string name="sync_send_empty_desc">Add APK files to share them with other devices on your local network.</string>
+    <string name="sync_send_how_it_works">How to share packages</string>
+    <string name="sync_send_step1">Tap \&quot;+ Add Files\&quot; to choose APK packages to share</string>
+    <string name="sync_send_step2">Turn on the server so other devices can access it over Wi-Fi</string>
+    <string name="sync_send_step3">Open the server link or scan QR code on PC to download</string>
+    <string name="sync_server_url_copied">Server link copied</string>
+    <string name="sync_server_settings_btn">Server Settings</string>
+    <string name="sync_receive_start_server_btn">Turn On Server</string>
 </resources>

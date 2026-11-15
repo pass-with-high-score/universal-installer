@@ -47,12 +47,17 @@ object SyncManager {
     val activeConnections = MutableStateFlow(0)
     val sharedFiles = MutableStateFlow<List<java.io.File>>(emptyList())
     val activeTransfers = MutableStateFlow<Map<String, TransferProgress>>(emptyMap())
+    val fileReceived = kotlinx.coroutines.flow.MutableSharedFlow<java.io.File>(replay = 1, extraBufferCapacity = 8)
 
     private val connectionCounter = java.util.concurrent.atomic.AtomicInteger(0)
     private val transferIdCounter = java.util.concurrent.atomic.AtomicLong(0)
     private val estimators = java.util.concurrent.ConcurrentHashMap<String, app.pwhs.core.util.TransferEstimator>()
 
     fun nextTransferId(): String = "transfer_${transferIdCounter.incrementAndGet()}"
+
+    fun emitFileReceived(file: java.io.File) {
+        fileReceived.tryEmit(file)
+    }
 
     fun incrementConnections() {
         val newVal = connectionCounter.incrementAndGet()

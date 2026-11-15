@@ -1,49 +1,78 @@
 package app.pwhs.universalinstaller.presentation.sync
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.os.Environment
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import app.pwhs.core.data.local.dataStore
+import app.pwhs.universalinstaller.presentation.install.DialogInstallActivity
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.SyncOptions
-import app.pwhs.core.data.local.dataStore
 import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.universalinstaller.telemetry.TelemetryEvents
-import androidx.datastore.preferences.core.edit
-import timber.log.Timber
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 
 data class SyncUiState(
+    // Server status & Wi-Fi LAN
     val state: SyncState = SyncState.STOPPED,
     val serverUrl: String? = null,
     val pinCode: String? = null,
     val activeConnections: Int = 0,
-    val sharedFiles: List<File> = emptyList(),
     val activeTransfers: Map<String, TransferProgress> = emptyMap(),
-    val syncOptions: SyncOptions = SyncOptions()
+    val syncOptions: SyncOptions = SyncOptions(),
+
+    // Tab 1: Share / Send files
+    val sharedFiles: List<File> = emptyList(),
+
+    // Tab 2: Received packages
+    val receivedFiles: List<File> = emptyList(),
 )
 
 class SyncViewModel(application: Application) : AndroidViewModel(application) {
     private val dataStore = application.dataStore
 
-    val uiState: StateFlow<SyncUiState> = combine(
+    private val baseDir = File(
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
+        "UniversalInstaller",
+    )
+    private val receivedDir = File(baseDir, "received")
+
+    private val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip", "apk+")
+
+    private val _recentlyReceived = MutableStateFlow<File?>(null)
+    val recentlyReceived: StateFlow<File?> = _recentlyReceived.asStateFlow()
+
+    private val _receivedFiles = MutableStateFlow<List<File>>(emptyList())
+
+    private val serverSubState = combine(
         SyncManager.state,
         SyncManager.serverUrl,
         SyncManager.pinCode,
         SyncManager.activeConnections,
         SyncManager.sharedFiles,
+    ) { state, serverUrl, pinCode, activeConns, sharedFiles ->
+        ServerCoreState(state, serverUrl, pinCode, activeConns, sharedFiles)
+    }
+
+    val uiState: StateFlow<SyncUiState> = combine(
+        serverSubState,
         SyncManager.activeTransfers,
         dataStore.data.map { prefs ->
             SyncOptions(
@@ -51,35 +80,37 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
                 pinCode = prefs[PreferencesKeys.SYNC_PIN_CODE] ?: "",
                 serverPort = prefs[PreferencesKeys.SYNC_SERVER_PORT] ?: "8080"
             )
-        }
-    ) { flows ->
-        @Suppress("UNCHECKED_CAST")
+        },
+        _receivedFiles,
+    ) { server, transfers, syncOptions, receivedFiles ->
         SyncUiState(
-            state = flows[0] as SyncState,
-            serverUrl = flows[1] as? String,
-            pinCode = flows[2] as? String,
-            activeConnections = flows[3] as Int,
-            sharedFiles = flows[4] as List<File>,
-            activeTransfers = flows[5] as Map<String, TransferProgress>,
-            syncOptions = flows[6] as SyncOptions
+            state = server.state,
+            serverUrl = server.serverUrl,
+            pinCode = server.pinCode,
+            activeConnections = server.activeConnections,
+            sharedFiles = server.sharedFiles,
+            activeTransfers = transfers,
+            syncOptions = syncOptions,
+            receivedFiles = receivedFiles,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SyncUiState())
 
-    private val baseDir = File(
-        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
-        "UniversalInstaller",
-    )
-
-    private val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
-
     init {
         refreshSharedFiles()
+        refreshReceivedFiles()
+
+        // Listen for files received via ApkHttpServer (Web upload)
+        viewModelScope.launch {
+            SyncManager.fileReceived.collect { file ->
+                refreshReceivedFiles()
+                _recentlyReceived.value = file
+            }
+        }
     }
 
     fun toggleServer(enabled: Boolean) {
         val intent = Intent(getApplication(), SyncService::class.java)
         if (enabled) {
-            // Only the start counts as a use — reporting the stop too would double every session.
             Telemetry.feature(TelemetryEvents.FEATURE_LAN_SHARE)
             try {
                 ContextCompat.startForegroundService(getApplication(), intent)
@@ -95,7 +126,6 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
                 Timber.e(e, "Failed to stop SyncService")
             }
         }
-        // Refresh file list when toggling
         refreshSharedFiles()
     }
 
@@ -121,10 +151,21 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             if (!baseDir.exists()) baseDir.mkdirs()
             val files = baseDir.listFiles()
-                ?.filter { it.isFile && it.extension.lowercase() in validExtensions }
+                ?.filter { it.isFile && (it.extension.lowercase() in validExtensions || it.name.endsWith(".apk+", true)) }
                 ?.sortedByDescending { it.lastModified() }
                 ?: emptyList()
             SyncManager.sharedFiles.value = files
+        }
+    }
+
+    fun refreshReceivedFiles() {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (!receivedDir.exists()) receivedDir.mkdirs()
+            val files = receivedDir.listFiles()
+                ?.filter { it.isFile && (it.extension.lowercase() in validExtensions || it.name.endsWith(".apk+", true)) }
+                ?.sortedByDescending { it.lastModified() }
+                ?: emptyList()
+            _receivedFiles.value = files
         }
     }
 
@@ -140,7 +181,7 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
                 try {
                     val displayName = getDisplayName(uri)
                     val ext = displayName.substringAfterLast('.', "").lowercase()
-                    if (ext !in validExtensions) {
+                    if (ext !in validExtensions && !displayName.endsWith(".apk+", true)) {
                         skippedCount++
                         return@forEach
                     }
@@ -156,7 +197,6 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
                 }
             }
 
-            // Refresh file list after copying
             refreshSharedFiles()
 
             withContext(Dispatchers.Main) {
@@ -185,6 +225,40 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun deleteReceivedFile(file: File) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                if (file.exists()) file.delete()
+                refreshReceivedFiles()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    fun installApk(context: Context, file: File) {
+        try {
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.fileprovider",
+                file
+            )
+            val intent = Intent(context, DialogInstallActivity::class.java).apply {
+                action = Intent.ACTION_VIEW
+                setDataAndType(uri, "application/vnd.android.package-archive")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to install ${file.name}")
+            Toast.makeText(context, "Error launching installer: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun clearRecentlyReceived() {
+        _recentlyReceived.value = null
+    }
+
     private fun getDisplayName(uri: android.net.Uri): String {
         var name = "shared_file_${System.currentTimeMillis()}.apk"
         val cursor = getApplication<Application>().contentResolver.query(uri, null, null, null, null)
@@ -199,3 +273,11 @@ class SyncViewModel(application: Application) : AndroidViewModel(application) {
         return name
     }
 }
+
+private data class ServerCoreState(
+    val state: SyncState,
+    val serverUrl: String?,
+    val pinCode: String?,
+    val activeConnections: Int,
+    val sharedFiles: List<File>,
+)

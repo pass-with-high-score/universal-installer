@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Universal Installer — Sync</title>
+    <title>Universal Installer — Sync &amp; Transfer</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -39,11 +39,11 @@
         }
         .logo-icon svg { width: 28px; height: 28px; }
         .app-name { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.02em; }
-        .header-subtitle { font-size: 13px; color: rgba(255,255,255,0.8); margin-top: 4px; }
+        .header-subtitle { font-size: 13px; color: rgba(255,255,255,0.85); margin-top: 4px; }
 
         /* Container */
         .container {
-            max-width: 520px;
+            max-width: 540px;
             margin: -16px auto 0;
             padding: 0 16px 32px;
             position: relative;
@@ -67,7 +67,7 @@
         .stat-value { font-size: 20px; font-weight: 700; color: #FB923C; }
         .stat-label { font-size: 11px; color: #71717a; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
 
-        /* File List */
+        /* Section Titles */
         .section-title {
             font-size: 12px;
             font-weight: 600;
@@ -75,7 +75,99 @@
             text-transform: uppercase;
             letter-spacing: 0.06em;
             padding: 16px 4px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+
+        /* Upload Area */
+        .upload-card {
+            background: #1c1c22;
+            border: 1px solid #2a2a32;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+        }
+        .upload-dropzone {
+            border: 2px dashed #3a3a46;
+            border-radius: 12px;
+            padding: 24px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            background: rgba(251, 146, 60, 0.02);
+        }
+        .upload-dropzone:hover, .upload-dropzone.dragover {
+            border-color: #FB923C;
+            background: rgba(251, 146, 60, 0.06);
+        }
+        .upload-dropzone input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
+        }
+        .upload-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+            display: inline-block;
+        }
+        .upload-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f4f4f5;
+            margin-bottom: 4px;
+        }
+        .upload-desc {
+            font-size: 12px;
+            color: #71717a;
+        }
+        .upload-progress-container {
+            display: none;
+            margin-top: 16px;
+            text-align: left;
+        }
+        .upload-progress-container.active { display: block; }
+        .upload-progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .upload-filename {
+            font-weight: 500;
+            color: #e4e4e7;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 75%;
+        }
+        .upload-percent { font-weight: 700; color: #FB923C; }
+        .progress-bar-bg {
+            height: 6px;
+            background: #2a2a32;
+            border-radius: 999px;
+            overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #FB923C, #EA580C);
+            border-radius: 999px;
+            transition: width 0.15s ease;
+        }
+        .upload-status {
+            margin-top: 10px;
+            font-size: 12px;
+            display: none;
+            align-items: center;
+            gap: 6px;
+        }
+        .upload-status.success { display: flex; color: #34d399; }
+        .upload-status.error { display: flex; color: #f87171; }
+
+        /* File List */
         .file-list {
             background: #1c1c22;
             border: 1px solid #2a2a32;
@@ -119,7 +211,9 @@
             border-radius: 10px;
             display: flex; align-items: center; justify-content: center;
             flex-shrink: 0;
+            transition: transform 0.15s ease, background 0.15s ease;
         }
+        .download-btn:hover { background: #f97316; transform: scale(1.05); }
         .download-btn svg { width: 18px; height: 18px; fill: #fff; }
 
         /* Empty state */
@@ -163,24 +257,48 @@
                 </div>
                 <span class="app-name">Universal Installer</span>
             </div>
-            <div class="header-subtitle">LAN File Sharing — Sync Server</div>
+            <div class="header-subtitle">LAN File Sharing &amp; Transfer Server</div>
         </div>
     </div>
 
     <div class="container">
+        <!-- Stats -->
         <div class="stats-bar">
             <div class="stat-chip">
-                <div class="stat-value">{{fileCount}}</div>
-                <div class="stat-label">Files</div>
+                <div class="stat-value" id="statsFileCount">{{fileCount}}</div>
+                <div class="stat-label">Files on Device</div>
             </div>
             <div class="stat-chip">
-                <div class="stat-value">{{totalSize}}</div>
+                <div class="stat-value" id="statsTotalSize">{{totalSize}}</div>
                 <div class="stat-label">Total Size</div>
             </div>
         </div>
 
+        <!-- Upload to Phone Card -->
+        <div class="section-title">Send to Device</div>
+        <div class="upload-card">
+            <div class="upload-dropzone" id="dropzone">
+                <input type="file" id="fileInput" accept=".apk,.apks,.xapk,.apkm,.zip,.apk+">
+                <div class="upload-icon">📤</div>
+                <div class="upload-title">Drop APK package here or click to browse</div>
+                <div class="upload-desc">Supports APK, APKS, XAPK, APKM and ZIP</div>
+            </div>
+
+            <div class="upload-progress-container" id="progressContainer">
+                <div class="upload-progress-info">
+                    <span class="upload-filename" id="progressFileName">uploading.apk</span>
+                    <span class="upload-percent" id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressBarFill"></div>
+                </div>
+                <div class="upload-status" id="uploadStatus"></div>
+            </div>
+        </div>
+
+        <!-- Available Downloads -->
         <div class="section-title">Available Downloads</div>
-        <div class="file-list">
+        <div class="file-list" id="fileList">
             {{listHtml}}
         </div>
 
@@ -189,5 +307,95 @@
             <div class="footer-note">Powered by Universal Installer for Android</div>
         </div>
     </div>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('fileInput');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFileName = document.getElementById('progressFileName');
+        const progressPercent = document.getElementById('progressPercent');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropzone.classList.remove('dragover');
+            });
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                uploadFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (fileInput.files && fileInput.files.length > 0) {
+                uploadFile(fileInput.files[0]);
+            }
+        });
+
+        function uploadFile(file) {
+            if (!file) return;
+
+            progressFileName.textContent = file.name;
+            progressPercent.textContent = '0%';
+            progressBarFill.style.width = '0%';
+            progressContainer.classList.add('active');
+            uploadStatus.className = 'upload-status';
+            uploadStatus.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', file, file.name);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressPercent.textContent = percent + '%';
+                    progressBarFill.style.width = percent + '%';
+                }
+            };
+
+            xhr.onload = () => {
+                if (xhr.status === 200) {
+                    progressPercent.textContent = '100%';
+                    progressBarFill.style.width = '100%';
+                    uploadStatus.className = 'upload-status success';
+                    uploadStatus.textContent = '✓ Uploaded successfully to phone!';
+                    uploadStatus.style.display = 'flex';
+                    fileInput.value = '';
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 1200);
+                } else {
+                    uploadStatus.className = 'upload-status error';
+                    uploadStatus.textContent = '✗ Upload failed: ' + (xhr.responseText || 'Server error');
+                    uploadStatus.style.display = 'flex';
+                }
+            };
+
+            xhr.onerror = () => {
+                uploadStatus.className = 'upload-status error';
+                uploadStatus.textContent = '✗ Network error while uploading';
+                uploadStatus.style.display = 'flex';
+            };
+
+            xhr.send(formData);
+        }
+    </script>
 </body>
 </html>

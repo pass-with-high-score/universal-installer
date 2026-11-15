@@ -3,8 +3,10 @@ package app.pwhs.universalinstaller.presentation.sync
 import android.content.Context
 import android.os.Environment
 import fi.iki.elonen.NanoHTTPD
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileInputStream
+import java.io.FileOutputStream
 import java.io.FilterInputStream
 import java.io.InputStream
 import java.net.URLEncoder
@@ -63,12 +65,17 @@ class ApkHttpServer(
             }
         }
 
-        // 2. Serve Files
+        // 2. Handle File Upload
+        if (session.method == Method.POST && (uri == "/upload" || uri.startsWith("/upload"))) {
+            return handleUpload(session)
+        }
+
+        // 3. Serve Files
         if (uri == "/") {
             return serveDirectoryList()
         }
 
-        // 3. Serve File Content
+        // 4. Serve File Content
         val fileName = uri.substringAfterLast("/")
         val file = File(baseDir, fileName)
         
@@ -114,6 +121,182 @@ class ApkHttpServer(
             return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Error reading file.")
         }
     }
+
+    private val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip", "apk+")
+
+    private fun handleUpload(session: IHTTPSession): Response {
+        val contentLength = session.headers["content-length"]?.toLongOrNull() ?: 0L
+        val contentType = session.headers["content-type"] ?: ""
+        val boundary = Regex("boundary=([^;\\s]+)").find(contentType)?.groupValues?.get(1)?.trim('"')
+        val transferId = SyncManager.nextTransferId()
+        val uploadDir = File(baseDir, "received").apply { if (!exists()) mkdirs() }
+
+        return try {
+            val savedFile = if (!boundary.isNullOrBlank()) {
+                streamMultipartUpload(session.inputStream, boundary, contentLength, uploadDir, transferId)
+            } else {
+                val files = HashMap<String, String>()
+                session.parseBody(files)
+                val tempPath = files.values.firstOrNull()
+                    ?: return newFixedLengthResponse(Response.Status.BAD_REQUEST, MIME_PLAINTEXT, "No file uploaded")
+                val original = session.parameters["file"]?.firstOrNull()
+                    ?: session.parameters["apk"]?.firstOrNull()
+                    ?: "uploaded-${System.currentTimeMillis()}.apk"
+                val rawName = original.substringAfterLast('/').substringAfterLast('\\')
+                val dest = File(uploadDir, sanitize(rawName))
+                File(tempPath).copyTo(dest, overwrite = true)
+                dest
+            }
+
+            val ext = savedFile.extension.lowercase()
+            if (ext !in validExtensions && !savedFile.name.endsWith(".apk+", true)) {
+                savedFile.delete()
+                return newFixedLengthResponse(
+                    Response.Status.BAD_REQUEST,
+                    MIME_PLAINTEXT,
+                    "Unsupported file format. Please upload APK, APKS, XAPK, APKM, or ZIP."
+                )
+            }
+
+            SyncManager.emitFileReceived(savedFile)
+            val json = """{"status":"ok","fileName":"${savedFile.name}","size":${savedFile.length()}}"""
+            newFixedLengthResponse(Response.Status.OK, "application/json", json)
+        } catch (t: Throwable) {
+            SyncManager.removeTransfer(transferId)
+            newFixedLengthResponse(Response.Status.INTERNAL_ERROR, MIME_PLAINTEXT, "Upload error: ${t.message}")
+        }
+    }
+
+    private fun streamMultipartUpload(
+        input: InputStream,
+        boundary: String,
+        contentLength: Long,
+        destDir: File,
+        transferId: String,
+    ): File {
+        var fileName = "uploaded-${System.currentTimeMillis()}.apk"
+        val headerBytes = ByteArrayOutputStream()
+        var prev = -1
+        var prevPrev = -1
+        var prev3 = -1
+
+        var b = input.read()
+        var headerCount = 0
+        while (b != -1) {
+            headerCount++
+            headerBytes.write(b)
+            if (prev3 == '\r'.code && prevPrev == '\n'.code && prev == '\r'.code && b == '\n'.code) {
+                break
+            }
+            if (prev == '\n'.code && b == '\n'.code) {
+                break
+            }
+            prev3 = prevPrev
+            prevPrev = prev
+            prev = b
+            if (headerCount > 8192) break
+            b = input.read()
+        }
+
+        val headerText = headerBytes.toString("UTF-8")
+        val fnMatch = Regex("filename=\"([^\"]+)\"").find(headerText)
+            ?: Regex("filename=([^;\\r\\n]+)").find(headerText)
+        if (fnMatch != null) {
+            val rawName = fnMatch.groupValues[1].trim().substringAfterLast('/').substringAfterLast('\\')
+            if (rawName.isNotBlank()) fileName = sanitize(rawName)
+        }
+
+        val destFile = File(destDir, fileName)
+        val tempFile = File(destDir, "$fileName.tmp")
+
+        val boundaryMarker = ("\r\n--$boundary").toByteArray(Charsets.US_ASCII)
+        val markerLen = boundaryMarker.size
+        val totalExpected = (contentLength - headerCount - markerLen - 4).coerceAtLeast(1L)
+
+        var lastProgressMs = 0L
+        var totalWritten = 0L
+        var remainingBodyBytes = if (contentLength > 0) (contentLength - headerCount) else Long.MAX_VALUE
+
+        try {
+            FileOutputStream(tempFile).use { fos ->
+                val buf = ByteArray(64 * 1024)
+                val tail = ByteArray(markerLen + 8)
+                var tailLen = 0
+
+                while (remainingBodyBytes > 0) {
+                    val toRead = minOf(buf.size.toLong(), remainingBodyBytes).toInt()
+                    val read = input.read(buf, 0, toRead)
+                    if (read == -1) break
+                    remainingBodyBytes -= read
+
+                    if (tailLen > 0) {
+                        val combined = ByteArray(tailLen + read)
+                        System.arraycopy(tail, 0, combined, 0, tailLen)
+                        System.arraycopy(buf, 0, combined, tailLen, read)
+
+                        val toWrite = (combined.size - tail.size).coerceAtLeast(0)
+                        if (toWrite > 0) {
+                            fos.write(combined, 0, toWrite)
+                            totalWritten += toWrite
+                        }
+                        tailLen = combined.size - toWrite
+                        System.arraycopy(combined, toWrite, tail, 0, tailLen)
+                    } else {
+                        if (read > tail.size) {
+                            val toWrite = read - tail.size
+                            fos.write(buf, 0, toWrite)
+                            totalWritten += toWrite
+                            tailLen = tail.size
+                            System.arraycopy(buf, toWrite, tail, 0, tailLen)
+                        } else {
+                            System.arraycopy(buf, 0, tail, 0, read)
+                            tailLen = read
+                        }
+                    }
+
+                    val now = System.currentTimeMillis()
+                    if (now - lastProgressMs >= 100L || totalWritten >= totalExpected) {
+                        lastProgressMs = now
+                        val written = totalWritten.coerceAtMost(totalExpected)
+                        SyncManager.updateProgress(transferId, fileName, written, totalExpected)
+                    }
+                }
+
+                if (tailLen > 0) {
+                    var boundaryIdx = -1
+                    for (i in 0..(tailLen - markerLen)) {
+                        var match = true
+                        for (j in 0 until markerLen) {
+                            if (tail[i + j] != boundaryMarker[j]) {
+                                match = false
+                                break
+                            }
+                        }
+                        if (match) {
+                            boundaryIdx = i
+                            break
+                        }
+                    }
+                    val finalBytesToWrite = if (boundaryIdx >= 0) boundaryIdx else tailLen
+                    if (finalBytesToWrite > 0) {
+                        fos.write(tail, 0, finalBytesToWrite)
+                        totalWritten += finalBytesToWrite
+                    }
+                }
+                fos.flush()
+            }
+
+            if (destFile.exists()) destFile.delete()
+            tempFile.renameTo(destFile)
+            return destFile
+        } finally {
+            SyncManager.removeTransfer(transferId)
+            if (tempFile.exists()) tempFile.delete()
+        }
+    }
+
+    private fun sanitize(name: String): String =
+        name.map { if (it.isLetterOrDigit() || it in "-_.") it else '_' }.joinToString("").take(120)
 
     private fun serveDirectoryList(): Response {
         val files = baseDir.listFiles()?.filter {
