@@ -491,4 +491,22 @@
     <string name="fp_success_toast">Đã gửi báo cáo khiếu nại tới Quản trị viên!</string>
     <string name="fp_error_submit_failed">Gửi báo cáo thất bại, vui lòng thử lại.</string>
     <string name="security_detail_sheet_title">Bảo mật &amp; Quét mã độc (AppShield)</string>
+
+    <!-- Security Findings & Score Section -->
+    <string name="verdict_safe">An toàn</string>
+    <string name="verdict_safe_desc">Không phát hiện dấu hiệu can thiệp hay hành vi độc hại nào.</string>
+    <string name="verdict_riskware">Rủi ro nhẹ (Bản Mod)</string>
+    <string name="verdict_riskware_desc">Ứng dụng có thể là bản sửa đổi (Mod), cert không khớp Play Store nhưng không có mã độc.</string>
+    <string name="verdict_suspicious">Đáng ngờ</string>
+    <string name="verdict_suspicious_desc">Phát hiện một số hành vi bất thường, hãy kiểm tra kỹ trước khi cài đặt.</string>
+    <string name="verdict_malicious">Mã độc nguy hiểm</string>
+    <string name="verdict_malicious_desc">Cảnh báo cao! Phát hiện kỹ thuật phá hoại hoặc giả mạo nghiêm trọng.</string>
+    <string name="severity_critical">NGHIÊM TRỌNG</string>
+    <string name="severity_high">CAO</string>
+    <string name="severity_medium">TRUNG BÌNH</string>
+    <string name="severity_low">THẤP</string>
+    <string name="severity_info">THÔNG TIN</string>
+    <string name="finding_evidence_header">Bằng chứng kỹ thuật (Evidence):</string>
+    <string name="finding_copy_evidence_desc">Sao chép bằng chứng</string>
+    <string name="findings_section_title">Phát hiện kỹ thuật (%1$d)</string>
 </resources>

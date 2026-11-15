@@ -491,4 +491,22 @@
     <string name="fp_success_toast">Dispute report submitted to administrator!</string>
     <string name="fp_error_submit_failed">Failed to submit report. Please try again.</string>
     <string name="security_detail_sheet_title">Security &amp; Malware Scan (AppShield)</string>
+
+    <!-- Security Findings & Score Section -->
+    <string name="verdict_safe">Safe</string>
+    <string name="verdict_safe_desc">No malicious behavior or unauthorized tampering detected.</string>
+    <string name="verdict_riskware">Low Risk (Modified App)</string>
+    <string name="verdict_riskware_desc">App appears to be a modified version with non-standard signing, but no active malware detected.</string>
+    <string name="verdict_suspicious">Suspicious</string>
+    <string name="verdict_suspicious_desc">Suspicious behavior detected. Please verify the source before proceeding.</string>
+    <string name="verdict_malicious">Dangerous Malware</string>
+    <string name="verdict_malicious_desc">High risk! Serious malicious behavior or counterfeit signatures detected.</string>
+    <string name="severity_critical">CRITICAL</string>
+    <string name="severity_high">HIGH</string>
+    <string name="severity_medium">MEDIUM</string>
+    <string name="severity_low">LOW</string>
+    <string name="severity_info">INFO</string>
+    <string name="finding_evidence_header">Technical Evidence:</string>
+    <string name="finding_copy_evidence_desc">Copy evidence</string>
+    <string name="findings_section_title">Technical Findings (%1$d)</string>
 </resources>

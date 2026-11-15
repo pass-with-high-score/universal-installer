@@ -1,32 +1,25 @@
 package app.pwhs.universalinstaller.presentation.install.components
 
+import android.content.ClipData
 import android.content.ClipboardManager
 import android.widget.Toast
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Dangerous
 import androidx.compose.material.icons.rounded.GppGood
-import androidx.compose.material.icons.rounded.Info
-import androidx.compose.material.icons.rounded.Shield
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -41,7 +34,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
@@ -61,29 +53,33 @@ fun SecurityScoreHeader(
     modifier: Modifier = Modifier,
 ) {
     val extendedColors = LocalExtendedColors.current
-    val (statusColor, containerColor, verdictLabel, icon) = when (report.verdict) {
-        Verdict.SAFE -> Quadruple(
+    val (statusColor, containerColor, verdictLabel, desc, icon) = when (report.verdict) {
+        Verdict.SAFE -> Quintuple(
             extendedColors.success,
             extendedColors.success.copy(alpha = 0.12f),
-            "An toàn",
+            stringResource(R.string.verdict_safe),
+            stringResource(R.string.verdict_safe_desc),
             Icons.Rounded.GppGood,
         )
-        Verdict.RISKWARE -> Quadruple(
+        Verdict.RISKWARE -> Quintuple(
             extendedColors.warning,
             extendedColors.warningContainer.copy(alpha = 0.5f),
-            "Rủi ro nhẹ (Bản Mod)",
+            stringResource(R.string.verdict_riskware),
+            stringResource(R.string.verdict_riskware_desc),
             Icons.Rounded.Warning,
         )
-        Verdict.SUSPICIOUS -> Quadruple(
+        Verdict.SUSPICIOUS -> Quintuple(
             extendedColors.warning,
             extendedColors.warningContainer,
-            "Đáng ngờ",
+            stringResource(R.string.verdict_suspicious),
+            stringResource(R.string.verdict_suspicious_desc),
             Icons.Rounded.Warning,
         )
-        Verdict.MALICIOUS -> Quadruple(
+        Verdict.MALICIOUS -> Quintuple(
             MaterialTheme.colorScheme.error,
             MaterialTheme.colorScheme.errorContainer,
-            "Mã độc nguy hiểm",
+            stringResource(R.string.verdict_malicious),
+            stringResource(R.string.verdict_malicious_desc),
             Icons.Rounded.Dangerous,
         )
     }
@@ -132,12 +128,7 @@ fun SecurityScoreHeader(
                 }
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text = when (report.verdict) {
-                        Verdict.SAFE -> "Không phát hiện dấu hiệu can thiệp hay hành vi độc hại nào."
-                        Verdict.RISKWARE -> "Ứng dụng có thể là bản sửa đổi (Mod), cert không khớp Play Store nhưng không có mã độc."
-                        Verdict.SUSPICIOUS -> "Phát hiện một số hành vi bất thường, hãy kiểm tra kỹ trước khi cài đặt."
-                        Verdict.MALICIOUS -> "Cảnh báo cao! Phát hiện kỹ thuật phá hoại hoặc giả mạo nghiêm trọng."
-                    },
+                    text = desc,
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -156,11 +147,11 @@ fun SecurityFindingCard(
     var expanded by remember { mutableStateOf(false) }
 
     val (badgeColor, badgeText) = when (finding.severity) {
-        SeverityLevel.CRITICAL -> MaterialTheme.colorScheme.error to "NGHIÊM TRỌNG"
-        SeverityLevel.HIGH -> MaterialTheme.colorScheme.error to "CAO"
-        SeverityLevel.MEDIUM -> extendedColors.warning to "TRUNG BÌNH"
-        SeverityLevel.LOW -> extendedColors.warning to "THẤP"
-        SeverityLevel.INFO -> MaterialTheme.colorScheme.primary to "THÔNG TIN"
+        SeverityLevel.CRITICAL -> MaterialTheme.colorScheme.error to stringResource(R.string.severity_critical)
+        SeverityLevel.HIGH -> MaterialTheme.colorScheme.error to stringResource(R.string.severity_high)
+        SeverityLevel.MEDIUM -> extendedColors.warning to stringResource(R.string.severity_medium)
+        SeverityLevel.LOW -> extendedColors.warning to stringResource(R.string.severity_low)
+        SeverityLevel.INFO -> MaterialTheme.colorScheme.primary to stringResource(R.string.severity_info)
     }
 
     Surface(
@@ -217,7 +208,7 @@ fun SecurityFindingCard(
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
-                                text = "Bằng chứng kỹ thuật (Evidence):",
+                                text = stringResource(R.string.finding_evidence_header),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.primary,
                                 fontWeight = FontWeight.SemiBold,
@@ -232,14 +223,14 @@ fun SecurityFindingCard(
                         IconButton(
                             onClick = {
                                 val cm = context.getSystemService<ClipboardManager>()
-                                cm?.setPrimaryClip(android.content.ClipData.newPlainText("Evidence", evidence))
+                                cm?.setPrimaryClip(ClipData.newPlainText("Evidence", evidence))
                                 Toast.makeText(context, context.getString(R.string.history_detail_copied), Toast.LENGTH_SHORT).show()
                             },
                             modifier = Modifier.size(24.dp),
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.ContentCopy,
-                                contentDescription = "Copy evidence",
+                                contentDescription = stringResource(R.string.finding_copy_evidence_desc),
                                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                 modifier = Modifier.size(16.dp),
                             )
@@ -264,29 +255,29 @@ fun SecurityFindingsSection(
 
         if (report.findings.isNotEmpty()) {
             Text(
-                text = "Phát hiện kỹ thuật (${report.findings.size})",
+                text = stringResource(R.string.findings_section_title, report.findings.size),
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface,
             )
-            Surface(
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.surfaceContainerHigh,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 280.dp),
+
+            // Render findings directly without nested LazyColumn so parent sheet scrolls smoothly
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                LazyColumn(
-                    contentPadding = PaddingValues(10.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    items(report.findings, key = { "${it.ruleId}_${it.title}" }) { finding ->
-                        SecurityFindingCard(finding = finding)
-                    }
+                report.findings.forEach { finding ->
+                    SecurityFindingCard(finding = finding)
                 }
             }
         }
     }
 }
 
-private data class Quadruple<A, B, C, D>(val first: A, val second: B, val third: C, val fourth: D)
+private data class Quintuple<A, B, C, D, E>(
+    val first: A,
+    val second: B,
+    val third: C,
+    val fourth: D,
+    val fifth: E,
+)
