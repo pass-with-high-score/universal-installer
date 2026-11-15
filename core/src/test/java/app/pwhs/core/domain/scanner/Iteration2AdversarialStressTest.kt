@@ -131,116 +131,16 @@ class Iteration2AdversarialStressTest {
     }
 
     // =========================================================================
-    // 2. Cooldown Calculation & State Machine Stress Tests
+    // 2. User API Key Behavior & Short-Circuit Stress Tests
     // =========================================================================
 
     @Test
-    fun testCooldown_rateLimitBoundary_preciseToSingleMillisecond() {
-        val t0 = 10_000_000L
-        var virtualTime = t0
-        VirusTotalKeyManager.clock = { virtualTime }
+    fun testKeyManager_withoutUserKey_shortCircuitsWithoutNetworkCalls() = runBlocking {
+        VirusTotalKeyManager.userApiKeyOverride = null
 
-        VirusTotalKeyManager.markCooldown(validKeyA, VirusTotalKeyManager.RATE_LIMIT_COOLDOWN_MS)
-        assertEquals(t0 + 65_000L, VirusTotalKeyManager.getKeyCooldownUntilMs(validKeyA))
+        assertFalse(VirusTotalKeyManager.canUseVirusTotal(fakeContext))
+        assertFalse(VirusTotalKeyManager.shouldAutoLookupHash(fakeContext, "sha_test"))
 
-        // t0: active
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKeyA))
-
-        // t0 + 64_999ms: strictly active
-        virtualTime = t0 + 64_999L
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKeyA))
-
-        // t0 + 65_000ms: strictly expired
-        virtualTime = t0 + 65_000L
-        assertFalse(VirusTotalKeyManager.isOnCooldown(validKeyA))
-
-        // t0 + 65_001ms: expired
-        virtualTime = t0 + 65_001L
-        assertFalse(VirusTotalKeyManager.isOnCooldown(validKeyA))
-    }
-
-    @Test
-    fun testCooldown_invalidKeyBoundary_preciseToSingleMillisecond() {
-        val t0 = 50_000_000L
-        var virtualTime = t0
-        VirusTotalKeyManager.clock = { virtualTime }
-
-        VirusTotalKeyManager.markCooldown(validKeyA, VirusTotalKeyManager.INVALID_KEY_COOLDOWN_MS)
-        assertEquals(t0 + 3_600_000L, VirusTotalKeyManager.getKeyCooldownUntilMs(validKeyA))
-
-        // t0: active
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKeyA))
-
-        // t0 + 3_599_999ms: strictly active
-        virtualTime = t0 + 3_599_999L
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKeyA))
-
-        // t0 + 3_600_000ms: strictly expired
-        virtualTime = t0 + 3_600_000L
-        assertFalse(VirusTotalKeyManager.isOnCooldown(validKeyA))
-    }
-
-    @Test
-    fun testKeyRotation_skipsCooledKeysAndRestoresWhenExpired() = runBlocking {
-        val t0 = 100_000_000L
-        var virtualTime = t0
-        VirusTotalKeyManager.clock = { virtualTime }
-
-        val remoteSource = object : VtRemoteConfigSource {
-            override suspend fun ensureFetched() = Unit
-            override fun isFallbackEnabled(): Boolean = true
-            override fun getRawKeys(): String = "$validKeyA, $validKeyB, $validKeyC"
-            override fun getDailyLimit(): Int = 20
-        }
-        VirusTotalKeyManager.install(remoteSource)
-
-        // Put Key A on 65s cooldown and Key B on 1h cooldown
-        VirusTotalKeyManager.markCooldown(validKeyA, VirusTotalKeyManager.RATE_LIMIT_COOLDOWN_MS)
-        VirusTotalKeyManager.markCooldown(validKeyB, VirusTotalKeyManager.INVALID_KEY_COOLDOWN_MS)
-
-        // Only Key C is ready
-        val initialCandidates = VirusTotalKeyManager.resolveTrialCandidateKeys(fakeContext, "sha1")
-        assertEquals(1, initialCandidates.size)
-        assertEquals(validKeyC, initialCandidates[0])
-
-        // Advance past 65s: Key A becomes ready, Key B still cooled
-        virtualTime = t0 + 65_000L
-        val after65s = VirusTotalKeyManager.resolveTrialCandidateKeys(fakeContext, "sha1")
-        assertEquals(2, after65s.size)
-        assertTrue(after65s.contains(validKeyA))
-        assertTrue(after65s.contains(validKeyC))
-        assertFalse(after65s.contains(validKeyB))
-
-        // Advance past 1 hour: all 3 keys ready
-        virtualTime = t0 + 3_600_000L
-        val after1h = VirusTotalKeyManager.resolveTrialCandidateKeys(fakeContext, "sha1")
-        assertEquals(3, after1h.size)
-        assertTrue(after1h.contains(validKeyA))
-        assertTrue(after1h.contains(validKeyB))
-        assertTrue(after1h.contains(validKeyC))
-    }
-
-    @Test
-    fun testKeyExhaustion_allKeysOnCooldown_shortCircuitsWithoutNetworkCalls() = runBlocking {
-        var virtualTime = 200_000_000L
-        VirusTotalKeyManager.clock = { virtualTime }
-
-        val remoteSource = object : VtRemoteConfigSource {
-            override suspend fun ensureFetched() = Unit
-            override fun isFallbackEnabled(): Boolean = true
-            override fun getRawKeys(): String = "$validKeyA, $validKeyB"
-            override fun getDailyLimit(): Int = 10
-        }
-        VirusTotalKeyManager.install(remoteSource)
-
-        VirusTotalKeyManager.markCooldown(validKeyA, VirusTotalKeyManager.RATE_LIMIT_COOLDOWN_MS)
-        VirusTotalKeyManager.markCooldown(validKeyB, VirusTotalKeyManager.RATE_LIMIT_COOLDOWN_MS)
-
-        // resolveTrialCandidateKeys returns empty
-        val candidates = VirusTotalKeyManager.resolveTrialCandidateKeys(fakeContext, "sha_exhausted")
-        assertTrue(candidates.isEmpty())
-
-        // checkFile short-circuits to NO_API_KEY with zero network calls
         var checkFileNetworkCalls = 0
         val serviceMock = object : VirusTotalService() {
             override suspend fun checkFile(apiKey: String, sha256: String): VtResult {
@@ -249,11 +149,10 @@ class Iteration2AdversarialStressTest {
             }
         }
 
-        val checkResult = VirusTotalKeyManager.checkFile(fakeContext, serviceMock, "sha_exhausted")
+        val checkResult = VirusTotalKeyManager.checkFile(fakeContext, serviceMock, "sha_test")
         assertEquals(VtStatus.NO_API_KEY, checkResult.status)
         assertEquals(0, checkFileNetworkCalls)
 
-        // uploadAndPoll short-circuits to NO_API_KEY with zero network calls
         var uploadNetworkCalls = 0
         val uploadServiceMock = object : VirusTotalService() {
             override suspend fun uploadFile(apiKey: String, file: File, onProgress: suspend (Int) -> Unit): Result<String> {
@@ -266,7 +165,7 @@ class Iteration2AdversarialStressTest {
             val uploadResult = VirusTotalKeyManager.uploadAndPoll(
                 context = fakeContext,
                 service = uploadServiceMock,
-                sha256 = "sha_exhausted",
+                sha256 = "sha_test",
                 file = dummyFile,
                 onUploadProgress = {},
             )
@@ -278,47 +177,24 @@ class Iteration2AdversarialStressTest {
     }
 
     @Test
-    fun testInFlightCheckFile_rateLimitAndInvalidKey_marksCorrectCooldowns() = runBlocking {
-        var virtualTime = 300_000_000L
-        VirusTotalKeyManager.clock = { virtualTime }
+    fun testKeyManager_withUserKey_delegatesToService() = runBlocking {
+        VirusTotalKeyManager.userApiKeyOverride = validKeyA
 
-        val remoteSource = object : VtRemoteConfigSource {
-            override suspend fun ensureFetched() = Unit
-            override fun isFallbackEnabled(): Boolean = true
-            override fun getRawKeys(): String = "$validKeyA, $validKeyB, $validKeyC"
-            override fun getDailyLimit(): Int = 10
-        }
-        VirusTotalKeyManager.install(remoteSource)
+        assertTrue(VirusTotalKeyManager.canUseVirusTotal(fakeContext))
+        assertTrue(VirusTotalKeyManager.shouldAutoLookupHash(fakeContext, "sha_test"))
 
-        // First rotated key returns 429, second returns 401, third returns CLEAN
-        val calledKeys = mutableListOf<String>()
-        val service = object : VirusTotalService() {
+        var calledKey: String? = null
+        val serviceMock = object : VirusTotalService() {
             override suspend fun checkFile(apiKey: String, sha256: String): VtResult {
-                calledKeys.add(apiKey)
-                return when (calledKeys.size) {
-                    1 -> VtResult(status = VtStatus.RATE_LIMITED, errorMessage = "Rate limited")
-                    2 -> VtResult(status = VtStatus.INVALID_API_KEY, errorMessage = "Invalid key")
-                    else -> VtResult(status = VtStatus.CLEAN, harmless = 50)
-                }
+                calledKey = apiKey
+                return VtResult(status = VtStatus.CLEAN, harmless = 50)
             }
         }
 
-        val result = VirusTotalKeyManager.checkFile(fakeContext, service, "in_flight_sha")
-        assertEquals(VtStatus.CLEAN, result.status)
-        assertEquals(3, calledKeys.size)
-
-        val firstKey = calledKeys[0]
-        val secondKey = calledKeys[1]
-        val thirdKey = calledKeys[2]
-
-        // Verify first key cooled 65s, second key cooled 1h, third key not cooled
-        assertTrue(VirusTotalKeyManager.isOnCooldown(firstKey))
-        assertEquals(virtualTime + 65_000L, VirusTotalKeyManager.getKeyCooldownUntilMs(firstKey))
-
-        assertTrue(VirusTotalKeyManager.isOnCooldown(secondKey))
-        assertEquals(virtualTime + 3_600_000L, VirusTotalKeyManager.getKeyCooldownUntilMs(secondKey))
-
-        assertFalse(VirusTotalKeyManager.isOnCooldown(thirdKey))
+        val checkResult = VirusTotalKeyManager.checkFile(fakeContext, serviceMock, "sha_test")
+        assertEquals(VtStatus.CLEAN, checkResult.status)
+        assertEquals(50, checkResult.harmless)
+        assertEquals(validKeyA, calledKey)
     }
 
     // =========================================================================

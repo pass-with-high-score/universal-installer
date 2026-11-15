@@ -32,8 +32,6 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
             rc.setConfigSettingsAsync(settings)
             rc.setDefaultsAsync(
                 mapOf(
-                    VirusTotalKeyManager.RC_KEY_FALLBACK_ENABLED to true,
-                    VirusTotalKeyManager.RC_KEY_FALLBACK_KEYS to "",
                     VirusTotalKeyManager.RC_KEY_TRIAL_DAILY_LIMIT to VirusTotalKeyManager.DEFAULT_TRIAL_DAILY_LIMIT.toLong(),
                     VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED to true,
                     VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_DAYS to 3L,
@@ -49,7 +47,7 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
 
     override suspend fun ensureFetched() {
         val rc = remoteConfig ?: return
-        if (fetchAttempted || rc.getString(VirusTotalKeyManager.RC_KEY_FALLBACK_KEYS).isNotBlank()) {
+        if (fetchAttempted) {
             return
         }
         withTimeoutOrNull(4_000L) {
@@ -60,18 +58,6 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
                 }
             }
         }
-    }
-
-    override fun isFallbackEnabled(): Boolean {
-        return runCatching {
-            remoteConfig?.getBoolean(VirusTotalKeyManager.RC_KEY_FALLBACK_ENABLED) ?: false
-        }.getOrDefault(false)
-    }
-
-    override fun getRawKeys(): String {
-        return runCatching {
-            remoteConfig?.getString(VirusTotalKeyManager.RC_KEY_FALLBACK_KEYS).orEmpty()
-        }.getOrDefault("")
     }
 
     override fun getDailyLimit(): Int {

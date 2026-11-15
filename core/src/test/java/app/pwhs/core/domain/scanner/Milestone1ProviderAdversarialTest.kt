@@ -42,8 +42,6 @@ class Milestone1ProviderAdversarialTest {
         VirusTotalKeyManager.resetForTesting()
         VirusTotalKeyManager.install(object : VtRemoteConfigSource {
             override suspend fun ensureFetched() = Unit
-            override fun isFallbackEnabled(): Boolean = true
-            override fun getRawKeys(): String = "$sampleKeyA,$sampleKeyB"
             override fun getDailyLimit(): Int = 10
         })
     }
@@ -105,16 +103,16 @@ class Milestone1ProviderAdversarialTest {
     }
 
     @Test
-    fun testKeyManager_trialKeyRateLimitRotation() = runBlocking {
-        var callCount = 0
-        var firstKeyCalled: String? = null
+    fun testKeyManager_userKeyHandling() = runBlocking {
+        VirusTotalKeyManager.userApiKeyOverride = null
+        val noKeyResult = VirusTotalKeyManager.checkFile(fakeContext, VirusTotalService(), "test_sha256")
+        assertEquals(VtStatus.NO_API_KEY, noKeyResult.status)
+
+        VirusTotalKeyManager.userApiKeyOverride = sampleKeyA
+        var calledKey: String? = null
         val serviceSpy = object : VirusTotalService() {
             override suspend fun checkFile(apiKey: String, sha256: String): VtResult {
-                callCount++
-                if (firstKeyCalled == null) {
-                    firstKeyCalled = apiKey
-                    return VtResult(status = VtStatus.RATE_LIMITED, errorMessage = "60")
-                }
+                calledKey = apiKey
                 return VtResult(status = VtStatus.CLEAN, harmless = 70)
             }
         }
@@ -122,7 +120,7 @@ class Milestone1ProviderAdversarialTest {
         val result = VirusTotalKeyManager.checkFile(fakeContext, serviceSpy, "test_sha256")
         assertEquals(VtStatus.CLEAN, result.status)
         assertEquals(70, result.harmless)
-        assertEquals(2, callCount)
+        assertEquals(sampleKeyA, calledKey)
     }
 
     @Test

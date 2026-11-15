@@ -33,13 +33,9 @@ class VirusTotalScannerTest {
     }
 
     private class FakeRemoteSource(
-        private val fallbackEnabled: Boolean = true,
-        private val keys: String = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
         private val dailyLimit: Int = 10,
     ) : VtRemoteConfigSource {
         override suspend fun ensureFetched() = Unit
-        override fun isFallbackEnabled(): Boolean = fallbackEnabled
-        override fun getRawKeys(): String = keys
         override fun getDailyLimit(): Int = dailyLimit
     }
 
@@ -51,6 +47,7 @@ class VirusTotalScannerTest {
     fun setUp() {
         VirusTotalKeyManager.resetForTesting()
         VirusTotalKeyManager.install(FakeRemoteSource())
+        VirusTotalKeyManager.userApiKeyOverride = "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
     }
 
     @After

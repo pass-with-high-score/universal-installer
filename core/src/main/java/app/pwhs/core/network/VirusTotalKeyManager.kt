@@ -1,7 +1,7 @@
 package app.pwhs.core.network
 
 import android.content.Context
-import android.os.SystemClock
+import androidx.annotation.VisibleForTesting
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.domain.model.VtResult
@@ -10,15 +10,11 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import timber.log.Timber
 import java.io.File
 import java.util.Locale
-import java.util.concurrent.ConcurrentHashMap
 
 object VirusTotalKeyManager {
 
-    const val RC_KEY_FALLBACK_ENABLED = "virustotal_fallback_enabled"
-    const val RC_KEY_FALLBACK_KEYS = "virustotal_fallback_keys"
     const val RC_KEY_TRIAL_DAILY_LIMIT = "virustotal_trial_daily_limit"
     const val RC_KEY_NEW_USER_PRO_TRIAL_ENABLED = "new_user_pro_trial_enabled"
     const val RC_KEY_NEW_USER_PRO_TRIAL_DAYS = "new_user_pro_trial_days"
@@ -32,41 +28,20 @@ object VirusTotalKeyManager {
     fun getMilestoneProTrialHours(): Int = remoteSource.getMilestoneProTrialHours()
 
     private val VT_KEY_REGEX = Regex("""\b[0-9a-fA-F]{64}\b""")
-    internal const val RATE_LIMIT_COOLDOWN_MS = 65_000L
-    internal const val INVALID_KEY_COOLDOWN_MS = 3_600_000L
-    private const val MAX_ROTATION_ATTEMPTS = 4
 
     @Volatile
     private var remoteSource: VtRemoteConfigSource = NoOpVtRemoteConfigSource
 
-    private val keyCooldownUntilMs = ConcurrentHashMap<String, Long>()
-
-    internal var clock: () -> Long = {
-        try {
-            SystemClock.elapsedRealtime()
-        } catch (_: Exception) {
-            System.currentTimeMillis()
-        }
-    }
+    @set:VisibleForTesting
+    internal var userApiKeyOverride: String? = null
 
     fun install(source: VtRemoteConfigSource) {
         remoteSource = source
     }
 
-    internal fun clearCooldowns() {
-        keyCooldownUntilMs.clear()
-    }
-
     internal fun resetForTesting() {
-        keyCooldownUntilMs.clear()
         remoteSource = NoOpVtRemoteConfigSource
-        clock = {
-            try {
-                SystemClock.elapsedRealtime()
-            } catch (_: Exception) {
-                System.currentTimeMillis()
-            }
-        }
+        userApiKeyOverride = null
     }
 
     fun parseKeyPool(raw: String): List<String> {
@@ -78,6 +53,7 @@ object VirusTotalKeyManager {
     }
 
     suspend fun readUserApiKey(context: Context): String {
+        userApiKeyOverride?.let { return it }
         return try {
             val prefs = context.dataStore.data.first()
             prefs[SharedPrefsKeys.VIRUSTOTAL_API_KEY]?.trim().orEmpty()
@@ -108,13 +84,11 @@ object VirusTotalKeyManager {
             val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
             val isPro = isPurchasedPro || (trialExp > VirusTotalQuotaStore.currentTrueTimeMillis())
             val usedToday = VirusTotalQuotaStore.parseAppShieldHashesToday(prefs).size
-            val poolNonEmpty = parseKeyPool(remoteSource.getRawKeys()).isNotEmpty()
-            val fallbackActive = remoteSource.isFallbackEnabled() && poolNonEmpty
             val limit = remoteSource.getDailyLimit().takeIf { it > 0 } ?: DEFAULT_TRIAL_DAILY_LIMIT
             VtQuotaStatus(
                 hasPersonalKey = hasPersonalKey,
                 isProUser = isPro,
-                isFallbackEnabled = fallbackActive,
+                isFallbackEnabled = false,
                 usedToday = usedToday,
                 dailyLimit = limit,
             )
@@ -122,23 +96,11 @@ object VirusTotalKeyManager {
     }
 
     suspend fun canUseVirusTotal(context: Context, sha256: String = ""): Boolean {
-        if (readUserApiKey(context).isNotBlank()) return true
-        remoteSource.ensureFetched()
-        if (!remoteSource.isFallbackEnabled()) return false
-        val pool = parseKeyPool(remoteSource.getRawKeys())
-        if (pool.isEmpty()) return false
-        if (isProUser(context)) return true
-        return VirusTotalQuotaStore.isTrialQuotaAvailable(context, sha256, remoteSource.getDailyLimit())
+        return readUserApiKey(context).isNotBlank()
     }
 
     suspend fun shouldAutoLookupHash(context: Context, sha256: String): Boolean {
-        if (readUserApiKey(context).isNotBlank()) return true
-        remoteSource.ensureFetched()
-        if (!remoteSource.isFallbackEnabled()) return false
-        val pool = parseKeyPool(remoteSource.getRawKeys())
-        if (pool.isEmpty()) return false
-        if (isProUser(context)) return true
-        return VirusTotalQuotaStore.isHashAlreadyScannedToday(context, sha256)
+        return readUserApiKey(context).isNotBlank()
     }
 
     suspend fun checkFile(context: Context, service: VirusTotalService, sha256: String): VtResult {
@@ -146,37 +108,10 @@ object VirusTotalKeyManager {
             return VtResult(status = VtStatus.ERROR, errorMessage = "Could not hash file")
         }
         val userKey = readUserApiKey(context)
-        if (userKey.isNotBlank()) {
-            return service.checkFile(userKey, sha256)
-        }
-
-        val candidates = resolveTrialCandidateKeys(context, sha256)
-        if (candidates.isEmpty()) {
+        if (userKey.isBlank()) {
             return VtResult(status = VtStatus.NO_API_KEY)
         }
-
-        var lastResult = VtResult(status = VtStatus.NO_API_KEY)
-        for (candidateKey in candidates) {
-            val result = service.checkFile(candidateKey, sha256)
-            lastResult = result
-            when (result.status) {
-                VtStatus.RATE_LIMITED -> {
-                    markCooldown(candidateKey, RATE_LIMIT_COOLDOWN_MS)
-                    Timber.w("Trial VT key rate-limited on checkFile; rotating to next key")
-                }
-                VtStatus.INVALID_API_KEY -> {
-                    markCooldown(candidateKey, INVALID_KEY_COOLDOWN_MS)
-                    Timber.w("Trial VT key invalid on checkFile; rotating to next key")
-                }
-                else -> {
-                    if (result.status != VtStatus.ERROR && result.status != VtStatus.NOT_FOUND) {
-                        VirusTotalQuotaStore.recordTrialHashUsed(context, sha256)
-                    }
-                    return result
-                }
-            }
-        }
-        return lastResult
+        return service.checkFile(userKey, sha256)
     }
 
     suspend fun uploadAndPoll(
@@ -189,70 +124,10 @@ object VirusTotalKeyManager {
         onPollProgress: (VtStatus, String) -> Unit = { _, _ -> },
     ): VtResult {
         val userKey = readUserApiKey(context)
-        if (userKey.isNotBlank()) {
-            return executeUploadAndPollWithSingleKey(userKey, service, file, onUploadProgress, onQueued, onPollProgress)
-        }
-
-        val candidates = resolveTrialCandidateKeys(context, sha256)
-        if (candidates.isEmpty()) {
+        if (userKey.isBlank()) {
             return VtResult(status = VtStatus.NO_API_KEY)
         }
-
-        var workingKey: String? = null
-        var analysisId: String? = null
-        var lastFailureResult: VtResult? = null
-
-        for (candidateKey in candidates) {
-            onUploadProgress(0)
-            val uploadResult = service.uploadFile(candidateKey, file, onUploadProgress)
-            val id = uploadResult.getOrNull()
-            if (id != null) {
-                workingKey = candidateKey
-                analysisId = id
-                break
-            }
-            val err = uploadResult.exceptionOrNull()
-            if (err is VirusTotalService.VtHttpException) {
-                when (err.vtStatus) {
-                    VtStatus.RATE_LIMITED -> {
-                        markCooldown(candidateKey, RATE_LIMIT_COOLDOWN_MS)
-                        lastFailureResult = VtResult(status = err.vtStatus, errorMessage = err.message.orEmpty())
-                        continue
-                    }
-                    VtStatus.INVALID_API_KEY -> {
-                        markCooldown(candidateKey, INVALID_KEY_COOLDOWN_MS)
-                        lastFailureResult = VtResult(status = err.vtStatus, errorMessage = err.message.orEmpty())
-                        continue
-                    }
-                    else -> return VtResult(status = err.vtStatus, errorMessage = err.message.orEmpty())
-                }
-            } else {
-                return VtResult(status = VtStatus.ERROR, errorMessage = err?.message ?: "Upload failed")
-            }
-        }
-
-        val activeKey = workingKey ?: return (lastFailureResult ?: VtResult(status = VtStatus.NO_API_KEY))
-        val activeAnalysisId = analysisId ?: return (lastFailureResult ?: VtResult(status = VtStatus.NO_API_KEY))
-
-        VirusTotalQuotaStore.recordTrialHashUsed(context, sha256)
-        onQueued(activeAnalysisId)
-
-        val pollResult = service.pollAnalysis(activeKey, activeAnalysisId) { status ->
-            onPollProgress(status, activeAnalysisId)
-        }
-        if (pollResult.status == VtStatus.RATE_LIMITED) {
-            markCooldown(activeKey, RATE_LIMIT_COOLDOWN_MS)
-            val backupKey = candidates.firstOrNull { it != activeKey && !isOnCooldown(it) }
-            if (backupKey != null) {
-                val retryPoll = service.pollAnalysis(backupKey, activeAnalysisId) { status ->
-                    onPollProgress(status, activeAnalysisId)
-                }
-                if (retryPoll.status != VtStatus.RATE_LIMITED) {
-                    return retryPoll
-                }
-            }
-        }
-        return pollResult
+        return executeUploadAndPollWithSingleKey(userKey, service, file, onUploadProgress, onQueued, onPollProgress)
     }
 
     private suspend fun executeUploadAndPollWithSingleKey(
@@ -277,34 +152,4 @@ object VirusTotalKeyManager {
             onPollProgress(status, analysisId)
         }
     }
-
-    internal suspend fun resolveTrialCandidateKeys(context: Context, sha256: String = ""): List<String> {
-        remoteSource.ensureFetched()
-        if (!remoteSource.isFallbackEnabled()) return emptyList()
-        val pool = parseKeyPool(remoteSource.getRawKeys())
-        if (pool.isEmpty()) return emptyList()
-        val dailyLimit = remoteSource.getDailyLimit()
-        if (!isProUser(context) && !VirusTotalQuotaStore.isTrialQuotaAvailable(context, sha256, dailyLimit)) {
-            return emptyList()
-        }
-
-        val now = clock()
-        val readyKeys = pool.filter { key -> (keyCooldownUntilMs[key] ?: 0L) <= now }.shuffled()
-        if (readyKeys.isEmpty()) {
-            Timber.w("All keys in VirusTotal fallback pool are currently on cooldown")
-            return emptyList()
-        }
-        return readyKeys.take(MAX_ROTATION_ATTEMPTS.coerceAtMost(readyKeys.size))
-    }
-
-    internal fun markCooldown(key: String, durationMs: Long) {
-        keyCooldownUntilMs[key] = clock() + durationMs
-    }
-
-    internal fun isOnCooldown(key: String): Boolean {
-        val until = keyCooldownUntilMs[key] ?: return false
-        return clock() < until
-    }
-
-    internal fun getKeyCooldownUntilMs(key: String): Long? = keyCooldownUntilMs[key]
 }

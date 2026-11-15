@@ -9,13 +9,11 @@ data class VtQuotaStatus(
 ) {
     val isUnlimited: Boolean get() = hasPersonalKey || isProUser
     val remainingToday: Int get() = (dailyLimit - usedToday).coerceAtLeast(0)
-    val isQuotaExhausted: Boolean get() = !isUnlimited && (!isFallbackEnabled || remainingToday <= 0)
+    val isQuotaExhausted: Boolean get() = !isUnlimited && remainingToday <= 0
 }
 
 interface VtRemoteConfigSource {
     suspend fun ensureFetched()
-    fun isFallbackEnabled(): Boolean
-    fun getRawKeys(): String
     fun getDailyLimit(): Int
     fun isNewUserProTrialEnabled(): Boolean = true
     fun getNewUserProTrialDays(): Int = 3
@@ -25,8 +23,6 @@ interface VtRemoteConfigSource {
 
 object NoOpVtRemoteConfigSource : VtRemoteConfigSource {
     override suspend fun ensureFetched() = Unit
-    override fun isFallbackEnabled(): Boolean = false
-    override fun getRawKeys(): String = ""
     override fun getDailyLimit(): Int = 0
     override fun isNewUserProTrialEnabled(): Boolean = false
     override fun getNewUserProTrialDays(): Int = 0

@@ -112,16 +112,16 @@ class VirusTotalKeyManagerTest {
 
     @Test
     fun testVtQuotaStatus_trialQuotaCalculations() {
-        val trialActive = VtQuotaStatus(hasPersonalKey = false, isProUser = false, isFallbackEnabled = true, usedToday = 1, dailyLimit = 3)
+        val trialActive = VtQuotaStatus(hasPersonalKey = false, isProUser = false, usedToday = 1, dailyLimit = 3)
         assertFalse(trialActive.isUnlimited)
         assertEquals(2, trialActive.remainingToday)
         assertFalse(trialActive.isQuotaExhausted)
 
-        val trialExhausted = VtQuotaStatus(hasPersonalKey = false, isProUser = false, isFallbackEnabled = true, usedToday = 3, dailyLimit = 3)
+        val trialExhausted = VtQuotaStatus(hasPersonalKey = false, isProUser = false, usedToday = 3, dailyLimit = 3)
         assertEquals(0, trialExhausted.remainingToday)
         assertTrue(trialExhausted.isQuotaExhausted)
 
-        val trialOverLimit = VtQuotaStatus(hasPersonalKey = false, isProUser = false, isFallbackEnabled = true, usedToday = 5, dailyLimit = 3)
+        val trialOverLimit = VtQuotaStatus(hasPersonalKey = false, isProUser = false, usedToday = 5, dailyLimit = 3)
         assertEquals(0, trialOverLimit.remainingToday)
         assertTrue(trialOverLimit.isQuotaExhausted)
     }
@@ -130,108 +130,50 @@ class VirusTotalKeyManagerTest {
     fun testRemoteConfigSource_customImplementation() {
         val customSource = object : VtRemoteConfigSource {
             override suspend fun ensureFetched() {}
-            override fun isFallbackEnabled(): Boolean = true
-            override fun getRawKeys(): String = validKey1
             override fun getDailyLimit(): Int = 5
         }
 
         VirusTotalKeyManager.install(customSource)
-        val pool = VirusTotalKeyManager.parseKeyPool(customSource.getRawKeys())
-        assertEquals(1, pool.size)
-        assertEquals(validKey1, pool[0])
         assertEquals(5, customSource.getDailyLimit())
     }
 
     @Test
-    fun testCooldown_rateLimit_65SecondsCooldown() {
-        var currentTime = 1_000_000L
-        VirusTotalKeyManager.clock = { currentTime }
-
-        VirusTotalKeyManager.markCooldown(validKey1, VirusTotalKeyManager.RATE_LIMIT_COOLDOWN_MS)
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKey1))
-        assertEquals(currentTime + 65_000L, VirusTotalKeyManager.getKeyCooldownUntilMs(validKey1))
-
-        // Before 65s expires
-        currentTime += 64_999L
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKey1))
-
-        // At exactly 65s
-        currentTime += 1L
-        assertFalse(VirusTotalKeyManager.isOnCooldown(validKey1))
+    fun testCanUseVirusTotal_withoutPersonalKey_returnsFalse() = runBlocking {
+        VirusTotalKeyManager.userApiKeyOverride = null
+        assertFalse(VirusTotalKeyManager.canUseVirusTotal(FakeContext()))
     }
 
     @Test
-    fun testCooldown_invalidKey_oneHourCooldown() {
-        var currentTime = 5_000_000L
-        VirusTotalKeyManager.clock = { currentTime }
-
-        VirusTotalKeyManager.markCooldown(validKey1, VirusTotalKeyManager.INVALID_KEY_COOLDOWN_MS)
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKey1))
-        assertEquals(currentTime + 3_600_000L, VirusTotalKeyManager.getKeyCooldownUntilMs(validKey1))
-
-        // At 59 minutes
-        currentTime += 59 * 60 * 1000L
-        assertTrue(VirusTotalKeyManager.isOnCooldown(validKey1))
-
-        // At 60 minutes
-        currentTime += 60 * 1000L
-        assertFalse(VirusTotalKeyManager.isOnCooldown(validKey1))
+    fun testCanUseVirusTotal_withPersonalKey_returnsTrue() = runBlocking {
+        VirusTotalKeyManager.userApiKeyOverride = validKey1
+        assertTrue(VirusTotalKeyManager.canUseVirusTotal(FakeContext()))
     }
 
     @Test
-    fun testKeyRotation_bypassesKeysOnCooldown() = runBlocking {
-        var currentTime = 10_000_000L
-        VirusTotalKeyManager.clock = { currentTime }
-
-        val remoteSource = object : VtRemoteConfigSource {
-            override suspend fun ensureFetched() = Unit
-            override fun isFallbackEnabled(): Boolean = true
-            override fun getRawKeys(): String = "$validKey1, $validKey2"
-            override fun getDailyLimit(): Int = 10
-        }
-        VirusTotalKeyManager.install(remoteSource)
-
-        // Put key 1 on cooldown
-        VirusTotalKeyManager.markCooldown(validKey1, VirusTotalKeyManager.RATE_LIMIT_COOLDOWN_MS)
-
-        val candidates = VirusTotalKeyManager.resolveTrialCandidateKeys(FakeContext(), "test_sha")
-        assertEquals(1, candidates.size)
-        assertEquals(validKey2, candidates[0])
-
-        // When cooldown expires, both keys are available
-        currentTime += 65_000L
-        val refreshedCandidates = VirusTotalKeyManager.resolveTrialCandidateKeys(FakeContext(), "test_sha")
-        assertEquals(2, refreshedCandidates.size)
-        assertTrue(refreshedCandidates.contains(validKey1))
-        assertTrue(refreshedCandidates.contains(validKey2))
-    }
-
-    @Test
-    fun testKeyRotation_allKeysOnCooldown_exhaustsQuotaAndReturnsNoApiKey() = runBlocking {
-        val currentTime = 20_000_000L
-        VirusTotalKeyManager.clock = { currentTime }
-
-        val remoteSource = object : VtRemoteConfigSource {
-            override suspend fun ensureFetched() = Unit
-            override fun isFallbackEnabled(): Boolean = true
-            override fun getRawKeys(): String = "$validKey1, $validKey2"
-            override fun getDailyLimit(): Int = 10
-        }
-        VirusTotalKeyManager.install(remoteSource)
-
-        // Mark all keys on cooldown
-        VirusTotalKeyManager.markCooldown(validKey1, VirusTotalKeyManager.RATE_LIMIT_COOLDOWN_MS)
-        VirusTotalKeyManager.markCooldown(validKey2, VirusTotalKeyManager.INVALID_KEY_COOLDOWN_MS)
-
-        val candidates = VirusTotalKeyManager.resolveTrialCandidateKeys(FakeContext(), "test_sha")
-        assertTrue("No candidate keys should be resolved when all are on cooldown", candidates.isEmpty())
-
+    fun testCheckFile_withoutPersonalKey_returnsNoApiKey() = runBlocking {
+        VirusTotalKeyManager.userApiKeyOverride = null
         val dummyService = object : VirusTotalService() {
             override suspend fun checkFile(apiKey: String, sha256: String): VtResult {
-                throw AssertionError("Should not make network calls when all keys are on cooldown")
+                throw AssertionError("Should not make network calls when personal key is missing")
             }
         }
         val result = VirusTotalKeyManager.checkFile(FakeContext(), dummyService, "test_sha")
         assertEquals(VtStatus.NO_API_KEY, result.status)
+    }
+
+    @Test
+    fun testCheckFile_withPersonalKey_delegatesToService() = runBlocking {
+        VirusTotalKeyManager.userApiKeyOverride = validKey1
+        var calledKey: String? = null
+        val dummyService = object : VirusTotalService() {
+            override suspend fun checkFile(apiKey: String, sha256: String): VtResult {
+                calledKey = apiKey
+                return VtResult(status = VtStatus.CLEAN, harmless = 70)
+            }
+        }
+        val result = VirusTotalKeyManager.checkFile(FakeContext(), dummyService, "test_sha")
+        assertEquals(VtStatus.CLEAN, result.status)
+        assertEquals(70, result.harmless)
+        assertEquals(validKey1, calledKey)
     }
 }
