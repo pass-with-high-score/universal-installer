@@ -5,6 +5,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 
@@ -66,6 +67,12 @@ object SharedPrefsKeys {
 
     /** Comma-separated SHA-256 hashes scanned today using the built-in AppShield engine. */
     val APPSHIELD_SCANNED_HASHES = stringPreferencesKey("appshield_scanned_hashes")
+
+    /** Anonymous client device ID hash for rate limiting. */
+    val ANONYMOUS_DEVICE_ID = stringPreferencesKey("anonymous_device_id")
+
+    /** Monotonic timestamp tracking for anti-date-manipulation quota check. */
+    val QUOTA_LAST_MAX_RECORDED_TIMESTAMP = longPreferencesKey("quota_last_max_recorded_timestamp")
 
     /** Whether the user has unlocked Universal Installer Pro (unlimited built-in VirusTotal). */
     val IS_PRO_USER = booleanPreferencesKey("is_pro_user")

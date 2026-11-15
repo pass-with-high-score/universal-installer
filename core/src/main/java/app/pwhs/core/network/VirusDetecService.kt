@@ -14,6 +14,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.onUpload
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -38,11 +39,32 @@ import timber.log.Timber
 import java.io.File
 import java.io.InputStream
 import java.security.MessageDigest
+import java.util.Locale
+
+data class RateLimitInfo(
+    val limit: Int? = null,
+    val remaining: Int? = null,
+    val reset: Long? = null,
+)
+
+data class ServerTimeResponse(
+    val timestamp: Long,
+    val iso: String,
+    val dateUtc: String,
+)
+
+data class VirusDetecApiException(
+    val httpCode: Int,
+    val errorCode: String?,
+    override val message: String,
+    val rateLimit: RateLimitInfo? = null,
+) : RuntimeException(message)
 
 open class VirusDetecService(
     private val client: HttpClient = defaultClient,
     private val baseUrl: String = PRIMARY_BASE_URL,
     private val apiKey: String = DEFAULT_CLIENT_API_KEY,
+    var deviceIdProvider: (suspend () -> String?)? = null,
 ) {
     companion object {
         const val PRIMARY_BASE_URL = "https://virusdetect.pwhs.app"
@@ -59,6 +81,40 @@ open class VirusDetecService(
                 }
             }
         }
+    }
+
+    private suspend fun HttpRequestBuilder.attachCommonHeaders(language: String) {
+        contentType(ContentType.Application.Json)
+        header("X-API-Key", apiKey)
+        header("Accept-Language", language)
+        val devId = runCatching { deviceIdProvider?.invoke() }.getOrNull()
+        if (!devId.isNullOrBlank()) {
+            header("X-Device-ID", devId)
+        }
+    }
+
+    private suspend fun handleApiError(response: HttpResponse): Nothing {
+        val rateLimit = parseRateLimitHeaders(response.headers)
+        val body = runCatching { response.bodyAsText() }.getOrDefault("")
+        val json = runCatching { JSONObject(body) }.getOrNull()
+        val errorCode = json?.optString("error_code")?.takeIf { it.isNotBlank() }
+        val message = json?.optString("message")?.takeIf { it.isNotBlank() }
+            ?: json?.optString("error")?.takeIf { it.isNotBlank() }
+            ?: "Request failed with HTTP ${response.status.value}"
+        throw VirusDetecApiException(
+            httpCode = response.status.value,
+            errorCode = errorCode,
+            message = message,
+            rateLimit = rateLimit,
+        )
+    }
+
+    private fun parseRateLimitHeaders(headers: io.ktor.http.Headers): RateLimitInfo {
+        return RateLimitInfo(
+            limit = headers["X-RateLimit-Limit"]?.toIntOrNull(),
+            remaining = headers["X-RateLimit-Remaining"]?.toIntOrNull(),
+            reset = headers["X-RateLimit-Reset"]?.toLongOrNull(),
+        )
     }
 
     suspend fun computeSha256(input: InputStream): String = withContext(Dispatchers.IO) {
@@ -78,7 +134,27 @@ open class VirusDetecService(
         }
     }
 
-    open suspend fun lookup(request: LookupRequest, language: String = "vi"): Result<LookupResponse> = withContext(Dispatchers.IO) {
+    open suspend fun getServerTime(): Result<ServerTimeResponse> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = executeWithFallback { url ->
+                client.get("$url/api/v1/time")
+            }
+            if (!response.status.isSuccess()) {
+                handleApiError(response)
+            }
+            val json = JSONObject(response.bodyAsText())
+            ServerTimeResponse(
+                timestamp = json.optLong("timestamp"),
+                iso = json.optString("iso"),
+                dateUtc = json.optString("date_utc"),
+            )
+        }
+    }
+
+    open suspend fun lookup(
+        request: LookupRequest,
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
+    ): Result<LookupResponse> = withContext(Dispatchers.IO) {
         runCatching {
             val payload = JSONObject().apply {
                 put("sha256", request.sha256)
@@ -96,22 +172,24 @@ open class VirusDetecService(
 
             val response = executeWithFallback { url ->
                 client.post("$url/api/v1/scan/lookup") {
-                    contentType(ContentType.Application.Json)
-                    header("X-API-Key", apiKey)
-                    header("Accept-Language", language)
+                    attachCommonHeaders(language)
                     setBody(payload.toString())
                 }
             }
 
             if (!response.status.isSuccess()) {
-                throw IllegalStateException("Lookup failed with HTTP ${response.status.value}: ${response.bodyAsText()}")
+                handleApiError(response)
             }
 
             parseLookupResponse(JSONObject(response.bodyAsText()))
         }
     }
 
-    open suspend fun createUploadTicket(sha256: String, fileSize: Long, language: String = "vi"): Result<UploadTicketResponse> = withContext(Dispatchers.IO) {
+    open suspend fun createUploadTicket(
+        sha256: String,
+        fileSize: Long,
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
+    ): Result<UploadTicketResponse> = withContext(Dispatchers.IO) {
         runCatching {
             val payload = JSONObject().apply {
                 put("sha256", sha256)
@@ -120,15 +198,13 @@ open class VirusDetecService(
 
             val response = executeWithFallback { url ->
                 client.post("$url/api/v1/scan/upload-ticket") {
-                    contentType(ContentType.Application.Json)
-                    header("X-API-Key", apiKey)
-                    header("Accept-Language", language)
+                    attachCommonHeaders(language)
                     setBody(payload.toString())
                 }
             }
 
             if (!response.status.isSuccess()) {
-                throw IllegalStateException("UploadTicket failed with HTTP ${response.status.value}: ${response.bodyAsText()}")
+                handleApiError(response)
             }
 
             val json = JSONObject(response.bodyAsText())
@@ -164,29 +240,37 @@ open class VirusDetecService(
         }
     }
 
-    open suspend fun startScan(jobId: String, language: String = "vi"): Result<String> = withContext(Dispatchers.IO) {
+    open suspend fun startScan(
+        jobId: String,
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
+    ): Result<String> = withContext(Dispatchers.IO) {
         runCatching {
             val payload = JSONObject().apply { put("job_id", jobId) }
             val response = executeWithFallback { url ->
                 client.post("$url/api/v1/scan/start") {
-                    contentType(ContentType.Application.Json)
-                    header("X-API-Key", apiKey)
-                    header("Accept-Language", language)
+                    attachCommonHeaders(language)
                     setBody(payload.toString())
                 }
             }
             if (!response.status.isSuccess()) {
-                throw IllegalStateException("StartScan failed with HTTP ${response.status.value}")
+                handleApiError(response)
             }
             JSONObject(response.bodyAsText()).optString("status")
         }
     }
 
-    open fun watchScanStream(jobId: String, language: String = "vi"): Flow<ScanStepUpdate> = flow {
+    open fun watchScanStream(
+        jobId: String,
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
+    ): Flow<ScanStepUpdate> = flow {
         val streamUrl = "$baseUrl/api/v1/scan/jobs/$jobId/stream?lang=$language"
+        val devId = runCatching { deviceIdProvider?.invoke() }.getOrNull()
         val response: HttpResponse = client.get(streamUrl) {
             header("X-API-Key", apiKey)
             header("Accept-Language", language)
+            if (!devId.isNullOrBlank()) {
+                header("X-Device-ID", devId)
+            }
         }
 
         val channel = response.bodyAsChannel()
@@ -216,7 +300,7 @@ open class VirusDetecService(
 
     suspend fun submitFalsePositive(
         request: FalsePositiveRequest,
-        language: String = "vi",
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
     ): Result<FalsePositiveResponse> = withContext(Dispatchers.IO) {
         runCatching {
             val payload = JSONObject().apply {
@@ -229,15 +313,13 @@ open class VirusDetecService(
 
             val response = executeWithFallback { url ->
                 client.post("$url/api/v1/reports/false-positive") {
-                    contentType(ContentType.Application.Json)
-                    header("X-API-Key", apiKey)
-                    header("Accept-Language", language)
+                    attachCommonHeaders(language)
                     setBody(payload.toString())
                 }
             }
 
             if (!response.status.isSuccess()) {
-                throw IllegalStateException("SubmitFalsePositive failed (${response.status.value}): ${response.bodyAsText()}")
+                handleApiError(response)
             }
 
             val json = JSONObject(response.bodyAsText())

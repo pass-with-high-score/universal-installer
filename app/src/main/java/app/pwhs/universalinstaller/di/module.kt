@@ -12,6 +12,7 @@ import app.pwhs.core.domain.scanner.impl.MockSecurityScanner
 import app.pwhs.core.domain.scanner.impl.OfflineStaticScanner
 import app.pwhs.core.domain.scanner.impl.VirusDetecScanner
 import app.pwhs.core.domain.scanner.impl.VirusTotalScanner
+import app.pwhs.core.network.DeviceIdProvider
 import app.pwhs.core.network.VirusTotalService
 import app.pwhs.universalinstaller.presentation.setting.virustotal.VirusTotalSettingViewModel
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
@@ -40,6 +41,7 @@ import io.ktor.client.plugins.logging.Logging
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -101,7 +103,7 @@ val appModule = module {
             }
         }
     }
-    single { VirusDetecService(get()) }
+    single { VirusDetecService(get(), deviceIdProvider = { DeviceIdProvider.getDeviceId(androidContext()) }) }
     single { VirusTotalService(get()) }
     single { VirusDetecScanner(get<VirusDetecService>()) }
     single { VirusTotalScanner(get<VirusTotalService>()) }

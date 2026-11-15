@@ -14,6 +14,8 @@ import app.pwhs.core.domain.scanner.ScannerCapabilities
 import app.pwhs.core.domain.scanner.ScannerProviderId
 import app.pwhs.core.domain.scanner.SecurityScanResult
 import app.pwhs.core.domain.scanner.toSecurityScanResult
+import app.pwhs.core.network.DeviceIdProvider
+import app.pwhs.core.network.VirusDetecApiException
 import app.pwhs.core.network.VirusDetecService
 import app.pwhs.core.network.VirusTotalKeyManager
 import app.pwhs.core.network.VirusTotalQuotaStore
@@ -75,6 +77,10 @@ class VirusDetecScanner(
         sha256: String,
         metadata: ScanApkMetadata,
     ): Result<SecurityScanResult?> = withContext(Dispatchers.IO) {
+        if (service.deviceIdProvider == null) {
+            service.deviceIdProvider = { DeviceIdProvider.getDeviceId(context) }
+        }
+        VirusTotalQuotaStore.syncWithServer(service)
         if (!isBuiltInQuotaAvailable(context, sha256)) {
             return@withContext Result.failure(
                 ScanErrorException(
@@ -118,6 +124,10 @@ class VirusDetecScanner(
         metadata: ScanApkMetadata,
         options: ScanOptions,
     ): Flow<ScanStep> = channelFlow {
+        if (service.deviceIdProvider == null) {
+            service.deviceIdProvider = { DeviceIdProvider.getDeviceId(context) }
+        }
+        VirusTotalQuotaStore.syncWithServer(service)
         // 1. File size verification
         val fileSize = if (metadata.fileSizeBytes > 0) metadata.fileSizeBytes else queryFileSize(context, uri)
         if (fileSize > capabilities.maxFileSizeBytes) {
@@ -232,6 +242,29 @@ class VirusDetecScanner(
     }
 
     private fun mapExceptionToScanError(t: Throwable?): ScanError {
+        if (t is VirusDetecApiException) {
+            return when (t.errorCode) {
+                "RATE_LIMITED", "ERR_RATE_LIMITED" -> ScanError.RateLimited(
+                    providerId,
+                    retryAfterSeconds = t.rateLimit?.reset,
+                    message = t.message,
+                )
+                "FILE_TOO_LARGE", "ERR_FILE_TOO_LARGE" -> ScanError.FileTooLarge(
+                    providerId,
+                    MAX_FILE_SIZE_BYTES,
+                    MAX_FILE_SIZE_BYTES,
+                    message = t.message,
+                )
+                "INVALID_API_KEY", "ERR_INVALID_API_KEY" -> ScanError.InvalidApiKey(providerId, t.message)
+                "TIMEOUT", "SCAN_TIMEOUT", "ERR_SCAN_TIMEOUT" -> ScanError.Timeout(providerId, 60_000L, t.message)
+                else -> when (t.httpCode) {
+                    429 -> ScanError.RateLimited(providerId, message = t.message)
+                    401, 403 -> ScanError.InvalidApiKey(providerId, t.message)
+                    in 500..599 -> ScanError.ServerError(providerId, t.httpCode, t.message)
+                    else -> ScanError.Generic(providerId, t.message, t)
+                }
+            }
+        }
         val msg = t?.message.orEmpty()
         return when {
             t is java.net.SocketTimeoutException || t is io.ktor.client.plugins.HttpRequestTimeoutException ->
@@ -248,8 +281,10 @@ class VirusDetecScanner(
 
     private fun mapErrorCodeToScanError(code: String?, message: String?): ScanError {
         return when (code) {
-            "RATE_LIMITED" -> ScanError.RateLimited(providerId, message = message ?: "Rate limit reached")
-            "FILE_TOO_LARGE" -> ScanError.FileTooLarge(providerId, MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_BYTES)
+            "RATE_LIMITED", "ERR_RATE_LIMITED" -> ScanError.RateLimited(providerId, message = message ?: "Rate limit reached")
+            "FILE_TOO_LARGE", "ERR_FILE_TOO_LARGE" -> ScanError.FileTooLarge(providerId, MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_BYTES)
+            "TIMEOUT", "SCAN_TIMEOUT", "ERR_SCAN_TIMEOUT" -> ScanError.Timeout(providerId, 60_000L, message ?: "Scan timeout")
+            "INVALID_API_KEY", "ERR_INVALID_API_KEY" -> ScanError.InvalidApiKey(providerId, message ?: "Invalid API key")
             else -> ScanError.Generic(providerId, message ?: code ?: "Scan processing failed")
         }
     }
