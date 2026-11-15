@@ -12,13 +12,20 @@ import app.pwhs.universalinstaller.domain.manager.InstallBlacklist
 import app.pwhs.universalinstaller.domain.model.InstalledApp
 import app.pwhs.universalinstaller.domain.provider.PrivilegedExecutor
 import app.pwhs.universalinstaller.domain.provider.PrivilegedProvider
+import android.content.Context
+import android.os.Environment
+import app.pwhs.core.domain.model.VtResult
+import app.pwhs.core.domain.model.VtStatus
+import app.pwhs.core.domain.scanner.SecurityScannerOrchestrator
 import app.pwhs.universalinstaller.presentation.install.controller.InstallerBackendFactory
 import app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor
 import app.pwhs.universalinstaller.presentation.install.controller.SystemAppMethod
+import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.presentation.manage.util.InstalledAppsLoader
 import app.pwhs.universalinstaller.presentation.manage.util.ManageExtractHelper
 import app.pwhs.universalinstaller.presentation.manage.util.ManageFilterHelper
 import app.pwhs.universalinstaller.presentation.manage.util.ManagePrivilegedActionHelper
+import app.pwhs.universalinstaller.presentation.manage.util.ManageScanHelper
 import app.pwhs.universalinstaller.presentation.manage.util.ManageUninstallHelper
 import app.pwhs.universalinstaller.presentation.manage.util.ManageUsageStatsHelper
 import app.pwhs.core.telemetry.AnalyticsHelper
@@ -29,6 +36,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -43,6 +51,8 @@ class ManageViewModel(
     private val uninstallLogDao: UninstallLogDao,
     private val backendFactory: InstallerBackendFactory,
     private val privilegedProvider: PrivilegedProvider,
+    private val scannerOrchestrator: SecurityScannerOrchestrator,
+    private val virusTotalNotifier: VirusTotalNotifier,
 ) : ViewModel() {
 
     private val notifier = UninstallNotifier(application)
@@ -62,6 +72,14 @@ class ManageViewModel(
     private val _batchExtractState = MutableStateFlow<BatchExtractState>(BatchExtractState.Idle)
     private val _privilegedReady = MutableStateFlow(false)
     private val _privilegedActionResult = MutableStateFlow<PrivilegedActionResult?>(null)
+    private val _securityScanTarget = MutableStateFlow<InstalledApp?>(null)
+    private val _securityScanResult = MutableStateFlow<VtResult?>(null)
+    private val _securityScanSha256 = MutableStateFlow("")
+    private var scanJob: Job? = null
+
+    val securityScanTarget: StateFlow<InstalledApp?> = _securityScanTarget.asStateFlow()
+    val securityScanResult: StateFlow<VtResult?> = _securityScanResult.asStateFlow()
+    val securityScanSha256: StateFlow<String> = _securityScanSha256.asStateFlow()
 
     private var extractJob: Job? = null
 
@@ -99,27 +117,43 @@ class ManageViewModel(
         runExtraction(packageName, appName, ExtractMode.Backup, outputDir = null)
 
     fun shareApp(packageName: String, appName: String) {
-        val shareDir = File(application.cacheDir, "share").apply { mkdirs() }
-        shareDir.listFiles()?.forEach { runCatching { it.delete() } }
+        val shareDir = File(application.cacheDir, "share").apply { mkdirs(); listFiles()?.forEach { runCatching { it.delete() } } }
         runExtraction(packageName, appName, ExtractMode.Share, outputDir = shareDir)
     }
 
     fun reinstallApp(packageName: String, appName: String) {
-        val reinstallDir = File(application.cacheDir, "reinstall").apply { mkdirs() }
-        reinstallDir.listFiles()?.forEach { runCatching { it.delete() } }
+        val reinstallDir = File(application.cacheDir, "reinstall").apply { mkdirs(); listFiles()?.forEach { runCatching { it.delete() } } }
         runExtraction(packageName, appName, ExtractMode.Reinstall, outputDir = reinstallDir)
     }
 
-    fun scanVirusTotal(context: android.content.Context, app: InstalledApp) {
-        AnalyticsHelper.logAppManagementAction("scan_virustotal")
-        viewModelScope.launch { ManageExtractHelper.scanVirusTotal(context, app) }
+    fun scanVirusTotal(context: Context, app: InstalledApp) {
+        AnalyticsHelper.logAppManagementAction("scan_security")
+        _securityScanTarget.value = app
+        _securityScanResult.value = VtResult(status = VtStatus.SCANNING)
+        _securityScanSha256.value = ""
+        scanJob?.cancel()
+        scanJob = viewModelScope.launch {
+            ManageScanHelper.scanInstalledApp(
+                context = context,
+                app = app,
+                scannerOrchestrator = scannerOrchestrator,
+                notifier = virusTotalNotifier,
+                onUpdateSha256 = { _securityScanSha256.value = it },
+                onProgress = { _securityScanResult.value = it },
+            )
+        }
+    }
+
+    fun dismissSecurityScan() {
+        scanJob?.cancel()
+        scanJob = null
+        _securityScanTarget.value = null
+        _securityScanResult.value = null
+        _securityScanSha256.value = ""
     }
 
     fun addToServer(packageName: String, appName: String) {
-        val serverDir = File(
-            android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_DOWNLOADS),
-            "UniversalInstaller"
-        ).apply { mkdirs() }
+        val serverDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "UniversalInstaller").apply { mkdirs() }
         runExtraction(packageName, appName, ExtractMode.Server, outputDir = serverDir)
     }
 
@@ -223,34 +257,16 @@ class ManageViewModel(
 
     fun dismissPrivilegedActionResult() { _privilegedActionResult.value = null }
 
-    fun disableSelected() = runPrivilegedBatch(
-        actionLabelRes = R.string.manage_batch_action_disable,
-        reloadAfter = true,
-    ) { executor, pkg ->
-        when (executor) {
-            PrivilegedExecutor.Root -> backendFactory.setEnabledViaRoot(pkg, false)
-            PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.setEnabled(pkg, false)
-        }
+    fun disableSelected() = runPrivilegedBatch(R.string.manage_batch_action_disable, reloadAfter = true) { e, p ->
+        if (e == PrivilegedExecutor.Root) backendFactory.setEnabledViaRoot(p, false) else ShizukuShellExecutor.setEnabled(p, false)
     }
 
-    fun forceStopSelected() = runPrivilegedBatch(
-        actionLabelRes = R.string.manage_batch_action_force_stop,
-        reloadAfter = false,
-    ) { executor, pkg ->
-        when (executor) {
-            PrivilegedExecutor.Root -> backendFactory.forceStopViaRoot(pkg)
-            PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.forceStop(pkg)
-        }
+    fun forceStopSelected() = runPrivilegedBatch(R.string.manage_batch_action_force_stop, reloadAfter = false) { e, p ->
+        if (e == PrivilegedExecutor.Root) backendFactory.forceStopViaRoot(p) else ShizukuShellExecutor.forceStop(p)
     }
 
-    fun clearDataSelected() = runPrivilegedBatch(
-        actionLabelRes = R.string.manage_batch_action_clear_data,
-        reloadAfter = false,
-    ) { executor, pkg ->
-        when (executor) {
-            PrivilegedExecutor.Root -> backendFactory.clearAppDataViaRoot(pkg)
-            PrivilegedExecutor.Shizuku -> ShizukuShellExecutor.clearAppData(pkg)
-        }
+    fun clearDataSelected() = runPrivilegedBatch(R.string.manage_batch_action_clear_data, reloadAfter = false) { e, p ->
+        if (e == PrivilegedExecutor.Root) backendFactory.clearAppDataViaRoot(p) else ShizukuShellExecutor.clearAppData(p)
     }
 
     private fun runPrivilegedBatch(
@@ -365,15 +381,8 @@ class ManageViewModel(
                 }
             }
             withContext(Dispatchers.Main) {
-                android.widget.Toast.makeText(
-                    application,
-                    application.getString(
-                        if (wasBlocked) R.string.manage_unblocked_toast
-                        else R.string.manage_blocked_toast,
-                        packageName,
-                    ),
-                    android.widget.Toast.LENGTH_LONG,
-                ).show()
+                val msg = application.getString(if (wasBlocked) R.string.manage_unblocked_toast else R.string.manage_blocked_toast, packageName)
+                android.widget.Toast.makeText(application, msg, android.widget.Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -383,25 +392,19 @@ class ManageViewModel(
     fun uninstallSelected() {
         val packages = _selectedPackages.value.toList()
         if (packages.isEmpty()) return
+        _selectedPackages.value = emptySet()
         if (packages.size == 1) {
-            _selectedPackages.value = emptySet()
             uninstallApp(packages.first())
             return
         }
-
         val (systemApps, userApps) = ManageUninstallHelper.partitionByKind(packages, _apps.value)
         if (systemApps.isEmpty()) {
-            _selectedPackages.value = emptySet()
             viewModelScope.launch { runBatchUninstall(userApps.map { it.first }) }
             return
         }
-
         viewModelScope.launch {
             _systemAppPrompt.value = if (privilegedProvider.resolveExecutor() == null) {
-                SystemAppPrompt.PrivilegedRequired(
-                    systemApps = systemApps,
-                    userAppsAvailable = userApps.map { it.first },
-                )
+                SystemAppPrompt.PrivilegedRequired(systemApps = systemApps, userAppsAvailable = userApps.map { it.first })
             } else {
                 SystemAppPrompt.Batch(systemApps = systemApps, userApps = userApps)
             }
@@ -482,13 +485,8 @@ class ManageViewModel(
 
     private fun loadInstalledApps(isRefresh: Boolean = false) {
         viewModelScope.launch {
-            if (isRefresh) {
-                _isRefreshing.value = true
-            } else {
-                _isLoading.value = true
-            }
-            val apps = InstalledAppsLoader.loadInstalledApps(application)
-            _apps.value = apps
+            if (isRefresh) _isRefreshing.value = true else _isLoading.value = true
+            _apps.value = InstalledAppsLoader.loadInstalledApps(application)
             _isLoading.value = false
             _isRefreshing.value = false
         }

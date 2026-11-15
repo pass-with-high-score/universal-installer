@@ -142,6 +142,7 @@ import coil3.request.ImageRequest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import app.pwhs.universalinstaller.util.extension.getDisplayName
+import app.pwhs.universalinstaller.presentation.manage.sheets.ManageSecurityScanSheet
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -152,6 +153,9 @@ fun ManageScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val blockedPackages by viewModel.blacklist.collectAsState()
+    val securityScanTarget by viewModel.securityScanTarget.collectAsState()
+    val securityScanResult by viewModel.securityScanResult.collectAsState()
+    val securityScanSha256 by viewModel.securityScanSha256.collectAsState()
 
     val context = LocalContext.current
     UninstallUi(
@@ -210,6 +214,16 @@ fun ManageScreen(
         onConfirmSystemApp = viewModel::confirmSystemAppPrompt,
         onDismissSystemApp = viewModel::dismissSystemAppPrompt,
     )
+
+    securityScanTarget?.let { target ->
+        ManageSecurityScanSheet(
+            app = target,
+            vtResult = securityScanResult,
+            sha256 = securityScanSha256,
+            onDismiss = viewModel::dismissSecurityScan,
+            onRescan = { viewModel.scanVirusTotal(context, target) },
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
