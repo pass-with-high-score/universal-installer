@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.pm.ResolveInfo
 import android.net.Uri
 import androidx.core.net.toUri
+import app.pwhs.core.security.GhostMapPregate
 import timber.log.Timber
 
 /**
@@ -34,6 +35,11 @@ object SystemInstallerFallback {
      *   installer to hand the file to — in which case there is nothing to offer the user.
      */
     fun resolve(context: Context, apkUri: Uri): Intent? {
+        val check = GhostMapPregate.validateUri(context, apkUri)
+        if (check is GhostMapPregate.ValidationResult.Invalid) {
+            Timber.w("Refusing to resolve system installer fallback for GhostMap malicious APK: ${check.reason}")
+            return null
+        }
         for (action in ACTIONS) {
             val target = candidates(context, action)
                 // Prefer the platform installer over, say, a file manager that also claims APKs:

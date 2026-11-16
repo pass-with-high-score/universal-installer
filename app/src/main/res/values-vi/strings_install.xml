@@ -375,6 +375,9 @@
     <string name="dialog_read_failed_text">Ứng dụng đã gửi gói này không còn cho phép truy cập vào nó nữa. Hãy mở lại tệp từ ứng dụng đó.</string>
     <string name="dialog_parse_failed_title">Không phải gói cài đặt được</string>
     <string name="dialog_parse_failed_text">Đã đọc được tệp, nhưng đây không phải là APK, APKS, XAPK hay APKM hợp lệ — có thể tệp bị thiếu hoặc là một loại lưu trữ khác.</string>
+    <string name="dialog_security_ghostmap_title">Cảnh báo bảo mật: Tệp độc hại (GhostMap)</string>
+    <string name="dialog_security_ghostmap_text">Tệp APK này chứa cấu trúc nén bất thường (lỗ hổng GhostMap) có thể khiến hệ thống Android sập liên tục (bootloop). Trình cài đặt đã chặn hoàn toàn để bảo vệ thiết bị.</string>
+    <string name="dialog_security_ghostmap_badge">Cảnh báo bảo mật: Đã chặn tệp độc hại GhostMap</string>
     <string name="dialog_permission_title">Chưa được phép cài đặt</string>
     <string name="dialog_permission_text">Android cần bạn cấp quyền để ứng dụng này cài đặt gói. Chưa có gì được cài đặt cả.</string>
     <string name="dialog_permission_grant">Cấp quyền</string>

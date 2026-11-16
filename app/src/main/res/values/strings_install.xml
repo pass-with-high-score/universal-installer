@@ -7,6 +7,9 @@
     <string name="dialog_read_failed_text">The app that sent this package no longer allows access to it. Open the file again from that app.</string>
     <string name="dialog_parse_failed_title">Not an installable package</string>
     <string name="dialog_parse_failed_text">The file was read, but it isn\'t a valid APK, APKS, XAPK or APKM — it may be incomplete or a different kind of archive.</string>
+    <string name="dialog_security_ghostmap_title">Security Warning: Malicious Package (GhostMap)</string>
+    <string name="dialog_security_ghostmap_text">This APK contains malformed compression headers (GhostMap vulnerability) that can cause the Android system to crash repeatedly (bootloop). Installation is strictly blocked to protect your device.</string>
+    <string name="dialog_security_ghostmap_badge">Security Warning: Malicious GhostMap package blocked</string>
     <string name="dialog_permission_title">Installation not allowed yet</string>
     <string name="dialog_permission_text">Android needs your permission for this app to install packages. Nothing has been installed yet.</string>
     <string name="dialog_permission_grant">Grant permission</string>

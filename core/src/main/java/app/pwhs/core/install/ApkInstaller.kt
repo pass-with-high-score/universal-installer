@@ -8,6 +8,7 @@ import android.content.IntentFilter
 import android.content.pm.PackageInstaller
 import android.net.Uri
 import androidx.core.content.ContextCompat
+import app.pwhs.core.security.GhostMapPregate
 import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.solrudev.ackpine.splits.Apk
 import ru.solrudev.ackpine.splits.ApkSplits.validate
@@ -65,6 +66,12 @@ class ApkInstaller(private val context: Context) {
         totalBytes: Long = -1L,
         onProgress: ((written: Long, total: Long) -> Unit)? = null,
     ): Result {
+        if (!isBundle) {
+            val check = GhostMapPregate.validateUri(context, uri)
+            if (check is GhostMapPregate.ValidationResult.Invalid) {
+                return Result.Failure("Security Alert (GhostMap blocked): ${check.reason}")
+            }
+        }
         val pm = context.packageManager.packageInstaller
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
         val sessionId = pm.createSession(params)
@@ -112,6 +119,10 @@ class ApkInstaller(private val context: Context) {
             var count = 0
             for (entry in entries) {
                 val apk = entry.apk
+                val check = GhostMapPregate.validateUri(context, apk.uri)
+                if (check is GhostMapPregate.ValidationResult.Invalid) {
+                    throw GhostMapPregate.GhostMapSecurityException(check.reason, check.entryName)
+                }
                 val name = if (apk is Apk.Base) "base.apk" else apk.name.substringAfterLast('/')
                 context.contentResolver.openInputStream(apk.uri)?.use { input ->
                     writeEntry(session, name, input, apk.size, progress)
@@ -133,6 +144,10 @@ class ApkInstaller(private val context: Context) {
                     if (!entry.isDirectory && rawName.endsWith(".apk", ignoreCase = true)) {
                         val tmpFile = File(tempDir, "entry_${entries.size}.apk")
                         tmpFile.outputStream().use { zip.copyTo(it) }
+                        val check = GhostMapPregate.validate(tmpFile)
+                        if (check is GhostMapPregate.ValidationResult.Invalid) {
+                            throw GhostMapPregate.GhostMapSecurityException(check.reason, check.entryName)
+                        }
                         entries.add(rawName to tmpFile)
                     }
                     zip.closeEntry()

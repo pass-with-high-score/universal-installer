@@ -33,7 +33,7 @@ class InstallParseDelegate(
     private val virusTotalNotifier: VirusTotalNotifier,
     private val obbDelegate: InstallObbDelegate,
     private val onProfileMatched: (String) -> Unit,
-    private val onParseFailed: ((String) -> Unit)? = null,
+    private val onParseFailed: ((String, Boolean) -> Unit)? = null,
 ) {
     constructor(
         application: Application,
@@ -141,7 +141,7 @@ class InstallParseDelegate(
                 ) {
                     _isLoading.value = false
                     _pendingApkInfo.value = null
-                    onParseFailed?.invoke(context.getString(app.pwhs.universalinstaller.R.string.dialog_parse_failed_text))
+                    onParseFailed?.invoke(context.getString(app.pwhs.universalinstaller.R.string.dialog_parse_failed_text), false)
                     return@launch
                 }
 
@@ -172,7 +172,12 @@ class InstallParseDelegate(
                 Timber.e(t, "parseApkInfo failed for $fileName")
                 _isLoading.value = false
                 _pendingApkInfo.value = null
-                onParseFailed?.invoke(t.message ?: context.getString(app.pwhs.universalinstaller.R.string.dialog_parse_failed_text))
+                val isGhostMap = t is app.pwhs.core.security.GhostMapPregate.GhostMapSecurityException ||
+                    t.message?.contains("GhostMap", ignoreCase = true) == true
+                onParseFailed?.invoke(
+                    t.message ?: context.getString(app.pwhs.universalinstaller.R.string.dialog_parse_failed_text),
+                    isGhostMap
+                )
             }
         }
     }

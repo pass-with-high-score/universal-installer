@@ -282,14 +282,16 @@ fun generateDialogParams(
                 iconPath = null,
                 apkUri = null,
             )
+            val isGhostMapThreat = stage.errorMessage.contains("GhostMap", ignoreCase = true) ||
+                target.packageName.contains("GhostMap", ignoreCase = true)
             DialogParams(
                 content = DialogInnerParams("failed_${target.sessionId}") {
                     DialogFailedContent(
                         target = target,
                         errorMessage = stage.errorMessage,
                         onClose = { onCloseAfterResult(false) },
-                        onRetry = onRetry,
-                        onFallbackInstall = onFallbackInstall,
+                        onRetry = if (isGhostMapThreat) null else onRetry,
+                        onFallbackInstall = if (isGhostMapThreat) null else onFallbackInstall,
                         uiStyle = uiStyle,
                         onChangeEngine = onChangeEngine,
                         onOpenAdvanced = onOpenAdvanced,
@@ -301,13 +303,14 @@ fun generateDialogParams(
 
         is DialogStage.ReadFailed -> DialogParams(
             content = DialogInnerParams("read_failed") {
+                val isGhostMapThreat = stage.reason.contains("GhostMap", ignoreCase = true)
                 DialogProblemContent(
-                    icon = Icons.Rounded.ErrorOutline,
-                    title = stringResource(R.string.dialog_read_failed_title),
-                    explanation = stringResource(R.string.dialog_read_failed_text),
+                    icon = if (isGhostMapThreat) Icons.Rounded.Security else Icons.Rounded.ErrorOutline,
+                    title = if (isGhostMapThreat) stringResource(R.string.dialog_security_ghostmap_title) else stringResource(R.string.dialog_read_failed_title),
+                    explanation = if (isGhostMapThreat) stringResource(R.string.dialog_security_ghostmap_text) else stringResource(R.string.dialog_read_failed_text),
                     detail = stage.reason,
-                    actionLabel = onFallbackInstall?.let { stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer") },
-                    onAction = onFallbackInstall,
+                    actionLabel = if (isGhostMapThreat) null else onFallbackInstall?.let { stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer") },
+                    onAction = if (isGhostMapThreat) null else onFallbackInstall,
                     onClose = { onCloseAfterResult(false) },
                 )
             }
@@ -315,13 +318,14 @@ fun generateDialogParams(
 
         is DialogStage.ParseFailed -> DialogParams(
             content = DialogInnerParams("parse_failed") {
+                val isGhostMapThreat = stage.reason.contains("GhostMap", ignoreCase = true)
                 DialogProblemContent(
-                    icon = Icons.Rounded.ErrorOutline,
-                    title = stringResource(R.string.dialog_parse_failed_title),
-                    explanation = stringResource(R.string.dialog_parse_failed_text),
+                    icon = if (isGhostMapThreat) Icons.Rounded.Security else Icons.Rounded.ErrorOutline,
+                    title = if (isGhostMapThreat) stringResource(R.string.dialog_security_ghostmap_title) else stringResource(R.string.dialog_parse_failed_title),
+                    explanation = if (isGhostMapThreat) stringResource(R.string.dialog_security_ghostmap_text) else stringResource(R.string.dialog_parse_failed_text),
                     detail = stage.reason,
-                    actionLabel = onFallbackInstall?.let { stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer") },
-                    onAction = onFallbackInstall,
+                    actionLabel = if (isGhostMapThreat) null else onFallbackInstall?.let { stringResource(R.string.dialog_failed_fallback_install, "Install via System Installer") },
+                    onAction = if (isGhostMapThreat) null else onFallbackInstall,
                     onClose = { onCloseAfterResult(false) },
                 )
             }
