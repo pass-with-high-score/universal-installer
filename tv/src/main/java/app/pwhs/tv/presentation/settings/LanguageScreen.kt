@@ -56,6 +56,7 @@ fun LanguageScreen(onBack: () -> Unit) {
             "en" to "English",
             "vi" to "Tiếng Việt",
             "zh" to "中文",
+            "zh-TW" to "繁體中文",
             "es" to "Español",
             "pt" to "Português",
             "ru" to "Русский",
