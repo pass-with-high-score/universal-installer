@@ -220,7 +220,7 @@
     <string name="setting_blacklist_title">已封鎖的套件</string>
     <string name="setting_blacklist_subtitle">永遠不會安裝的套件，適用於會不斷自行重新安裝的應用程式。</string>
     <string name="setting_blacklist_empty">沒有任何封鎖項目</string>
-    <string name="setting_blacklist_empty_hint">若要封鎖應用程式，請開啟「管理」，點選該應用程式，然後選擇「禁止安裝」。</string>
+    <string name="setting_blacklist_empty_hint">若要封鎖應用程式，請開啟「管理」，點選該應用程式，然後選擇「封鎖安裝」。</string>
     <string name="setting_blacklist_remove">解除封鎖</string>
     <string name="setting_blacklist_count">已封鎖 %1$d 個</string>
     <string name="setting_auto_approve_title">自動核准所選應用程式的請求</string>
