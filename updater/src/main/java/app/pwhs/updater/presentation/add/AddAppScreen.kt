@@ -68,6 +68,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.pwhs.core.R
+import app.pwhs.core.presentation.adaptive.MaxWidthContainer
 import app.pwhs.core.ui.theme.Spacing
 import app.pwhs.updater.domain.model.UpdateSourceType
 import app.pwhs.updater.presentation.InstalledAppItem
@@ -80,15 +81,19 @@ fun AddAppScreen(
     viewModel: UpdatesViewModel,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
+    initialUrl: String = "",
+    initialCategory: String = "",
+    initialIncludePrereleases: Boolean = false,
+    initialTargetPackageName: String? = null,
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var urlText by remember { mutableStateOf("") }
-    var categoryText by remember { mutableStateOf("") }
+    var urlText by remember(initialUrl) { mutableStateOf(initialUrl) }
+    var categoryText by remember(initialCategory) { mutableStateOf(initialCategory) }
     var customRegexText by remember { mutableStateOf("") }
-    var includePrereleases by remember { mutableStateOf(false) }
+    var includePrereleases by remember(initialIncludePrereleases) { mutableStateOf(initialIncludePrereleases) }
     var selectedApp by remember { mutableStateOf<InstalledAppItem?>(null) }
     var showAppPicker by remember { mutableStateOf(false) }
 
@@ -141,7 +146,8 @@ fun AddAppScreen(
                 shadowElevation = 8.dp,
                 modifier = Modifier.fillMaxWidth(),
             ) {
-                Box(
+                MaxWidthContainer(
+                    maxWidth = 680.dp,
                     modifier = Modifier
                         .fillMaxWidth()
                         .navigationBarsPadding()
@@ -153,7 +159,7 @@ fun AddAppScreen(
                                 context = context,
                                 url = urlText.trim(),
                                 includePrereleases = includePrereleases,
-                                targetPackageName = selectedApp?.packageName,
+                                targetPackageName = selectedApp?.packageName ?: initialTargetPackageName,
                                 category = categoryText.trim().takeIf { it.isNotBlank() },
                                 onSuccess = onBackClick,
                             )
@@ -183,10 +189,15 @@ fun AddAppScreen(
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
     ) { innerPadding ->
+        MaxWidthContainer(
+            maxWidth = 680.dp,
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = Spacing.L, vertical = Spacing.M),
             verticalArrangement = Arrangement.spacedBy(Spacing.L),
@@ -422,6 +433,7 @@ fun AddAppScreen(
             }
 
             Spacer(modifier = Modifier.height(60.dp))
+        }
         }
     }
 

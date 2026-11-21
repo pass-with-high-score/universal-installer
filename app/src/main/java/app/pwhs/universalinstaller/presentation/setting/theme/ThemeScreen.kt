@@ -23,6 +23,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
 import app.pwhs.core.domain.ThemeMode
 import app.pwhs.core.domain.AppThemePreset
+import app.pwhs.core.presentation.adaptive.MaxWidthContainer
 import androidx.compose.foundation.background
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.graphics.Color
@@ -100,11 +101,16 @@ private fun ThemeUi(
             )
         }
     ) { innerPadding ->
-        LazyColumn(
+        MaxWidthContainer(
+            maxWidth = 680.dp,
             modifier = Modifier
                 .padding(innerPadding)
+                .navigationBarsPadding()
                 .fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 24.dp)
+        ) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 32.dp)
         ) {
             item {
                 Text(
@@ -234,6 +240,7 @@ private fun ThemeUi(
                     }
                 )
             }
+        }
         }
     }
 }

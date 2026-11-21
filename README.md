@@ -13,6 +13,9 @@
     <a href="LICENSE">
       <img src="https://img.shields.io/badge/License-GPL--3.0--only-blue.svg" alt="License">
     </a>
+    <a href="https://t.me/blockads_android_chat">
+      <img src="https://img.shields.io/badge/Telegram-Community-26A5E4?logo=telegram&logoColor=white" alt="Telegram Community">
+    </a>
   </p>
 
   <h4>Download</h4>
@@ -32,6 +35,7 @@
   </p>
 
   <a href="https://universal-installer.pwhs.app/">Website</a> ·
+  <a href="https://t.me/blockads_android_chat">Telegram</a> ·
   <a href="https://universal-installer.pwhs.app/privacy">Privacy</a> ·
   <a href="https://universal-installer.pwhs.app/terms">Terms</a>
 </div>

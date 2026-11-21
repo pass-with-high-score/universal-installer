@@ -7,6 +7,7 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,11 +27,13 @@ import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.FilterAlt
 import androidx.compose.material.icons.rounded.FolderZip
+import androidx.compose.material.icons.rounded.Info
 import androidx.compose.material.icons.rounded.Launch
 import androidx.compose.material.icons.rounded.OpenInBrowser
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Share
 import androidx.compose.material.icons.rounded.SystemUpdate
+import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
@@ -40,13 +43,19 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -71,19 +80,42 @@ fun TrackedAppDetailBottomSheet(
     onCheckUpdate: (TrackedApp) -> Unit,
     onDownloadAndInstall: (TrackedApp) -> Unit,
 ) {
-    val context = LocalContext.current
-
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         containerColor = MaterialTheme.colorScheme.surface,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = Spacing.L)
-                .verticalScroll(rememberScrollState()),
-        ) {
+        TrackedAppDetailContent(
+            app = app,
+            onDismiss = onDismiss,
+            onUpdateApp = onUpdateApp,
+            onDeleteApp = onDeleteApp,
+            onCheckUpdate = onCheckUpdate,
+            onDownloadAndInstall = onDownloadAndInstall,
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TrackedAppDetailContent(
+    app: TrackedApp,
+    onDismiss: () -> Unit,
+    onUpdateApp: (TrackedApp) -> Unit,
+    onDeleteApp: (TrackedApp) -> Unit,
+    onCheckUpdate: (TrackedApp) -> Unit,
+    onDownloadAndInstall: (TrackedApp) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val context = LocalContext.current
+    var activeTab by rememberSaveable(app.packageName) { mutableIntStateOf(0) }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = Spacing.L)
+            .verticalScroll(rememberScrollState()),
+    ) {
             // Header
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -160,78 +192,114 @@ fun TrackedAppDetailBottomSheet(
 
             Spacer(modifier = Modifier.height(Spacing.M))
 
-            // Quick App Actions Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(Spacing.S),
-            ) {
-                if (app.isInstalled) {
-                    FilledTonalButton(
-                        onClick = {
-                            runCatching {
-                                val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                                if (intent != null) context.startActivity(intent)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = MaterialTheme.shapes.medium,
-                    ) {
-                        Icon(Icons.AutoMirrored.Rounded.Launch, contentDescription = null, modifier = Modifier.size(16.dp))
-                        Spacer(modifier = Modifier.width(Spacing.XS))
-                        Text("Open")
-                    }
-                }
-
-                OutlinedButton(
-                    onClick = {
-                        context.openUriSafely(app.sourceUrl)
+            // Compact 2-tab switcher so Overview stays concise while power-user Settings stay 1 tap away.
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                SegmentedButton(
+                    selected = activeTab == 0,
+                    onClick = { activeTab = 0 },
+                    shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Info,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
                     },
-                    modifier = Modifier.weight(1f),
-                    shape = MaterialTheme.shapes.medium,
                 ) {
-                    Icon(Icons.Rounded.OpenInBrowser, contentDescription = null, modifier = Modifier.size(16.dp))
-                    Spacer(modifier = Modifier.width(Spacing.XS))
-                    Text("Source")
+                    Text(
+                        text = "Overview",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
-
-                OutlinedButton(
-                    onClick = {
-                        runCatching {
-                            val sendIntent = Intent(Intent.ACTION_SEND).apply {
-                                type = "text/plain"
-                                putExtra(Intent.EXTRA_TEXT, app.sourceUrl)
-                            }
-                            context.startActivity(Intent.createChooser(sendIntent, "Share App Link"))
-                        }
+                SegmentedButton(
+                    selected = activeTab == 1,
+                    onClick = { activeTab = 1 },
+                    shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Tune,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp),
+                        )
                     },
-                    shape = MaterialTheme.shapes.medium,
                 ) {
-                    Icon(Icons.Rounded.Share, contentDescription = "Share")
+                    Text(
+                        text = stringResource(R.string.nav_settings),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
 
-            if ((app.hasUpdate || !app.isInstalled) && !app.latestDownloadUrl.isNullOrBlank()) {
-                Spacer(modifier = Modifier.height(Spacing.M))
-                Button(
-                    onClick = {
-                        onDismiss()
-                        onDownloadAndInstall(app)
-                    },
+            Spacer(modifier = Modifier.height(Spacing.M))
+
+            if (activeTab == 0) {
+                // Quick App Actions Row
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = MaterialTheme.shapes.medium,
+                    horizontalArrangement = Arrangement.spacedBy(Spacing.S),
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Icon(
-                        if (app.isInstalled) Icons.Rounded.SystemUpdate else Icons.Rounded.Download,
-                        contentDescription = null,
-                        modifier = Modifier.size(18.dp),
-                    )
-                    Spacer(modifier = Modifier.width(Spacing.S))
-                    Text(if (app.isInstalled) "Download & Install Update" else stringResource(R.string.updates_card_btn_install))
+                    if (app.isInstalled) {
+                        FilledTonalButton(
+                            onClick = {
+                                runCatching {
+                                    val intent = context.packageManager.getLaunchIntentForPackage(app.packageName)
+                                    if (intent != null) context.startActivity(intent)
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            shape = MaterialTheme.shapes.medium,
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                        ) {
+                            Icon(Icons.AutoMirrored.Rounded.Launch, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(Spacing.XS))
+                            Text("Open", maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+                        }
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            context.openUriSafely(app.sourceUrl)
+                        },
+                        modifier = Modifier.weight(1f),
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Icon(Icons.Rounded.OpenInBrowser, contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(modifier = Modifier.width(Spacing.XS))
+                        Text("Source", maxLines = 1, softWrap = false, overflow = TextOverflow.Ellipsis)
+                    }
+
+                    OutlinedButton(
+                        onClick = { onCheckUpdate(app) },
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Icon(Icons.Rounded.Refresh, contentDescription = "Check update", modifier = Modifier.size(18.dp))
+                    }
+
+                    OutlinedButton(
+                        onClick = {
+                            runCatching {
+                                val sendIntent = Intent(Intent.ACTION_SEND).apply {
+                                    type = "text/plain"
+                                    putExtra(Intent.EXTRA_TEXT, app.sourceUrl)
+                                }
+                                context.startActivity(Intent.createChooser(sendIntent, "Share App Link"))
+                            }
+                        },
+                        shape = MaterialTheme.shapes.medium,
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp),
+                    ) {
+                        Icon(Icons.Rounded.Share, contentDescription = "Share", modifier = Modifier.size(18.dp))
+                    }
                 }
 
-                if (app.availableAssets.size > 1) {
-                    Spacer(modifier = Modifier.height(Spacing.S))
-                    OutlinedButton(
+                if ((app.hasUpdate || !app.isInstalled) && !app.latestDownloadUrl.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(Spacing.M))
+                    Button(
                         onClick = {
                             onDismiss()
                             onDownloadAndInstall(app)
@@ -239,93 +307,110 @@ fun TrackedAppDetailBottomSheet(
                         modifier = Modifier.fillMaxWidth(),
                         shape = MaterialTheme.shapes.medium,
                     ) {
-                        Icon(Icons.Rounded.FolderZip, contentDescription = null, modifier = Modifier.size(18.dp))
+                        Icon(
+                            if (app.isInstalled) Icons.Rounded.SystemUpdate else Icons.Rounded.Download,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp),
+                        )
                         Spacer(modifier = Modifier.width(Spacing.S))
-                        Text(stringResource(R.string.updates_detail_choose_asset_btn, app.availableAssets.size))
+                        Text(if (app.isInstalled) "Download & Install Update" else stringResource(R.string.updates_card_btn_install))
+                    }
+
+                    if (app.availableAssets.size > 1) {
+                        Spacer(modifier = Modifier.height(Spacing.S))
+                        OutlinedButton(
+                            onClick = {
+                                onDismiss()
+                                onDownloadAndInstall(app)
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                        ) {
+                            Icon(Icons.Rounded.FolderZip, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(modifier = Modifier.width(Spacing.S))
+                            Text(stringResource(R.string.updates_detail_choose_asset_btn, app.availableAssets.size))
+                        }
                     }
                 }
-            }
 
-            Spacer(modifier = Modifier.height(Spacing.L))
-            HorizontalDivider()
-            Spacer(modifier = Modifier.height(Spacing.M))
+                Spacer(modifier = Modifier.height(Spacing.M))
 
-            // Changelog / Release notes
-            Text(
-                text = stringResource(R.string.updates_card_changelog_title),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-            )
-            Spacer(modifier = Modifier.height(Spacing.S))
-            val changelogScrollState = rememberScrollState()
-            Surface(
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surfaceContainerLowest,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .heightIn(max = 240.dp),
-            ) {
-                Box(
+                // Changelog / Release notes
+                Text(
+                    text = stringResource(R.string.updates_card_changelog_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(modifier = Modifier.height(Spacing.S))
+                val changelogScrollState = rememberScrollState()
+                Surface(
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.surfaceContainerLowest,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .verticalScroll(changelogScrollState)
-                        .verticalScrollbar(changelogScrollState)
-                        .padding(Spacing.M),
+                        .heightIn(min = 96.dp, max = 360.dp),
                 ) {
-                    Text(
-                        text = app.releaseNotes?.takeIf { it.isNotBlank() } ?: "No release notes provided for this version.",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(Spacing.L))
-            HorizontalDivider()
-            Spacer(modifier = Modifier.height(Spacing.M))
-
-            // Per-App Settings Section
-            TrackedAppConfigurationSection(
-                app = app,
-                onSaveConfig = onUpdateApp,
-            )
-
-            Spacer(modifier = Modifier.height(Spacing.M))
-
-            // Ignore version / Delete app actions
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-            ) {
-                if (app.isVersionIgnored) {
-                    TextButton(onClick = {
-                        onUpdateApp(app.copy(ignoredVersion = null))
-                    }) {
-                        Text("Unignore Version")
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .verticalScroll(changelogScrollState)
+                            .verticalScrollbar(changelogScrollState)
+                            .padding(Spacing.M),
+                    ) {
+                        Text(
+                            text = app.releaseNotes?.takeIf { it.isNotBlank() } ?: "No release notes provided for this version.",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
                     }
-                } else if (app.hasUpdate && app.latestVersionName != null) {
-                    TextButton(onClick = {
-                        onUpdateApp(app.copy(ignoredVersion = app.latestVersionName))
-                    }) {
-                        Icon(Icons.Rounded.Block, contentDescription = null, modifier = Modifier.size(16.dp))
+                }
+
+                Spacer(modifier = Modifier.height(Spacing.M))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(Spacing.S))
+
+                // Ignore version / Delete app actions
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    if (app.isVersionIgnored) {
+                        TextButton(onClick = {
+                            onUpdateApp(app.copy(ignoredVersion = null))
+                        }) {
+                            Text("Unignore Version")
+                        }
+                    } else if (app.hasUpdate && app.latestVersionName != null) {
+                        TextButton(onClick = {
+                            onUpdateApp(app.copy(ignoredVersion = app.latestVersionName))
+                        }) {
+                            Icon(Icons.Rounded.Block, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(Spacing.XS))
+                            Text("Ignore ${app.latestVersionName}")
+                        }
+                    } else {
+                        Spacer(modifier = Modifier.width(1.dp))
+                    }
+
+                    TextButton(
+                        onClick = {
+                            onDismiss()
+                            onDeleteApp(app)
+                        },
+                    ) {
+                        Icon(Icons.Rounded.DeleteOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
                         Spacer(modifier = Modifier.width(Spacing.XS))
-                        Text("Ignore ${app.latestVersionName}")
+                        Text("Delete Tracking", color = MaterialTheme.colorScheme.error)
                     }
                 }
-
-                TextButton(
-                    onClick = {
-                        onDismiss()
-                        onDeleteApp(app)
-                    },
-                ) {
-                    Icon(Icons.Rounded.DeleteOutline, contentDescription = null, tint = MaterialTheme.colorScheme.error)
-                    Spacer(modifier = Modifier.width(Spacing.XS))
-                    Text("Delete Tracking", color = MaterialTheme.colorScheme.error)
-                }
+            } else {
+                // Per-App Settings Section
+                TrackedAppConfigurationSection(
+                    app = app,
+                    onSaveConfig = onUpdateApp,
+                )
             }
 
-            Spacer(modifier = Modifier.height(36.dp))
-        }
+            Spacer(modifier = Modifier.height(24.dp))
     }
 }

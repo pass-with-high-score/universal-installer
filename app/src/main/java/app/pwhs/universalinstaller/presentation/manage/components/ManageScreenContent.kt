@@ -51,6 +51,7 @@ internal fun ManageScreenContent(
     onShowActions: (InstalledApp) -> Unit,
     onToggleSelection: (String) -> Unit,
     modifier: Modifier = Modifier,
+    activePackageName: String? = null,
 ) {
     Column(
         modifier = modifier.fillMaxSize()
@@ -150,6 +151,7 @@ internal fun ManageScreenContent(
                     onRefresh = onRefresh,
                     onShowActions = onShowActions,
                     onToggleSelection = onToggleSelection,
+                    activePackageName = activePackageName,
                 )
             }
         }

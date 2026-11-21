@@ -15,7 +15,12 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
+import app.pwhs.core.presentation.adaptive.AdaptiveTwoPane
+import app.pwhs.core.presentation.adaptive.FoldablePosture
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
+import app.pwhs.core.presentation.adaptive.TabletopSplitLayout
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -75,42 +80,48 @@ internal fun PageContent(
     analyticsEnabled: Boolean = true,
     onAnalyticsEnabledChange: (Boolean) -> Unit = {},
     pageOffset: Float = 0f,
+    pageIndex: Int = 0,
+    totalPages: Int = 1,
 ) {
-    // Centered while it fits, scrollable once the keyboard takes half the screen away.
-    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-        val viewportHeight = maxHeight
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+    val tabletopPosture = adaptiveInfo.posture as? FoldablePosture.Tabletop
+
+    val copyAndControls: @Composable (TextAlign, Alignment.Horizontal) -> Unit = { textAlign, horizontalAlignment ->
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .heightIn(min = viewportHeight),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+                .widthIn(max = 460.dp),
+            horizontalAlignment = horizontalAlignment,
         ) {
-            AnimatedOnboardingBadge(
-                page = page,
-                pageOffset = pageOffset,
-                isPermissionPage = isPermissionPage,
-                hasPermission = hasPermission,
-            )
-
-            Spacer(Modifier.height(32.dp))
-
             Text(
                 text = page.title,
-                style = MaterialTheme.typography.headlineSmall,
+                style = if (adaptiveInfo.useTwoPane) {
+                    MaterialTheme.typography.headlineLarge
+                } else {
+                    MaterialTheme.typography.headlineSmall
+                },
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
+                textAlign = textAlign,
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(if (adaptiveInfo.useTwoPane) 16.dp else 12.dp))
             Text(
                 text = page.description,
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
+                style = if (adaptiveInfo.useTwoPane) {
+                    MaterialTheme.typography.titleMedium
+                } else {
+                    MaterialTheme.typography.bodyLarge
+                },
+                fontWeight = FontWeight.Normal,
+                textAlign = textAlign,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = if (textAlign == TextAlign.Center) 16.dp else 0.dp),
             )
+
+            if (adaptiveInfo.useTwoPane && page.badgeType == OnboardingBadgeType.INSTALL) {
+                Spacer(Modifier.height(24.dp))
+                SupportedFormatPills()
+            }
 
             if (page.deviceSupportList) {
                 Spacer(Modifier.height(24.dp))
@@ -175,6 +186,106 @@ internal fun PageContent(
                         Spacer(Modifier.width(8.dp))
                         Text(stringResource(R.string.onboarding_grant_permission))
                     }
+                }
+            }
+        }
+    }
+
+    when {
+        tabletopPosture != null -> {
+            TabletopSplitLayout(
+                posture = tabletopPosture,
+                topContent = {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        AnimatedOnboardingBadge(
+                            page = page,
+                            pageOffset = pageOffset,
+                            isPermissionPage = isPermissionPage,
+                            hasPermission = hasPermission,
+                        )
+                    }
+                },
+                bottomContent = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                            .padding(top = 16.dp),
+                        contentAlignment = Alignment.TopCenter,
+                    ) {
+                        copyAndControls(TextAlign.Center, Alignment.CenterHorizontally)
+                    }
+                },
+            )
+        }
+
+        adaptiveInfo.useTwoPane -> {
+            AdaptiveTwoPane(
+                firstWeight = 0.48f,
+                showDividerWhenFlat = false,
+                first = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(end = 20.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        OnboardingHeroPanel(
+                            page = page,
+                            pageOffset = pageOffset,
+                            isPermissionPage = isPermissionPage,
+                            hasPermission = hasPermission,
+                            pageIndex = pageIndex,
+                            totalPages = totalPages,
+                        )
+                    }
+                },
+                second = {
+                    BoxWithConstraints(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 24.dp),
+                    ) {
+                        val paneHeight = maxHeight
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .verticalScroll(rememberScrollState())
+                                .heightIn(min = paneHeight),
+                            contentAlignment = Alignment.CenterStart,
+                        ) {
+                            copyAndControls(TextAlign.Start, Alignment.Start)
+                        }
+                    }
+                },
+            )
+        }
+
+        else -> {
+            // Centered while it fits, scrollable once the keyboard takes half the screen away.
+            BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                val viewportHeight = maxHeight
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState())
+                        .heightIn(min = viewportHeight),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center,
+                ) {
+                    AnimatedOnboardingBadge(
+                        page = page,
+                        pageOffset = pageOffset,
+                        isPermissionPage = isPermissionPage,
+                        hasPermission = hasPermission,
+                    )
+
+                    Spacer(Modifier.height(32.dp))
+
+                    copyAndControls(TextAlign.Center, Alignment.CenterHorizontally)
                 }
             }
         }

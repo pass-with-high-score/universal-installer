@@ -155,6 +155,7 @@ internal fun AppCard(
     onLongClick: () -> Unit,
     onToggleSelect: () -> Unit,
     modifier: Modifier = Modifier,
+    isActiveDetail: Boolean = false,
 ) {
     val context = LocalContext.current
 
@@ -163,8 +164,8 @@ internal fun AppCard(
             .fillMaxWidth()
             .clip(MaterialTheme.shapes.large)
             .semantics {
-                if (isSelectionMode) {
-                    selected = isSelected
+                if (isSelectionMode || isActiveDetail) {
+                    selected = isSelected || isActiveDetail
                 }
             }
             .combinedClickable(
@@ -175,15 +176,18 @@ internal fun AppCard(
             ),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surfaceContainerLow,
+            containerColor = when {
+                isSelected -> MaterialTheme.colorScheme.primaryContainer
+                isActiveDetail -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.45f)
+                else -> MaterialTheme.colorScheme.surfaceContainerLow
+            },
         ),
         // Flat card — no shadow. A thin outline separates each row; a primary border marks
-        // the current selection so it reads even without the leading check icon.
+        // the current selection or active detail item in 2-pane mode.
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(
-            1.dp,
-            if (isSelected) MaterialTheme.colorScheme.primary
+            width = if (isSelected || isActiveDetail) 1.5.dp else 1.dp,
+            color = if (isSelected || isActiveDetail) MaterialTheme.colorScheme.primary
                 else MaterialTheme.colorScheme.outlineVariant,
         ),
     ) {

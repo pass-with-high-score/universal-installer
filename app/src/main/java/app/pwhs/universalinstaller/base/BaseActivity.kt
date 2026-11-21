@@ -18,6 +18,7 @@ import app.pwhs.core.domain.ThemeMode
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.domain.AppThemePreset
+import app.pwhs.core.presentation.adaptive.ProvideAdaptiveLayoutInfo
 import app.pwhs.universalinstaller.ui.theme.UniversalInstallerTheme
 import app.pwhs.universalinstaller.util.LocaleHelper
 import kotlinx.coroutines.flow.first
@@ -118,10 +119,12 @@ abstract class BaseActivity : FragmentActivity() {
                 amoledMode = themeState.amoledMode,
                 themePreset = themeState.themePreset
             ) {
-                if (this@BaseActivity !is app.pwhs.universalinstaller.presentation.splash.SplashActivity) {
-                    app.pwhs.universalinstaller.presentation.setting.security.components.AppLockGate()
+                ProvideAdaptiveLayoutInfo(activity = this@BaseActivity) {
+                    if (this@BaseActivity !is app.pwhs.universalinstaller.presentation.splash.SplashActivity) {
+                        app.pwhs.universalinstaller.presentation.setting.security.components.AppLockGate()
+                    }
+                    content()
                 }
-                content()
             }
         }
     }

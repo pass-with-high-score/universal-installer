@@ -109,6 +109,7 @@
              launches via shortcuts still get a polished system splash. -->
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.UniversalInstaller.Splash" />
@@ -116,6 +117,7 @@
         <activity
             android:name=".presentation.install.InstallActivity"
             android:autoRemoveFromRecents="true"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:excludeFromRecents="true"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
@@ -127,7 +129,7 @@
         <activity
             android:name=".presentation.install.DialogInstallActivity"
             android:autoRemoveFromRecents="true"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:excludeFromRecents="true"
             android:exported="true"
             android:label="@string/installer_dialog_label"
@@ -302,7 +304,7 @@
         <activity
             android:name=".presentation.manage.uninstall.DialogUninstallActivity"
             android:autoRemoveFromRecents="true"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:excludeFromRecents="true"
             android:exported="true"
             android:label="@string/uninstaller_dialog_label"
@@ -327,66 +329,82 @@
         </activity>
         <activity
             android:name=".presentation.manage.ManageActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.stats.StatsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.manage.BackupsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.manage.permissions.AppPermissionsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.sync.SyncActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.sync.SendToTvActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="true"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.SettingActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.download.DownloadHistoryActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.manage.logs.UninstallLogsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.language.LanguageActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.profile.ProfileActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.profile.edit.ProfileEditActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.about.AboutActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.diagnostics.DiagnosticsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.help.HelpActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
             android:name=".presentation.setting.blacklist.BlacklistActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
         <activity
@@ -396,6 +414,7 @@
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name=".presentation.setting.autoapprove.AutoApproveActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:theme="@style/Theme.UniversalInstaller" />
 
@@ -452,18 +471,22 @@
 
         <activity
             android:name=".presentation.setting.theme.ThemeActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
             android:name=".presentation.setting.installui.InstallUiActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
             android:name=".presentation.setting.security.SecurityActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
             android:name=".presentation.setting.virustotal.VirusTotalSettingActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"
             android:launchMode="singleTop" />
         <!-- Answers the Cancel action on an install-prompt notification without opening a

@@ -36,6 +36,7 @@ internal fun AppListLayout(
     onShowActions: (InstalledApp) -> Unit,
     onToggleSelection: (String) -> Unit,
     modifier: Modifier = Modifier,
+    activePackageName: String? = null,
 ) {
     val sideloadLabel = stringResource(R.string.manage_group_other)
     PullToRefreshBox(
@@ -76,6 +77,7 @@ internal fun AppListLayout(
                             isSelectionMode = isSelectionMode,
                             isSelected = app.packageName in selectedPackages,
                             isBlocked = app.packageName in blockedPackages,
+                            isActiveDetail = activePackageName != null && app.packageName == activePackageName,
                             onShowActions = { onShowActions(app) },
                             onLongClick = { onToggleSelection(app.packageName) },
                             onToggleSelect = { onToggleSelection(app.packageName) },
@@ -93,6 +95,7 @@ internal fun AppListLayout(
                         isSelectionMode = isSelectionMode,
                         isSelected = app.packageName in selectedPackages,
                         isBlocked = app.packageName in blockedPackages,
+                        isActiveDetail = activePackageName != null && app.packageName == activePackageName,
                         onShowActions = { onShowActions(app) },
                         onLongClick = { onToggleSelection(app.packageName) },
                         onToggleSelect = { onToggleSelection(app.packageName) },

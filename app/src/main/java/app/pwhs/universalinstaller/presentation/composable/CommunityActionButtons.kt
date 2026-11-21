@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import app.pwhs.core.util.openUriSafely
 import app.pwhs.universalinstaller.R
 
-private const val TELEGRAM_URL = "https://t.me/blockads_android"
+private const val TELEGRAM_URL = "https://t.me/blockads_android_chat"
 private const val GITHUB_URL = "https://github.com/pass-with-high-score/universal-installer"
 
 /**

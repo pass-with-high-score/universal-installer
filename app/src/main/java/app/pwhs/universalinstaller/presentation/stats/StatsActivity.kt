@@ -8,7 +8,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import app.pwhs.core.telemetry.AnalyticsHelper
 import app.pwhs.universalinstaller.base.BaseActivity
-import app.pwhs.universalinstaller.presentation.composable.BottomBar
+import app.pwhs.universalinstaller.presentation.composable.AdaptiveNavScaffold
 import app.pwhs.universalinstaller.presentation.composable.BottomBarItem
 import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.universalinstaller.telemetry.TelemetryEvents
@@ -24,19 +24,11 @@ class StatsActivity : BaseActivity() {
         Telemetry.feature(TelemetryEvents.FEATURE_USER_STATS)
         val openMilestones = intent?.getBooleanExtra(EXTRA_OPEN_MILESTONES, false) == true
         setContentWithTheme {
-            Scaffold(
-                bottomBar = { BottomBar(BottomBarItem.Stats) },
-            ) { innerPadding ->
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(bottom = innerPadding.calculateBottomPadding()),
-                ) {
-                    StatsScreen(
-                        viewModel = viewModel,
-                        initialTab = if (openMilestones) 1 else 0,
-                    )
-                }
+            AdaptiveNavScaffold(currentTab = BottomBarItem.Stats) {
+                StatsScreen(
+                    viewModel = viewModel,
+                    initialTab = if (openMilestones) 1 else 0,
+                )
             }
         }
     }

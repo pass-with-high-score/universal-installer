@@ -32,7 +32,8 @@ import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.FolderZip
 import androidx.compose.material.icons.rounded.History
-import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.material.icons.rounded.MoveToInbox
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.MilitaryTech
 import androidx.compose.material.icons.rounded.Security
@@ -41,8 +42,8 @@ import androidx.compose.material.icons.rounded.SportsEsports
 import androidx.compose.material.icons.rounded.Storage
 import androidx.compose.material.icons.rounded.Verified
 import androidx.compose.material.icons.rounded.WorkspacePremium
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -142,18 +143,20 @@ fun MilestoneItemCard(
         "${(item.targetValue * animatedProgress).roundToLong().coerceAtMost(displayedCurrent)} / ${item.targetValue}"
     }
 
-    ElevatedCard(
+    Card(
         onClick = onClick ?: {},
         enabled = onClick != null,
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.elevatedCardColors(
+        colors = CardDefaults.cardColors(
             containerColor = if (item.isUnlocked) {
                 colors.secondaryContainer.copy(alpha = 0.55f).compositeOver(colors.surface)
             } else {
                 colors.surfaceContainerLow
             },
         ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, colors.outlineVariant),
     ) {
         Row(
             modifier = Modifier
@@ -278,7 +281,7 @@ fun MilestoneItemCard(
 }
 
 fun MilestoneId.iconVector(): ImageVector = when (this) {
-    MilestoneId.FIRST_INSTALL -> Icons.Rounded.InstallMobile
+    MilestoneId.FIRST_INSTALL -> Icons.Rounded.MoveToInbox
     MilestoneId.TEN_INSTALLS -> Icons.Rounded.Verified
     MilestoneId.FIFTY_INSTALLS -> Icons.Rounded.MilitaryTech
     MilestoneId.HUNDRED_INSTALLS -> Icons.Rounded.EmojiEvents

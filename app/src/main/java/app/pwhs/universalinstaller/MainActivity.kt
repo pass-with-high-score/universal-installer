@@ -23,9 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import app.pwhs.core.domain.AppThemePreset
 import app.pwhs.core.domain.ThemeMode
+import app.pwhs.core.presentation.adaptive.ProvideAdaptiveLayoutInfo
 import app.pwhs.core.presentation.onboarding.OnboardingScreen
 import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.core.util.DeviceCompat
@@ -120,11 +122,11 @@ class MainActivity : ComponentActivity() {
                 onDispose {}
             }
 
-            var currentRoute by remember {
+            var currentRoute by rememberSaveable {
                 mutableStateOf(if (showOnboarding) AppRoute.Onboarding else AppRoute.Main)
             }
 
-            var onboardingStartTime by remember { mutableLongStateOf(System.currentTimeMillis()) }
+            var onboardingStartTime by rememberSaveable { mutableLongStateOf(System.currentTimeMillis()) }
 
             UniversalInstallerTheme(
                 darkTheme = darkTheme,
@@ -132,6 +134,7 @@ class MainActivity : ComponentActivity() {
                 amoledMode = themeState.amoledMode,
                 themePreset = themeState.themePreset,
             ) {
+                ProvideAdaptiveLayoutInfo(activity = this@MainActivity) {
                 when (currentRoute) {
                     AppRoute.Onboarding -> {
                         val backupViewModel: app.pwhs.universalinstaller.presentation.setting.backup.BackupViewModel = org.koin.androidx.compose.koinViewModel()
@@ -201,6 +204,7 @@ class MainActivity : ComponentActivity() {
                             this@MainActivity.disableSceneTransition()
                         }
                     }
+                }
                 }
             }
         }

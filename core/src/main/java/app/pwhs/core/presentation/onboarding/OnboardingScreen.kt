@@ -6,15 +6,22 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.ButtonDefaults
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -22,7 +29,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.Devices
 import androidx.compose.material.icons.rounded.Insights
-import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.MoveToInbox
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material3.Button
@@ -81,7 +88,7 @@ fun OnboardingScreen(
     val pages = buildList {
         add(
             OnboardingPage(
-                icon = Icons.Rounded.InstallMobile,
+                icon = Icons.Rounded.MoveToInbox,
                 title = stringResource(R.string.onboarding_page1_title),
                 description = stringResource(R.string.onboarding_page1_desc),
                 badgeType = OnboardingBadgeType.INSTALL,
@@ -162,15 +169,30 @@ fun OnboardingScreen(
         onPauseOrDispose {}
     }
 
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+    val contentMaxWidth = when {
+        adaptiveInfo.useTwoPane -> 960.dp
+        adaptiveInfo.isMedium -> 560.dp
+        else -> 600.dp
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background,
     ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .statusBarsPadding()
+                .navigationBarsPadding()
+                .imePadding(),
+            contentAlignment = Alignment.Center,
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp)
-                .imePadding(),
+                .widthIn(max = contentMaxWidth)
+                .padding(horizontal = if (adaptiveInfo.useTwoPane) 32.dp else 24.dp, vertical = 16.dp),
         ) {
             // Top action bar: Restore backup (if available) + Skip button
             Row(
@@ -216,6 +238,8 @@ fun OnboardingScreen(
                 val pageOffset = (pagerState.currentPage - page) + pagerState.currentPageOffsetFraction
                 PageContent(
                     pageOffset = pageOffset,
+                    pageIndex = page,
+                    totalPages = pages.size,
                     analyticsEnabled = analyticsEnabled,
                     onAnalyticsEnabledChange = { enabled ->
                         analyticsEnabled = enabled
@@ -281,14 +305,28 @@ fun OnboardingScreen(
                 }
 
                 // Next / Get Started button
+                val buttonHeight = if (adaptiveInfo.useTwoPane) 48.dp else 40.dp
+                val buttonPadding = if (adaptiveInfo.useTwoPane) {
+                    PaddingValues(horizontal = 24.dp, vertical = 12.dp)
+                } else {
+                    ButtonDefaults.ContentPadding
+                }
                 if (pagerState.currentPage < pages.lastIndex) {
-                    FilledTonalButton(onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(pagerState.currentPage + 1)
-                        }
-                    }) {
+                    FilledTonalButton(
+                        onClick = {
+                            scope.launch {
+                                pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                            }
+                        },
+                        modifier = Modifier.heightIn(min = buttonHeight),
+                        contentPadding = buttonPadding,
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        ),
+                    ) {
                         Text(stringResource(R.string.onboarding_next))
-                        Spacer(Modifier.width(4.dp))
+                        Spacer(Modifier.width(6.dp))
                         Icon(
                             Icons.AutoMirrored.Rounded.ArrowForward,
                             contentDescription = null,
@@ -296,19 +334,24 @@ fun OnboardingScreen(
                         )
                     }
                 } else {
-                    Button(onClick = {
-                        scope.launch {
-                            AnalyticsHelper.logOnboardingComplete(stepCount = pages.size)
-                            context.dataStore.edit {
-                                it[SharedPrefsKeys.ONBOARDING_COMPLETED] = true
+                    Button(
+                        onClick = {
+                            scope.launch {
+                                AnalyticsHelper.logOnboardingComplete(stepCount = pages.size)
+                                context.dataStore.edit {
+                                    it[SharedPrefsKeys.ONBOARDING_COMPLETED] = true
+                                }
+                                onFinish()
                             }
-                            onFinish()
-                        }
-                    }) {
+                        },
+                        modifier = Modifier.heightIn(min = buttonHeight),
+                        contentPadding = buttonPadding,
+                    ) {
                         Text(stringResource(R.string.onboarding_get_started))
                     }
                 }
             }
+        }
         }
     }
 }

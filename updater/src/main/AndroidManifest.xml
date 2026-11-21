@@ -7,9 +7,12 @@
     <application>
         <activity
             android:name=".presentation.UpdatesActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="true"
             android:label="App Updates"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.UniversalInstaller">
+            <!-- Internal deep links: universalinstaller://updates (/add, /app, /check) -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -17,6 +20,53 @@
                 <data
                     android:host="updates"
                     android:scheme="universalinstaller" />
+            </intent-filter>
+
+            <!-- Obtainium deep link compatibility: obtainium://add/<url> & obtainium://app/<json> -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="obtainium" android:host="add" />
+                <data android:scheme="obtainium" android:host="app" />
+            </intent-filter>
+
+            <!-- Obtainium web redirect -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="apps.obtainium.imranr.dev"
+                    android:pathPrefix="/redirect" />
+            </intent-filter>
+
+            <!-- F-Droid & IzzyOnDroid app pages -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="f-droid.org" android:pathPrefix="/packages/" />
+                <data android:scheme="https" android:host="f-droid.org" android:pathPattern="/.*/packages/.*" />
+                <data android:scheme="https" android:host="apt.izzysoft.de" android:pathPrefix="/fdroid/index/apk/" />
+            </intent-filter>
+
+            <!-- GitHub / GitLab / Codeberg release pages (scoped to /releases so normal browsing isn't hijacked) -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="github.com" android:pathPattern="/.*/.*/releases.*" />
+                <data android:scheme="https" android:host="gitlab.com" android:pathPattern="/.*/.*/-/releases.*" />
+                <data android:scheme="https" android:host="codeberg.org" android:pathPattern="/.*/.*/releases.*" />
+            </intent-filter>
+
+            <!-- Share a repo/app link from Chrome, GitHub, F-Droid, Telegram, etc. -->
+            <intent-filter android:label="Track in Universal Installer">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
     </application>

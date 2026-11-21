@@ -31,7 +31,7 @@ import app.pwhs.universalinstaller.presentation.pro.components.ProCelebrationCon
 import app.pwhs.universalinstaller.presentation.pro.components.ProIssueDialog
 import app.pwhs.universalinstaller.presentation.pro.components.ProSupporterView
 
-private const val SUPPORT_COMMUNITY_URL = "https://t.me/blockads_android"
+private const val SUPPORT_COMMUNITY_URL = "https://t.me/blockads_android_chat"
 private const val GOOGLE_PLAY_SUBS_URL = "https://play.google.com/store/account/subscriptions"
 
 @OptIn(ExperimentalMaterial3Api::class)

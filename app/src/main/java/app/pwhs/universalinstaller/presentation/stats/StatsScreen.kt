@@ -5,15 +5,22 @@
 package app.pwhs.universalinstaller.presentation.stats
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Alignment
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EmojiEvents
 import androidx.compose.material.icons.rounded.QueryStats
@@ -78,6 +85,9 @@ fun StatsScreen(
         }
     }
 
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+    val isTwoColumn = adaptiveInfo.useTwoPane
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -93,10 +103,16 @@ fun StatsScreen(
             )
         },
     ) { innerPadding ->
-        LazyColumn(
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(top = innerPadding.calculateTopPadding()),
+            contentAlignment = Alignment.TopCenter,
+        ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .widthIn(max = if (isTwoColumn) 1080.dp else 680.dp),
             contentPadding = PaddingValues(
                 top = 4.dp,
                 bottom = 24.dp,
@@ -171,39 +187,90 @@ fun StatsScreen(
             }
 
             if (!isStoreUser || activeTab == 0) {
-                item(key = "install_uninstall_card") {
-                    InstallUninstallOverviewCard(
-                        summary = summary,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .animateItem(),
-                    )
-                }
-                item(key = "storage_formats_card") {
-                    StorageFormatsCard(
-                        summary = summary,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .animateItem(),
-                    )
-                }
-                item(key = "modes_security_card") {
-                    ModesAndSecurityCard(
-                        summary = summary,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .animateItem(),
-                    )
-                }
-                item(key = "activity_timeline_card") {
-                    ActivityTimelineCard(
-                        summary = summary,
-                        selectedDays = selectedDays,
-                        onSelectDays = viewModel::selectPeriodDays,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .animateItem(),
-                    )
+                if (isTwoColumn) {
+                    item(key = "overview_row_1") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Max)
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        ) {
+                            InstallUninstallOverviewCard(
+                                summary = summary,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                            )
+                            StorageFormatsCard(
+                                summary = summary,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                            )
+                        }
+                    }
+                    item(key = "overview_row_2") {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(IntrinsicSize.Max)
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                            horizontalArrangement = Arrangement.spacedBy(14.dp),
+                        ) {
+                            ModesAndSecurityCard(
+                                summary = summary,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                            )
+                            ActivityTimelineCard(
+                                summary = summary,
+                                selectedDays = selectedDays,
+                                onSelectDays = viewModel::selectPeriodDays,
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight(),
+                            )
+                        }
+                    }
+                } else {
+                    item(key = "install_uninstall_card") {
+                        InstallUninstallOverviewCard(
+                            summary = summary,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                        )
+                    }
+                    item(key = "storage_formats_card") {
+                        StorageFormatsCard(
+                            summary = summary,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                        )
+                    }
+                    item(key = "modes_security_card") {
+                        ModesAndSecurityCard(
+                            summary = summary,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                        )
+                    }
+                    item(key = "activity_timeline_card") {
+                        ActivityTimelineCard(
+                            summary = summary,
+                            selectedDays = selectedDays,
+                            onSelectDays = viewModel::selectPeriodDays,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                        )
+                    }
                 }
                 if (summary.topUpdatedApps.isNotEmpty()) {
                     item(key = "top_apps_card") {
@@ -232,25 +299,61 @@ fun StatsScreen(
                             .thenByDescending { it.progressFraction },
                     )
 
-                items(
-                    items = filteredMilestones,
-                    key = { "milestone_${it.id.name}" },
-                ) { milestone ->
-                    MilestoneItemCard(
-                        item = milestone,
-                        modifier = Modifier
-                            .padding(horizontal = 16.dp)
-                            .animateItem(),
-                        onClick = {
-                            AnalyticsHelper.logMilestoneClicked(milestone.id.name, milestone.isUnlocked)
-                        },
-                    )
+                if (isTwoColumn) {
+                    val rows = filteredMilestones.chunked(2)
+                    items(
+                        items = rows,
+                        key = { row -> "milestone_row_${row.first().id.name}" },
+                    ) { row ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        ) {
+                            MilestoneItemCard(
+                                item = row[0],
+                                modifier = Modifier.weight(1f),
+                                onClick = {
+                                    AnalyticsHelper.logMilestoneClicked(row[0].id.name, row[0].isUnlocked)
+                                },
+                            )
+                            if (row.size > 1) {
+                                MilestoneItemCard(
+                                    item = row[1],
+                                    modifier = Modifier.weight(1f),
+                                    onClick = {
+                                        AnalyticsHelper.logMilestoneClicked(row[1].id.name, row[1].isUnlocked)
+                                    },
+                                )
+                            } else {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
+                    }
+                } else {
+                    items(
+                        items = filteredMilestones,
+                        key = { "milestone_${it.id.name}" },
+                    ) { milestone ->
+                        MilestoneItemCard(
+                            item = milestone,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                            onClick = {
+                                AnalyticsHelper.logMilestoneClicked(milestone.id.name, milestone.isUnlocked)
+                            },
+                        )
+                    }
                 }
             }
 
             item(key = "bottom_spacer") {
                 Spacer(modifier = Modifier.height(8.dp))
             }
+        }
         }
     }
 }

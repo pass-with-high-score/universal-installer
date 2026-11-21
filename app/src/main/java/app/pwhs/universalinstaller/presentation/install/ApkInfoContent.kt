@@ -46,7 +46,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import app.pwhs.core.data.local.SharedPrefsKeys
@@ -155,7 +156,10 @@ internal fun ApkInfoContent(
         apkInfo.installedVersionCode > 0 &&
         apkInfo.versionCode < apkInfo.installedVersionCode
 
-    val scrollCap = (LocalConfiguration.current.screenHeightDp * APK_SHEET_SCROLL_FRACTION).dp
+    val windowHeightDp = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp()
+    }
+    val scrollCap = windowHeightDp * APK_SHEET_SCROLL_FRACTION
     Column(modifier = Modifier.fillMaxWidth()) {
         Column(
             modifier = Modifier

@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Download
@@ -18,11 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.presentation.adaptive.AdaptiveTwoPane
+import app.pwhs.core.presentation.adaptive.FoldablePosture
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
+import app.pwhs.core.presentation.adaptive.TabletopSplitLayout
 import app.pwhs.universalinstaller.R
 import java.io.File
 
 /**
- * Mobile-first tab for receiving APK packages over local Wi-Fi and Web browser.
+ * Adaptive tab for receiving APK packages over local Wi-Fi and Web browser.
+ * - Expanded / Book Fold: 2-pane (Server control + Guide on left, Received Packages on right).
+ * - Tabletop Fold: Server hero on top half, Received Packages on bottom half.
+ * - Compact / Medium: Single vertical scrolling column.
  */
 @Composable
 fun SyncReceiveTab(
@@ -34,29 +42,27 @@ fun SyncReceiveTab(
     onInstallApk: (File) -> Unit,
     onDeleteFile: (File) -> Unit,
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 32.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        // 1. Wi-Fi Server Hero Status Card
-        item(key = "receive_server_hero") {
-            SyncServerHeroCard(
-                state = uiState.state,
-                serverUrl = uiState.serverUrl,
-                syncOptions = uiState.syncOptions,
-                onToggle = onToggleServer,
-                onShowQr = onShowQr,
-                onOpenSettings = onOpenSettings,
-                subtitleOverride = if (uiState.state == SyncState.RUNNING) {
-                    stringResource(R.string.sync_receive_subtitle)
-                } else {
-                    stringResource(R.string.sync_receive_empty_desc)
-                },
-            )
-        }
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+    val tabletopPosture = adaptiveInfo.posture as? FoldablePosture.Tabletop
 
-        // 2. Live Incoming Transfers (Uploads from PC to Phone)
+    val serverHeroCard: @Composable () -> Unit = {
+        SyncServerHeroCard(
+            state = uiState.state,
+            serverUrl = uiState.serverUrl,
+            syncOptions = uiState.syncOptions,
+            onToggle = onToggleServer,
+            onShowQr = onShowQr,
+            onOpenSettings = onOpenSettings,
+            subtitleOverride = if (uiState.state == SyncState.RUNNING) {
+                stringResource(R.string.sync_receive_subtitle)
+            } else {
+                stringResource(R.string.sync_receive_empty_desc)
+            },
+        )
+    }
+
+    val receivedItems: LazyListScope.() -> Unit = {
+        // Live Incoming Transfers (Uploads from PC to Phone)
         if (uiState.activeTransfers.isNotEmpty()) {
             item(key = "receive_transfers_header") {
                 Row(
@@ -85,7 +91,7 @@ fun SyncReceiveTab(
             }
         }
 
-        // 3. Received Packages Section
+        // Received Packages Section
         item(key = "received_packages_header") {
             Text(
                 text = stringResource(R.string.sync_receive_packages_header, uiState.receivedFiles.size),
@@ -121,10 +127,69 @@ fun SyncReceiveTab(
                 )
             }
         }
+    }
 
-        // 4. Illustrated How-It-Works Guide
-        item(key = "receive_guide") {
-            SyncReceiveHowItWorksCard()
+    when {
+        tabletopPosture != null -> {
+            TabletopSplitLayout(
+                posture = tabletopPosture,
+                modifier = modifier.fillMaxSize(),
+                topContent = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 20.dp, vertical = 12.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        serverHeroCard()
+                    }
+                },
+                bottomContent = {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 32.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        content = receivedItems,
+                    )
+                },
+            )
+        }
+
+        adaptiveInfo.useTwoPane -> {
+            AdaptiveTwoPane(
+                firstWeight = 0.44f,
+                modifier = modifier.fillMaxSize(),
+                first = {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 20.dp, end = 16.dp, top = 16.dp, bottom = 32.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                    ) {
+                        item(key = "receive_server_hero") { serverHeroCard() }
+                        item(key = "receive_guide") { SyncReceiveHowItWorksCard() }
+                    }
+                },
+                second = {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 16.dp, end = 20.dp, top = 16.dp, bottom = 32.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        content = receivedItems,
+                    )
+                },
+            )
+        }
+
+        else -> {
+            LazyColumn(
+                modifier = modifier.fillMaxSize(),
+                contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                item(key = "receive_server_hero") { serverHeroCard() }
+                receivedItems()
+                item(key = "receive_guide") { SyncReceiveHowItWorksCard() }
+            }
         }
     }
 }

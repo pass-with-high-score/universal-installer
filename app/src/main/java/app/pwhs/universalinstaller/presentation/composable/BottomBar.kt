@@ -4,7 +4,7 @@ import android.app.Activity
 import android.content.Intent
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Apps
-import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.MoveToInbox
 import androidx.compose.material.icons.rounded.QueryStats
 import androidx.compose.material.icons.rounded.RocketLaunch
 import androidx.compose.material.icons.rounded.Settings
@@ -43,7 +43,7 @@ enum class BottomBarItem(
     Install(
         activityClass = InstallActivity::class.java,
         label = CoreR.string.nav_install,
-        icon = Icons.Rounded.InstallMobile,
+        icon = Icons.Rounded.MoveToInbox,
     ),
     Updates(
         activityClass = runCatching { Class.forName("app.pwhs.updater.presentation.UpdatesActivity") }.getOrNull(),

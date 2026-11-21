@@ -55,6 +55,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import app.pwhs.core.R
 import app.pwhs.core.ui.component.EmptyStateView
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.Surface
+import app.pwhs.core.presentation.adaptive.AdaptiveTwoPane
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
+import app.pwhs.core.presentation.adaptive.MaxWidthContainer
+import app.pwhs.updater.presentation.dialog.TrackedAppDetailContent
 import app.pwhs.core.ui.theme.Spacing
 import app.pwhs.updater.domain.model.TrackedApp
 import app.pwhs.updater.presentation.component.TrackedAppCard
@@ -147,6 +155,10 @@ fun UpdatesScreen(
         }
     }
 
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+    val useTwoPane = adaptiveInfo.useTwoPane
+
+    val listPane: @Composable () -> Unit = {
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -181,12 +193,14 @@ fun UpdatesScreen(
                 },
             )
         },
+        floatingActionButtonPosition = if (adaptiveInfo.useNavigationRail) FabPosition.Start else FabPosition.End,
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onNavigateToAddApp,
                 icon = { Icon(Icons.Rounded.Add, contentDescription = null) },
                 text = { Text(stringResource(R.string.updates_track_app)) },
                 shape = MaterialTheme.shapes.large,
+                modifier = if (adaptiveInfo.useNavigationRail) Modifier.navigationBarsPadding() else Modifier,
             )
         },
         bottomBar = bottomBar,
@@ -199,6 +213,10 @@ fun UpdatesScreen(
                 .fillMaxSize()
                 .padding(innerPadding),
         ) {
+            MaxWidthContainer(
+                maxWidth = if (useTwoPane) 1120.dp else 680.dp,
+                modifier = Modifier.fillMaxSize(),
+            ) {
             Column(modifier = Modifier.fillMaxSize()) {
                 // Collapsible Search Bar
                 UpdaterSearchBar(
@@ -363,9 +381,8 @@ fun UpdatesScreen(
                                 app = app,
                                 downloadInfo = uiState.downloadProgressMap[app.packageName],
                                 isChecking = uiState.checkingPackageNames.contains(app.packageName),
-                                onClick = {
-                                    viewModel.selectAppForDetail(app)
-                                },
+                                isSelected = useTwoPane && uiState.selectedAppForDetail?.packageName == app.packageName,
+                                onClick = { viewModel.selectAppForDetail(app) },
                                 onUpdateClick = {
                                     if (app.availableAssets.size > 1) {
                                         appForFilePicker = app
@@ -373,24 +390,79 @@ fun UpdatesScreen(
                                         viewModel.downloadAndInstall(context, app)
                                     }
                                 },
-                                onCancelDownloadClick = {
-                                    viewModel.cancelDownload(app.packageName)
-                                },
-                                onCheckClick = {
-                                    viewModel.checkSingleUpdate(app.packageName)
-                                },
-                                onDeleteClick = {
-                                    viewModel.removeTrackedApp(app.packageName)
-                                },
-                                onEditCategoryClick = {
-                                    appToEditCategory = app
-                                },
+                                onCancelDownloadClick = { viewModel.cancelDownload(app.packageName) },
+                                onCheckClick = { viewModel.checkSingleUpdate(app.packageName) },
+                                onDeleteClick = { viewModel.removeTrackedApp(app.packageName) },
+                                onEditCategoryClick = { appToEditCategory = app },
                             )
                         }
                     }
                 }
             }
+            }
         }
+    }
+    }
+
+    if (useTwoPane) {
+        AdaptiveTwoPane(
+            firstWeight = 0.50f,
+            first = listPane,
+            second = {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding()
+                            .navigationBarsPadding(),
+                    ) {
+                        val selectedApp = uiState.selectedAppForDetail
+                        if (selectedApp != null) {
+                            TrackedAppDetailContent(
+                                app = selectedApp,
+                                onDismiss = { viewModel.selectAppForDetail(null) },
+                                onUpdateApp = { updatedApp ->
+                                    viewModel.updateTrackedApp(updatedApp)
+                                },
+                                onDeleteApp = { appToDelete ->
+                                    viewModel.removeTrackedApp(appToDelete.packageName)
+                                    viewModel.selectAppForDetail(null)
+                                },
+                                onCheckUpdate = { appToCheck ->
+                                    viewModel.checkSingleUpdate(appToCheck.packageName)
+                                },
+                                onDownloadAndInstall = { appToInstall ->
+                                    if (appToInstall.availableAssets.size > 1) {
+                                        appForFilePicker = appToInstall
+                                    } else {
+                                        viewModel.downloadAndInstall(context, appToInstall)
+                                    }
+                                },
+                                modifier = Modifier.padding(top = Spacing.L),
+                            )
+                        } else {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(Spacing.XXL),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                EmptyStateView(
+                                    icon = Icons.Rounded.CloudDownload,
+                                    title = stringResource(R.string.nav_updates),
+                                    subtitle = stringResource(R.string.updates_no_apps_subtitle),
+                                )
+                            }
+                        }
+                    }
+                }
+            },
+        )
+    } else {
+        listPane()
     }
 
     if (appToEditCategory != null) {
@@ -407,7 +479,7 @@ fun UpdatesScreen(
         )
     }
 
-    if (uiState.selectedAppForDetail != null) {
+    if (!useTwoPane && uiState.selectedAppForDetail != null) {
         TrackedAppDetailBottomSheet(
             app = uiState.selectedAppForDetail!!,
             sheetState = detailSheetState,

@@ -14,13 +14,19 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.selection.selectable
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.graphicsLayer
+import app.pwhs.core.presentation.adaptive.AdaptiveTwoPane
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
+import app.pwhs.core.presentation.adaptive.MaxWidthContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.CheckCircle
@@ -118,6 +124,115 @@ private fun InstallUiContent(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     // The card only exists in this mode, so everything about where it sits belongs to it.
     val cardIsShown = mode == ExternalOpenMode.Dialog
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+
+    val optionsItems: LazyListScope.() -> Unit = {
+        item { SectionLabel(stringResource(R.string.setting_external_open_title)) }
+
+        items(EXTERNAL_OPEN_OPTIONS.size) { index ->
+            val option = EXTERNAL_OPEN_OPTIONS[index]
+            ModeRow(
+                title = stringResource(option.titleRes),
+                description = stringResource(option.descriptionRes),
+                selected = option.mode == mode,
+                onSelect = { if (option.mode != mode) onModeChange(option.mode) },
+            )
+        }
+
+        // Nested, and gone entirely for the two modes that draw no card — which is what makes
+        // the old contradiction with auto-confirm disappear instead of needing explaining.
+        item {
+            AnimatedVisibility(visible = cardIsShown) {
+                Column {
+                    SectionLabel(
+                        text = stringResource(R.string.install_ui_card_group),
+                        indented = true,
+                    )
+                    CardPositionPicker(
+                        current = style,
+                        onChange = onStyleChange,
+                    )
+                    SwitchRow(
+                        title = stringResource(R.string.setting_auto_confirm_title),
+                        description = stringResource(R.string.install_ui_auto_confirm_sub),
+                        checked = autoConfirm,
+                        onCheckedChange = onAutoConfirmChange,
+                        indented = true,
+                    )
+                }
+            }
+        }
+
+        item {
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
+                thickness = 0.5.dp,
+            )
+        }
+
+        // Auto-approve section — always visible regardless of mode
+        item { SectionLabel(stringResource(R.string.setting_auto_approve_title)) }
+
+        item {
+            SwitchRow(
+                title = stringResource(R.string.setting_auto_approve_title),
+                description = stringResource(R.string.setting_auto_approve_subtitle),
+                checked = autoApprove,
+                onCheckedChange = onAutoApproveChange,
+            )
+        }
+
+        item {
+            AnimatedVisibility(visible = autoApprove) {
+                Column {
+                    val context = LocalContext.current
+                    val subtitle = if (autoApproveCount > 0) {
+                        stringResource(R.string.setting_auto_approve_count, autoApproveCount)
+                    } else {
+                        stringResource(R.string.setting_auto_approve_none)
+                    }
+                    ListItem(
+                        headlineContent = { Text(stringResource(R.string.setting_auto_approve_apps_title)) },
+                        supportingContent = { Text(subtitle) },
+                        leadingContent = {
+                            Icon(
+                                imageVector = Icons.Rounded.TaskAlt,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        },
+                        modifier = Modifier
+                            .padding(horizontal = 24.dp)
+                            .clickable {
+                                context.startActivity(
+                                    android.content.Intent(
+                                        context,
+                                        app.pwhs.universalinstaller.presentation.setting.autoapprove.AutoApproveActivity::class.java,
+                                    )
+                                )
+                            },
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                    )
+                    SwitchRow(
+                        title = stringResource(R.string.setting_auto_approve_block_trackers_title),
+                        description = stringResource(R.string.setting_auto_approve_block_trackers_subtitle),
+                        checked = autoApproveBlockTrackers,
+                        onCheckedChange = onAutoApproveBlockTrackersChange,
+                        indented = true,
+                    )
+                }
+            }
+        }
+
+        item {
+            SwitchRow(
+                title = stringResource(R.string.setting_show_download_tab_title),
+                description = stringResource(R.string.setting_show_download_tab_subtitle),
+                checked = showDownloadTab,
+                onCheckedChange = onShowDownloadTabChange,
+            )
+        }
+    }
 
     Scaffold(
         modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -146,119 +261,72 @@ private fun InstallUiContent(
             )
         },
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 24.dp),
-        ) {
-            // The answer to "what will this look like", shown rather than named.
-            item { InstallUiPreview(mode = mode, style = style) }
-
-            item { SectionLabel(stringResource(R.string.setting_external_open_title)) }
-
-            items(EXTERNAL_OPEN_OPTIONS.size) { index ->
-                val option = EXTERNAL_OPEN_OPTIONS[index]
-                ModeRow(
-                    title = stringResource(option.titleRes),
-                    description = stringResource(option.descriptionRes),
-                    selected = option.mode == mode,
-                    onSelect = { if (option.mode != mode) onModeChange(option.mode) },
-                )
-            }
-
-            // Nested, and gone entirely for the two modes that draw no card — which is what makes
-            // the old contradiction with auto-confirm disappear instead of needing explaining.
-            item {
-                AnimatedVisibility(visible = cardIsShown) {
-                    Column {
-                        SectionLabel(
-                            text = stringResource(R.string.install_ui_card_group),
-                            indented = true,
-                        )
-                        CardPositionPicker(
-                            current = style,
-                            onChange = onStyleChange,
-                        )
-                        SwitchRow(
-                            title = stringResource(R.string.setting_auto_confirm_title),
-                            description = stringResource(R.string.install_ui_auto_confirm_sub),
-                            checked = autoConfirm,
-                            onCheckedChange = onAutoConfirmChange,
-                            indented = true,
-                        )
-                    }
-                }
-            }
-
-            item {
-                HorizontalDivider(
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                    thickness = 0.5.dp,
-                )
-            }
-
-            // Auto-approve section — always visible regardless of mode
-            item { SectionLabel(stringResource(R.string.setting_auto_approve_title)) }
-
-            item {
-                SwitchRow(
-                    title = stringResource(R.string.setting_auto_approve_title),
-                    description = stringResource(R.string.setting_auto_approve_subtitle),
-                    checked = autoApprove,
-                    onCheckedChange = onAutoApproveChange,
-                )
-            }
-
-            item {
-                AnimatedVisibility(visible = autoApprove) {
-                    Column {
-                        val context = LocalContext.current
-                        val subtitle = if (autoApproveCount > 0) {
-                            stringResource(R.string.setting_auto_approve_count, autoApproveCount)
-                        } else {
-                            stringResource(R.string.setting_auto_approve_none)
-                        }
-                        ListItem(
-                            headlineContent = { Text(stringResource(R.string.setting_auto_approve_apps_title)) },
-                            supportingContent = { Text(subtitle) },
-                            leadingContent = {
-                                Icon(
-                                    imageVector = Icons.Rounded.TaskAlt,
-                                    contentDescription = null,
-                                    tint = MaterialTheme.colorScheme.primary,
-                                )
-                            },
+        if (adaptiveInfo.useTwoPane) {
+            AdaptiveTwoPane(
+                firstWeight = 0.44f,
+                showDividerWhenFlat = false,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .navigationBarsPadding()
+                    .fillMaxSize(),
+                first = {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(start = 24.dp, end = 12.dp, top = 8.dp, bottom = 24.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Surface(
                             modifier = Modifier
-                                .padding(horizontal = 24.dp)
-                                .clickable {
-                                    context.startActivity(
-                                        android.content.Intent(
-                                            context,
-                                            app.pwhs.universalinstaller.presentation.setting.autoapprove.AutoApproveActivity::class.java,
-                                        )
-                                    )
-                                },
-                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                        )
-                        SwitchRow(
-                            title = stringResource(R.string.setting_auto_approve_block_trackers_title),
-                            description = stringResource(R.string.setting_auto_approve_block_trackers_subtitle),
-                            checked = autoApproveBlockTrackers,
-                            onCheckedChange = onAutoApproveBlockTrackersChange,
-                            indented = true,
-                        )
+                                .fillMaxSize()
+                                .heightIn(min = 340.dp),
+                            shape = RoundedCornerShape(28.dp),
+                            color = MaterialTheme.colorScheme.surfaceContainerLow,
+                            border = BorderStroke(
+                                1.dp,
+                                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                            ),
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Box(
+                                    modifier = Modifier.graphicsLayer {
+                                        scaleX = 1.2f
+                                        scaleY = 1.2f
+                                    },
+                                ) {
+                                    InstallUiPreview(mode = mode, style = style)
+                                }
+                            }
+                        }
                     }
+                },
+                second = {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 32.dp),
+                        content = optionsItems,
+                    )
+                },
+            )
+        } else {
+            MaxWidthContainer(
+                maxWidth = 600.dp,
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .navigationBarsPadding()
+                    .fillMaxSize(),
+            ) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(bottom = 32.dp),
+                ) {
+                    // The answer to "what will this look like", shown rather than named.
+                    item { InstallUiPreview(mode = mode, style = style) }
+                    optionsItems()
                 }
-            }
-
-            item {
-                SwitchRow(
-                    title = stringResource(R.string.setting_show_download_tab_title),
-                    description = stringResource(R.string.setting_show_download_tab_subtitle),
-                    checked = showDownloadTab,
-                    onCheckedChange = onShowDownloadTabChange,
-                )
             }
         }
     }

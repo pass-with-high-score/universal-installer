@@ -24,11 +24,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.InstallMobile
+import androidx.compose.material.icons.rounded.MoveToInbox
 import androidx.compose.material.icons.rounded.WorkspacePremium
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
@@ -105,12 +106,14 @@ fun UserRankBannerCard(
         label = "rankBadgeScale",
     )
 
-    ElevatedCard(
+    Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.elevatedCardColors(
+        colors = CardDefaults.cardColors(
             containerColor = colors.primaryContainer,
         ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, colors.outlineVariant.copy(alpha = 0.5f)),
     ) {
         Column(
             modifier = Modifier
@@ -241,7 +244,7 @@ fun InstallUninstallOverviewCard(
 
     StatsSectionCard(
         title = stringResource(R.string.stats_section_install_uninstall),
-        icon = Icons.Rounded.InstallMobile,
+        icon = Icons.Rounded.MoveToInbox,
         modifier = modifier,
     ) {
         Row(
@@ -343,7 +346,7 @@ fun StatsSectionCard(
         label = "cardAlpha",
     )
 
-    ElevatedCard(
+    Card(
         modifier = modifier
             .fillMaxWidth()
             .graphicsLayer {
@@ -352,9 +355,11 @@ fun StatsSectionCard(
                 this.alpha = alpha
             },
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(
+        colors = CardDefaults.cardColors(
             containerColor = colors.surfaceContainerLow,
         ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        border = BorderStroke(1.dp, colors.outlineVariant),
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

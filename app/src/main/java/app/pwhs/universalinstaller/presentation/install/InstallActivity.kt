@@ -11,7 +11,7 @@ import app.pwhs.universalinstaller.review.AppReview
 import app.pwhs.universalinstaller.review.ReviewGate
 import app.pwhs.universalinstaller.telemetry.Telemetry
 import app.pwhs.universalinstaller.telemetry.TelemetryEvents
-import app.pwhs.universalinstaller.presentation.composable.BottomBar
+import app.pwhs.universalinstaller.presentation.composable.AdaptiveNavScaffold
 import app.pwhs.universalinstaller.presentation.composable.BottomBarItem
 import android.Manifest
 import android.content.pm.PackageManager
@@ -123,12 +123,8 @@ class InstallActivity : BaseActivity() {
                 }
             }
 
-            Scaffold(
-                bottomBar = { BottomBar(BottomBarItem.Install) }
-            ) { innerPadding ->
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = innerPadding.calculateBottomPadding())) {
+            AdaptiveNavScaffold(currentTab = BottomBarItem.Install) {
+                Box(modifier = Modifier.fillMaxSize()) {
                     InstallScreen(
                         viewModel = viewModel,
                         onMergeSplits = { uri -> requestMergeExternalFile(uri) },

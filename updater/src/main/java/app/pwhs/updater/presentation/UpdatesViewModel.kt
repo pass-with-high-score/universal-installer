@@ -96,12 +96,17 @@ class UpdatesViewModel(
                 DefaultAppSeeder.markSeeded(context)
                 return@launch
             }
-            addTrackedAppFromUrl(
-                context = context,
-                url = "https://github.com/pass-with-high-score/universal-installer",
-                targetPackageName = "app.pwhs.universalinstaller",
-            )
+            // Seed locally first so first launch always shows Universal Installer even if
+            // offline or GitHub API is rate-limited, then sync version & check release silently.
+            val seedApp = DefaultAppSeeder.defaultSeedApp()
+            repository.saveTrackedApp(seedApp)
+            repository.syncInstalledVersions()
             DefaultAppSeeder.markSeeded(context)
+            runCatching {
+                repository.checkForUpdate(seedApp.packageName)
+            }.onFailure { e ->
+                Timber.w(e, "Initial background update check for default seed app failed")
+            }
         }
     }
 

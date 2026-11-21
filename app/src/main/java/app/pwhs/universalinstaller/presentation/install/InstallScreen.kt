@@ -76,7 +76,9 @@ import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import app.pwhs.universalinstaller.presentation.composable.CommunityActionButtons
 import app.pwhs.universalinstaller.presentation.composable.InstallerModeBadge
 import app.pwhs.universalinstaller.presentation.composable.SessionCard
+import app.pwhs.core.presentation.adaptive.MaxWidthContainer
 import app.pwhs.universalinstaller.presentation.install.components.InstallTipOverlay
+import app.pwhs.universalinstaller.presentation.install.components.PackageDropZone
 import app.pwhs.universalinstaller.presentation.install.components.ShizukuPromoBanner
 import app.pwhs.universalinstaller.util.extension.getDisplayName
 import org.koin.androidx.compose.koinViewModel
@@ -809,11 +811,16 @@ private fun InstallUi(
             )
         },
     ) { innerPadding ->
-        Box(
+        PackageDropZone(
+            onUrisDropped = onFilesPicked,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize(),
         ) {
+            MaxWidthContainer(
+                maxWidth = 760.dp,
+                modifier = Modifier.fillMaxSize(),
+            ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(
@@ -955,7 +962,8 @@ private fun InstallUi(
                     )
                 }
             }
-        }
+            }
+            }
 
         InstallTipOverlay(
             onOpenSyncServer = onOpenSyncServer,
@@ -969,6 +977,6 @@ private fun InstallUi(
                 .align(Alignment.BottomCenter)
                 .padding(horizontal = 16.dp, vertical = 12.dp),
         )
+        }
     }
-}
 }

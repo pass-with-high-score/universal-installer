@@ -1,18 +1,28 @@
 package app.pwhs.updater.presentation.dialog
 
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -143,110 +153,6 @@ fun TrackedAppConfigurationSection(
 
         Spacer(modifier = Modifier.height(Spacing.S))
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-        ) {
-            Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(R.string.updates_config_use_release_title), style = MaterialTheme.typography.bodyMedium)
-                Text(
-                    stringResource(R.string.updates_config_use_release_title_desc),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-            Spacer(modifier = Modifier.width(Spacing.S))
-            Switch(checked = useReleaseTitleAsVersion, onCheckedChange = { useReleaseTitleAsVersion = it })
-        }
-
-        Spacer(modifier = Modifier.height(Spacing.S))
-
-        OutlinedTextField(
-            value = customRegex,
-            onValueChange = { customRegex = it },
-            label = { Text(stringResource(R.string.updates_config_asset_regex_label)) },
-            placeholder = { Text(stringResource(R.string.updates_config_asset_regex_placeholder)) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.S))
-
-        OutlinedTextField(
-            value = versionRegex,
-            onValueChange = { versionRegex = it },
-            label = { Text(stringResource(R.string.updates_config_version_regex_label)) },
-            placeholder = { Text(stringResource(R.string.updates_config_version_regex_placeholder)) },
-            isError = regexError != null,
-            supportingText = {
-                if (regexError != null) {
-                    Text(regexError, color = MaterialTheme.colorScheme.error)
-                } else if (previewVersion != null) {
-                    Text(
-                        stringResource(R.string.updates_config_preview_extracted, previewVersion),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.S))
-
-        OutlinedTextField(
-            value = matchGroup,
-            onValueChange = { matchGroup = it },
-            label = { Text(stringResource(R.string.updates_config_match_group_label)) },
-            placeholder = { Text(stringResource(R.string.updates_config_match_group_placeholder)) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.S))
-
-        // Issue #142: Installed Version Extractor Regex
-        OutlinedTextField(
-            value = installedVersionRegex,
-            onValueChange = { installedVersionRegex = it },
-            label = { Text(stringResource(R.string.updates_installed_version_regex_label)) },
-            placeholder = { Text(stringResource(R.string.updates_installed_version_regex_placeholder)) },
-            isError = installedRegexError != null,
-            supportingText = {
-                if (installedRegexError != null) {
-                    Text(installedRegexError, color = MaterialTheme.colorScheme.error)
-                } else if (previewInstalledVersion != null) {
-                    Text(
-                        stringResource(R.string.updates_preview_installed_extracted, previewInstalledVersion),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-            },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.S))
-
-        OutlinedTextField(
-            value = installedVersionMatchGroup,
-            onValueChange = { installedVersionMatchGroup = it },
-            label = { Text(stringResource(R.string.updates_installed_match_group_label)) },
-            placeholder = { Text(stringResource(R.string.updates_config_installed_match_group_placeholder)) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
-        )
-
-        Spacer(modifier = Modifier.height(Spacing.S))
-
         OutlinedTextField(
             value = category,
             onValueChange = { category = it },
@@ -256,5 +162,157 @@ fun TrackedAppConfigurationSection(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium,
         )
+
+        Spacer(modifier = Modifier.height(Spacing.M))
+
+        val hasAdvancedConfig = remember(app) {
+            app.useReleaseTitleAsVersion ||
+                !app.customRegexFilter.isNullOrBlank() ||
+                !app.versionRegex.isNullOrBlank() ||
+                !app.matchGroup.isNullOrBlank() ||
+                !app.installedVersionRegex.isNullOrBlank() ||
+                !app.installedVersionMatchGroup.isNullOrBlank()
+        }
+        var advancedExpanded by remember(app.packageName) { mutableStateOf(hasAdvancedConfig) }
+
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)),
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { advancedExpanded = !advancedExpanded }
+                        .padding(horizontal = Spacing.M, vertical = Spacing.S),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Text(
+                        text = "Advanced version & asset matching",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurface,
+                    )
+                    Icon(
+                        imageVector = if (advancedExpanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+
+                AnimatedVisibility(visible = advancedExpanded) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(start = Spacing.M, end = Spacing.M, bottom = Spacing.M),
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(stringResource(R.string.updates_config_use_release_title), style = MaterialTheme.typography.bodyMedium)
+                                Text(
+                                    stringResource(R.string.updates_config_use_release_title_desc),
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(Spacing.S))
+                            Switch(checked = useReleaseTitleAsVersion, onCheckedChange = { useReleaseTitleAsVersion = it })
+                        }
+
+                        Spacer(modifier = Modifier.height(Spacing.S))
+
+                        OutlinedTextField(
+                            value = customRegex,
+                            onValueChange = { customRegex = it },
+                            label = { Text(stringResource(R.string.updates_config_asset_regex_label)) },
+                            placeholder = { Text(stringResource(R.string.updates_config_asset_regex_placeholder)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacing.S))
+
+                        OutlinedTextField(
+                            value = versionRegex,
+                            onValueChange = { versionRegex = it },
+                            label = { Text(stringResource(R.string.updates_config_version_regex_label)) },
+                            placeholder = { Text(stringResource(R.string.updates_config_version_regex_placeholder)) },
+                            isError = regexError != null,
+                            supportingText = {
+                                if (regexError != null) {
+                                    Text(regexError, color = MaterialTheme.colorScheme.error)
+                                } else if (previewVersion != null) {
+                                    Text(
+                                        stringResource(R.string.updates_config_preview_extracted, previewVersion),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.SemiBold,
+                                    )
+                                }
+                            },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacing.S))
+
+                        OutlinedTextField(
+                            value = matchGroup,
+                            onValueChange = { matchGroup = it },
+                            label = { Text(stringResource(R.string.updates_config_match_group_label)) },
+                            placeholder = { Text(stringResource(R.string.updates_config_match_group_placeholder)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacing.S))
+
+                        // Issue #142: Installed Version Extractor Regex
+                        OutlinedTextField(
+                            value = installedVersionRegex,
+                            onValueChange = { installedVersionRegex = it },
+                            label = { Text(stringResource(R.string.updates_installed_version_regex_label)) },
+                            placeholder = { Text(stringResource(R.string.updates_installed_version_regex_placeholder)) },
+                            isError = installedRegexError != null,
+                            supportingText = {
+                                if (installedRegexError != null) {
+                                    Text(installedRegexError, color = MaterialTheme.colorScheme.error)
+                                } else if (previewInstalledVersion != null) {
+                                    Text(
+                                        stringResource(R.string.updates_preview_installed_extracted, previewInstalledVersion),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        fontWeight = FontWeight.SemiBold,
+                                    )
+                                }
+                            },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                        )
+
+                        Spacer(modifier = Modifier.height(Spacing.S))
+
+                        OutlinedTextField(
+                            value = installedVersionMatchGroup,
+                            onValueChange = { installedVersionMatchGroup = it },
+                            label = { Text(stringResource(R.string.updates_installed_match_group_label)) },
+                            placeholder = { Text(stringResource(R.string.updates_config_installed_match_group_placeholder)) },
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.medium,
+                        )
+                    }
+                }
+            }
+        }
     }
 }

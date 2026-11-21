@@ -38,6 +38,7 @@ import app.pwhs.universalinstaller.domain.model.ExternalOpenMode
 import app.pwhs.universalinstaller.domain.model.InstallUiStyle
 import app.pwhs.universalinstaller.domain.model.VtStatus
 import app.pwhs.universalinstaller.presentation.install.dialog.detectInstallRisks
+import app.pwhs.core.presentation.adaptive.ProvideAdaptiveLayoutInfo
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallContent
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogInstallUriHelper
 import app.pwhs.universalinstaller.presentation.install.dialog.InsufficientStorageDialog
@@ -198,11 +199,12 @@ class DialogInstallActivity : FragmentActivity() {
         val callerPackage = CallerAppDetector.detectCallerPackage(this, intent)
 
         setContent {
+            ProvideAdaptiveLayoutInfo(activity = this@DialogInstallActivity) {
             val mode by produceState<ExternalOpenMode?>(null) { value = readExternalOpenMode() }
             val forcedToDialog by forceDialogUi.collectAsState()
             val uiStyle by produceState(InstallUiStyle.Dialog) { value = readInstallUiStyle() }
             val resolvedMode = mode
-            if (resolvedMode == null && !forcedToDialog) return@setContent
+            if (resolvedMode == null && !forcedToDialog) return@ProvideAdaptiveLayoutInfo
 
             val context = this@DialogInstallActivity
             val cancelAndFinish = {
@@ -230,7 +232,7 @@ class DialogInstallActivity : FragmentActivity() {
                     onInstallFromNotificationAction = ::installFromNotificationAction,
                     onFinish = ::finish,
                 )
-                return@setContent
+                return@ProvideAdaptiveLayoutInfo
             }
 
             val uiState by viewModel.uiState.collectAsState()
@@ -477,6 +479,7 @@ class DialogInstallActivity : FragmentActivity() {
                         pendingFallbackBackend = null
                     },
                 )
+            }
             }
         }
     }

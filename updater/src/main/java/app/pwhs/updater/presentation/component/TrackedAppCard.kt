@@ -70,6 +70,7 @@ fun TrackedAppCard(
     onCancelDownloadClick: (() -> Unit)? = null,
     isChecking: Boolean = false,
     onEditCategoryClick: (() -> Unit)? = null,
+    isSelected: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val isDownloading = downloadInfo != null
@@ -80,11 +81,19 @@ fun TrackedAppCard(
         modifier = modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.extraLarge,
         colors = CardDefaults.outlinedCardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+            containerColor = if (isSelected) {
+                MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.4f)
+            } else {
+                MaterialTheme.colorScheme.surfaceContainerLow
+            },
         ),
         border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+            width = if (isSelected) 1.5.dp else 1.dp,
+            color = if (isSelected) {
+                MaterialTheme.colorScheme.primary
+            } else {
+                MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f)
+            },
         ),
     ) {
         Column(

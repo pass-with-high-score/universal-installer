@@ -31,6 +31,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -54,6 +55,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.InstallerProfile
 import app.pwhs.universalinstaller.presentation.setting.SettingViewModel
@@ -147,6 +149,11 @@ private fun ProfileUi(
                     scrolledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                 ),
             )
+        },
+        floatingActionButtonPosition = if (LocalAdaptiveLayoutInfo.current.useNavigationRail) {
+            FabPosition.Start
+        } else {
+            FabPosition.End
         },
         floatingActionButton = {
             FloatingActionButton(

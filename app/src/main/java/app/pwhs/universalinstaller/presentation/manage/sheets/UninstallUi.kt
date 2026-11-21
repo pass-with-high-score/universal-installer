@@ -27,8 +27,12 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import app.pwhs.core.presentation.adaptive.AdaptiveTwoPane
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -73,6 +77,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButtonDefaults
@@ -253,7 +258,10 @@ internal fun UninstallUi(
         onDismissSystemApp = onDismissSystemApp,
         selectedPackagesCount = uiState.selectedPackages.size,
     )
-    actionTarget?.let { target ->
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+    val useTwoPane = adaptiveInfo.useTwoPane
+
+    val renderActionSheet: @Composable (InstalledApp, Boolean) -> Unit = { target, asInline ->
         // Re-probe before each open in case Shizuku permission was just revoked or root
         // shell expired — the cached `privilegedReady` flag may be stale.
         LaunchedEffect(target.packageName) { onRefreshPrivileged() }
@@ -262,7 +270,7 @@ internal fun UninstallUi(
             extractInProgress = extractInProgress,
             privilegedReady = uiState.privilegedReady,
             onOpenApp = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 if (uiState.privilegedReady) {
                     onOpenAppPrivileged(target.packageName, target.appName)
                 } else {
@@ -270,64 +278,64 @@ internal fun UninstallUi(
                 }
             },
             onOpenAppInfo = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 openAppInfoSettings(context, target.packageName)
             },
             onShare = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onShare(target.packageName, target.appName)
             },
             onReinstall = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onReinstall(target.packageName, target.appName)
             },
             onCheckVirusTotal = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onCheckVirusTotal(target)
             },
             vtDisabled = vtDisabled,
             onExtract = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onExtract(target.packageName, target.appName)
             },
             onAddToServer = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onAddToServer(target.packageName, target.appName)
             },
             onForceStop = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onForceStop(target.packageName, target.appName)
             },
             onSetEnabled = { enabled ->
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onSetEnabled(target.packageName, target.appName, enabled)
             },
             onClearData = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 confirmClearDataTarget = target
             },
             queryStorage = queryStorage,
             queryUsage = queryUsage,
             onUninstall = {
-                actionTarget = null
-                // System apps bypass the generic confirm — the ViewModel surfaces the
-                // root-aware method dialog directly. User apps still get the explicit
-                // "Are you sure" guard before destructive action. Biometric gate (when
-                // enabled) wraps the system-app path; the user-app path goes through the
-                // confirm dialog → its onConfirm calls gatedUninstall.
+                if (!asInline) actionTarget = null
                 if (target.isSystemApp) gatedUninstall(target.packageName)
                 else confirmUninstallTarget = target
             },
             onBlockPackage = {
-                actionTarget = null
+                if (!asInline) actionTarget = null
                 onBlockPackage(target.packageName)
             },
             isBlocked = target.packageName in blockedPackages,
             onInstallToSecureFolder = { userId ->
                 onInstallToSecureFolder(target.packageName, target.appName, userId)
             },
+            asInlinePane = asInline,
             onDismiss = { actionTarget = null },
         )
+    }
+
+    if (!useTwoPane) {
+        actionTarget?.let { target -> renderActionSheet(target, false) }
     }
 
     app.pwhs.universalinstaller.presentation.manage.ManageSnackbars(
@@ -371,94 +379,133 @@ internal fun UninstallUi(
         )
     }
 
-    Scaffold(
-        modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        contentWindowInsets = WindowInsets(0, 0, 0, 0),
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = {
-            app.pwhs.universalinstaller.presentation.manage.ManageHeader(
-                isSelectionMode = uiState.isSelectionMode,
-                selectedCount = uiState.selectedPackages.size,
-                isAllSelected = uiState.isAllSelected,
-                searchActive = searchActive,
-                privilegedReady = uiState.privilegedReady,
-                scrollBehavior = scrollBehavior,
-                onClearSelection = onClearSelection,
-                onToggleSelectAll = onToggleSelectAll,
-                onExtractSelected = onExtractSelected,
-                onRequestBatchUninstall = {
-                    val hasSystem = uiState.apps
-                        .filter { it.packageName in uiState.selectedPackages }
-                        .any { it.isSystemApp }
-                    if (hasSystem) onUninstallSelected() else showBatchConfirm = true
-                },
-                onForceStopSelected = onForceStopSelected,
-                onDisableSelected = onDisableSelected,
-                onRequestBatchClearData = { showBatchClearDataConfirm = true },
-                onToggleSearch = {
-                    if (searchActive) {
-                        onSearchQueryChanged("")
-                        searchActive = false
-                    } else {
-                        searchActive = true
-                    }
-                },
-                onRefresh = onRefresh,
-                onOpenBackups = onOpenBackups,
-                onOpenLogs = onOpenLogs,
-            )
-        },
-        floatingActionButton = {
-            if (!uiState.isSelectionMode && !uiState.isLoading) {
-                // Tap → filter sheet; long-press → scroll to top. M3's `FloatingActionButton`
-                // and clickable `Surface` only expose `onClick`, so we compose a FAB-shaped
-                // Surface and attach `combinedClickable` ourselves. Avoids a second FAB that
-                // clashed visually with the red `DeleteOutline` on each card.
-                val haptic = LocalHapticFeedback.current
-                Surface(
-                    shape = FloatingActionButtonDefaults.shape,
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    shadowElevation = 6.dp,
-                    modifier = Modifier
-                        .size(56.dp)
-                        .clip(FloatingActionButtonDefaults.shape)
-                        .combinedClickable(
-                            role = Role.Button,
-                            onClick = { showFilterSheet = true },
-                            onLongClick = {
-                                haptic.performHapticFeedback(
-                                    HapticFeedbackType.LongPress
-                                )
-                                coroutineScope.launch { listState.scrollToItem(0) }
-                            },
-                        ),
-                ) {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Rounded.FilterList,
-                            contentDescription = stringResource(R.string.uninstall_filter_cd),
-                        )
+    val listPane: @Composable () -> Unit = {
+        Scaffold(
+            modifier = modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = {
+                app.pwhs.universalinstaller.presentation.manage.ManageHeader(
+                    isSelectionMode = uiState.isSelectionMode,
+                    selectedCount = uiState.selectedPackages.size,
+                    isAllSelected = uiState.isAllSelected,
+                    searchActive = searchActive,
+                    privilegedReady = uiState.privilegedReady,
+                    scrollBehavior = scrollBehavior,
+                    onClearSelection = onClearSelection,
+                    onToggleSelectAll = onToggleSelectAll,
+                    onExtractSelected = onExtractSelected,
+                    onRequestBatchUninstall = {
+                        val hasSystem = uiState.apps
+                            .filter { it.packageName in uiState.selectedPackages }
+                            .any { it.isSystemApp }
+                        if (hasSystem) onUninstallSelected() else showBatchConfirm = true
+                    },
+                    onForceStopSelected = onForceStopSelected,
+                    onDisableSelected = onDisableSelected,
+                    onRequestBatchClearData = { showBatchClearDataConfirm = true },
+                    onToggleSearch = {
+                        if (searchActive) {
+                            onSearchQueryChanged("")
+                            searchActive = false
+                        } else {
+                            searchActive = true
+                        }
+                    },
+                    onRefresh = onRefresh,
+                    onOpenBackups = onOpenBackups,
+                    onOpenLogs = onOpenLogs,
+                )
+            },
+            floatingActionButtonPosition = if (adaptiveInfo.useNavigationRail) FabPosition.Start else FabPosition.End,
+            floatingActionButton = {
+                if (!uiState.isSelectionMode && !uiState.isLoading) {
+                    val haptic = LocalHapticFeedback.current
+                    Surface(
+                        shape = FloatingActionButtonDefaults.shape,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                        shadowElevation = 6.dp,
+                        modifier = Modifier
+                            .then(if (adaptiveInfo.useNavigationRail) Modifier.navigationBarsPadding() else Modifier)
+                            .size(56.dp)
+                            .clip(FloatingActionButtonDefaults.shape)
+                            .combinedClickable(
+                                role = Role.Button,
+                                onClick = { showFilterSheet = true },
+                                onLongClick = {
+                                    haptic.performHapticFeedback(
+                                        HapticFeedbackType.LongPress
+                                    )
+                                    coroutineScope.launch { listState.scrollToItem(0) }
+                                },
+                            ),
+                    ) {
+                        Box(contentAlignment = Alignment.Center) {
+                            Icon(
+                                imageVector = Icons.Rounded.FilterList,
+                                contentDescription = stringResource(R.string.uninstall_filter_cd),
+                            )
+                        }
                     }
                 }
-            }
-        },
-    ) { innerPadding ->
-        app.pwhs.universalinstaller.presentation.manage.ManageScreenContent(
-            uiState = uiState,
-            searchActive = searchActive,
-            searchFocusRequester = searchFocusRequester,
-            blockedPackages = blockedPackages,
-            listState = listState,
-            onSearchQueryChanged = onSearchQueryChanged,
-            onToggleSearchActive = { searchActive = it },
-            onToggleAppFilter = onToggleAppFilter,
-            onRefreshUsageAccess = onRefreshUsageAccess,
-            onResetFilters = onResetFilters,
-            onRefresh = onRefresh,
-            onShowActions = { actionTarget = it },
-            onToggleSelection = onToggleSelection,
-            modifier = Modifier.padding(innerPadding),
+            },
+        ) { innerPadding ->
+            app.pwhs.universalinstaller.presentation.manage.ManageScreenContent(
+                uiState = uiState,
+                searchActive = searchActive,
+                searchFocusRequester = searchFocusRequester,
+                blockedPackages = blockedPackages,
+                listState = listState,
+                onSearchQueryChanged = onSearchQueryChanged,
+                onToggleSearchActive = { searchActive = it },
+                onToggleAppFilter = onToggleAppFilter,
+                onRefreshUsageAccess = onRefreshUsageAccess,
+                onResetFilters = onResetFilters,
+                onRefresh = onRefresh,
+                onShowActions = { actionTarget = it },
+                onToggleSelection = onToggleSelection,
+                activePackageName = if (useTwoPane) actionTarget?.packageName else null,
+                modifier = Modifier.padding(innerPadding),
+            )
+        }
+    }
+
+    if (useTwoPane) {
+        AdaptiveTwoPane(
+            firstWeight = 0.52f,
+            first = listPane,
+            second = {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background,
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .statusBarsPadding()
+                            .navigationBarsPadding(),
+                    ) {
+                        val selected = actionTarget
+                        if (selected != null) {
+                            renderActionSheet(selected, true)
+                        } else {
+                            Box(
+                                modifier = Modifier.fillMaxSize().padding(32.dp),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                EmptyStateView(
+                                    icon = Icons.Rounded.Android,
+                                    title = stringResource(app.pwhs.core.R.string.nav_manage),
+                                    subtitle = stringResource(R.string.uninstall_search_hint),
+                                )
+                            }
+                        }
+                    }
+                }
+            },
         )
+    } else {
+        listPane()
     }
 }

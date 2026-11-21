@@ -56,7 +56,7 @@ import app.pwhs.core.util.openUriSafely
 import app.pwhs.tv.R
 import app.pwhs.tv.ui.components.QrCode
 
-private const val TELEGRAM_URL = "https://t.me/blockads_android"
+private const val TELEGRAM_URL = "https://t.me/blockads_android_chat"
 private const val GITHUB_URL = "https://github.com/pass-with-high-score/universal-installer"
 private const val WEBSITE_URL = "https://universal-installer.pwhs.app/"
 private const val PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=app.pwhs.universalinstaller"

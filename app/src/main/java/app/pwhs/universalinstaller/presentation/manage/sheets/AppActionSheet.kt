@@ -5,11 +5,14 @@ import android.widget.Toast
 import app.pwhs.core.R as CoreR
 import app.pwhs.core.util.copyToClipboard
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -88,6 +91,7 @@ internal fun AppActionSheet(
     onBlockPackage: () -> Unit,
     isBlocked: Boolean,
     onInstallToSecureFolder: ((userId: Int) -> Unit)? = null,
+    asInlinePane: Boolean = false,
     onDismiss: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -109,15 +113,89 @@ internal fun AppActionSheet(
         usage = queryUsage(app.packageName)
     }
 
-    ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = sheetState,
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState()),
+    val sheetBody: @Composable (Modifier) -> Unit = { bodyModifier ->
+        AppActionSheetBody(
+            app = app,
+            context = context,
+            launchable = launchable,
+            secureFolderProfile = secureFolderProfile,
+            storage = storage,
+            usage = usage,
+            extractInProgress = extractInProgress,
+            privilegedReady = privilegedReady,
+            onOpenApp = onOpenApp,
+            onOpenAppInfo = onOpenAppInfo,
+            onShare = onShare,
+            onReinstall = onReinstall,
+            onCheckVirusTotal = onCheckVirusTotal,
+            vtDisabled = vtDisabled,
+            onAddToServer = onAddToServer,
+            onExtract = onExtract,
+            onForceStop = onForceStop,
+            onSetEnabled = onSetEnabled,
+            onClearData = onClearData,
+            onUninstall = onUninstall,
+            onBlockPackage = onBlockPackage,
+            isBlocked = isBlocked,
+            onInstallToSecureFolder = onInstallToSecureFolder,
+            onDismiss = onDismiss,
+            onShowAntiSplitPrompt = { showAntiSplitPrompt = true },
+            asInlinePane = asInlinePane,
+            modifier = bodyModifier,
+        )
+    }
+
+    if (asInlinePane) {
+        sheetBody(Modifier.fillMaxSize().padding(top = 12.dp))
+    } else {
+        ModalBottomSheet(
+            onDismissRequest = onDismiss,
+            sheetState = sheetState,
         ) {
+            sheetBody(Modifier)
+        }
+    }
+
+    if (showAntiSplitPrompt) {
+        AntiSplitPromptDialog(
+            onDismiss = { showAntiSplitPrompt = false },
+            onDownload = { AntiSplitBridge.openDownloadPage(context) },
+        )
+    }
+}
+
+@Composable
+private fun AppActionSheetBody(
+    app: InstalledApp,
+    context: android.content.Context,
+    launchable: Boolean,
+    secureFolderProfile: app.pwhs.universalinstaller.presentation.install.DeviceUserProfile?,
+    storage: StorageBreakdown?,
+    usage: List<UsageBucket>,
+    extractInProgress: Boolean,
+    privilegedReady: Boolean,
+    onOpenApp: () -> Unit,
+    onOpenAppInfo: () -> Unit,
+    onShare: () -> Unit,
+    onReinstall: () -> Unit,
+    onCheckVirusTotal: () -> Unit,
+    vtDisabled: Boolean,
+    onAddToServer: () -> Unit,
+    onExtract: () -> Unit,
+    onForceStop: () -> Unit,
+    onSetEnabled: (Boolean) -> Unit,
+    onClearData: () -> Unit,
+    onUninstall: () -> Unit,
+    onBlockPackage: () -> Unit,
+    isBlocked: Boolean,
+    onInstallToSecureFolder: ((userId: Int) -> Unit)?,
+    onDismiss: () -> Unit,
+    onShowAntiSplitPrompt: () -> Unit,
+    asInlinePane: Boolean = false,
+    modifier: Modifier = Modifier,
+) {
+    val viewingArea: @Composable () -> Unit = {
+        Column(modifier = Modifier.fillMaxWidth()) {
             // Header
             AppActionHeader(
                 app = app,
@@ -136,33 +214,35 @@ internal fun AppActionSheet(
             }
 
             // Storage breakdown (from UsageStatsManager/StorageStatsManager)
-            if (storage != null) {
-                storage?.let { s ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 20.dp, vertical = 4.dp),
-                        horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    ) {
-                        StorageChip(
-                            label = stringResource(R.string.manage_storage_app),
-                            value = android.text.format.Formatter.formatShortFileSize(context, s.appBytes),
-                            weight = 1f,
-                        )
-                        StorageChip(
-                            label = stringResource(R.string.manage_storage_data),
-                            value = android.text.format.Formatter.formatShortFileSize(context, s.dataBytes),
-                            weight = 1f,
-                        )
-                        StorageChip(
-                            label = stringResource(R.string.manage_storage_cache),
-                            value = android.text.format.Formatter.formatShortFileSize(context, s.cacheBytes),
-                            weight = 1f,
-                        )
-                    }
+            storage?.let { s ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp, vertical = 4.dp),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                ) {
+                    StorageChip(
+                        label = stringResource(R.string.manage_storage_app),
+                        value = android.text.format.Formatter.formatShortFileSize(context, s.appBytes),
+                        weight = 1f,
+                    )
+                    StorageChip(
+                        label = stringResource(R.string.manage_storage_data),
+                        value = android.text.format.Formatter.formatShortFileSize(context, s.dataBytes),
+                        weight = 1f,
+                    )
+                    StorageChip(
+                        label = stringResource(R.string.manage_storage_cache),
+                        value = android.text.format.Formatter.formatShortFileSize(context, s.cacheBytes),
+                        weight = 1f,
+                    )
                 }
             }
+        }
+    }
 
+    val interactionArea: @Composable () -> Unit = {
+        Column(modifier = Modifier.fillMaxWidth()) {
             Spacer(Modifier.height(4.dp))
 
             // Quick Actions Hero Row
@@ -325,13 +405,13 @@ internal fun AppActionSheet(
                                     newTask = true,
                                 )
                                 if (!AntiSplitBridge.canResolveIntent(context, intent)) {
-                                    showAntiSplitPrompt = true
+                                    onShowAntiSplitPrompt()
                                 } else {
                                     runCatching {
                                         context.startActivity(intent)
                                         onDismiss()
                                     }.onFailure {
-                                        showAntiSplitPrompt = true
+                                        onShowAntiSplitPrompt()
                                     }
                                 }
                             },
@@ -420,10 +500,28 @@ internal fun AppActionSheet(
         }
     }
 
-    if (showAntiSplitPrompt) {
-        AntiSplitPromptDialog(
-            onDismiss = { showAntiSplitPrompt = false },
-            onDownload = { AntiSplitBridge.openDownloadPage(context) },
-        )
+    if (asInlinePane) {
+        BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+            val viewportHeight = maxHeight
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+                    .heightIn(min = viewportHeight),
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                viewingArea()
+                interactionArea()
+            }
+        }
+    } else {
+        Column(
+            modifier = modifier
+                .fillMaxWidth()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            viewingArea()
+            interactionArea()
+        }
     }
 }

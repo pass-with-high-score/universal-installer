@@ -221,7 +221,7 @@ private fun AboutUi(
                     iconPainter = painterResource(R.drawable.ic_telegram),
                     title = stringResource(R.string.setting_telegram_title),
                     subtitle = stringResource(R.string.setting_telegram_subtitle),
-                    onClick = { uriHandler.openUriSafely(context, "https://t.me/blockads_android") },
+                    onClick = { uriHandler.openUriSafely(context, "https://t.me/blockads_android_chat") },
                 )
             }
             item { AboutRowDivider() }

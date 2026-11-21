@@ -14,6 +14,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,9 +41,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import app.pwhs.core.presentation.adaptive.FoldablePosture
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
 import app.pwhs.core.domain.AppThemePreset
 import app.pwhs.core.domain.ThemeMode
 import app.pwhs.universalinstaller.R
@@ -233,10 +235,6 @@ fun DialogInstallContent(
         amoledMode = amoledMode,
         themePreset = themePreset,
     ) {
-        val configuration = LocalConfiguration.current
-        val screenHeight = configuration.screenHeightDp.dp
-        val maxDialogHeight = screenHeight * 0.8f
-
         WindowBlurEffect(enabled = true)
 
         if (pendingRisks.isNotEmpty()) {
@@ -273,7 +271,17 @@ fun DialogInstallContent(
         if (uiState.dialogStage == DialogStage.None) return@UniversalInstallerTheme
 
         val isSheet = uiStyle == InstallUiStyle.Sheet
-        Box(
+        val posture = LocalAdaptiveLayoutInfo.current.posture
+        // Avoid placing the install dialog directly across a separating fold hinge:
+        // - Tabletop (horizontal hinge): anchor to BottomCenter so controls stay in the lower half.
+        // - Book (vertical hinge): anchor to CenterEnd so the card sits cleanly in the right half.
+        val dialogAlignment = when {
+            isSheet || posture is FoldablePosture.Tabletop -> Alignment.BottomCenter
+            posture is FoldablePosture.Book -> Alignment.CenterEnd
+            else -> Alignment.Center
+        }
+
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .pointerInput(Unit) {
@@ -281,22 +289,34 @@ fun DialogInstallContent(
                         onDismissAndFinish()
                     })
                 },
-            contentAlignment = if (isSheet) Alignment.BottomCenter else Alignment.Center,
+            contentAlignment = dialogAlignment,
         ) {
+            val containerHeight = maxHeight
+            val containerWidth = maxWidth
+            val maxCardWidth = when (posture) {
+                is FoldablePosture.Book -> (containerWidth * 0.46f).coerceAtMost(480.dp)
+                else -> if (isSheet) 560.dp else 480.dp
+            }
+            val maxCardHeight = when (posture) {
+                is FoldablePosture.Tabletop -> containerHeight * 0.46f
+                else -> if (isSheet) containerHeight * 0.9f else containerHeight * 0.8f
+            }
+
             SheetEntryAnimation(enabled = isSheet) {
                 Surface(
                     modifier = (
                         if (isSheet) {
                             Modifier
                                 .fillMaxWidth()
+                                .widthIn(max = maxCardWidth)
                                 .navigationBarsPadding()
                                 .padding(horizontal = 12.dp, vertical = 12.dp)
-                                .heightIn(max = screenHeight * 0.9f)
+                                .heightIn(max = maxCardHeight)
                         } else {
                             Modifier
                                 .padding(24.dp)
-                                .widthIn(max = 480.dp)
-                                .heightIn(max = maxDialogHeight)
+                                .widthIn(max = maxCardWidth)
+                                .heightIn(max = maxCardHeight)
                         }
                     )
                         .pointerInput(Unit) {

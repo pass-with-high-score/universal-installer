@@ -28,7 +28,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.core.net.toUri
 import androidx.lifecycle.compose.LifecycleResumeEffect
+import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
+import app.pwhs.core.presentation.adaptive.MaxWidthContainer
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.components.PackageDropZone
 import app.pwhs.universalinstaller.presentation.composable.QrCode
 import app.pwhs.universalinstaller.presentation.setting.components.SyncOptionsBottomSheet
 import org.koin.androidx.compose.koinViewModel
@@ -215,6 +218,9 @@ fun SyncScreen(
         }
     }
 
+    val adaptiveInfo = LocalAdaptiveLayoutInfo.current
+    val useRail = adaptiveInfo.useNavigationRail
+
     Scaffold(
         modifier = modifier,
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -222,6 +228,9 @@ fun SyncScreen(
             Column {
                 TopAppBar(
                     title = { Text(stringResource(R.string.quick_transfer_sync_title)) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                    ),
                     navigationIcon = {
                         IconButton(onClick = { (context as? android.app.Activity)?.finish() }) {
                             Icon(
@@ -253,83 +262,181 @@ fun SyncScreen(
                     }
                 )
 
-                PrimaryTabRow(
-                    selectedTabIndex = selectedTab,
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Tab(
-                        selected = selectedTab == 0,
-                        onClick = { selectedTab = 0 },
-                        text = { Text(stringResource(R.string.sync_tab_send)) },
-                        icon = {
-                            Icon(Icons.Rounded.UploadFile, contentDescription = null)
-                        },
-                    )
-                    Tab(
-                        selected = selectedTab == 1,
-                        onClick = { selectedTab = 1 },
-                        text = { Text(stringResource(R.string.sync_tab_receive)) },
-                        icon = {
-                            Icon(Icons.Rounded.FileDownload, contentDescription = null)
-                        },
-                    )
+                if (!useRail) {
+                    PrimaryTabRow(
+                        selectedTabIndex = selectedTab,
+                        containerColor = Color.Transparent,
+                        modifier = Modifier.fillMaxWidth(),
+                        divider = {},
+                    ) {
+                        Tab(
+                            selected = selectedTab == 0,
+                            onClick = { selectedTab = 0 },
+                            text = { Text(stringResource(R.string.sync_tab_send)) },
+                            icon = {
+                                Icon(Icons.Rounded.UploadFile, contentDescription = null)
+                            },
+                        )
+                        Tab(
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            text = { Text(stringResource(R.string.sync_tab_receive)) },
+                            icon = {
+                                Icon(Icons.Rounded.FileDownload, contentDescription = null)
+                            },
+                        )
+                    }
                 }
+                HorizontalDivider(
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
+                )
             }
         }
     ) { padding ->
-        AnimatedContent(
-            targetState = selectedTab,
-            transitionSpec = {
-                if (targetState > initialState) {
-                    (slideInHorizontally(animationSpec = tween(220)) { it } + fadeIn(animationSpec = tween(220)))
-                        .togetherWith(slideOutHorizontally(animationSpec = tween(220)) { -it } + fadeOut(animationSpec = tween(220)))
-                } else {
-                    (slideInHorizontally(animationSpec = tween(220)) { -it } + fadeIn(animationSpec = tween(220)))
-                        .togetherWith(slideOutHorizontally(animationSpec = tween(220)) { it } + fadeOut(animationSpec = tween(220)))
-                }
-            },
-            label = "SyncTabContent",
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding),
-        ) { tabIndex ->
-            when (tabIndex) {
-                0 -> SyncSendTab(
-                    uiState = uiState,
-                    onToggle = { enabled ->
-                        if (enabled && !hasStoragePermission) {
-                            showStorageDialog = true
-                        } else {
-                            viewModel.toggleServer(enabled)
-                        }
-                    },
-                    onShowQr = { showQrDialog = true },
-                    onOpenSettings = { showSettingsSheet = true },
-                    onPickFiles = {
-                        if (!hasStoragePermission) {
-                            showStorageDialog = true
-                        } else {
-                            safeLaunchFilePicker()
-                        }
-                    },
-                    onDeleteFile = { viewModel.deleteSharedFile(it) },
-                )
+        val colors = MaterialTheme.colorScheme
+        val isAmoled = colors.background == Color.Black && colors.surface == Color.Black
+        val contentPane: @Composable (Modifier) -> Unit = { paneModifier ->
+            PackageDropZone(
+                onUrisDropped = { uris ->
+                    if (!hasStoragePermission) {
+                        showStorageDialog = true
+                    } else {
+                        onSyncFilesPicked(uris)
+                    }
+                },
+                modifier = paneModifier,
+            ) {
+                MaxWidthContainer(
+                    maxWidth = if (adaptiveInfo.useTwoPane) 1120.dp else 680.dp,
+                    modifier = Modifier.fillMaxSize(),
+                ) {
+                    AnimatedContent(
+                        targetState = selectedTab,
+                        transitionSpec = {
+                            if (targetState > initialState) {
+                                (slideInHorizontally(animationSpec = tween(220)) { it } + fadeIn(animationSpec = tween(220)))
+                                    .togetherWith(slideOutHorizontally(animationSpec = tween(220)) { -it } + fadeOut(animationSpec = tween(220)))
+                            } else {
+                                (slideInHorizontally(animationSpec = tween(220)) { -it } + fadeIn(animationSpec = tween(220)))
+                                    .togetherWith(slideOutHorizontally(animationSpec = tween(220)) { it } + fadeOut(animationSpec = tween(220)))
+                            }
+                        },
+                        label = "SyncTabContent",
+                        modifier = Modifier.fillMaxSize(),
+                    ) { tabIndex ->
+                        when (tabIndex) {
+                            0 -> SyncSendTab(
+                                uiState = uiState,
+                                onToggle = { enabled ->
+                                    if (enabled && !hasStoragePermission) {
+                                        showStorageDialog = true
+                                    } else {
+                                        viewModel.toggleServer(enabled)
+                                    }
+                                },
+                                onShowQr = { showQrDialog = true },
+                                onOpenSettings = { showSettingsSheet = true },
+                                onPickFiles = {
+                                    if (!hasStoragePermission) {
+                                        showStorageDialog = true
+                                    } else {
+                                        safeLaunchFilePicker()
+                                    }
+                                },
+                                onDeleteFile = { viewModel.deleteSharedFile(it) },
+                            )
 
-                1 -> SyncReceiveTab(
-                    uiState = uiState,
-                    onToggleServer = { enabled ->
-                        if (enabled && !hasStoragePermission) {
-                            showStorageDialog = true
-                        } else {
-                            viewModel.toggleServer(enabled)
+                            1 -> SyncReceiveTab(
+                                uiState = uiState,
+                                onToggleServer = { enabled ->
+                                    if (enabled && !hasStoragePermission) {
+                                        showStorageDialog = true
+                                    } else {
+                                        viewModel.toggleServer(enabled)
+                                    }
+                                },
+                                onShowQr = { showQrDialog = true },
+                                onOpenSettings = { showSettingsSheet = true },
+                                onInstallApk = { file -> viewModel.installApk(context, file) },
+                                onDeleteFile = { viewModel.deleteReceivedFile(it) },
+                            )
                         }
-                    },
-                    onShowQr = { showQrDialog = true },
-                    onOpenSettings = { showSettingsSheet = true },
-                    onInstallApk = { file -> viewModel.installApk(context, file) },
-                    onDeleteFile = { viewModel.deleteReceivedFile(it) },
+                    }
+                }
+            }
+        }
+
+        if (useRail) {
+            val railItemColors = NavigationRailItemDefaults.colors(
+                selectedIconColor = colors.onPrimaryContainer,
+                selectedTextColor = colors.primary,
+                indicatorColor = colors.primaryContainer,
+                unselectedIconColor = colors.onSurfaceVariant,
+                unselectedTextColor = colors.onSurfaceVariant,
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+            ) {
+                NavigationRail(
+                    containerColor = if (isAmoled) Color.Black else NavigationRailDefaults.ContainerColor,
+                    windowInsets = WindowInsets(0, 0, 0, 0),
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxHeight(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterVertically),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        NavigationRailItem(
+                            selected = selectedTab == 0,
+                            onClick = { selectedTab = 0 },
+                            colors = railItemColors,
+                            icon = {
+                                if (uiState.sharedFiles.isNotEmpty()) {
+                                    BadgedBox(badge = { Badge { Text(uiState.sharedFiles.size.toString()) } }) {
+                                        Icon(Icons.Rounded.UploadFile, contentDescription = stringResource(R.string.sync_tab_send))
+                                    }
+                                } else {
+                                    Icon(Icons.Rounded.UploadFile, contentDescription = stringResource(R.string.sync_tab_send))
+                                }
+                            },
+                            label = { Text(stringResource(R.string.sync_tab_send)) },
+                        )
+                        NavigationRailItem(
+                            selected = selectedTab == 1,
+                            onClick = { selectedTab = 1 },
+                            colors = railItemColors,
+                            icon = {
+                                if (uiState.receivedFiles.isNotEmpty()) {
+                                    BadgedBox(badge = { Badge { Text(uiState.receivedFiles.size.toString()) } }) {
+                                        Icon(Icons.Rounded.FileDownload, contentDescription = stringResource(R.string.sync_tab_receive))
+                                    }
+                                } else {
+                                    Icon(Icons.Rounded.FileDownload, contentDescription = stringResource(R.string.sync_tab_receive))
+                                }
+                            },
+                            label = { Text(stringResource(R.string.sync_tab_receive)) },
+                        )
+                    }
+                }
+                VerticalDivider(
+                    thickness = 1.dp,
+                    color = colors.outlineVariant.copy(alpha = 0.5f),
+                )
+                contentPane(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
                 )
             }
+        } else {
+            contentPane(
+                Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+            )
         }
     }
 }

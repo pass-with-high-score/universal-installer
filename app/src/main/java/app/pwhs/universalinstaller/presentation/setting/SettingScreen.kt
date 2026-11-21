@@ -57,6 +57,7 @@ import app.pwhs.universalinstaller.domain.model.ExternalOpenMode
 import app.pwhs.universalinstaller.domain.model.InstallUiStyle
 import app.pwhs.universalinstaller.presentation.composable.EmptyStateView
 import app.pwhs.core.billing.BillingManager
+import app.pwhs.core.presentation.adaptive.MaxWidthContainer
 import app.pwhs.universalinstaller.presentation.composable.SettingsSection
 import app.pwhs.universalinstaller.presentation.composable.UniversalSearchBar
 import app.pwhs.universalinstaller.presentation.install.controller.RootState
@@ -267,10 +268,14 @@ private fun SettingUi(
             )
         },
     ) { innerPadding ->
-        Column(
+        MaxWidthContainer(
+            maxWidth = 720.dp,
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
+        ) {
+        Column(
+            modifier = Modifier.fillMaxSize()
         ) {
             UniversalSearchBar(
                 query = searchQuery,
@@ -458,6 +463,7 @@ private fun SettingUi(
                 } // end of else
             } // end of Crossfade
         } // end of Column
+        } // end of MaxWidthContainer
     } // end of Scaffold
 
     SettingSheetsHost(
