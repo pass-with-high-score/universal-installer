@@ -463,6 +463,33 @@ object AnalyticsHelper {
         Telemetry.event(TelemetryEvents.EVENT_MILESTONE_BANNER_ACTION, params)
     }
 
+    // ── Giai đoạn 9: Khóa bảo mật (Security Lock) ────────────────────────
+    fun updateSecurityLockEnabled(enabled: Boolean) {
+        Telemetry.setUserProperty(
+            TelemetryEvents.PROPERTY_SECURITY_LOCK_ENABLED,
+            enabled.toString(),
+        )
+    }
+
+    fun logSecurityLockToggled(enabled: Boolean, method: String) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_SECURITY_LOCK_TOGGLED,
+            TelemetryEvents.PARAM_ENABLED to enabled,
+            TelemetryEvents.PARAM_METHOD to method,
+        )
+        if (enabled) {
+            Telemetry.feature(TelemetryEvents.FEATURE_SECURITY_LOCK)
+        }
+    }
+
+    fun logSecurityLockUnlocked(method: String, success: Boolean) {
+        Telemetry.event(
+            TelemetryEvents.EVENT_SECURITY_LOCK_UNLOCKED,
+            TelemetryEvents.PARAM_METHOD to method,
+            TelemetryEvents.PARAM_SUCCESS to success,
+        )
+    }
+
     private fun String.normalizeFileType(): String =
         substringAfterLast('.', "").lowercase(Locale.ROOT).ifEmpty { lowercase(Locale.ROOT) }
 }

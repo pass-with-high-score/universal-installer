@@ -152,10 +152,19 @@ class App : Application(), SingletonImageLoader.Factory {
      */
     private suspend fun applyTelemetryPreference() {
         if (!Telemetry.isCollecting) return
-        val enabled = runCatching { dataStore.data.first()[SharedPrefsKeys.ANALYTICS_ENABLED] }
-            .onFailure { Timber.w(it, "Could not read the analytics preference; leaving it on") }
-            .getOrNull() ?: true
+        val prefs = runCatching { dataStore.data.first() }
+            .onFailure { Timber.w(it, "Could not read preferences; leaving analytics on") }
+            .getOrNull()
+        val enabled = prefs?.get(SharedPrefsKeys.ANALYTICS_ENABLED) ?: true
         Telemetry.setCollectionEnabled(enabled)
+        if (enabled && prefs != null) {
+            val pinActive = (prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.PIN_LOCK_ENABLED] == true) &&
+                !prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.PIN_LOCK_HASH].isNullOrBlank() &&
+                !prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.PIN_LOCK_SALT].isNullOrBlank()
+            val bioActive = prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.BIOMETRIC_LOCK_INSTALL] == true ||
+                prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] == true
+            app.pwhs.core.telemetry.AnalyticsHelper.updateSecurityLockEnabled(pinActive || bioActive)
+        }
     }
 
     override fun newImageLoader(context: android.content.Context): ImageLoader {

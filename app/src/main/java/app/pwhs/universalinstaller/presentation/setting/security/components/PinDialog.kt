@@ -167,6 +167,10 @@ fun PinDialog(
             }
             is PinDialogMode.Verify -> {
                 val correct = onVerifyPin?.invoke(pin) ?: false
+                app.pwhs.core.telemetry.AnalyticsHelper.logSecurityLockUnlocked(
+                    method = app.pwhs.core.telemetry.TelemetryEvents.LOCK_METHOD_PIN,
+                    success = correct,
+                )
                 if (correct) {
                     onSuccess?.invoke()
                 } else {

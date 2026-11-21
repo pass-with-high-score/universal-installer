@@ -5,6 +5,8 @@ import androidx.datastore.preferences.core.edit
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.telemetry.AnalyticsHelper
+import app.pwhs.core.telemetry.TelemetryEvents
 import app.pwhs.universalinstaller.presentation.install.controller.ShizukuShellExecutor
 import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.setting.security.util.PinCryptoHelper
@@ -146,6 +148,8 @@ class SecurityViewModel(
                 prefs[PreferencesKeys.PIN_LOCK_INSTALL] = true
             }
             isSettingsUnlockedState.value = true
+            AnalyticsHelper.logSecurityLockToggled(enabled = true, method = TelemetryEvents.LOCK_METHOD_PIN)
+            AnalyticsHelper.updateSecurityLockEnabled(true)
         }
     }
 
@@ -184,6 +188,8 @@ class SecurityViewModel(
                 prefs[PreferencesKeys.PIN_LOCK_SALT] = ""
             }
             isSettingsUnlockedState.value = false
+            AnalyticsHelper.logSecurityLockToggled(enabled = false, method = TelemetryEvents.LOCK_METHOD_PIN)
+            syncSecurityLockUserProperty()
         }
     }
 
@@ -224,6 +230,8 @@ class SecurityViewModel(
             dataStore.edit { prefs ->
                 prefs[PreferencesKeys.BIOMETRIC_LOCK_INSTALL] = enabled
             }
+            AnalyticsHelper.logSecurityLockToggled(enabled = enabled, method = TelemetryEvents.LOCK_METHOD_BIOMETRIC)
+            syncSecurityLockUserProperty()
         }
     }
 
@@ -232,7 +240,19 @@ class SecurityViewModel(
             dataStore.edit { prefs ->
                 prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] = enabled
             }
+            AnalyticsHelper.logSecurityLockToggled(enabled = enabled, method = TelemetryEvents.LOCK_METHOD_BIOMETRIC)
+            syncSecurityLockUserProperty()
         }
+    }
+
+    private suspend fun syncSecurityLockUserProperty() {
+        val prefs = dataStore.data.first()
+        val pinActive = (prefs[PreferencesKeys.PIN_LOCK_ENABLED] == true) &&
+            !prefs[PreferencesKeys.PIN_LOCK_HASH].isNullOrBlank() &&
+            !prefs[PreferencesKeys.PIN_LOCK_SALT].isNullOrBlank()
+        val bioActive = prefs[PreferencesKeys.BIOMETRIC_LOCK_INSTALL] == true ||
+            prefs[PreferencesKeys.BIOMETRIC_LOCK_UNINSTALL] == true
+        AnalyticsHelper.updateSecurityLockEnabled(pinActive || bioActive)
     }
 
     fun unlockSettings() {

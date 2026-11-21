@@ -159,6 +159,7 @@ object TelemetryEvents {
     const val PROPERTY_IS_PRO_USER = "is_pro_user"
     const val PROPERTY_TOTAL_INSTALLS_TIER = "total_installs_tier"
     const val PROPERTY_PREFERRED_FILE_TYPE = "preferred_file_type"
+    const val PROPERTY_SECURITY_LOCK_ENABLED = "security_lock_enabled"
 
     const val TIER_0 = "0"
     const val TIER_1_5 = "1_5"
@@ -223,4 +224,13 @@ object TelemetryEvents {
     const val ACTION_VIEW = "view"
 
     const val FEATURE_USER_STATS = "user_stats"
+
+    // ── Giai đoạn 9: Khóa bảo mật (Security Lock) ────────────────────────
+    const val FEATURE_SECURITY_LOCK = "security_lock"
+    const val EVENT_SECURITY_LOCK_TOGGLED = "security_lock_toggled"
+    const val EVENT_SECURITY_LOCK_UNLOCKED = "security_lock_unlocked"
+
+    const val PARAM_SUCCESS = "success"
+    const val LOCK_METHOD_PIN = "pin"
+    const val LOCK_METHOD_BIOMETRIC = "biometric"
 }

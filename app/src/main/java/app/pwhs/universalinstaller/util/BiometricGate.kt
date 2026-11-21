@@ -58,10 +58,18 @@ object BiometricGate {
         val executor = ContextCompat.getMainExecutor(activity)
         val callback = object : BiometricPrompt.AuthenticationCallback() {
             override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
+                app.pwhs.core.telemetry.AnalyticsHelper.logSecurityLockUnlocked(
+                    method = app.pwhs.core.telemetry.TelemetryEvents.LOCK_METHOD_BIOMETRIC,
+                    success = true,
+                )
                 onSuccess()
             }
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                app.pwhs.core.telemetry.AnalyticsHelper.logSecurityLockUnlocked(
+                    method = app.pwhs.core.telemetry.TelemetryEvents.LOCK_METHOD_BIOMETRIC,
+                    success = false,
+                )
                 // Treat user-driven dismissals as plain cancel (no toast). Hard errors get
                 // surfaced via onError so the screen can show feedback if it cares.
                 val isUserCancel = errorCode == BiometricPrompt.ERROR_USER_CANCELED ||
