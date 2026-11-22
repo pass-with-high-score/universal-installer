@@ -854,6 +854,17 @@ private fun InstallUi(
                 }
             }
 
+            if (selectedTab == SourceTab.Local) {
+                item(key = "recent_apks") {
+                    app.pwhs.universalinstaller.presentation.install.components.RecentApksSection(
+                        isUnlocked = isProUser || !billingManager.isAvailable,
+                        onPick = onPickFromScan,
+                        onRequirePro = { showUpgradeProSheet = true },
+                        onSeeAll = onStartDeviceScan,
+                    )
+                }
+            }
+
             item(key = "source_picker") {
                 SourcePicker(
                     selectedTab = selectedTab,

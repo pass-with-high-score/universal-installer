@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Bolt
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Security
@@ -145,6 +146,11 @@ fun PaywallContent(
                     icon = Icons.Rounded.Shield,
                     title = stringResource(R.string.pro_benefit_vt_title),
                     desc = stringResource(R.string.pro_benefit_vt_desc),
+                )
+                PaywallBenefitRow(
+                    icon = Icons.Rounded.Bolt,
+                    title = stringResource(R.string.pro_benefit_recent_apks_title),
+                    desc = stringResource(R.string.pro_benefit_recent_apks_desc),
                 )
                 PaywallBenefitRow(
                     icon = Icons.Rounded.Security,

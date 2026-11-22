@@ -525,4 +525,6 @@
     <string name="apk_info_vt_chip_rate_limited">Free limit reached · Unlock</string>
     <string name="apk_info_vt_chip_invalid_key">Invalid API key</string>
     <string name="apk_info_vt_chip_need_key">Need API Key / Pro</string>
+    <string name="install_recent_apks_title">Recent APKs</string>
+    <string name="install_recent_apks_see_all">See all</string>
 </resources>

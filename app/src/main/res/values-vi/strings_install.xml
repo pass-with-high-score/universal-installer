@@ -525,4 +525,6 @@
     <string name="apk_info_vt_chip_rate_limited">Hết lượt miễn phí · Mở khóa</string>
     <string name="apk_info_vt_chip_invalid_key">API Key không hợp lệ</string>
     <string name="apk_info_vt_chip_need_key">Cần API Key / Pro</string>
+    <string name="install_recent_apks_title">APK mới thêm gần đây</string>
+    <string name="install_recent_apks_see_all">Xem tất cả</string>
 </resources>

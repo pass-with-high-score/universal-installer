@@ -148,6 +148,8 @@
     <string name="pro_upgrade_sheet_title">Universal Installer Pro</string>
     <string name="pro_upgrade_sheet_subtitle">Mở khóa bảo mật toàn diện và trải nghiệm cài đặt không giới hạn</string>
     <string name="pro_benefit_vt_title">Tự Động Quét AppShield Tức Thì</string>
+    <string name="pro_benefit_recent_apks_title">Cài Nhanh APK Gần Đây 1 Chạm</string>
+    <string name="pro_benefit_recent_apks_desc">Tự động hiện các file APK vừa tải ngay trên màn hình Cài đặt để chọn cài tức thì</string>
     <string name="pro_benefit_vt_desc">Tự động kiểm tra mã độc ngay giây đầu tiên mở file APK — không cần bấm nút, không cần tạo API Key và không giới hạn lượt</string>
     <string name="pro_benefit_priority_title">Soi Quyền Cập Nhật &amp; Cắt Gọn Split APK</string>
     <string name="pro_benefit_priority_desc">Cảnh báo quyền nhạy cảm mới phát sinh khi cài đè, kiểm tra chữ ký gốc và lọc bỏ ngôn ngữ/cấu hình thừa chỉ với 1 chạm</string>

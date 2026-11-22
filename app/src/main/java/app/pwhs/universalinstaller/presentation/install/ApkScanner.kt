@@ -98,6 +98,44 @@ object ApkScanner {
     }
 
     /**
+     * Fast, lightweight scan for the Install screen's "Recent APKs" section.
+     * Only runs when storage access is already granted: queries MediaStore plus the
+     * Downloads directory (up to 1 subfolder deep so freshly downloaded files appear
+     * before MediaStore indexes them), then enriches only the newest [limit] files.
+     */
+    suspend fun scanRecent(
+        context: Context,
+        limit: Int = 5,
+    ): List<FoundPackageFile> = withContext(Dispatchers.IO) {
+        if (!hasAllFilesAccess(context)) return@withContext emptyList()
+        val foundMap = LinkedHashMap<String, FoundPackageFile>()
+        scanMediaStore(context).forEach { foundMap[it.path] = it }
+
+        val downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+        if (downloadDir != null && downloadDir.exists() && downloadDir.canRead()) {
+            downloadDir.listFiles()?.forEach { child ->
+                if (child.isFile) {
+                    addIfPackageFile(child, foundMap)
+                } else if (child.isDirectory && !isExcludedDir(child.name)) {
+                    child.listFiles()?.forEach { nested ->
+                        if (nested.isFile) addIfPackageFile(nested, foundMap)
+                    }
+                }
+            }
+        }
+
+        val newest = foundMap.values
+            .filter { File(it.path).exists() }
+            .sortedByDescending { it.modifiedMillis }
+            .take(limit)
+
+        val pm = context.packageManager
+        newest.map { file ->
+            if (file.extension == "apk") enrichWithPackageInfo(pm, file) else file
+        }
+    }
+
+    /**
      * Finds installable package files quickly by querying MediaStore and scanning
      * common user download directories directly, falling back to a bounded recursive scan
      * if MediaStore yields no results. Enriches metadata in parallel to minimize latency.

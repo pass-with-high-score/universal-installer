@@ -264,9 +264,22 @@ object InstallApkSplitsHelper {
         var isWearOsSupported = false
 
         try {
-            val tempFile = File(context.cacheDir, "temp_parse_${System.currentTimeMillis()}.apk")
-            context.contentResolver.openInputStream(uriForParsing)?.use { input ->
-                tempFile.outputStream().use { output -> input.copyTo(output) }
+            val directFile = if (uriForParsing.scheme == "file") {
+                uriForParsing.path?.let { File(it) }?.takeIf { it.exists() && it.canRead() }
+            } else null
+
+            val createdTempFile: File?
+            val parseFile: File
+            if (directFile != null) {
+                createdTempFile = null
+                parseFile = directFile
+            } else {
+                val tempFile = File(context.cacheDir, "temp_parse_${System.currentTimeMillis()}.apk")
+                context.contentResolver.openInputStream(uriForParsing)?.use { input ->
+                    tempFile.outputStream().use { output -> input.copyTo(output, bufferSize = 64 * 1024) }
+                }
+                createdTempFile = tempFile
+                parseFile = tempFile
             }
 
             val parseFlags = (PackageManager.GET_PERMISSIONS or
@@ -278,13 +291,13 @@ object InstallApkSplitsHelper {
             val packageInfo = try {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     pm.getPackageArchiveInfo(
-                        tempFile.absolutePath,
+                        parseFile.absolutePath,
                         PackageManager.PackageInfoFlags.of(parseFlags)
                     )
                 } else {
                     @Suppress("DEPRECATION")
                     pm.getPackageArchiveInfo(
-                        tempFile.absolutePath,
+                        parseFile.absolutePath,
                         parseFlags.toInt(),
                     )
                 }
@@ -294,8 +307,8 @@ object InstallApkSplitsHelper {
             }
 
             if (packageInfo != null) {
-                packageInfo.applicationInfo?.sourceDir = tempFile.absolutePath
-                packageInfo.applicationInfo?.publicSourceDir = tempFile.absolutePath
+                packageInfo.applicationInfo?.sourceDir = parseFile.absolutePath
+                packageInfo.applicationInfo?.publicSourceDir = parseFile.absolutePath
 
                 appName = packageInfo.applicationInfo?.loadLabel(pm)?.toString() ?: appName
                 icon = try { packageInfo.applicationInfo?.loadIcon(pm) } catch (_: Exception) { null }
@@ -328,10 +341,10 @@ object InstallApkSplitsHelper {
                 }
             }
 
-            if (tempFile.exists()) {
+            if (parseFile.exists()) {
                 try {
                     withContext(Dispatchers.IO) {
-                        ZipFile(tempFile)
+                        ZipFile(parseFile)
                     }.use { zip ->
                         if (supportedAbis.isEmpty()) {
                             val abiRegex = Regex("^lib/([^/]+)/")
@@ -365,7 +378,7 @@ object InstallApkSplitsHelper {
                 }
             }
 
-            tempFile.delete()
+            createdTempFile?.delete()
         } catch (e: Exception) {
             Timber.e(e, "Error parsing APK with PackageManager")
         }
