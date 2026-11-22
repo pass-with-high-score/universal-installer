@@ -220,16 +220,6 @@
     <string name="tv_settings_virustotal_enable_desc">安裝前使用 70 多個防毒引擎掃描套件</string>
     <string name="tv_settings_virustotal_strict_title">嚴格安全檢查</string>
     <string name="tv_settings_virustotal_strict_desc">偵測到威脅時警告並要求確認</string>
-    <string name="tv_settings_virustotal_key_title">VirusTotal API 金鑰</string>
-    <string name="tv_settings_virustotal_key_configured">已設定（%s）</string>
-    <string name="tv_settings_virustotal_key_not_set">未設定，選取以設定</string>
-    <string name="tv_settings_virustotal_dialog_title">VirusTotal API 金鑰</string>
-    <string name="tv_settings_virustotal_dialog_desc">用手機掃描 QR Code 以取得免費 API 金鑰，或在下方貼上：</string>
-    <string name="tv_settings_virustotal_dialog_hint">輸入 64 字元的 API 金鑰</string>
-    <string name="tv_settings_virustotal_dialog_paste">從剪貼簿貼上</string>
-    <string name="tv_settings_virustotal_dialog_save">儲存金鑰</string>
-    <string name="tv_settings_virustotal_dialog_clear">清除金鑰</string>
-    <string name="tv_settings_virustotal_dialog_close">關閉</string>
     <string name="tv_vt_status_clean">VirusTotal：安全（0/70）</string>
     <string name="tv_vt_status_malicious">VirusTotal：%d 個引擎偵測到威脅！</string>
     <string name="tv_vt_status_suspicious">VirusTotal：%d 個引擎判定可疑</string>
@@ -238,14 +228,12 @@
     <string name="tv_vt_status_queued">VirusTotal：排隊中…</string>
     <string name="tv_vt_status_analyzing">VirusTotal：分析中…</string>
     <string name="tv_vt_status_not_found">VirusTotal：資料庫中找不到此檔案</string>
-    <string name="tv_vt_status_no_key">VirusTotal：未設定 API 金鑰</string>
-    <string name="tv_vt_status_invalid_key">VirusTotal：API 金鑰無效</string>
-    <string name="tv_vt_status_rate_limited">VirusTotal：已達使用頻率上限</string>
-    <string name="tv_vt_status_too_large">VirusTotal：檔案過大（%s）</string>
     <string name="tv_vt_status_error">VirusTotal：掃描錯誤</string>
     <string name="tv_vt_action_upload">上傳並掃描</string>
     <string name="tv_vt_action_retry">重試掃描</string>
-    <string name="tv_vt_action_setup">設定 API 金鑰</string>
     <string name="tv_vt_strict_warning_title">安全警告</string>
     <string name="tv_vt_strict_warning_desc">VirusTotal 在此套件中偵測到威脅（%d 個引擎）。仍要安裝嗎？</string>
+    <string name="tv_settings_section_backends">安裝後端與權限</string>
+    <string name="tv_settings_install_options_title">進階安裝選項</string>
+    <string name="tv_settings_install_options_desc">設定覆寫安裝、降級安裝與使用者權限旗標</string>
 </resources>

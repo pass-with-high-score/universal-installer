@@ -100,7 +100,6 @@
     <string name="batch_install_merged_splits">已合併</string>
     <string name="permissions_title">應用程式權限</string>
     <string name="permissions_subtitle">檢視哪些權限已啟用，並授予你需要的權限。</string>
-    <string name="permissions_menu_cd">檢視權限</string>
     <string name="permissions_granted">已授予</string>
     <string name="permissions_grant">授予</string>
     <string name="permissions_open_settings">開啟設定</string>
@@ -128,7 +127,6 @@
     <string name="uninstall_selected_action">解除安裝所選項目</string>
     <string name="uninstall_filter_cd">篩選</string>
     <string name="uninstall_logs_cd">解除安裝記錄</string>
-    <string name="uninstall_confirm_single_title">要解除安裝 %s 嗎？</string>
     <string name="uninstall_confirm_single_text">這會從你的裝置移除 %1$s（%2$s）。</string>
     <string name="uninstall_system_badge">系統應用程式</string>
     <string name="uninstall_system_dialog_title_single">要移除系統應用程式嗎？</string>
@@ -171,7 +169,6 @@
     <string name="manage_action_install_secure_folder">安裝到安全資料夾</string>
     <string name="manage_action_install_secure_folder_done">已將 %s 安裝到安全資料夾</string>
     <string name="manage_action_install_secure_folder_failed">安裝到安全資料夾失敗：%s</string>
-    <string name="manage_action_install_secure_folder_already">已安裝 · 點選即可重新安裝</string>
     <string name="manage_action_check_vt">檢查 VirusTotal</string>
     <string name="manage_action_installer_source">由 %1$s 安裝</string>
     <string name="manage_action_add_to_server">同步與分享</string>

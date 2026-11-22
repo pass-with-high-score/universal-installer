@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Telepítés</string>
-    <string name="txt_updates">Frissítések</string>
-    <string name="txt_manage">Kezelés</string>
     <string name="more_actions_cd">További műveletek</string>
     <string name="cancel">Mégse</string>
     <string name="status_success">Sikeres</string>
@@ -59,7 +57,6 @@
     <string name="stats_op_update">Frissítések</string>
     <string name="stats_op_downgrade">Visszaléptetések</string>
     <string name="stats_total_uninstalled">Eltávolított alkalmazások</string>
-    <string name="stats_total_downloads">Letöltött csomagok</string>
     <string name="stats_section_storage_formats">Tárhely és csomagformátumok</string>
     <string name="stats_bytes_installed">Telepített mennyiség</string>
     <string name="stats_bytes_cleaned">Felszabadított tárhely</string>
@@ -116,4 +113,25 @@
     <string name="milestone_security_guardian_title">Biztonsági őr</string>
     <string name="milestone_security_guardian_desc">Ellenőrizz 5 csomagot a VirusTotallal vagy a Nyomkövető-keresővel</string>
     <string name="app_functions_display_description">Telepített alkalmazások keresése, telepítési és eltávolítási előzmények, telepítési statisztikák megtekintése, és a tárhely átvizsgálása APK-csomagok után.</string>
+    <string name="stats_category_premium">Pro &amp; Támogató</string>
+    <string name="milestone_pro_supporter_title">Pro támogató</string>
+    <string name="milestone_pro_supporter_desc">Oldd fel a Universal Installer Pro verziót és támogasd a nyílt forráskódú fejlesztést</string>
+    <string name="milestone_pro_vt_guardian_title">Pro AppShield őrző</string>
+    <string name="milestone_pro_vt_guardian_desc">Végezz 20 AppShield biztonsági vizsgálatot Pro funkciókkal</string>
+    <string name="milestone_pro_unlimited_champion_title">Pro AppShield bajnok</string>
+    <string name="milestone_pro_unlimited_champion_desc">Végezz 50 AppShield biztonsági vizsgálatot Pro funkciókkal</string>
+    <string name="update_diff_card_title">Frissítés- és aláírás-ellenőrző</string>
+    <string name="update_diff_sig_match">Aláírás ellenőrizve — Biztonságosan frissíthető</string>
+    <string name="update_diff_sig_mismatch">Eltérő aláírás — Előbb távolítsd el a meglévő appot</string>
+    <string name="update_diff_no_new_perms">Nem került új engedély ebbe a frissítésbe</string>
+    <string name="update_diff_added_perms_title">+%1$d új engedélyt kér ez a frissítés</string>
+    <string name="update_diff_removed_perms_title">-%1$d engedély eltávolítva a telepített verzióhoz képest</string>
+    <string name="update_diff_chip_clean">Ellenőrzött frissítés</string>
+    <string name="update_diff_chip_new_perms">+%1$d új engedély</string>
+    <string name="update_diff_chip_sig_mismatch">Eltérő aláírás</string>
+    <string name="split_optimize_action">Okos optimalizálás</string>
+    <string name="split_select_all_action">Összes kijelölése</string>
+    <string name="split_saved_badge">Megtakarítva: %1$s • Telepítés: %2$s / %3$s</string>
+    <string name="split_full_size_badge">Teljes méret: %1$s (%2$d/%3$d részcsomag)</string>
+    <string name="vt_cloud_keys_temporary_unavailable">A felhőalapú vizsgálószerverek átmenetileg foglaltak vagy nem elérhetők. Próbáld újra rövidesen, vagy adj meg saját API-kulcsot.</string>
 </resources>

@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">安裝</string>
-    <string name="txt_updates">更新</string>
-    <string name="txt_manage">管理</string>
     <string name="more_actions_cd">更多操作</string>
     <string name="cancel">取消</string>
     <string name="status_success">成功</string>
@@ -59,7 +57,6 @@
     <string name="stats_op_update">更新</string>
     <string name="stats_op_downgrade">降級</string>
     <string name="stats_total_uninstalled">已解除安裝的應用程式</string>
-    <string name="stats_total_downloads">已下載的套件</string>
     <string name="stats_section_storage_formats">儲存空間與套件格式</string>
     <string name="stats_bytes_installed">已安裝容量</string>
     <string name="stats_bytes_cleaned">已釋放儲存空間</string>

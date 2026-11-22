@@ -100,7 +100,6 @@
     <string name="batch_install_merged_splits">Egyesítve</string>
     <string name="permissions_title">Alkalmazásengedélyek</string>
     <string name="permissions_subtitle">Nézd át, mely engedélyek aktívak, és add meg azokat, amelyekre szükséged van.</string>
-    <string name="permissions_menu_cd">Engedélyek áttekintése</string>
     <string name="permissions_granted">Megadva</string>
     <string name="permissions_grant">Megadás</string>
     <string name="permissions_open_settings">Beállítások megnyitása</string>
@@ -128,7 +127,6 @@
     <string name="uninstall_selected_action">Kijelöltek eltávolítása</string>
     <string name="uninstall_filter_cd">Szűrő</string>
     <string name="uninstall_logs_cd">Eltávolítási napló</string>
-    <string name="uninstall_confirm_single_title">Eltávolítod: %s?</string>
     <string name="uninstall_confirm_single_text">Ez eltávolítja a(z) %1$s (%2$s) alkalmazást az eszközödről.</string>
     <string name="uninstall_system_badge">Rendszeralkalmazás</string>
     <string name="uninstall_system_dialog_title_single">Eltávolítod a rendszeralkalmazást?</string>
@@ -171,7 +169,6 @@
     <string name="manage_action_install_secure_folder">Telepítés a Biztonságos mappába</string>
     <string name="manage_action_install_secure_folder_done">%s telepítve a Biztonságos mappába</string>
     <string name="manage_action_install_secure_folder_failed">Nem sikerült a Biztonságos mappába telepíteni: %s</string>
-    <string name="manage_action_install_secure_folder_already">Telepítve · Koppints az újratelepítéshez</string>
     <string name="manage_action_check_vt">VirusTotal-ellenőrzés</string>
     <string name="manage_action_installer_source">Telepítette: %1$s</string>
     <string name="manage_action_add_to_server">Szinkron és megosztás</string>

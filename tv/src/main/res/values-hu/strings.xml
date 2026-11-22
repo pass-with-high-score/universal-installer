@@ -215,4 +215,25 @@
     <string name="found_chip_installed">Telepítve</string>
     <string name="found_chip_new">Új</string>
     <string name="dialog_chip_downgrade">Visszaléptetés</string>
+    <string name="tv_settings_section_backends">Telepítési motorok és engedélyek</string>
+    <string name="tv_settings_install_options_title">Speciális telepítési beállítások</string>
+    <string name="tv_settings_install_options_desc">Csere, régebbi verzióra váltás és felhasználói engedélyjelzők beállítása</string>
+    <string name="tv_settings_section_virustotal">AppShield biztonság</string>
+    <string name="tv_settings_virustotal_enable_title">Beépített biztonsági vizsgáló</string>
+    <string name="tv_settings_virustotal_enable_desc">Csomagok ellenőrzése a beépített AppShield biztonsági motorral telepítés előtt</string>
+    <string name="tv_settings_virustotal_strict_title">Szigorú biztonsági ellenőrzés</string>
+    <string name="tv_settings_virustotal_strict_desc">Figyelmeztetés és megerősítés kérése, ha fenyegetést észlel</string>
+    <string name="tv_vt_status_clean">AppShield: Tiszta (0 fenyegetés)</string>
+    <string name="tv_vt_status_malicious">AppShield: %d fenyegetés észlelve!</string>
+    <string name="tv_vt_status_suspicious">AppShield: %d figyelmeztetés</string>
+    <string name="tv_vt_status_scanning">AppShield: Fájl vizsgálata…</string>
+    <string name="tv_vt_status_uploading">AppShield: Feltöltés… %d%%</string>
+    <string name="tv_vt_status_queued">AppShield: Várólistán…</string>
+    <string name="tv_vt_status_analyzing">AppShield: Elemzés…</string>
+    <string name="tv_vt_status_not_found">AppShield: A fájl nem található az adatbázisban</string>
+    <string name="tv_vt_status_error">AppShield: Vizsgálati hiba</string>
+    <string name="tv_vt_action_upload">Feltöltés és vizsgálat</string>
+    <string name="tv_vt_action_retry">Vizsgálat újrapróbálása</string>
+    <string name="tv_vt_strict_warning_title">Biztonsági figyelmeztetés</string>
+    <string name="tv_vt_strict_warning_desc">Az AppShield fenyegetést észlelt ebben a csomagban (%d fenyegetés). Biztosan telepíteni szeretnéd?</string>
 </resources>
