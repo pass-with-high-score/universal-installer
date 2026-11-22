@@ -1,5 +1,8 @@
 package app.pwhs.universalinstaller.presentation.pro.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -27,9 +30,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -44,27 +54,50 @@ fun ProSupporterView(
     modifier: Modifier = Modifier,
     planType: ProProductType? = null,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .padding(bottom = 32.dp, top = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Box(
+    var popped by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { popped = true }
+    val medalScale by animateFloatAsState(
+        targetValue = if (popped) 1f else 0.4f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "proSupporterMedalScale",
+    )
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(
             modifier = Modifier
-                .size(72.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)),
-            contentAlignment = Alignment.Center,
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp, top = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                imageVector = Icons.Rounded.WorkspacePremium,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(42.dp),
-            )
-        }
+            Box(
+                modifier = Modifier
+                    .size(74.dp)
+                    .graphicsLayer {
+                        scaleX = medalScale
+                        scaleY = medalScale
+                    }
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.tertiary,
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.WorkspacePremium,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(42.dp),
+                )
+            }
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -187,5 +220,12 @@ fun ProSupporterView(
         TextButton(onClick = onDismiss) {
             Text(stringResource(android.R.string.ok))
         }
+        }
+
+        ConfettiCelebrationOverlay(
+            modifier = Modifier.matchParentSize(),
+            particleCount = 85,
+            durationMillis = 3600L,
+        )
     }
 }

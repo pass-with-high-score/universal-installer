@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.stats.MilestoneId
+import app.pwhs.universalinstaller.presentation.pro.components.ConfettiCelebrationOverlay
 
 @Composable
 fun MilestoneUnlockBanner(
@@ -87,6 +88,7 @@ fun MilestoneUnlockBanner(
             ),
             elevation = CardDefaults.elevatedCardElevation(defaultElevation = 6.dp),
         ) {
+            Box(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -154,6 +156,12 @@ fun MilestoneUnlockBanner(
                     )
                 }
                 Spacer(modifier = Modifier.width(2.dp))
+            }
+            ConfettiCelebrationOverlay(
+                modifier = Modifier.matchParentSize(),
+                particleCount = 55,
+                durationMillis = 3200L,
+            )
             }
         }
     }

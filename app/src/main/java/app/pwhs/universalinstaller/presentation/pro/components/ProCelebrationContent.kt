@@ -1,5 +1,8 @@
 package app.pwhs.universalinstaller.presentation.pro.components
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -26,10 +29,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -41,35 +50,51 @@ fun ProCelebrationContent(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 24.dp)
-            .padding(bottom = 32.dp, top = 8.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        // Glowing Gold Crown
-        Box(
+    var popped by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { popped = true }
+    val crownScale by animateFloatAsState(
+        targetValue = if (popped) 1f else 0.35f,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow,
+        ),
+        label = "proCelebrationCrownScale",
+    )
+
+    Box(modifier = modifier.fillMaxWidth()) {
+        Column(
             modifier = Modifier
-                .size(76.dp)
-                .clip(CircleShape)
-                .background(
-                    Brush.radialGradient(
-                        colors = listOf(
-                            MaterialTheme.colorScheme.primary,
-                            MaterialTheme.colorScheme.tertiary,
-                        )
-                    )
-                ),
-            contentAlignment = Alignment.Center,
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp)
+                .padding(bottom = 32.dp, top = 8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(
-                imageVector = Icons.Rounded.WorkspacePremium,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.size(44.dp),
-            )
-        }
+            // Glowing Gold Crown
+            Box(
+                modifier = Modifier
+                    .size(76.dp)
+                    .graphicsLayer {
+                        scaleX = crownScale
+                        scaleY = crownScale
+                    }
+                    .clip(CircleShape)
+                    .background(
+                        Brush.radialGradient(
+                            colors = listOf(
+                                MaterialTheme.colorScheme.primary,
+                                MaterialTheme.colorScheme.tertiary,
+                            )
+                        )
+                    ),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.WorkspacePremium,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(44.dp),
+                )
+            }
 
         Spacer(modifier = Modifier.height(18.dp))
 
@@ -165,6 +190,13 @@ fun ProCelebrationContent(
                 fontWeight = FontWeight.Bold,
             )
         }
+        }
+
+        ConfettiCelebrationOverlay(
+            modifier = Modifier.matchParentSize(),
+            particleCount = 110,
+            durationMillis = 4000L,
+        )
     }
 }
 
