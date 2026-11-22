@@ -27,6 +27,7 @@ object VirusTotalKeyManager {
     fun getNewUserProTrialDays(): Int = remoteSource.getNewUserProTrialDays()
     fun isMilestoneProTrialEnabled(): Boolean = remoteSource.isMilestoneProTrialEnabled()
     fun getMilestoneProTrialHours(): Int = remoteSource.getMilestoneProTrialHours()
+    suspend fun ensureRemoteConfigFetched() = remoteSource.ensureFetched()
 
     private val VT_KEY_REGEX = Regex("""\b[0-9a-fA-F]{64}\b""")
 

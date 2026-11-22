@@ -52,6 +52,9 @@ object TvReceiverState {
     @Volatile
     var currentExpectedBytes: Long? = null
 
+    @Volatile
+    private var forceDisconnectedIp: String? = null
+
     private val _status = MutableStateFlow<ReceiverStatus>(ReceiverStatus.Stopped)
     val status: StateFlow<ReceiverStatus> = _status.asStateFlow()
 
@@ -70,7 +73,25 @@ object TvReceiverState {
     }
 
     fun updateConnectedClient(client: ConnectedClient?) {
+        if (client != null) {
+            forceDisconnectedIp = null
+        }
         _connectedClient.value = client
+    }
+
+    /** Called when TV user explicitly taps Disconnect so the phone's next /ping receives 410 Gone. */
+    fun forceDisconnectCurrentClient() {
+        forceDisconnectedIp = _connectedClient.value?.ip
+        _connectedClient.value = null
+    }
+
+    /** Consumes the force-disconnect flag for [ip] so the next /ping returns 410 and clears the flag. */
+    fun consumeForceDisconnectFor(ip: String): Boolean {
+        if (forceDisconnectedIp == ip) {
+            forceDisconnectedIp = null
+            return true
+        }
+        return false
     }
 
     fun emitReceivingProgress(progress: ReceivingProgress?) {

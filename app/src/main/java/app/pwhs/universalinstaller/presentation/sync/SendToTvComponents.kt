@@ -137,11 +137,11 @@ private fun TvStepRow(stepNumber: String, text: String, icon: ImageVector) {
 
 @Composable
 fun TvConnectedDeviceCard(host: String, onDisconnect: () -> Unit) {
-    ElevatedCard(
+    Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh
         )
     ) {
         Row(
@@ -221,11 +221,11 @@ fun TvFileDropzoneCard(onPickApk: () -> Unit) {
 
 @Composable
 fun TvErrorCard(error: String, onRetry: () -> Unit) {
-    ElevatedCard(
+    Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.elevatedCardColors(
-            containerColor = MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.35f)
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.errorContainer
         )
     ) {
         Column(

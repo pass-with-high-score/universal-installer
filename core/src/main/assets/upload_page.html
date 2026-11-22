@@ -426,19 +426,27 @@
         const disconnectedState = document.getElementById('disconnectedState');
         let pingTimer = null;
 
-        disconnectBtn.addEventListener('click', () => {
+        function showDisconnectedUi() {
             if (pingTimer) clearInterval(pingTimer);
-            fetch('/disconnect').catch(() => {});
             form.style.display = 'none';
             disconnectedState.classList.add('active');
             document.querySelector('h1').style.display = 'none';
             document.querySelector('p.subtitle').style.display = 'none';
             document.querySelector('.icon').style.display = 'none';
+        }
+
+        disconnectBtn.addEventListener('click', () => {
+            fetch('/disconnect').catch(() => {});
+            showDisconnectedUi();
         });
 
         // Heartbeat connection presence
         function sendPing() {
-            fetch('/ping').catch(() => {});
+            fetch('/ping').then(res => {
+                if (res.status === 410) {
+                    showDisconnectedUi();
+                }
+            }).catch(() => {});
         }
         sendPing();
         pingTimer = setInterval(sendPing, 2500);

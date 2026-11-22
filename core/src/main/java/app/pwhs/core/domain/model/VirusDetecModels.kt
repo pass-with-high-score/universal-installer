@@ -112,6 +112,17 @@ fun ScanReport.toVtResult(): VtResult {
 
     val criticalOrHigh = findings.count { it.severity == SeverityLevel.CRITICAL || it.severity == SeverityLevel.HIGH }
     val medium = findings.count { it.severity == SeverityLevel.MEDIUM }
+    val nonHigh = (findings.size - criticalOrHigh).coerceAtLeast(0)
+    val effectiveSuspicious = when {
+        medium > 0 -> medium
+        status == VtStatus.SUSPICIOUS -> nonHigh.coerceAtLeast(1)
+        else -> 0
+    }
+    val effectiveMalicious = when {
+        criticalOrHigh > 0 -> criticalOrHigh
+        status == VtStatus.MALICIOUS -> findings.size.coerceAtLeast(1)
+        else -> 0
+    }
 
     val engineResults = findings.map { finding ->
         VtEngineResult(
@@ -126,8 +137,8 @@ fun ScanReport.toVtResult(): VtResult {
     }
 
     return VtResult(
-        malicious = criticalOrHigh,
-        suspicious = medium,
+        malicious = effectiveMalicious,
+        suspicious = effectiveSuspicious,
         harmless = if (findings.isEmpty()) 70 else (70 - findings.size).coerceAtLeast(0),
         undetected = 0,
         status = status,

@@ -6,6 +6,8 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -43,6 +45,15 @@ abstract class BaseActivity : FragmentActivity() {
         
         // Remove standard sliding window transitions to mimic Compose navigation speed
         disableSceneTransition()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        if (this !is app.pwhs.universalinstaller.presentation.splash.SplashActivity) {
+            lifecycleScope.launch {
+                app.pwhs.universalinstaller.domain.pro.ProTrialManager.checkAndGrantNewUserTrial(applicationContext)
+            }
+        }
     }
 
     override fun onNewIntent(intent: android.content.Intent) {

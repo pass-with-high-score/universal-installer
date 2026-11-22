@@ -26,21 +26,21 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
     init {
         remoteConfig?.let { rc ->
             val settings = FirebaseRemoteConfigSettings.Builder()
-                .setMinimumFetchIntervalInSeconds(if (isDebug) 60L else 3600L)
+                .setMinimumFetchIntervalInSeconds(if (isDebug) 0L else 3600L)
                 .setFetchTimeoutInSeconds(10L)
                 .build()
             rc.setConfigSettingsAsync(settings)
             rc.setDefaultsAsync(
                 mapOf(
                     VirusTotalKeyManager.RC_KEY_APPSHIELD_DAILY_LIMIT to VirusTotalKeyManager.DEFAULT_APPSHIELD_DAILY_LIMIT.toLong(),
-                    VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED to true,
+                    VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED to false,
                     VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_DAYS to 3L,
-                    VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_ENABLED to true,
+                    VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_ENABLED to false,
                     VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_HOURS to 24L,
                 )
             )
-            rc.fetchAndActivate().addOnCompleteListener {
-                fetchAttempted = true
+            rc.fetchAndActivate().addOnCompleteListener { task ->
+                fetchAttempted = task.isSuccessful
             }
         }
     }
@@ -50,10 +50,10 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
         if (fetchAttempted) {
             return
         }
-        withTimeoutOrNull(4_000L) {
+        withTimeoutOrNull(5_000L) {
             suspendCancellableCoroutine { cont ->
-                rc.fetchAndActivate().addOnCompleteListener {
-                    fetchAttempted = true
+                rc.fetchAndActivate().addOnCompleteListener { task ->
+                    fetchAttempted = task.isSuccessful
                     if (cont.isActive) cont.resume(Unit)
                 }
             }
@@ -69,8 +69,8 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
 
     override fun isNewUserProTrialEnabled(): Boolean {
         return runCatching {
-            remoteConfig?.getBoolean(VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED) ?: true
-        }.getOrDefault(true)
+            remoteConfig?.getBoolean(VirusTotalKeyManager.RC_KEY_NEW_USER_PRO_TRIAL_ENABLED) ?: false
+        }.getOrDefault(false)
     }
 
     override fun getNewUserProTrialDays(): Int {
@@ -81,8 +81,8 @@ private class FirebaseVtRemoteConfigSource(isDebug: Boolean) : VtRemoteConfigSou
 
     override fun isMilestoneProTrialEnabled(): Boolean {
         return runCatching {
-            remoteConfig?.getBoolean(VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_ENABLED) ?: true
-        }.getOrDefault(true)
+            remoteConfig?.getBoolean(VirusTotalKeyManager.RC_KEY_MILESTONE_PRO_TRIAL_ENABLED) ?: false
+        }.getOrDefault(false)
     }
 
     override fun getMilestoneProTrialHours(): Int {

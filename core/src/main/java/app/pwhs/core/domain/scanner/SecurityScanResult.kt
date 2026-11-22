@@ -152,16 +152,21 @@ fun SecurityScanResult.toVtResult(): VtResult {
     }
 
     // 4. Resolve counts
-    val effectiveMalicious = if (maliciousCount > 0) {
-        maliciousCount
-    } else {
-        findings.count { it.severity == ScannerSeverity.CRITICAL || it.severity == ScannerSeverity.HIGH }
+    val highCount = findings.count { it.severity == ScannerSeverity.CRITICAL || it.severity == ScannerSeverity.HIGH }
+    val medCount = findings.count { it.severity == ScannerSeverity.MEDIUM }
+    val nonHighCount = (findings.size - highCount).coerceAtLeast(0)
+    val effectiveMalicious = when {
+        maliciousCount > 0 -> maliciousCount
+        highCount > 0 -> highCount
+        status == VtStatus.MALICIOUS -> findings.size.coerceAtLeast(1)
+        else -> 0
     }
 
-    val effectiveSuspicious = if (suspiciousCount > 0) {
-        suspiciousCount
-    } else {
-        findings.count { it.severity == ScannerSeverity.MEDIUM }
+    val effectiveSuspicious = when {
+        suspiciousCount > 0 -> suspiciousCount
+        medCount > 0 -> medCount
+        status == VtStatus.SUSPICIOUS -> nonHighCount.coerceAtLeast(1)
+        else -> 0
     }
 
     val effectiveHarmless = if (harmlessCount > 0) {

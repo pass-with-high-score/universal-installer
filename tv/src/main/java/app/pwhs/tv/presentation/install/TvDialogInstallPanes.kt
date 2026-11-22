@@ -267,21 +267,22 @@ internal fun ReadyView(
                 isSame -> stringResource(R.string.tv_details_status_same, installed)
                 else -> stringResource(R.string.tv_details_status_update, installed)
             }
-            val statusColor = if (isDowngrade) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
+            val statusColor = if (isDowngrade) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
             Spacer(Modifier.height(10.dp))
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clip(RoundedCornerShape(10.dp))
                     .background(
-                        if (isDowngrade) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
-                        else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                        if (isDowngrade) MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.65f)
+                        else MaterialTheme.colorScheme.surfaceVariant
                     )
-                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                    .padding(horizontal = 14.dp, vertical = 8.dp)
             ) {
                 Text(
                     text = statusText,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
                     color = statusColor
                 )
             }

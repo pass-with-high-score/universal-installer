@@ -5,6 +5,7 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -81,8 +82,8 @@ fun ManualConnectDialog(
                 .wrapContentHeight()
                 .imePadding(),
             shape = RoundedCornerShape(24.dp),
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 6.dp
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+            tonalElevation = 0.dp
         ) {
             Column(
                 modifier = Modifier
@@ -161,20 +162,26 @@ fun ManualConnectDialog(
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                             discoveredTvs.forEach { tv ->
+                                val isSelected = ipInput == "${tv.host}:${tv.port}"
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .clip(RoundedCornerShape(12.dp))
+                                        .clip(RoundedCornerShape(14.dp))
                                         .clickable(enabled = !isConnecting) {
                                             ipInput = "${tv.host}:${tv.port}"
                                             focusManager.clearFocus()
                                             onConnect("${tv.host}:${tv.port}")
                                         },
-                                    shape = RoundedCornerShape(12.dp),
-                                    color = if (ipInput == "${tv.host}:${tv.port}")
-                                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+                                    shape = RoundedCornerShape(14.dp),
+                                    color = if (isSelected)
+                                        MaterialTheme.colorScheme.primaryContainer
                                     else MaterialTheme.colorScheme.surfaceContainerHigh,
-                                    tonalElevation = 1.dp
+                                    border = BorderStroke(
+                                        1.dp,
+                                        if (isSelected) MaterialTheme.colorScheme.primary
+                                        else MaterialTheme.colorScheme.outlineVariant
+                                    ),
+                                    tonalElevation = 0.dp
                                 ) {
                                     Row(
                                         modifier = Modifier.padding(12.dp),
@@ -260,7 +267,13 @@ fun ManualConnectDialog(
                 OutlinedTextField(
                     value = ipInput,
                     onValueChange = { ipInput = it.trim() },
-                    label = { Text(stringResource(R.string.tv_sync_code_input_hint)) },
+                    label = {
+                        Text(
+                            text = stringResource(R.string.tv_sync_code_input_hint),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    },
                     placeholder = { Text("ERHE / 192.168.1.128") },
                     leadingIcon = {
                         Icon(Icons.Rounded.Lan, contentDescription = null, modifier = Modifier.size(20.dp))

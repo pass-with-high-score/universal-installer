@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -64,7 +65,13 @@ fun TvDialogInstallContent(
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            modifier = Modifier.widthIn(min = 520.dp, max = 660.dp),
+            modifier = Modifier
+                .widthIn(min = 520.dp, max = 660.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f),
+                    shape = RoundedCornerShape(24.dp),
+                ),
             shape = RoundedCornerShape(24.dp),
             colors = SurfaceDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surface,

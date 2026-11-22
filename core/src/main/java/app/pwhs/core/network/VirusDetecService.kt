@@ -53,6 +53,15 @@ data class ServerTimeResponse(
     val dateUtc: String,
 )
 
+data class TrialStatusResponse(
+    val granted: Boolean = false,
+    val newUserTrialClaimed: Boolean = false,
+    val claimedMilestones: Set<String> = emptySet(),
+    val trialExpiresAt: Long = 0L,
+    val serverTime: Long = 0L,
+    val isTrialActive: Boolean = false,
+)
+
 data class VirusDetecApiException(
     val httpCode: Int,
     val errorCode: String?,
@@ -330,6 +339,67 @@ open class VirusDetecService(
                 sha256 = json.optString("sha256"),
             )
         }
+    }
+
+    open suspend fun getTrialStatus(
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
+    ): Result<TrialStatusResponse> = withContext(Dispatchers.IO) {
+        runCatching {
+            val response = executeWithFallback { url ->
+                client.get("$url/api/v1/trial/status") {
+                    attachCommonHeaders(language)
+                }
+            }
+            if (!response.status.isSuccess()) {
+                handleApiError(response)
+            }
+            parseTrialStatusResponse(JSONObject(response.bodyAsText()))
+        }
+    }
+
+    open suspend fun claimTrial(
+        claimType: String,
+        durationHours: Int,
+        milestoneId: String = "",
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
+    ): Result<TrialStatusResponse> = withContext(Dispatchers.IO) {
+        runCatching {
+            val payload = JSONObject().apply {
+                put("claim_type", claimType)
+                put("duration_hours", durationHours)
+                if (milestoneId.isNotBlank()) {
+                    put("milestone_id", milestoneId)
+                }
+            }
+            val response = executeWithFallback { url ->
+                client.post("$url/api/v1/trial/claim") {
+                    attachCommonHeaders(language)
+                    setBody(payload.toString())
+                }
+            }
+            if (!response.status.isSuccess()) {
+                handleApiError(response)
+            }
+            parseTrialStatusResponse(JSONObject(response.bodyAsText()))
+        }
+    }
+
+    internal fun parseTrialStatusResponse(json: JSONObject): TrialStatusResponse {
+        val milestonesArr = json.optJSONArray("claimed_milestones") ?: JSONArray()
+        val milestones = buildSet {
+            for (i in 0 until milestonesArr.length()) {
+                val item = milestonesArr.optString(i).trim()
+                if (item.isNotBlank()) add(item)
+            }
+        }
+        return TrialStatusResponse(
+            granted = json.optBoolean("granted", false),
+            newUserTrialClaimed = json.optBoolean("new_user_trial_claimed", false),
+            claimedMilestones = milestones,
+            trialExpiresAt = json.optLong("trial_expires_at", 0L),
+            serverTime = json.optLong("server_time", 0L),
+            isTrialActive = json.optBoolean("is_trial_active", false),
+        )
     }
 
     private suspend fun executeWithFallback(block: suspend (String) -> HttpResponse): HttpResponse {

@@ -317,10 +317,17 @@ fun HeroPendingCard(
                         scale = TvButtonNoScale,
                         modifier = Modifier
                             .focusRequester(installFocus)
-                            .weight(1f),
+                            .weight(1.2f),
                         shape = ButtonDefaults.shape(btnShape)
                     ) {
-                        Text(if (isInstalling) stringResource(R.string.tv_receive_installing_plain) else stringResource(R.string.tv_receive_install), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                        Text(
+                            text = if (isInstalling) stringResource(R.string.tv_receive_installing_plain) else stringResource(R.string.tv_receive_install),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            softWrap = false,
+                        )
                     }
                     Button(
                         onClick = onDismiss,
@@ -332,7 +339,14 @@ fun HeroPendingCard(
                             contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
                     ) {
-                        Text(stringResource(R.string.tv_receive_dismiss), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                        Text(
+                            text = stringResource(R.string.tv_receive_dismiss),
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.Center,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            softWrap = false,
+                        )
                     }
                 }
             }

@@ -127,9 +127,8 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     }
 
     fun disconnect() {
-        TvReceiverState.updateConnectedClient(null)
+        TvReceiverState.forceDisconnectCurrentClient()
         TvReceiverState.emitReceivingProgress(null)
-        TvReceiver.restart(context)
     }
 
     private val _isDownloadingUrl = MutableStateFlow(false)

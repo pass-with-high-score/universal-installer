@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
@@ -246,7 +247,13 @@ fun ApkDetailsDialog(
         }
 
         Surface(
-            modifier = Modifier.width(680.dp),
+            modifier = Modifier
+                .width(680.dp)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.25f),
+                    shape = RoundedCornerShape(24.dp),
+                ),
             shape = RoundedCornerShape(24.dp),
             colors = SurfaceDefaults.colors(
                 containerColor = MaterialTheme.colorScheme.surface,

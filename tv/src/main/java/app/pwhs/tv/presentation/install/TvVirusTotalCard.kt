@@ -53,11 +53,12 @@ fun TvVirusTotalCard(
     if (vtResult == null) return
 
     val status = vtResult.status
-    val isClean = status == VtStatus.CLEAN
+    val isPrecheck = vtResult.isPrecheckOnly
+    val isClean = status == VtStatus.CLEAN && !isPrecheck
     val isThreat = status == VtStatus.MALICIOUS || status == VtStatus.SUSPICIOUS
     val isBusy = status == VtStatus.SCANNING || status == VtStatus.UPLOADING ||
         status == VtStatus.QUEUED || status == VtStatus.ANALYZING
-    val isNotFound = status == VtStatus.NOT_FOUND
+    val isNotFound = status == VtStatus.NOT_FOUND || isPrecheck
 
     val containerBg = when {
         isClean -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
@@ -75,9 +76,9 @@ fun TvVirusTotalCard(
     }
 
     val titleText = when (status) {
-        VtStatus.CLEAN -> stringResource(R.string.tv_vt_status_clean)
-        VtStatus.MALICIOUS -> stringResource(R.string.tv_vt_status_malicious, vtResult.malicious)
-        VtStatus.SUSPICIOUS -> stringResource(R.string.tv_vt_status_suspicious, vtResult.suspicious)
+        VtStatus.CLEAN -> if (isPrecheck) stringResource(R.string.tv_vt_status_not_found) else stringResource(R.string.tv_vt_status_clean)
+        VtStatus.MALICIOUS -> stringResource(R.string.tv_vt_status_malicious, vtResult.malicious.coerceAtLeast(1))
+        VtStatus.SUSPICIOUS -> stringResource(R.string.tv_vt_status_suspicious, vtResult.suspicious.coerceAtLeast(1))
         VtStatus.SCANNING -> stringResource(R.string.tv_vt_status_scanning)
         VtStatus.UPLOADING -> stringResource(R.string.tv_vt_status_uploading, vtResult.uploadProgress)
         VtStatus.QUEUED -> stringResource(R.string.tv_vt_status_queued)

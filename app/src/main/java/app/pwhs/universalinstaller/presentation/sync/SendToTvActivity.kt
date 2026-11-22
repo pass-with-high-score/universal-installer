@@ -118,7 +118,7 @@ private fun SendToTvScreen(onBack: () -> Unit) {
 
             withContext(Dispatchers.IO) {
                 for (p in candidatePorts) {
-                    val pingUrl = "http://$host:$p/ping"
+                    val pingUrl = "http://$host:$p/ping?connect=1"
                     val ok = runCatching {
                         val conn = URL(pingUrl).openConnection() as HttpURLConnection
                         conn.connectTimeout = 2500
@@ -276,7 +276,7 @@ private fun SendToTvScreen(onBack: () -> Unit) {
         val pingUrl = "http://$host:$port/ping"
 
         while (isActive) {
-            withContext(Dispatchers.IO) {
+            val remoteDisconnected = withContext(Dispatchers.IO) {
                 runCatching {
                     val conn = URL(pingUrl).openConnection() as HttpURLConnection
                     conn.connectTimeout = 3000
@@ -287,7 +287,20 @@ private fun SendToTvScreen(onBack: () -> Unit) {
                         conn.inputStream.use { it.readBytes() }
                     }
                     conn.disconnect()
-                }
+                    code == HttpURLConnection.HTTP_GONE
+                }.getOrDefault(false)
+            }
+            if (remoteDisconnected) {
+                scanned = null
+                uploading = false
+                errorMessage = null
+                isSuccess = false
+                currentFileName = null
+                uploadProgress = 0
+                uploadBytes = null
+                uploadSpeed = 0L
+                uploadEta = null
+                break
             }
             delay(2500)
         }
@@ -369,9 +382,7 @@ private fun SendToTvScreen(onBack: () -> Unit) {
                                     devices = discoveredTvs,
                                     isSearching = true,
                                     onSelectTv = { tv ->
-                                        scanned = "http://${tv.host}:${tv.port}/"
-                                        errorMessage = null
-                                        isSuccess = false
+                                        connectToTv("${tv.host}:${tv.port}", isFromQr = true)
                                     }
                                 )
 

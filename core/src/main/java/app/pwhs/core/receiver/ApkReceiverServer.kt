@@ -63,6 +63,10 @@ class ApkReceiverServer(
     }
 
     private fun handlePing(session: IHTTPSession): Response {
+        val clientIp = cleanIp(session.remoteIpAddress)
+        if (session.parameters["connect"] == null && TvReceiverState.consumeForceDisconnectFor(clientIp)) {
+            return newFixedLengthResponse(Response.Status.GONE, MIME_PLAINTEXT, "disconnected")
+        }
         recordClient(session)
         return newFixedLengthResponse(Response.Status.OK, MIME_PLAINTEXT, "pong")
     }
