@@ -32,8 +32,12 @@
     <string name="setting_search_no_results">No settings found</string>
     <string name="setting_search_no_results_sub">Nothing matches \&quot;%s\&quot;</string>
     <string name="setting_section_installation">Installation</string>
+    <string name="setting_installer_settings_title">Installer settings</string>
+    <string name="setting_installer_settings_subtitle">Engine, install options, and default handler</string>
+    <string name="setting_theme_entry_subtitle">Change app theme and colors</string>
     <string name="setting_group_installing">Installing</string>
     <string name="setting_group_after_install">After installing</string>
+    <string name="setting_group_defaults">System defaults</string>
     <string name="setting_install_mode_title">Install mode</string>
     <string name="setting_install_mode_default">Default</string>
     <string name="setting_install_mode_shizuku">Shizuku</string>

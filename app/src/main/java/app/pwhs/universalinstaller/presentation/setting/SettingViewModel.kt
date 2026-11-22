@@ -281,6 +281,8 @@ class SettingViewModel(
     fun setInstallerPackageName(packageName: String) = privilegeDelegate.setInstallerPackageName(packageName)
     fun toggleDefaultInstaller(enabled: Boolean) = privilegeDelegate.toggleDefaultInstaller(enabled)
     fun toggleDefaultUninstaller(enabled: Boolean) = privilegeDelegate.toggleDefaultUninstaller(enabled)
+    fun updateDefaultInstallerStatus() = privilegeDelegate.updateDefaultInstallerStatus()
+    fun updateDefaultUninstallerStatus() = privilegeDelegate.updateDefaultUninstallerStatus()
     val useCustomAuthorizer: StateFlow<Boolean> = privilegeDelegate.useCustomAuthorizer
     val customAuthorizerCommand: StateFlow<String> = privilegeDelegate.customAuthorizerCommand
     fun setCustomAuthorizerCommand(command: String) = privilegeDelegate.setCustomAuthorizerCommand(command)

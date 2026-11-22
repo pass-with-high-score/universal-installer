@@ -15,6 +15,10 @@
     <string name="logs_delete_entry_cd">Xóa mục</string>
     <string name="setting_title">Thiết lập</string>
     <string name="setting_section_installation">Cài đặt</string>
+    <string name="setting_installer_settings_title">Cài đặt trình cài đặt</string>
+    <string name="setting_installer_settings_subtitle">Chế độ cài, tuỳ chọn và trình mặc định</string>
+    <string name="setting_theme_entry_subtitle">Thay đổi chủ đề và màu sắc ứng dụng</string>
+    <string name="setting_group_defaults">Mặc định hệ thống</string>
     <string name="setting_shizuku_not_installed">Shizuku chưa được cài đặt</string>
     <string name="setting_shizuku_not_running">Shizuku đã được cài đặt nhưng không chạy</string>
     <string name="setting_shizuku_unsupported">Phiên bản Shizuku quá cũ (trước v11)</string>

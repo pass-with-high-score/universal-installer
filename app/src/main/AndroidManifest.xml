@@ -480,6 +480,11 @@
             android:exported="false"
             android:launchMode="singleTop" />
         <activity
+            android:name=".presentation.setting.installer.InstallerSettingsActivity"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
+            android:exported="false"
+            android:launchMode="singleTop" />
+        <activity
             android:name=".presentation.setting.security.SecurityActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|density"
             android:exported="false"

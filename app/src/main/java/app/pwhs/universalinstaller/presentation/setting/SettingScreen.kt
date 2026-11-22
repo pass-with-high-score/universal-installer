@@ -68,6 +68,7 @@ import androidx.datastore.preferences.core.Preferences
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import app.pwhs.universalinstaller.presentation.composable.CommunityActionButtons
+import app.pwhs.universalinstaller.presentation.setting.sections.SettingsHubSections
 import app.pwhs.universalinstaller.presentation.setting.sections.AboutSection
 import app.pwhs.universalinstaller.presentation.setting.sections.AdvancedSection
 import app.pwhs.universalinstaller.presentation.setting.sections.ProfilesSection
@@ -364,88 +365,18 @@ private fun SettingUi(
                     )
                 }
 
-                // ── Installation Section ─────────────────────
-                InstallSection(
+                // ── Settings Hub Sections ────────────────────
+                SettingsHubSections(
                     q = q,
-                    installLabels = installLabels,
+                    context = context,
                     uiState = uiState,
-                    dhizukuState = dhizukuState,
-                    useDhizuku = useDhizuku,
-                    context = context,
-                    onInstallModeChanged = onInstallModeChanged,
-                    onUseDhizukuChanged = onUseDhizukuChanged,
-                    onRootRetry = onRootRetry,
-                    onDeleteApkChanged = onDeleteApkChanged,
-                    onAutoOpenAfterInstallChanged = onAutoOpenAfterInstallChanged,
-                    onDefaultInstallerChanged = onDefaultInstallerChanged,
-                    onDefaultUninstallerChanged = onDefaultUninstallerChanged,
-                    onOpenInstallOptions = { showInstallOptionsSheet = true },
-                    onOpenInstallPriority = { showInstallPrioritySheet = true },
-                )
-
-                // ── Profiles Section ─────────────────────────
-                ProfilesSection(
-                    q = q,
-                    profileLabels = profileLabels,
-                    onProfilesClick = onProfilesClick,
-                )
-
-                // ── Interface Section ────────────────────────
-                InterfaceSection(
-                    q = q,
-                    interfaceLabels = interfaceLabels,
-                    context = context,
-                    onLanguageClick = onLanguageClick
-                )
-
-                // ── Security Section ─────────────────────────
-                SecuritySection(
-                    q = q,
-                    securityLabels = securityLabels,
-                    context = context,
-                )
-
-                // ── Privacy Section ──────────────────────────
-                // Absent from the open-source build: Telemetry has no sink there, so the
-                // switch would promise control over something that never happens.
-                PrivacySection(
-                    q = q,
-                    privacyLabels = privacyLabels,
                     analyticsEnabled = analyticsEnabled,
-                    onAnalyticsEnabledChanged = onAnalyticsEnabledChanged
-                )
-
-                // ── Sync Section ─────────────────────────────
-                SyncSection(
-                    q = q,
-                    syncLabels = syncLabels,
-                    context = context,
-                    syncOptions = uiState.syncOptions,
+                    onAnalyticsEnabledChanged = onAnalyticsEnabledChanged,
+                    onLanguageClick = onLanguageClick,
+                    onProfilesClick = onProfilesClick,
                     onOpenSyncOptions = { showSyncOptionsSheet = true },
-                )
-
-                // ── Advanced Options ─────────────────────────
-                AdvancedSection(
-                    q = q,
-                    advancedLabels = advancedLabels,
-                    securityScanDisabled = uiState.virusTotalDisabled,
-                    onToggleSecurityScan = onToggleSecurityScan,
-                )
-
-                // ── Backup & Restore Section ─────────────────
-                BackupSection(
-                    q = q,
-                    backupLabels = backupLabels,
                     onExportClick = { backupViewModel.showExportSheet(true) },
                     onRestoreClick = { openRestorePicker?.invoke() },
-                )
-
-                // ── About Section ────────────────────────────
-                AboutSection(
-                    q = q,
-                    aboutLabels = aboutLabels,
-                    context = context,
-                    appVersion = uiState.appVersion,
                     onReplayTutorial = onReplayTutorial,
                 )
 
