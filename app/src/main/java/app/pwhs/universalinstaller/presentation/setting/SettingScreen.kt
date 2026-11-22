@@ -202,6 +202,7 @@ private fun SettingUi(
     var showInstallPrioritySheet by rememberSaveable { mutableStateOf(false) }
     var showSyncOptionsSheet by rememberSaveable { mutableStateOf(false) }
     var showUpgradeProSheet by rememberSaveable { mutableStateOf(false) }
+    var showManageVisibleTabsSheet by rememberSaveable { mutableStateOf(false) }
     val billingManager: BillingManager = koinInject()
     val isProUser by billingManager.isProUser.collectAsState()
 
@@ -313,6 +314,8 @@ private fun SettingUi(
                 "interface",
                 stringResource(R.string.theme_screen_title),
                 stringResource(R.string.setting_language_title),
+                stringResource(R.string.setting_manage_visible_tabs_title),
+                "tabs",
             )
             val securityLabels = listOf("security", "lock", "biometric", "fingerprint", "installations", "uninstalls",
                 stringResource(R.string.setting_blacklist_title), "blacklist", "block",
@@ -373,6 +376,7 @@ private fun SettingUi(
                     analyticsEnabled = analyticsEnabled,
                     onAnalyticsEnabledChanged = onAnalyticsEnabledChanged,
                     onLanguageClick = onLanguageClick,
+                    onManageVisibleTabsClick = { showManageVisibleTabsSheet = true },
                     onProfilesClick = onProfilesClick,
                     onOpenSyncOptions = { showSyncOptionsSheet = true },
                     onExportClick = { backupViewModel.showExportSheet(true) },
@@ -418,4 +422,10 @@ private fun SettingUi(
         onSyncRequirePinChanged = onSyncRequirePinChanged,
         onSyncPinCodeChanged = onSyncPinCodeChanged,
     )
+
+    if (showManageVisibleTabsSheet) {
+        app.pwhs.universalinstaller.presentation.setting.components.ManageVisibleTabsBottomSheet(
+            onDismiss = { showManageVisibleTabsSheet = false },
+        )
+    }
 } // end of SettingUi

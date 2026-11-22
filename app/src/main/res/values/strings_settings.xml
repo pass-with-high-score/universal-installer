@@ -35,6 +35,9 @@
     <string name="setting_installer_settings_title">Installer settings</string>
     <string name="setting_installer_settings_subtitle">Engine, install options, and default handler</string>
     <string name="setting_theme_entry_subtitle">Change app theme and colors</string>
+    <string name="setting_manage_visible_tabs_title">Manage visible tabs</string>
+    <string name="setting_manage_visible_tabs_subtitle">Manage visible tabs in the main interface</string>
+    <string name="setting_manage_visible_tabs_always_on">Always visible</string>
     <string name="setting_group_installing">Installing</string>
     <string name="setting_group_after_install">After installing</string>
     <string name="setting_group_defaults">System defaults</string>

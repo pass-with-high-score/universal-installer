@@ -22,6 +22,7 @@ object PreferencesKeys {
     val DELETE_APK_AFTER_INSTALL = booleanPreferencesKey("delete_apk_after_install")
     val DISMISS_SHIZUKU_PROMO_BANNER = booleanPreferencesKey("dismiss_shizuku_promo_banner")
     val DISMISSED_FEATURE_TIPS = stringSetPreferencesKey("dismissed_feature_tips")
+    val HIDDEN_BOTTOM_TABS = stringSetPreferencesKey("hidden_bottom_tabs")
     val TIP_SESSION_COUNT = intPreferencesKey("tip_session_count")
     val NEXT_TIP_SESSION = intPreferencesKey("next_tip_session")
 

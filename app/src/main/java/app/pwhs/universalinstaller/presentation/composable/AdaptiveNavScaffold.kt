@@ -116,8 +116,18 @@ private fun AppNavigationRail(
         }
     }
 
-    val destinations = remember {
-        BottomBarItem.entries.filter { it.activityClass != null }
+    val hiddenTabs by produceState(initialValue = emptySet<String>(), context) {
+        runCatching {
+            context.dataStore.data.collect { prefs ->
+                value = prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+            }
+        }
+    }
+
+    val destinations = remember(hiddenTabs, currentTab) {
+        BottomBarItem.entries.filter {
+            it.activityClass != null && (it.isAlwaysVisible || it == currentTab || it.name !in hiddenTabs)
+        }
     }
 
     val isAmoled = colors.background == Color.Black && colors.surface == Color.Black

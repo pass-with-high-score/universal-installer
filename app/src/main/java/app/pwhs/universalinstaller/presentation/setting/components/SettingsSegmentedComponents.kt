@@ -45,13 +45,15 @@ fun SettingsCardGroup(
 ) {
     if (items.isEmpty()) return
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleSmall,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(start = 12.dp, bottom = 8.dp),
-        )
+        if (title.isNotBlank()) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(start = 12.dp, bottom = 8.dp),
+            )
+        }
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             items.forEachIndexed { index, itemContent ->
                 val topRadius = if (index == 0) OUTER_RADIUS else INNER_RADIUS

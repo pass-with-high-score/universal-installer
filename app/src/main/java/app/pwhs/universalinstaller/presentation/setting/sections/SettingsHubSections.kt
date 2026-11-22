@@ -18,6 +18,7 @@ import androidx.compose.material.icons.rounded.Replay
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.SettingsApplications
 import androidx.compose.material.icons.rounded.Tune
+import androidx.compose.material.icons.rounded.ViewCarousel
 import androidx.compose.material.icons.rounded.Wallpaper
 import androidx.compose.material.icons.rounded.WifiTethering
 import androidx.compose.runtime.Composable
@@ -48,6 +49,7 @@ internal fun LazyListScope.SettingsHubSections(
     analyticsEnabled: Boolean,
     onAnalyticsEnabledChanged: (Boolean) -> Unit,
     onLanguageClick: () -> Unit,
+    onManageVisibleTabsClick: () -> Unit = {},
     onProfilesClick: () -> Unit,
     onOpenSyncOptions: () -> Unit,
     onExportClick: () -> Unit,
@@ -62,6 +64,8 @@ internal fun LazyListScope.SettingsHubSections(
         val installUiSub = stringResource(R.string.install_ui_entry_subtitle)
         val langTitle = stringResource(R.string.setting_language_title)
         val langSub = stringResource(R.string.setting_language_subtitle)
+        val tabsTitle = stringResource(R.string.setting_manage_visible_tabs_title)
+        val tabsSub = stringResource(R.string.setting_manage_visible_tabs_subtitle)
 
         val rows = buildList<@Composable () -> Unit> {
             if (matchesQuery(q, listOf(themeTitle, themeSub, "interface theme color dark amoled"))) {
@@ -91,6 +95,16 @@ internal fun LazyListScope.SettingsHubSections(
                         subtitle = langSub,
                         icon = Icons.Rounded.Language,
                         onClick = onLanguageClick,
+                    )
+                }
+            }
+            if (matchesQuery(q, listOf(tabsTitle, tabsSub, "tabs bottom bar navigation visible hide"))) {
+                add {
+                    SettingsNavRow(
+                        title = tabsTitle,
+                        subtitle = tabsSub,
+                        icon = Icons.Rounded.ViewCarousel,
+                        onClick = onManageVisibleTabsClick,
                     )
                 }
             }

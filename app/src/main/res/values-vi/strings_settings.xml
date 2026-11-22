@@ -18,6 +18,9 @@
     <string name="setting_installer_settings_title">Cài đặt trình cài đặt</string>
     <string name="setting_installer_settings_subtitle">Chế độ cài, tuỳ chọn và trình mặc định</string>
     <string name="setting_theme_entry_subtitle">Thay đổi chủ đề và màu sắc ứng dụng</string>
+    <string name="setting_manage_visible_tabs_title">Quản lý các tab hiển thị</string>
+    <string name="setting_manage_visible_tabs_subtitle">Quản lý các tab hiển thị trên giao diện chính</string>
+    <string name="setting_manage_visible_tabs_always_on">Luôn hiển thị</string>
     <string name="setting_group_defaults">Mặc định hệ thống</string>
     <string name="setting_shizuku_not_installed">Shizuku chưa được cài đặt</string>
     <string name="setting_shizuku_not_running">Shizuku đã được cài đặt nhưng không chạy</string>
