@@ -79,7 +79,8 @@ class SettingPrivilegeDelegate(
         rootState = { _rootState.value },
         updateShizukuState = { updateShizukuState() },
         requestShizukuPermission = { requestShizukuPermission() },
-        startServiceHint = { startServiceHint() },
+        startShizukuService = ::startShizukuService,
+        onRootStateUpdated = { _rootState.value = it },
         emitEvent = emitEvent,
     )
 
@@ -113,6 +114,7 @@ class SettingPrivilegeDelegate(
                         prefs[PreferencesKeys.USE_SHIZUKU] = true
                         prefs[PreferencesKeys.USE_DHIZUKU] = keepDhizuku
                     }
+                    defaultRoleDelegate.onShizukuPermissionGranted()
                 }
             } else {
                 app.pwhs.core.telemetry.AnalyticsHelper.logShizukuStatusChanged(app.pwhs.core.telemetry.TelemetryEvents.SHIZUKU_PERMISSION_DENIED)
@@ -208,6 +210,7 @@ class SettingPrivilegeDelegate(
                     prefs[PreferencesKeys.USE_SHIZUKU] = true
                     prefs[PreferencesKeys.USE_DHIZUKU] = keepDhizuku
                 }
+                defaultRoleDelegate.onShizukuPermissionGranted()
             }
         }
     }

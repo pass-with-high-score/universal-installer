@@ -208,6 +208,7 @@ class DialogInstallActivity : FragmentActivity() {
 
             val context = this@DialogInstallActivity
             val cancelAndFinish = {
+                if (viewModel.uiState.value.dialogDownloadProgress != null) viewModel.cancelDialogDownload()
                 viewModel.dismissPendingInstall()
                 viewModel.dialogClose()
                 viewModel.clearDialogTarget()
@@ -444,6 +445,7 @@ class DialogInstallActivity : FragmentActivity() {
                 onOpenInstallPermissionSettings = ::openInstallPermissionSettings,
                 onProceedInstall = proceedInstall,
                 onDismissAndFinish = dismissAndFinish,
+                onCancelAndFinish = cancelAndFinish,
                 onFinishAfterSuccess = finishAfterSuccess,
                 onScanVirusTotal = { viewModel.scanVirusTotal(it) },
             )

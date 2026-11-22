@@ -121,6 +121,7 @@ fun DialogInstallContent(
     onOpenInstallPermissionSettings: () -> Unit,
     onProceedInstall: () -> Unit,
     onDismissAndFinish: () -> Unit,
+    onCancelAndFinish: () -> Unit = onDismissAndFinish,
     onFinishAfterSuccess: (keepApk: Boolean, packageNameToOpen: String?) -> Unit,
     onScanVirusTotal: (Context) -> Unit,
 ) {
@@ -246,7 +247,7 @@ fun DialogInstallContent(
                 },
                 onCancel = {
                     pendingRisks = emptyList()
-                    onDismissAndFinish()
+                    onCancelAndFinish()
                 },
                 onPrivilegedUninstall = viewModel::uninstallConflictingApp,
                 onExistingAppUninstalled = {
@@ -337,7 +338,7 @@ fun DialogInstallContent(
                             keepApk = keepApk,
                             onKeepApkChanged = onKeepApkChanged,
                             onInstall = handleInstallTap,
-                            onCancel = onDismissAndFinish,
+                            onCancel = onCancelAndFinish,
                             onMenu = viewModel::dialogShowMenu,
                             onUnblock = viewModel::unblockPackage,
                             onMenuBack = viewModel::dialogBackToPrepare,

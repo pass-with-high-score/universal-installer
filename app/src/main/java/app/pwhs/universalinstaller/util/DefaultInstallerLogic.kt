@@ -67,10 +67,14 @@ object DefaultInstallerLogic {
             component.flattenToShortString(), lock, userId, hasSystemLevelPermission,
         )
 
-        // Ours is the one that has to go: with lock=false it is the entire operation.
-        clearPackagePreferredActivities(iPackageManager, component.packageName, userId, hasSystemLevelPermission)
-
-        if (!lock) return
+        // Only clear our package's preferred activities when explicitly unlocking, because
+        // clearPackagePreferredActivities wipes ALL roles for this package (including
+        // DialogUninstallActivity). When locking, replacePreferredActivity updates only
+        // the installer intent filters without touching the default uninstaller role.
+        if (!lock) {
+            clearPackagePreferredActivities(iPackageManager, component.packageName, userId, hasSystemLevelPermission)
+            return
+        }
 
         for (action in ACTIONS) {
             val probeIntent = Intent(action).apply {
@@ -109,7 +113,7 @@ object DefaultInstallerLogic {
             }
             val match = IntentFilter.MATCH_CATEGORY_TYPE or IntentFilter.MATCH_ADJUSTMENT_MASK
 
-            addPreferredActivity(iPackageManager, filter, match, names.toTypedArray(), component, userId)
+            replaceOrAddPreferredActivity(iPackageManager, filter, match, names.toTypedArray(), component, userId)
 
             // Best effort, and only available as UID 0. When it does land it is what makes the
             // registration stick regardless of the candidate set above.
@@ -171,6 +175,28 @@ object DefaultInstallerLogic {
         // hidden-API surface — the class is hidden but the method is present at runtime.
         @Suppress("UNCHECKED_CAST")
         return result.javaClass.getMethod("getList").invoke(result) as List<ResolveInfo>
+    }
+
+    private fun replaceOrAddPreferredActivity(
+        iPackageManager: IPackageManager,
+        filter: IntentFilter,
+        match: Int,
+        names: Array<ComponentName>,
+        component: ComponentName,
+        userId: Int,
+    ) {
+        val replaced = runCatching {
+            val m = iPackageManager.javaClass.getMethod(
+                "replacePreferredActivity",
+                IntentFilter::class.java, Int::class.javaPrimitiveType,
+                Array<ComponentName>::class.java, ComponentName::class.java,
+                Int::class.javaPrimitiveType,
+            )
+            m.invoke(iPackageManager, filter, match, names, component, userId)
+        }.isSuccess
+        if (!replaced) {
+            addPreferredActivity(iPackageManager, filter, match, names, component, userId)
+        }
     }
 
     private fun addPreferredActivity(

@@ -115,7 +115,7 @@ class DialogUninstallActivity : ComponentActivity() {
             val useRootPref = prefs?.get(PreferencesKeys.USE_ROOT) ?: false
 
             val isPrivileged by produceState(initialValue = useShizukuPref || useRootPref) {
-                value = useShizukuPref || useRootPref || (privilegedProvider.resolveExecutor() != null)
+                value = useShizukuPref || useRootPref || (privilegedProvider.resolveExecutor(requestIfNeeded = false) != null)
             }
 
             val darkTheme = when (themeMode) {

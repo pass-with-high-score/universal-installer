@@ -108,6 +108,7 @@
     <string name="setting_default_uninstaller_enabled">Universal Installer is now the default uninstaller</string>
     <string name="setting_default_uninstaller_disabled">Default uninstaller preference cleared</string>
     <string name="setting_default_uninstaller_failed">Failed to change default uninstaller</string>
+    <string name="setting_default_uninstaller_requires_root">System uninstaller has higher priority on this device — Root (or Shizuku via Root/Sui) is required</string>
     <string name="setting_shizuku_options_install_group">Install</string>
     <string name="setting_shizuku_options_uninstall_group">Uninstall</string>
     <string name="setting_shizuku_uninstall_keep_data">Keep app data</string>
