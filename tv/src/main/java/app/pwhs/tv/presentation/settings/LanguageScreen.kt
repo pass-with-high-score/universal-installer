@@ -64,7 +64,8 @@ fun LanguageScreen(onBack: () -> Unit) {
             "ar" to "العربية",
             "tr" to "Türkçe",
             "bn" to "বাংলা",
-            "fa" to "فارسی"
+            "fa" to "فارسی",
+            "hu" to "Magyar"
         ).sortedBy { if (it.first.isEmpty()) "" else it.second }
     }
 

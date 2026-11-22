@@ -121,6 +121,13 @@ Use direct register: `vi` uses "bạn" (never "quý khách"), `pt-BR` uses "voc�
 | open source | hi | ओपन सोर्स |
 | open source | zh | 开源 |
 | open source | ja | オープンソース |
+| install | hu | telepít |
+| uninstall | hu | eltávolít |
+| package | hu | csomag |
+| downgrade | hu | visszaléptet |
+| dismiss | hu | Bezárás |
+| disabled | hu | letilt |
+| settings | hu | beállítás |
 
 ## Notes per locale
 
@@ -131,6 +138,7 @@ Use direct register: `vi` uses "bạn" (never "quý khách"), `pt-BR` uses "voc�
 - `fa` — Persian / Farsi (RTL, uses direct register, "نصب" for install, "لغو نصب" for uninstall, "تنظیمات" for settings)
 - `fr` — French (standard polite UI register "vous")
 - `hi` — Hindi
+- `hu` — Hungarian (informal "te" register, like `de` "du"). "Blocked" (never-install list) = "Blokkolt", kept distinct from "Disabled" = "Letiltott". Use „…” quotes. Glossary rows are stems: Hungarian is agglutinative.
 - `in` — Indonesian (Android's legacy code `in`, never write `id` in CSV)
 - `it` — Italian
 - `ja` — Japanese (standard polite Japanese UI conventions)
