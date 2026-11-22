@@ -58,7 +58,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.datastore.preferences.core.edit
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -755,6 +758,27 @@ private fun InstallUi(
             billingManager = billingManager,
             onDismissRequest = { showUpgradeProSheet = false },
             source = app.pwhs.core.telemetry.TelemetryEvents.SOURCE_HOME_TOP_BAR,
+        )
+    }
+
+    val trialWelcomeScope = androidx.compose.runtime.rememberCoroutineScope()
+    val proEntitlement by billingManager.proEntitlement.collectAsState()
+    val trialWelcomeShown by produceState<Boolean?>(initialValue = null, context) {
+        context.dataStore.data.collect { prefs ->
+            value = prefs[app.pwhs.core.data.local.SharedPrefsKeys.PRO_TRIAL_WELCOME_SHOWN] ?: false
+        }
+    }
+    val activeTrial = proEntitlement as? app.pwhs.core.billing.ProEntitlement.Trial
+    if (activeTrial != null && trialWelcomeShown == false) {
+        app.pwhs.universalinstaller.presentation.pro.components.ProTrialWelcomeDialog(
+            expiresAtMillis = activeTrial.expiresAtMillis,
+            onDismiss = {
+                trialWelcomeScope.launch {
+                    context.dataStore.edit { prefs ->
+                        prefs[app.pwhs.core.data.local.SharedPrefsKeys.PRO_TRIAL_WELCOME_SHOWN] = true
+                    }
+                }
+            },
         )
     }
 

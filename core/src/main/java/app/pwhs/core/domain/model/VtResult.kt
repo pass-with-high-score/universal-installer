@@ -41,4 +41,6 @@ data class VtResult(
     val analysisId: String = "",
     val engineResults: List<VtEngineResult> = emptyList(),
     val report: ScanReport? = null,
+    /** True when the report came only from lightweight metadata precheck (no DEX/binary scan). */
+    val isPrecheckOnly: Boolean = false,
 )

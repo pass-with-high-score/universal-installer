@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">Удалить выбранные</string>
     <string name="uninstall_filter_cd">Фильтр</string>
     <string name="uninstall_logs_cd">Журналы удаления</string>
-    <string name="uninstall_confirm_single_title">Удалить %s?</string>
     <string name="uninstall_confirm_single_text">Это удалит %1$s (%2$s) с вашего устройства.</string>
     <string name="batch_install_title">Пакетная установка</string>
     <string name="batch_install_summary">%1$d пакетов · выбрано %2$s</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">Дублирующийся пакет</string>
     <string name="permissions_title">Разрешения приложения</string>
     <string name="permissions_subtitle">Проверьте активные разрешения и предоставьте те, которые вам нужны.</string>
-    <string name="permissions_menu_cd">Проверить разрешения</string>
     <string name="permissions_granted">Предоставлено</string>
     <string name="permissions_grant">Предоставить</string>
     <string name="permissions_open_settings">Открыть настройки</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Установить в защищенную папку</string>
     <string name="manage_action_install_secure_folder_done">%s установлено в защищенную папку</string>
     <string name="manage_action_install_secure_folder_failed">Ошибка установки в защищенную папку: %s</string>
-    <string name="manage_action_install_secure_folder_already">Установлено · Нажмите для переустановки</string>
     <string name="manage_action_add_to_server">Синхронизация и обмен</string>
     <string name="manage_action_add_to_server_sub">Поделиться по локальной сети Wi-Fi</string>
     <string name="manage_action_added_to_server">%s добавлено в Синхронизацию и обмен</string>

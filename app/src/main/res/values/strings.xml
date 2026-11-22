@@ -2,8 +2,6 @@
 <resources>
     <string name="app_name" translatable="false">Universal Installer</string>
     <string name="txt_install">Install</string>
-    <string name="txt_updates">Updates</string>
-    <string name="txt_manage">Manage</string>
     <string name="more_actions_cd">More actions</string>
     <string name="cancel">Cancel</string>
     <string name="status_success">Success</string>
@@ -63,7 +61,6 @@
     <string name="stats_op_update">Updates</string>
     <string name="stats_op_downgrade">Downgrades</string>
     <string name="stats_total_uninstalled">Apps Uninstalled</string>
-    <string name="stats_total_downloads">Packages Downloaded</string>
 
     <string name="stats_section_storage_formats">Storage &amp; Package Formats</string>
     <string name="stats_bytes_installed">Volume Installed</string>

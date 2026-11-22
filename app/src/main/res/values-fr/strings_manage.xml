@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">Désinstaller la sélection</string>
     <string name="uninstall_filter_cd">Filtrer</string>
     <string name="uninstall_logs_cd">Journaux de désinstallation</string>
-    <string name="uninstall_confirm_single_title">Désinstaller %s ?</string>
     <string name="uninstall_confirm_single_text">Cela supprimera %1$s (%2$s) de votre appareil.</string>
     <string name="batch_install_title">Installation en lot</string>
     <string name="batch_install_summary">%1$d paquets · %2$s sélectionné(s)</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">Paquet en double</string>
     <string name="permissions_title">Permissions de l\'application</string>
     <string name="permissions_subtitle">Passez en revue les permissions actives et accordez celles dont vous avez besoin.</string>
-    <string name="permissions_menu_cd">Passer en revue les permissions</string>
     <string name="permissions_granted">Accordée</string>
     <string name="permissions_grant">Accorder</string>
     <string name="permissions_open_settings">Ouvrir les paramètres</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Installer dans le Dossier Sécurisé</string>
     <string name="manage_action_install_secure_folder_done">%s installé dans le Dossier Sécurisé</string>
     <string name="manage_action_install_secure_folder_failed">Échec de l\'installation dans le Dossier Sécurisé : %s</string>
-    <string name="manage_action_install_secure_folder_already">Installé · Appuyer pour réinstaller</string>
     <string name="manage_action_add_to_server">Synchroniser et partager</string>
     <string name="manage_action_add_to_server_sub">Partager sur le Wi-Fi local</string>
     <string name="manage_action_added_to_server">%s ajouté à Synchroniser et partager</string>

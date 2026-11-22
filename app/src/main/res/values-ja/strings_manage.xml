@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">選択した項目をアンインストール</string>
     <string name="uninstall_filter_cd">フィルター</string>
     <string name="uninstall_logs_cd">アンインストールログ</string>
-    <string name="uninstall_confirm_single_title">%s をアンインストールしますか？</string>
     <string name="uninstall_confirm_single_text">%1$s (%2$s) がデバイスから削除されます。</string>
     <string name="batch_install_title">一括インストール</string>
     <string name="batch_install_summary">%1$d 個のパッケージ · %2$s を選択中</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">重複するパッケージ</string>
     <string name="permissions_title">アプリの権限</string>
     <string name="permissions_subtitle">有効な権限を確認し、必要な権限を許可してください。</string>
-    <string name="permissions_menu_cd">権限を確認</string>
     <string name="permissions_granted">許可済み</string>
     <string name="permissions_grant">許可する</string>
     <string name="permissions_open_settings">設定を開く</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">セキュリティフォルダにインストール</string>
     <string name="manage_action_install_secure_folder_done">%s をセキュリティフォルダにインストールしました</string>
     <string name="manage_action_install_secure_folder_failed">セキュリティフォルダへのインストールに失敗しました: %s</string>
-    <string name="manage_action_install_secure_folder_already">インストール済み · タップして再インストール</string>
     <string name="manage_action_add_to_server">同期と共有</string>
     <string name="manage_action_add_to_server_sub">ローカルWi-Fiで共有</string>
     <string name="manage_action_added_to_server">%s を同期と共有に追加しました</string>

@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">Desinstalar seleccionadas</string>
     <string name="uninstall_filter_cd">Filtrar</string>
     <string name="uninstall_logs_cd">Registros de desinstalación</string>
-    <string name="uninstall_confirm_single_title">¿Desinstalar %s?</string>
     <string name="uninstall_confirm_single_text">Esto eliminará %1$s (%2$s) de tu dispositivo.</string>
     <string name="batch_install_title">Instalación por lotes</string>
     <string name="batch_install_summary">%1$d paquetes · %2$s seleccionados</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">Paquete duplicado</string>
     <string name="permissions_title">Permisos de la aplicación</string>
     <string name="permissions_subtitle">Revisa qué permisos están activos y concede los que necesites.</string>
-    <string name="permissions_menu_cd">Revisar permisos</string>
     <string name="permissions_granted">Concedido</string>
     <string name="permissions_grant">Conceder</string>
     <string name="permissions_open_settings">Abrir configuración</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Instalar en Carpeta Segura</string>
     <string name="manage_action_install_secure_folder_done">%s instalado en la Carpeta Segura</string>
     <string name="manage_action_install_secure_folder_failed">Error al instalar en la Carpeta Segura: %s</string>
-    <string name="manage_action_install_secure_folder_already">Instalado · Toque para reinstalar</string>
     <string name="manage_action_add_to_server">Sincronizar y compartir</string>
     <string name="manage_action_add_to_server_sub">Compartir en Wi-Fi local</string>
     <string name="manage_action_added_to_server">Se agregó %s a Sincronizar y compartir</string>

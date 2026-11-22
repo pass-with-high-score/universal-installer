@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="txt_setting">Cài đặt</string>
     <string name="logs_screen_title">Nhật ký Gỡ cài đặt</string>
     <string name="logs_clear_all_dialog_title">Xóa tất cả nhật ký?</string>
     <string name="logs_clear_all_dialog_text">Hành động này sẽ xóa vĩnh viễn lịch sử nhật ký gỡ cài đặt trên thiết bị này.</string>
@@ -208,7 +207,6 @@
     <string name="setting_install_mode_default">Mặc định</string>
     <string name="setting_install_mode_shizuku">Shizuku</string>
     <string name="setting_install_mode_dhizuku" translatable="false">Dhizuku</string>
-    <string name="setting_install_mode_shizuku_dhizuku" translatable="false">Shizuku + Dhizuku</string>
     <string name="setting_use_dhizuku_title">Dùng Dhizuku thay thế</string>
     <string name="setting_dhizuku_unsupported">Dhizuku cần Android 8.0 trở lên</string>
     <string name="setting_dhizuku_not_installed">Thiết bị chưa cài Dhizuku</string>
@@ -217,10 +215,6 @@
     <string name="setting_dhizuku_profile_owner_unsupported">Dhizuku đang hoạt động với quyền Profile Owner. Cài đặt im lặng yêu cầu quyền Device Owner.</string>
     <string name="setting_dhizuku_denied">Dhizuku đã từ chối yêu cầu cấp quyền</string>
     <string name="setting_dhizuku_ready">Sẵn sàng — cài im lặng. Lưu ý Dhizuku chỉ hỗ trợ \"Cho phép hạ cấp\"; các tuỳ chọn cài đặt khác chỉ áp dụng cho Shizuku và Root.</string>
-    <string name="setting_shizuku_dhizuku_not_running">Cả Shizuku và Dhizuku đều chưa chạy</string>
-    <string name="setting_shizuku_dhizuku_ready">Sẵn sàng — đang dùng Shizuku (Dhizuku dự phòng)</string>
-    <string name="setting_shizuku_dhizuku_ready_dhizuku_active">Shizuku chưa chạy — đang dùng Dhizuku dự phòng</string>
-    <string name="setting_shizuku_dhizuku_no_permission">Nhấn để cấp quyền cho Shizuku và Dhizuku</string>
     <string name="setting_install_mode_root">Root</string>
     <string name="setting_install_mode_custom">Tùy chỉnh</string>
     <string name="setting_install_mode_default_sub">Trình cài đặt của Android — sẽ hỏi bạn xác nhận từng ứng dụng</string>
@@ -338,10 +332,7 @@
     <string name="setting_section_sync_short">Đồng bộ</string>
     <string name="setting_sync_control_panel">Bảng điều khiển đồng bộ</string>
     <string name="setting_section_advanced">Nâng cao</string>
-    <string name="setting_vt_api_key_title">Khóa API VirusTotal</string>
     <string name="setting_vt_api_key_placeholder">Dán khóa API vào đây…</string>
-    <string name="setting_vt_disable_title">Tắt VirusTotal</string>
-    <string name="setting_vt_disable_desc">Tắt toàn bộ tính năng VirusTotal: không quét, không tải lên tệp/hash và ẩn toàn bộ giao diện VirusTotal.</string>
     <string name="setting_security_level_title">Mức bảo mật</string>
     <string name="setting_security_normal">Bình thường</string>
     <string name="setting_security_strict">Nghiêm ngặt</string>

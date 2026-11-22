@@ -108,11 +108,13 @@ class VirusDetecScanner(
                 receivers = metadata.receivers,
             )
             val response = service.lookup(req).getOrThrow()
+            val isPrecheck = response.report == null && response.precheckReport != null
             val report = response.report ?: response.precheckReport
-            if (report != null) {
+            if (response.report != null) {
                 recordBuiltInQuotaUsed(context, sha256)
             }
             report?.toSecurityScanResult(providerId = ScannerProviderId.VIRUSDETEC)
+                ?.copy(isPrecheckOnly = isPrecheck)
         }.recoverCatching { t ->
             if (t is ScanErrorException) throw t
             throw mapExceptionToScanException(t)
@@ -158,7 +160,7 @@ class VirusDetecScanner(
         val lookupResult = lookupHash(context, sha256, metadata.copy(sha256 = sha256))
         if (lookupResult.isSuccess) {
             val cached = lookupResult.getOrNull()
-            if (cached != null && !options.forceRecheck) {
+            if (cached != null && !cached.isPrecheckOnly && !options.forceRecheck) {
                 send(ScanStep.Completed(cached))
                 return@channelFlow
             }

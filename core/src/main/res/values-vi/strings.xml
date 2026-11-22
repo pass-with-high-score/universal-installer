@@ -2,15 +2,11 @@
     <string name="onboarding_skip">Bỏ qua</string>
     <string name="onboarding_next">Tiếp tục</string>
     <string name="onboarding_get_started">Bắt đầu</string>
-    <string name="onboarding_restore_title">Khôi phục dữ liệu</string>
-    <string name="onboarding_restore_desc">Chuyển từ thiết bị khác hoặc Obtainium? Bạn có thể khôi phục cài đặt, các ứng dụng đang theo dõi và token API ngay bây giờ.</string>
     <string name="onboarding_restore_action">Khôi phục từ bản sao lưu</string>
     <string name="onboarding_permission_granted">Đã cấp quyền</string>
     <string name="onboarding_grant_permission">Cấp quyền</string>
     <string name="onboarding_page1_title">Cài đặt bất kỳ gói nào</string>
     <string name="onboarding_page1_desc">Hỗ trợ các định dạng APK, APKS, XAPK và APKM. Cài đặt APK chia nhỏ một cách dễ dàng.</string>
-    <string name="onboarding_page2_title">Quản lý ứng dụng của bạn</string>
-    <string name="onboarding_page2_desc">Duyệt qua các ứng dụng đã cài đặt, gỡ cài đặt những ứng dụng không mong muốn và quản lý thiết bị của bạn một cách dễ dàng.</string>
     <string name="onboarding_devices_title">Hỗ trợ nhiều loại thiết bị</string>
     <string name="onboarding_devices_desc">Dễ dàng cài đặt và quản lý ứng dụng trên điện thoại Android, Android TV, Android Auto và đồng hồ thông minh Wear OS.</string>
     <string name="onboarding_device_android">Android</string>
@@ -19,21 +15,13 @@
     <string name="onboarding_device_wearos">Wear OS</string>
     <string name="onboarding_page3_title">Cho phép cài đặt</string>
     <string name="onboarding_page3_desc">Để cài đặt các gói, ứng dụng cần có quyền cài đặt từ các nguồn không xác định. Nhấn vào nút bên dưới để cấp nó.</string>
-    <string name="onboarding_virustotal_title">Quét trước khi cài</string>
-    <string name="onboarding_virustotal_desc">Kiểm tra gói cài đặt với hơn 70 engine diệt virus ngay trong màn hình cài đặt. Cần API key VirusTotal miễn phí.</string>
     <string name="onboarding_security_normal">Bình thường</string>
     <string name="onboarding_security_strict">Nghiêm ngặt</string>
     <string name="onboarding_security_normal_sub">Cài đặt vẫn là nút chính. Quét khi nào bạn muốn.</string>
     <string name="onboarding_security_strict_sub">Quét trở thành nút chính, và cài file chưa quét sẽ phải xác nhận.</string>
     <string name="onboarding_virustotal_get_key">Lấy API key miễn phí</string>
-    <string name="onboarding_virustotal_key_label">API key VirusTotal</string>
-    <string name="onboarding_virustotal_paste">Dán từ clipboard</string>
-    <string name="onboarding_virustotal_key_hint">Không bắt buộc — bạn có thể thêm sau trong Cài đặt.</string>
     <string name="onboarding_virustotal_key_saved">Đã lưu. Có thể quét ngay.</string>
     <string name="onboarding_virustotal_key_malformed">Key dài 64 ký tự — kiểm tra lại phần đã dán.</string>
-    <string name="onboarding_xiaomi_title">Nếu cài đặt thất bại trên MIUI</string>
-    <string name="onboarding_xiaomi_desc">Tối ưu hóa MIUI/HyperOS có thể chặn cài đặt từ bên thứ ba mà không báo lý do. Nếu gặp trường hợp đó, hãy mở Tùy chọn nhà phát triển, tắt \"Tối ưu hóa MIUI\", cài đặt ứng dụng rồi bật lại. Khi đang tắt, giao diện hệ thống có thể bị lỗi hiển thị — khởi động lại điện thoại sẽ khắc phục.</string>
-    <string name="onboarding_xiaomi_open_developer_options">Mở Tùy chọn nhà phát triển</string>
     <string name="permission_return_channel_name">Quay lại ứng dụng</string>
     <string name="permission_return_channel_desc">Thông báo quay lại ứng dụng sau khi cấp quyền trong cài đặt hệ thống.</string>
     <string name="permission_return_title">Đã cấp quyền</string>
@@ -93,7 +81,6 @@
     <string name="nav_settings">Thiết lập</string>
 
     <!-- Transfer Estimator -->
-    <string name="transfer_speed">%1$s/s</string>
     <string name="transfer_eta_seconds">Còn ~%1$d giây</string>
     <string name="transfer_eta_minutes_seconds">Còn ~%1$d ph %2$d giây</string>
     <string name="transfer_eta_hours_minutes">Còn ~%1$d giờ %2$d ph</string>
@@ -131,16 +118,7 @@
     <string name="onboarding_xiaomi_dev_options_hint">Tùy chọn nhà phát triển chưa được mở khóa. Vui lòng vào Cài đặt &gt; Giới thiệu điện thoại và nhấn 7 lần vào Số hiệu bản dựng.</string>
 
     <!-- VirusTotal Daily Quota & Unlimited Options -->
-    <string name="vt_quota_daily_remaining">Lượt quét miễn phí hôm nay: còn %1$d/%2$d lượt</string>
-    <string name="vt_quota_daily_exhausted">Đã hết lượt miễn phí hôm nay (%1$d/%1$d lượt)</string>
-    <string name="vt_quota_unlimited_custom_key">Không giới hạn (Đang dùng API Key cá nhân)</string>
     <string name="vt_quota_unlimited_pro">Không giới hạn (Đang dùng gói Pro)</string>
-    <string name="vt_unlock_unlimited_header">2 cách mở khóa quét Không giới hạn</string>
-    <string name="vt_unlock_option1_title">1. Dùng API Key cá nhân (Miễn phí 100%)</string>
-    <string name="vt_unlock_option1_desc">Tự tạo tài khoản VirusTotal và dán mã API key 64 ký tự của riêng bạn để quét không giới hạn.</string>
-    <string name="vt_unlock_option2_title">2. Nâng cấp gói Pro (Tự động &amp; Không cần cấu hình)</string>
-    <string name="vt_unlock_option2_desc">Quét tự động ngay lập tức qua hệ thống key tốc độ cao của ứng dụng mà không cần tự tạo API key, kèm mọi quyền lợi Pro.</string>
-    <string name="vt_unlock_pro_badge">PRO</string>
     <string name="vt_unlock_pro_btn">Nâng cấp Pro</string>
     <string name="vt_unlock_pro_coming_soon">Gói Universal Installer Pro sẽ sớm mở bán trên Google Play! Hiện tại bạn có thể nhập API Key VirusTotal cá nhân (miễn phí) để quét không giới hạn ngay lập tức.</string>
 
@@ -150,6 +128,17 @@
     <string name="pro_benefit_vt_title">Tự Động Quét AppShield Tức Thì</string>
     <string name="pro_benefit_recent_apks_title">Cài Nhanh APK Gần Đây 1 Chạm</string>
     <string name="pro_benefit_recent_apks_desc">Tự động hiện các file APK vừa tải ngay trên màn hình Cài đặt để chọn cài tức thì</string>
+    <string name="pro_trial_badge">DÙNG THỬ</string>
+    <string name="pro_trial_days_left">Còn %1$d ngày</string>
+    <string name="pro_trial_day_left">Còn 1 ngày</string>
+    <string name="pro_trial_hours_left">Còn %1$d giờ</string>
+    <string name="pro_trial_less_than_hour">Còn dưới 1 giờ</string>
+    <string name="pro_trial_active_banner">Đang dùng thử Pro · %1$s</string>
+    <string name="pro_plan_lifetime_active">Pro Vĩnh Viễn</string>
+    <string name="pro_plan_yearly_active">Pro Hàng Năm</string>
+    <string name="pro_trial_welcome_title">Chúc mừng! Bạn nhận được dùng thử Pro miễn phí</string>
+    <string name="pro_trial_welcome_desc">Trải nghiệm đầy đủ tính năng Universal Installer Pro (%1$s) — không cần thanh toán.</string>
+    <string name="pro_trial_welcome_cta">Khám phá ngay</string>
     <string name="pro_benefit_vt_desc">Tự động kiểm tra mã độc ngay giây đầu tiên mở file APK — không cần bấm nút, không cần tạo API Key và không giới hạn lượt</string>
     <string name="pro_benefit_priority_title">Soi Quyền Cập Nhật &amp; Cắt Gọn Split APK</string>
     <string name="pro_benefit_priority_desc">Cảnh báo quyền nhạy cảm mới phát sinh khi cài đè, kiểm tra chữ ký gốc và lọc bỏ ngôn ngữ/cấu hình thừa chỉ với 1 chạm</string>
@@ -165,8 +154,6 @@
     <string name="pro_plan_lifetime_tag">Tiết kiệm nhất</string>
     <string name="pro_plan_lifetime_default">79.000 đ</string>
     <string name="pro_plan_lifetime_desc">Thanh toán 1 lần, dùng vĩnh viễn</string>
-    <string name="pro_purchase_success">Cảm ơn bạn đã ủng hộ! Gói Pro đã được kích hoạt thành công.</string>
-    <string name="pro_purchase_failed">Giao dịch bị hủy hoặc không thành công. Vui lòng thử lại.</string>
     <string name="pro_restore_btn">Khôi phục giao dịch</string>
     <string name="pro_restore_success">Đã khôi phục gói Pro thành công!</string>
     <string name="pro_restore_not_found">Không tìm thấy giao dịch Pro nào trên tài khoản Google này.</string>
@@ -179,7 +166,6 @@
     <string name="pro_thank_you_btn">Bắt đầu trải nghiệm</string>
     <string name="pro_issue_canceled_title">Bạn gặp khó khăn khi thanh toán?</string>
     <string name="pro_issue_canceled_desc">Nếu gặp sự cố với Google Play hoặc muốn một giải pháp khác, bạn có thể tham khảo:</string>
-    <string name="pro_issue_action_vt_key">Dùng API Key cá nhân (Miễn phí)</string>
     <string name="pro_issue_action_contact">Liên hệ hỗ trợ (Telegram / Cộng đồng)</string>
     <string name="pro_issue_action_dismiss">Để sau</string>
     <string name="pro_issue_error_title">Lỗi thanh toán</string>
@@ -199,9 +185,4 @@
     <string name="setting_pro_banner_desc_active">Cảm ơn bạn đã đồng hành cùng dự án!</string>
     <string name="setting_pro_banner_badge_active">Đã kích hoạt</string>
     <string name="setting_pro_banner_badge_upgrade">Nâng cấp</string>
-    <string name="setting_virustotal_title">Bảo mật &amp; Quét mã độc (AppShield)</string>
-    <string name="setting_virustotal_desc">Cấu hình quét đám mây AppShield, VirusTotal và ngưỡng an toàn</string>
-    <string name="setting_virustotal_status_enabled">Đang bật</string>
-    <string name="setting_virustotal_status_disabled">Đã tắt</string>
-    <string name="setting_virustotal_status_unlimited">Không giới hạn</string>
 </resources>

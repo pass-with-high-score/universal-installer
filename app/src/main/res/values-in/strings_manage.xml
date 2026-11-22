@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">Copot yang dipilih</string>
     <string name="uninstall_filter_cd">Saring</string>
     <string name="uninstall_logs_cd">Log pencopotan</string>
-    <string name="uninstall_confirm_single_title">Copot %s?</string>
     <string name="uninstall_confirm_single_text">Ini akan menghapus %1$s (%2$s) dari perangkat Anda.</string>
     <string name="batch_install_title">Instalasi massal</string>
     <string name="batch_install_summary">%1$d paket · %2$s dipilih</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">Paket duplikat</string>
     <string name="permissions_title">Izin aplikasi</string>
     <string name="permissions_subtitle">Tinjau izin mana yang aktif dan berikan izin yang Anda butuhkan.</string>
-    <string name="permissions_menu_cd">Tinjau izin</string>
     <string name="permissions_granted">Diberikan</string>
     <string name="permissions_grant">Berikan</string>
     <string name="permissions_open_settings">Buka pengaturan</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Pasang ke Folder Aman</string>
     <string name="manage_action_install_secure_folder_done">Berhasil memasang %s ke Folder Aman</string>
     <string name="manage_action_install_secure_folder_failed">Gagal memasang ke Folder Aman: %s</string>
-    <string name="manage_action_install_secure_folder_already">Terpasang · Ketuk untuk memasang ulang</string>
     <string name="manage_action_add_to_server">Sinkronisasi &amp; Bagikan</string>
     <string name="manage_action_add_to_server_sub">Bagikan di Wi-Fi lokal</string>
     <string name="manage_action_added_to_server">Menambahkan %s ke Sinkronisasi &amp; Bagikan</string>

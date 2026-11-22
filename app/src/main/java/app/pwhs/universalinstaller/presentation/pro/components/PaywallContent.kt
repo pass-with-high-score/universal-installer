@@ -72,6 +72,7 @@ fun PaywallContent(
     onPurchase: () -> Unit,
     onRestore: () -> Unit,
     modifier: Modifier = Modifier,
+    trialExpiresAtMillis: Long? = null,
 ) {
     val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
@@ -125,6 +126,23 @@ fun PaywallContent(
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
         )
+
+        if (trialExpiresAtMillis != null) {
+            Spacer(modifier = Modifier.height(12.dp))
+            val remaining = app.pwhs.universalinstaller.presentation.setting.components.formatTrialRemaining(trialExpiresAtMillis)
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = MaterialTheme.colorScheme.tertiaryContainer,
+            ) {
+                Text(
+                    text = stringResource(R.string.pro_trial_active_banner, remaining),
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(20.dp))
 

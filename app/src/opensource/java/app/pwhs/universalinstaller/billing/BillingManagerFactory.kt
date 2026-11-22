@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import app.pwhs.core.billing.BillingManager
 import app.pwhs.core.billing.BillingPurchaseResult
+import app.pwhs.core.billing.ProEntitlement
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
@@ -22,6 +23,8 @@ fun createBillingManager(context: Context): BillingManager = NoOpBillingManager(
 private class NoOpBillingManager(context: Context) : BillingManager {
     private val _isProUser = MutableStateFlow(false)
     override val isProUser: StateFlow<Boolean> = _isProUser.asStateFlow()
+    private val _proEntitlement = MutableStateFlow<ProEntitlement>(ProEntitlement.Free)
+    override val proEntitlement: StateFlow<ProEntitlement> = _proEntitlement.asStateFlow()
     override val yearlyPrice: StateFlow<String?> = MutableStateFlow(null)
     override val lifetimePrice: StateFlow<String?> = MutableStateFlow(null)
     override val isAvailable: Boolean = false
@@ -30,8 +33,14 @@ private class NoOpBillingManager(context: Context) : BillingManager {
         CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
             context.dataStore.data.collectLatest { prefs ->
                 val isPurchasedPro = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+                val planType = ProProductType.entries.find { it.name == prefs[SharedPrefsKeys.PRO_PLAN_TYPE] }
                 val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
                 val isTrial = trialExp > VirusTotalQuotaStore.currentTrueTimeMillis()
+                _proEntitlement.value = when {
+                    isPurchasedPro -> ProEntitlement.Purchased(planType)
+                    isTrial -> ProEntitlement.Trial(trialExp)
+                    else -> ProEntitlement.Free
+                }
                 _isProUser.value = isPurchasedPro || isTrial
             }
         }

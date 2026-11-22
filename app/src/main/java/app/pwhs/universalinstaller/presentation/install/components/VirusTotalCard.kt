@@ -62,42 +62,50 @@ fun VirusTotalCard(
     val isPro = quota.isProUser
     val extendedColors = LocalExtendedColors.current
     val status = vt?.status
+    val isPrecheckClean = status == VtStatus.CLEAN && vt.isPrecheckOnly
+    val isTooLargeForDeepScan = fileSizeBytes > app.pwhs.core.domain.scanner.impl.VirusDetecScanner.MAX_FILE_SIZE_BYTES
     val inProgress = status == VtStatus.SCANNING ||
         status == VtStatus.UPLOADING ||
         status == VtStatus.QUEUED ||
         status == VtStatus.ANALYZING
-    val hasResult = status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS)
+    val hasResult = status in setOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS) && !isPrecheckClean
     val needsQuotaOrKeyResolution = status in setOf(
         VtStatus.RATE_LIMITED,
         VtStatus.NO_API_KEY,
         VtStatus.INVALID_API_KEY,
     ) || (!quota.isUnlimited && quota.remainingToday == 0 && !hasResult && !inProgress)
-    val vtColor = when (status) {
-        VtStatus.CLEAN -> MaterialTheme.colorScheme.primary
-        VtStatus.MALICIOUS, VtStatus.ERROR -> MaterialTheme.colorScheme.error
-        VtStatus.SUSPICIOUS, VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY,
-        VtStatus.RATE_LIMITED, VtStatus.TOO_LARGE -> extendedColors.warning
+    val vtColor = when {
+        isPrecheckClean && isTooLargeForDeepScan -> extendedColors.warning
+        isPrecheckClean -> MaterialTheme.colorScheme.onSurfaceVariant
+        status == VtStatus.CLEAN -> MaterialTheme.colorScheme.primary
+        status == VtStatus.MALICIOUS || status == VtStatus.ERROR -> MaterialTheme.colorScheme.error
+        status in setOf(
+            VtStatus.SUSPICIOUS, VtStatus.NO_API_KEY, VtStatus.INVALID_API_KEY,
+            VtStatus.RATE_LIMITED, VtStatus.TOO_LARGE,
+        ) -> extendedColors.warning
         else -> MaterialTheme.colorScheme.onSurfaceVariant
     }
-    val vtDesc = when (status) {
-        VtStatus.CLEAN -> stringResource(R.string.apk_info_vt_clean)
-        VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vt?.malicious ?: 0)
-        VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vt?.suspicious ?: 0)
-        VtStatus.NOT_FOUND -> stringResource(R.string.apk_info_vt_desc_not_found)
-        VtStatus.NO_API_KEY -> stringResource(R.string.apk_info_vt_desc_no_api_key)
-        VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_desc_invalid_key)
-        VtStatus.RATE_LIMITED -> vt?.errorMessage?.takeIf { it.isNotBlank() }
+    val vtDesc = when {
+        isPrecheckClean && isTooLargeForDeepScan -> stringResource(R.string.apk_info_vt_precheck_too_large)
+        isPrecheckClean -> stringResource(R.string.apk_info_vt_precheck_clean)
+        status == VtStatus.CLEAN -> stringResource(R.string.apk_info_vt_clean)
+        status == VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vt?.malicious ?: 0)
+        status == VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vt?.suspicious ?: 0)
+        status == VtStatus.NOT_FOUND -> stringResource(R.string.apk_info_vt_desc_not_found)
+        status == VtStatus.NO_API_KEY -> stringResource(R.string.apk_info_vt_desc_no_api_key)
+        status == VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_desc_invalid_key)
+        status == VtStatus.RATE_LIMITED -> vt?.errorMessage?.takeIf { it.isNotBlank() }
             ?: stringResource(R.string.apk_info_vt_desc_rate_limited_default)
-        VtStatus.ERROR -> if (vt?.errorMessage.isNullOrBlank()) {
+        status == VtStatus.ERROR -> if (vt?.errorMessage.isNullOrBlank()) {
             stringResource(R.string.apk_info_vt_desc_error_default)
         } else {
             vt.errorMessage
         }
-        VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt?.errorMessage.orEmpty())
-        VtStatus.SCANNING -> stringResource(R.string.apk_info_vt_desc_scanning)
-        VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_desc_uploading, vt?.uploadProgress ?: 0)
-        VtStatus.QUEUED -> stringResource(R.string.apk_info_vt_desc_queued)
-        VtStatus.ANALYZING -> stringResource(R.string.apk_info_vt_desc_analyzing)
+        status == VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt?.errorMessage.orEmpty())
+        status == VtStatus.SCANNING -> stringResource(R.string.apk_info_vt_desc_scanning)
+        status == VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_desc_uploading, vt?.uploadProgress ?: 0)
+        status == VtStatus.QUEUED -> stringResource(R.string.apk_info_vt_desc_queued)
+        status == VtStatus.ANALYZING -> stringResource(R.string.apk_info_vt_desc_analyzing)
         else -> null
     }
     val isAlarming = status == VtStatus.MALICIOUS
@@ -117,10 +125,11 @@ fun VirusTotalCard(
         Column(modifier = Modifier.padding(16.dp).animateContentSize()) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
-                    imageVector = when (status) {
-                        VtStatus.CLEAN -> Icons.Rounded.GppGood
-                        VtStatus.MALICIOUS -> Icons.Rounded.Dangerous
-                        VtStatus.SUSPICIOUS -> Icons.Rounded.Warning
+                    imageVector = when {
+                        isPrecheckClean -> Icons.Rounded.Security
+                        status == VtStatus.CLEAN -> Icons.Rounded.GppGood
+                        status == VtStatus.MALICIOUS -> Icons.Rounded.Dangerous
+                        status == VtStatus.SUSPICIOUS -> Icons.Rounded.Warning
                         else -> Icons.Rounded.Security
                     },
                     contentDescription = null,
@@ -230,7 +239,7 @@ fun VirusTotalCard(
                         )
                     }
                 }
-            } else if (status == VtStatus.NOT_FOUND) {
+            } else if (status == VtStatus.NOT_FOUND || (isPrecheckClean && !isTooLargeForDeepScan)) {
                 Spacer(Modifier.height(8.dp))
                 FilledTonalButton(
                     onClick = onCheck,
@@ -244,7 +253,10 @@ fun VirusTotalCard(
                     )
                     Spacer(Modifier.width(6.dp))
                     Text(
-                        text = stringResource(R.string.apk_info_vt_btn_upload_and_scan),
+                        text = stringResource(
+                            if (isPrecheckClean) R.string.apk_info_vt_btn_deep_scan
+                            else R.string.apk_info_vt_btn_upload_and_scan
+                        ),
                         style = MaterialTheme.typography.labelMedium,
                     )
                 }

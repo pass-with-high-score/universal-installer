@@ -3,15 +3,11 @@
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_next">Next</string>
     <string name="onboarding_get_started">Get Started</string>
-    <string name="onboarding_restore_title">Restore your data</string>
-    <string name="onboarding_restore_desc">Switching from another device or Obtainium? You can restore your settings, tracked applications, and API tokens right now.</string>
     <string name="onboarding_restore_action">Restore from Backup</string>
     <string name="onboarding_permission_granted">Permission granted</string>
     <string name="onboarding_grant_permission">Grant Permission</string>
     <string name="onboarding_page1_title">Install Any Package</string>
     <string name="onboarding_page1_desc">Support for APK, APKS, XAPK, and APKM formats. Install split APKs with ease.</string>
-    <string name="onboarding_page2_title">Manage Your Apps</string>
-    <string name="onboarding_page2_desc">Browse installed apps, uninstall unwanted ones, and manage your device effortlessly.</string>
     <string name="onboarding_devices_title">Support Multiple Devices</string>
     <string name="onboarding_devices_desc">Seamlessly install and manage applications across Android phones, Android TV, Android Auto, and Wear OS smartwatches.</string>
     <string name="onboarding_device_android">Android</string>
@@ -20,21 +16,13 @@
     <string name="onboarding_device_wearos">Wear OS</string>
     <string name="onboarding_page3_title">Allow Installation</string>
     <string name="onboarding_page3_desc">To install packages, the app needs permission to install from unknown sources. Tap the button below to grant it.</string>
-    <string name="onboarding_virustotal_title">Scan before you install</string>
-    <string name="onboarding_virustotal_desc">Check any package against 70+ antivirus engines from the install screen. Needs a free VirusTotal API key.</string>
     <string name="onboarding_security_normal">Normal</string>
     <string name="onboarding_security_strict">Strict</string>
     <string name="onboarding_security_normal_sub">Install stays the main button. Scan whenever you want it.</string>
     <string name="onboarding_security_strict_sub">Scan becomes the main button, and installing unscanned files asks first.</string>
     <string name="onboarding_virustotal_get_key">Get a free API key</string>
-    <string name="onboarding_virustotal_key_label">VirusTotal API key</string>
-    <string name="onboarding_virustotal_paste">Paste from clipboard</string>
-    <string name="onboarding_virustotal_key_hint">Optional — you can add this later in Settings.</string>
     <string name="onboarding_virustotal_key_saved">Saved. Scanning is ready.</string>
     <string name="onboarding_virustotal_key_malformed">A key is 64 characters — check the paste.</string>
-    <string name="onboarding_xiaomi_title">If an install fails on MIUI</string>
-    <string name="onboarding_xiaomi_desc">MIUI/HyperOS optimization can block third-party installs without saying why. If that happens, open Developer options, turn off \"MIUI optimization\", install the app, then turn it back on. While it is off the system theme may look distorted — restarting the phone fixes that.</string>
-    <string name="onboarding_xiaomi_open_developer_options">Open Developer options</string>
 
     <!-- Permission Monitor Shared -->
     <string name="permission_return_channel_name">Return to app</string>
@@ -122,7 +110,6 @@
     <string name="nav_settings">Settings</string>
 
     <!-- Transfer Estimator -->
-    <string name="transfer_speed">%1$s/s</string>
     <string name="transfer_eta_seconds">~%1$d s left</string>
     <string name="transfer_eta_minutes_seconds">~%1$d m %2$d s left</string>
     <string name="transfer_eta_hours_minutes">~%1$d h %2$d m left</string>
@@ -135,16 +122,7 @@
     <string name="onboarding_xiaomi_dev_options_hint">Developer options not unlocked. Please open Settings &gt; About phone, and tap Build number 7 times.</string>
 
     <!-- VirusTotal Daily Quota & Unlimited Options -->
-    <string name="vt_quota_daily_remaining">Free daily scans: %1$d/%2$d left today</string>
-    <string name="vt_quota_daily_exhausted">Daily free limit reached (%1$d/%1$d used today)</string>
-    <string name="vt_quota_unlimited_custom_key">Unlimited (Personal API Key active)</string>
     <string name="vt_quota_unlimited_pro">Unlimited (Universal Installer Pro active)</string>
-    <string name="vt_unlock_unlimited_header">2 Ways to Unlock Unlimited Scans</string>
-    <string name="vt_unlock_option1_title">1. Use Your Own API Key (Free)</string>
-    <string name="vt_unlock_option1_desc">Sign up on VirusTotal and paste your personal 64-character API key for unlimited free checks.</string>
-    <string name="vt_unlock_option2_title">2. Upgrade to Pro (Zero-Config Unlimited)</string>
-    <string name="vt_unlock_option2_desc">Instant automatic cloud scanning with no API key setup required, plus all Pro supporter perks.</string>
-    <string name="vt_unlock_pro_badge">PRO</string>
     <string name="vt_unlock_pro_btn">Upgrade to Pro</string>
     <string name="vt_unlock_pro_coming_soon">Universal Installer Pro billing will be available soon! You can enter a free personal VirusTotal API key right now for unlimited scans.</string>
 
@@ -154,6 +132,17 @@
     <string name="pro_benefit_vt_title">Zero-Click Auto AppShield Scan</string>
     <string name="pro_benefit_recent_apks_title">1-Tap Recent APKs</string>
     <string name="pro_benefit_recent_apks_desc">Quickly see and install newly downloaded APK files right on the Install screen</string>
+    <string name="pro_trial_badge">TRIAL</string>
+    <string name="pro_trial_days_left">%1$d days left</string>
+    <string name="pro_trial_day_left">1 day left</string>
+    <string name="pro_trial_hours_left">%1$d hours left</string>
+    <string name="pro_trial_less_than_hour">&lt; 1 hour left</string>
+    <string name="pro_trial_active_banner">Pro Trial active · %1$s</string>
+    <string name="pro_plan_lifetime_active">Lifetime Pro</string>
+    <string name="pro_plan_yearly_active">Yearly Pro</string>
+    <string name="pro_trial_welcome_title">You unlocked a Free Pro Trial!</string>
+    <string name="pro_trial_welcome_desc">Enjoy full Universal Installer Pro access (%1$s) — no payment required.</string>
+    <string name="pro_trial_welcome_cta">Start exploring</string>
     <string name="pro_benefit_vt_desc">Automatically checks APK safety the instant you open a file — no button tap, no API key setup, and no daily limit</string>
     <string name="pro_benefit_priority_title">Update Diff &amp; Smart Split Debloater</string>
     <string name="pro_benefit_priority_desc">Inspect newly added permissions &amp; signature match on updates, and strip unused split APK languages/ABIs in 1 tap</string>
@@ -169,8 +158,6 @@
     <string name="pro_plan_lifetime_tag">Best Value</string>
     <string name="pro_plan_lifetime_default">$4.99</string>
     <string name="pro_plan_lifetime_desc">Pay once, unlock forever</string>
-    <string name="pro_purchase_success">Thank you for supporting! Universal Installer Pro is now active.</string>
-    <string name="pro_purchase_failed">Purchase cancelled or failed. Please try again.</string>
     <string name="pro_restore_btn">Restore Purchases</string>
     <string name="pro_restore_success">Universal Installer Pro restored successfully!</string>
     <string name="pro_restore_not_found">No active Pro purchase found for this Google account.</string>
@@ -183,7 +170,6 @@
     <string name="pro_thank_you_btn">Explore Pro Features</string>
     <string name="pro_issue_canceled_title">Need help with checkout?</string>
     <string name="pro_issue_canceled_desc">If you encountered an issue on Google Play or prefer another option, here is what you can do:</string>
-    <string name="pro_issue_action_vt_key">Use Free Personal API Key</string>
     <string name="pro_issue_action_contact">Contact Support (Telegram / Community)</string>
     <string name="pro_issue_action_dismiss">Maybe Later</string>
     <string name="pro_issue_error_title">Payment Error</string>
@@ -203,9 +189,4 @@
     <string name="setting_pro_banner_desc_active">Thank you for supporting our project!</string>
     <string name="setting_pro_banner_badge_active">Active</string>
     <string name="setting_pro_banner_badge_upgrade">Upgrade</string>
-    <string name="setting_virustotal_title">AppShield Security Scan</string>
-    <string name="setting_virustotal_desc">Configure AppShield &amp; VirusTotal scanners and safety thresholds</string>
-    <string name="setting_virustotal_status_enabled">Active</string>
-    <string name="setting_virustotal_status_disabled">Disabled</string>
-    <string name="setting_virustotal_status_unlimited">Unlimited</string>
 </resources>

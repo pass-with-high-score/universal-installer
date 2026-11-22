@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="txt_setting">Settings</string>
     <string name="setting_external_open_title">When another app opens an APK</string>
     <string name="setting_external_open_dialog">Ask on screen</string>
     <string name="setting_external_open_dialog_sub">Show the install card over the app you opened it from.</string>
@@ -45,7 +44,6 @@
     <string name="setting_install_mode_default">Default</string>
     <string name="setting_install_mode_shizuku">Shizuku</string>
     <string name="setting_install_mode_dhizuku" translatable="false">Dhizuku</string>
-    <string name="setting_install_mode_shizuku_dhizuku" translatable="false">Shizuku + Dhizuku</string>
     <string name="setting_use_dhizuku_title">Use Dhizuku instead</string>
     <string name="setting_dhizuku_unsupported">Dhizuku needs Android 8.0 or newer</string>
     <string name="setting_dhizuku_not_installed">Dhizuku is not installed on this device</string>
@@ -54,10 +52,6 @@
     <string name="setting_dhizuku_profile_owner_unsupported">Dhizuku is set as Profile Owner. Silent install requires Device Owner.</string>
     <string name="setting_dhizuku_denied">Dhizuku denied the permission request</string>
     <string name="setting_dhizuku_ready">Ready — installs run silently. Note Dhizuku only supports \&quot;Allow downgrade\&quot;; the other install options apply to Shizuku and Root only.</string>
-    <string name="setting_shizuku_dhizuku_not_running">Neither Shizuku nor Dhizuku is running</string>
-    <string name="setting_shizuku_dhizuku_ready">Ready — Shizuku active with Dhizuku fallback</string>
-    <string name="setting_shizuku_dhizuku_ready_dhizuku_active">Shizuku not running — using Dhizuku fallback</string>
-    <string name="setting_shizuku_dhizuku_no_permission">Tap to grant permissions for Shizuku and Dhizuku</string>
     <string name="setting_install_mode_root">Root</string>
     <string name="setting_install_mode_custom">Custom</string>
     <string name="setting_install_mode_default_sub">Android\'s own installer — it asks you to confirm each app</string>
@@ -355,10 +349,7 @@
     <string name="setting_analytics_title">Share usage data</string>
     <string name="setting_analytics_subtitle">Reports which install method was used and whether it worked, plus crash reports. Never the packages you install.</string>
     <string name="setting_section_advanced">Advanced</string>
-    <string name="setting_vt_api_key_title">VirusTotal API Key</string>
     <string name="setting_vt_api_key_placeholder">Paste API key here…</string>
-    <string name="setting_vt_disable_title">Disable VirusTotal</string>
-    <string name="setting_vt_disable_desc">Turns off every VirusTotal feature: no scans are run, nothing is uploaded, and all VirusTotal UI is hidden.</string>
     <string name="setting_security_level_title">Security level</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Strict</string>

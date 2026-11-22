@@ -84,7 +84,6 @@
     <string name="batch_install_merged_splits">Συγχωνεύτηκαν</string>
     <string name="permissions_title">Άδειες εφαρμογής</string>
     <string name="permissions_subtitle">Ελέγξτε ποιες άδειες είναι ενεργές και χορηγήστε αυτές που χρειάζεστε.</string>
-    <string name="permissions_menu_cd">Έλεγχος αδειών</string>
     <string name="permissions_granted">Χορηγήθηκαν</string>
     <string name="permissions_grant">Χορήγηση</string>
     <string name="permissions_open_settings">Άνοιγμα ρυθμίσεων</string>
@@ -109,7 +108,6 @@
     <string name="uninstall_selected_action">Απεγκατάσταση επιλεγμένων</string>
     <string name="uninstall_filter_cd">Φίλτρο</string>
     <string name="uninstall_logs_cd">Αρχεία καταγραφής απεγκατάστασης</string>
-    <string name="uninstall_confirm_single_title">Απεγκατάσταση %s;</string>
     <string name="uninstall_confirm_single_text">Αυτό θα καταργήσει το %1$s (%2$s) από τη συσκευή σας.</string>
     <string name="uninstall_system_badge">Εφαρμογή συστήματος</string>
     <string name="uninstall_system_dialog_title_single">Κατάργηση εφαρμογής συστήματος;</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Εγκατάσταση στον Ασφαλή Φάκελο</string>
     <string name="manage_action_install_secure_folder_done">Εγκαταστάθηκε το %s στον Ασφαλή Φάκελο</string>
     <string name="manage_action_install_secure_folder_failed">Αποτυχία εγκατάστασης στον Ασφαλή Φάκελο: %s</string>
-    <string name="manage_action_install_secure_folder_already">Εγκατεστημένο · Πατήστε για επανεγκατάσταση</string>
     <string name="manage_action_add_to_server">Συγχρονισμός &amp; Κοινή χρήση</string>
     <string name="manage_action_add_to_server_sub">Κοινή χρήση στο τοπικό Wi-Fi</string>
     <string name="manage_action_added_to_server">Προστέθηκε το %s στον Συγχρονισμό &amp; Κοινή χρήση</string>

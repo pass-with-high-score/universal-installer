@@ -99,7 +99,6 @@
     <string name="batch_install_merged_splits">মার্জ করা</string>
     <string name="permissions_title">অ্যাপের অনুমতিসমূহ</string>
     <string name="permissions_subtitle">কোন অনুমতিগুলো সক্রিয় রয়েছে তা পর্যালোচনা করুন এবং আপনার প্রয়োজনীয় অনুমতি মঞ্জুর করুন।</string>
-    <string name="permissions_menu_cd">অনুমতি পর্যালোচনা করুন</string>
     <string name="permissions_granted">অনুমোদিত</string>
     <string name="permissions_grant">মঞ্জুর করুন</string>
     <string name="permissions_open_settings">সেটিংস খুলুন</string>
@@ -127,7 +126,6 @@
     <string name="uninstall_selected_action">নির্বাচিতগুলো আনইনস্টল করুন</string>
     <string name="uninstall_filter_cd">ফিল্টার</string>
     <string name="uninstall_logs_cd">আনইনস্টল লগ</string>
-    <string name="uninstall_confirm_single_title">%s আনইনস্টল করবেন?</string>
     <string name="uninstall_confirm_single_text">এটি আপনার ডিভাইস থেকে %1$s (%2$s) সরিয়ে ফেলবে।</string>
     <string name="uninstall_system_badge">সিস্টেম অ্যাপ</string>
     <string name="uninstall_system_dialog_title_single">সিস্টেম অ্যাপ সরাবেন?</string>
@@ -194,7 +192,6 @@
     <string name="manage_action_install_secure_folder">সিকিউর ফোল্ডারে ইনস্টল করুন</string>
     <string name="manage_action_install_secure_folder_done">সিকিউর ফোল্ডারে %s ইনস্টল করা হয়েছে</string>
     <string name="manage_action_install_secure_folder_failed">সিকিউর ফোল্ডারে ইনস্টল করতে ব্যর্থ: %s</string>
-    <string name="manage_action_install_secure_folder_already">ইনস্টল করা আছে · পুনরায় ইনস্টল করতে আলতো চাপুন</string>
     <string name="manage_action_add_to_server">সিঙ্ক ও শেয়ার</string>
     <string name="manage_action_add_to_server_sub">স্থানীয় ওয়াই-ফাইতে শেয়ার করুন</string>
     <string name="manage_action_added_to_server">সিঙ্ক ও শেয়ারে %s যোগ করা হয়েছে</string>

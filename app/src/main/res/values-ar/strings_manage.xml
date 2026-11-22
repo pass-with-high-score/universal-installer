@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">إلغاء تثبيت المحدد</string>
     <string name="uninstall_filter_cd">تصفية</string>
     <string name="uninstall_logs_cd">سجلات إلغاء التثبيت</string>
-    <string name="uninstall_confirm_single_title">إلغاء تثبيت %s؟</string>
     <string name="uninstall_confirm_single_text">سيؤدي هذا إلى إزالة %1$s (%2$s) من جهازك.</string>
     <string name="batch_install_title">تثبيت دفعي</string>
     <string name="batch_install_summary">%1$d حزمة · تم تحديد %2$s</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">حزمة مكررة</string>
     <string name="permissions_title">أذونات التطبيق</string>
     <string name="permissions_subtitle">راجع الأذونات النشطة وامنح الأذونات التي تحتاجها.</string>
-    <string name="permissions_menu_cd">مراجعة الأذونات</string>
     <string name="permissions_granted">تم المنح</string>
     <string name="permissions_grant">منح</string>
     <string name="permissions_open_settings">فتح الإعدادات</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">تثبيت في المجلد الآمن</string>
     <string name="manage_action_install_secure_folder_done">تم تثبيت %s في المجلد الآمن</string>
     <string name="manage_action_install_secure_folder_failed">فشل التثبيت في المجلد الآمن: %s</string>
-    <string name="manage_action_install_secure_folder_already">مثبت · اضغط لإعادة التثبيت</string>
     <string name="manage_action_add_to_server">المزامنة والمشاركة</string>
     <string name="manage_action_add_to_server_sub">المشاركة عبر شبكة Wi-Fi المحلية</string>
     <string name="manage_action_added_to_server">تمت إضافة %s إلى المزامنة والمشاركة</string>

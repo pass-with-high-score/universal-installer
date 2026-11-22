@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import app.pwhs.core.billing.BillingManager
 import app.pwhs.core.billing.BillingPurchaseResult
+import app.pwhs.core.billing.ProEntitlement
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
@@ -43,6 +44,9 @@ private class PlayBillingManager(
     private val _isProUser = MutableStateFlow(false)
     override val isProUser: StateFlow<Boolean> = _isProUser.asStateFlow()
 
+    private val _proEntitlement = MutableStateFlow<ProEntitlement>(ProEntitlement.Free)
+    override val proEntitlement: StateFlow<ProEntitlement> = _proEntitlement.asStateFlow()
+
     private val _yearlyPrice = MutableStateFlow<String?>(null)
     override val yearlyPrice: StateFlow<String?> = _yearlyPrice.asStateFlow()
 
@@ -69,8 +73,15 @@ private class PlayBillingManager(
         scope.launch {
             context.dataStore.data.collectLatest { prefs ->
                 val isPurchasedPro = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
+                val planName = prefs[SharedPrefsKeys.PRO_PLAN_TYPE]
+                val planType = ProProductType.entries.find { it.name == planName }
                 val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
                 val isTrial = trialExp > VirusTotalQuotaStore.currentTrueTimeMillis()
+                _proEntitlement.value = when {
+                    isPurchasedPro -> ProEntitlement.Purchased(planType)
+                    isTrial -> ProEntitlement.Trial(trialExp)
+                    else -> ProEntitlement.Free
+                }
                 _isProUser.value = isPurchasedPro || isTrial
             }
         }
@@ -205,14 +216,20 @@ private class PlayBillingManager(
                     }
                 }
 
+                val detectedPlan = when {
+                    hasValidInApp -> ProProductType.LIFETIME
+                    hasValidSub -> ProProductType.YEARLY
+                    else -> null
+                }
+
                 if (subsOk && inAppOk) {
                     val isPro = hasValidSub || hasValidInApp
                     Timber.d("PlayBillingManager: queryPurchases result isPro=$isPro (subs=$hasValidSub, inApp=$hasValidInApp)")
-                    updateProStatus(isPro)
+                    updateProStatus(isPro, detectedPlan)
                     deliver(isPro)
                 } else if (hasValidSub || hasValidInApp) {
                     Timber.d("PlayBillingManager: Found valid purchase despite partial query failure (subs=$hasValidSub, inApp=$hasValidInApp)")
-                    updateProStatus(true)
+                    updateProStatus(true, detectedPlan)
                     deliver(true)
                 } else {
                     Timber.w("PlayBillingManager: Failed to query purchases (subs=${subsResult.responseCode}, inApp=${inAppResult.responseCode})")
@@ -354,12 +371,16 @@ private class PlayBillingManager(
         }
     }
 
-    private fun updateProStatus(isPro: Boolean) {
+    private fun updateProStatus(isPro: Boolean, planType: ProProductType? = null) {
         scope.launch {
             context.dataStore.edit { prefs ->
                 prefs[SharedPrefsKeys.IS_PRO_USER] = isPro
+                if (isPro && planType != null) {
+                    prefs[SharedPrefsKeys.PRO_PLAN_TYPE] = planType.name
+                } else if (!isPro) {
+                    prefs.remove(SharedPrefsKeys.PRO_PLAN_TYPE)
+                }
             }
-            _isProUser.value = isPro
             app.pwhs.core.telemetry.AnalyticsHelper.updateIsProUser(isPro)
             if (isPro) {
                 UserStatsTracker.recordProStatusChanged(context)

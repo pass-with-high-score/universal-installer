@@ -120,6 +120,44 @@ fun VirusTotalInstallPrompt(
                 }
             }
 
+            currentStatus == VtStatus.CLEAN && vt != null && vt.isPrecheckOnly -> {
+                val isTooLarge = apkInfo.fileSizeBytes > app.pwhs.core.domain.scanner.impl.VirusDetecScanner.MAX_FILE_SIZE_BYTES
+                val chipColor = if (isTooLarge) extendedColors.warning else MaterialTheme.colorScheme.onSurfaceVariant
+                val chipBg = if (isTooLarge) extendedColors.warning.copy(alpha = 0.12f)
+                else MaterialTheme.colorScheme.surfaceContainerHighest
+                val label = stringResource(
+                    if (isTooLarge) R.string.apk_info_vt_chip_precheck_too_large
+                    else R.string.apk_info_vt_chip_precheck
+                )
+                Row(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .clickable {
+                            if (isTooLarge) showDetailSheet = true else onScan()
+                        }
+                        .background(chipBg)
+                        .border(
+                            BorderStroke(0.5.dp, chipColor.copy(alpha = 0.35f)),
+                            RoundedCornerShape(50),
+                        )
+                        .padding(horizontal = 10.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Security,
+                        contentDescription = null,
+                        tint = chipColor,
+                        modifier = Modifier.size(14.dp),
+                    )
+                    Spacer(Modifier.width(6.dp))
+                    Text(
+                        text = label,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = chipColor,
+                    )
+                }
+            }
+
             currentStatus == VtStatus.CLEAN && vt != null -> {
                 val totalEngines = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
                 val tallySuffix = if (totalEngines > 0) " (0/$totalEngines)" else ""

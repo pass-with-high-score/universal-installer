@@ -84,7 +84,6 @@
     <string name="batch_install_merged_splits">Об\'єднано</string>
     <string name="permissions_title">Дозволи додатка</string>
     <string name="permissions_subtitle">Перевірте, які дозволи активні, та надайте ті, що потрібні.</string>
-    <string name="permissions_menu_cd">Перегляд дозволів</string>
     <string name="permissions_granted">Надано</string>
     <string name="permissions_grant">Надати</string>
     <string name="permissions_open_settings">Відкрити налаштування</string>
@@ -109,7 +108,6 @@
     <string name="uninstall_selected_action">Видалити вибране</string>
     <string name="uninstall_filter_cd">Фільтр</string>
     <string name="uninstall_logs_cd">Журнали видалення</string>
-    <string name="uninstall_confirm_single_title">Видалити %s?</string>
     <string name="uninstall_confirm_single_text">Це видалить %1$s (%2$s) з вашого пристрою.</string>
     <string name="uninstall_system_badge">Системний додаток</string>
     <string name="uninstall_system_dialog_title_single">Видалити системний додаток?</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Встановити в Захищену папку</string>
     <string name="manage_action_install_secure_folder_done">%s встановлено в Захищену папку</string>
     <string name="manage_action_install_secure_folder_failed">Помилка встановлення в Захищену папку: %s</string>
-    <string name="manage_action_install_secure_folder_already">Встановлено · Натисніть для повторного встановлення</string>
     <string name="manage_action_add_to_server">Синхронізація та обмін</string>
     <string name="manage_action_add_to_server_sub">Поділитися через локальний Wi-Fi</string>
     <string name="manage_action_added_to_server">%s додано до Синхронізації та обміну</string>

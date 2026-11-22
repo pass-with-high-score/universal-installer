@@ -77,12 +77,14 @@ object SharedPrefsKeys {
 
     /** Whether the user has unlocked Universal Installer Pro (unlimited built-in VirusTotal). */
     val IS_PRO_USER = booleanPreferencesKey("is_pro_user")
+    val PRO_PLAN_TYPE = stringPreferencesKey("pro_plan_type")
 
     /** Whether the 3-day new user Pro trial has already been claimed on this device. */
     val NEW_USER_TRIAL_CLAIMED = booleanPreferencesKey("new_user_trial_claimed")
 
     /** Timestamp in ms when temporary Pro trial expires. 0 or absent if no trial active. */
     val PRO_TRIAL_EXPIRATION_TIMESTAMP = longPreferencesKey("pro_trial_expiration_timestamp")
+    val PRO_TRIAL_WELCOME_SHOWN = booleanPreferencesKey("pro_trial_welcome_shown")
 
     /** Set of milestone IDs that have already granted their Pro trial hours. */
     val PRO_TRIAL_CLAIMED_MILESTONES = stringSetPreferencesKey("pro_trial_claimed_milestones")

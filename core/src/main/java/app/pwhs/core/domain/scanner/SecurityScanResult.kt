@@ -92,6 +92,7 @@ data class SecurityScanResult(
     val permalink: String? = null,
     val scannedAtMillis: Long = System.currentTimeMillis(),
     val rawReport: ScanReport? = null,
+    val isPrecheckOnly: Boolean = false,
 )
 
 /**
@@ -104,7 +105,7 @@ data class SecurityScanResult(
 fun SecurityScanResult.toVtResult(): VtResult {
     // 1. If we have a native rawReport (e.g. from VirusDetec), use it directly for exact fidelity
     if (rawReport != null) {
-        val vt = rawReport.toVtResult()
+        val vt = rawReport.toVtResult().copy(isPrecheckOnly = isPrecheckOnly)
         return if (engineDetections.isNotEmpty() && vt.engineResults.isEmpty()) {
             vt.copy(
                 engineResults = engineDetections.map { VtEngineResult(it.engineName, it.category, it.result) }

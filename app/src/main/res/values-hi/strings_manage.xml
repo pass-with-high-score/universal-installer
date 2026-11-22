@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">चयनित अनइंस्टॉल करें</string>
     <string name="uninstall_filter_cd">फ़िल्टर</string>
     <string name="uninstall_logs_cd">अनइंस्टॉल लॉग</string>
-    <string name="uninstall_confirm_single_title">%s अनइंस्टॉल करें?</string>
     <string name="uninstall_confirm_single_text">यह आपके डिवाइस से %1$s (%2$s) को हटा देगा।</string>
     <string name="batch_install_title">बैच इंस्टॉल</string>
     <string name="batch_install_summary">%1$d पैकेज · %2$s चयनित</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">डुप्लिकेट पैकेज</string>
     <string name="permissions_title">ऐप अनुमतियां</string>
     <string name="permissions_subtitle">समीक्षा करें कि कौन सी अनुमतियां सक्रिय हैं और जिनकी आपको आवश्यकता है उन्हें प्रदान करें।</string>
-    <string name="permissions_menu_cd">अनुमतियों की समीक्षा करें</string>
     <string name="permissions_granted">प्रदान की गई</string>
     <string name="permissions_grant">प्रदान करें</string>
     <string name="permissions_open_settings">सेटिंग्स खोलें</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">सिक्योर फ़ोल्डर में इंस्टॉल करें</string>
     <string name="manage_action_install_secure_folder_done">सिक्योर फ़ोल्डर में %s इंस्टॉल किया गया</string>
     <string name="manage_action_install_secure_folder_failed">सिक्योर फ़ोल्डर में इंस्टॉल करने में विफल: %s</string>
-    <string name="manage_action_install_secure_folder_already">इंस्टॉल है · पुनः इंस्टॉल करने के लिए टैप करें</string>
     <string name="manage_action_add_to_server">सिंक और शेयर</string>
     <string name="manage_action_add_to_server_sub">स्थानीय वाई-फ़ाई पर साझा करें</string>
     <string name="manage_action_added_to_server">सिंक और शेयर में %s जोड़ा गया</string>

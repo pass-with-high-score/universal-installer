@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">卸载所选应用</string>
     <string name="uninstall_filter_cd">过滤</string>
     <string name="uninstall_logs_cd">卸载日志</string>
-    <string name="uninstall_confirm_single_title">卸载 %s？</string>
     <string name="uninstall_confirm_single_text">这将从您的设备中移除 %1$s (%2$s)。</string>
     <string name="manage_filter_blocked">已屏蔽</string>
     <string name="manage_blocked_badge">已屏蔽</string>
@@ -42,7 +41,6 @@
     <string name="batch_install_dup_package">重复的包</string>
     <string name="permissions_title">应用权限</string>
     <string name="permissions_subtitle">查看哪些权限处于活动状态，并授予您需要的权限。</string>
-    <string name="permissions_menu_cd">查看权限</string>
     <string name="permissions_granted">已授予</string>
     <string name="permissions_grant">授予</string>
     <string name="permissions_open_settings">打开设置</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">安装到安全文件夹</string>
     <string name="manage_action_install_secure_folder_done">已将 %s 安装到安全文件夹</string>
     <string name="manage_action_install_secure_folder_failed">安装到安全文件夹失败：%s</string>
-    <string name="manage_action_install_secure_folder_already">已安装 · 点击重新安装</string>
     <string name="manage_action_add_to_server">同步与共享</string>
     <string name="manage_action_add_to_server_sub">在局域网 Wi-Fi 上共享</string>
     <string name="manage_action_added_to_server">已将 %s 添加到同步与共享</string>

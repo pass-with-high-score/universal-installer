@@ -70,12 +70,9 @@ import app.pwhs.universalinstaller.R
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-private val QUICK_REASON_RES = listOf(
-    R.string.fp_preset_open_source,
-    R.string.fp_preset_official_site,
-    R.string.fp_preset_safe_mod,
-    R.string.fp_preset_utility_tool,
-)
+private val QUICK_REASON_RES_MALICIOUS = listOf(R.string.fp_preset_open_source, R.string.fp_preset_official_site, R.string.fp_preset_safe_mod, R.string.fp_preset_utility_tool)
+private val QUICK_REASON_RES_SUSPICIOUS = listOf(R.string.fp_preset_normal_permissions, R.string.fp_preset_open_source, R.string.fp_preset_official_site, R.string.fp_preset_safe_mod)
+private val QUICK_REASON_RES_SAFE = listOf(R.string.fn_preset_malware, R.string.fn_preset_adware, R.string.fn_preset_impersonation, R.string.fn_preset_permissions)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,6 +81,9 @@ fun ReportFalsePositiveDialog(
     packageName: String,
     appName: String,
     onDismiss: () -> Unit,
+    isCleanVerdict: Boolean = false,
+    verdictLabel: String? = null,
+    riskScore: Int? = null,
     virusDetecService: VirusDetecService = koinInject(),
 ) {
     val context = LocalContext.current
@@ -144,7 +144,7 @@ fun ReportFalsePositiveDialog(
                 Spacer(Modifier.height(12.dp))
 
                 Text(
-                    text = stringResource(R.string.fp_sheet_title),
+                    text = stringResource(if (isCleanVerdict) R.string.fn_sheet_title else R.string.fp_sheet_title),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface,
@@ -153,7 +153,7 @@ fun ReportFalsePositiveDialog(
                 Spacer(Modifier.height(4.dp))
 
                 Text(
-                    text = stringResource(R.string.fp_sheet_subtitle),
+                    text = stringResource(if (isCleanVerdict) R.string.fn_sheet_subtitle else R.string.fp_sheet_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
@@ -215,6 +215,14 @@ fun ReportFalsePositiveDialog(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
+                            if (!verdictLabel.isNullOrBlank() && riskScore != null) {
+                                Text(
+                                    text = stringResource(R.string.fp_current_verdict_label, verdictLabel, riskScore),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = MaterialTheme.colorScheme.primary,
+                                )
+                            }
                         }
 
                         if (sha256.isNotBlank()) {
@@ -255,13 +263,18 @@ fun ReportFalsePositiveDialog(
                         fontWeight = FontWeight.SemiBold,
                     )
 
+                    val quickReasons = when {
+                        isCleanVerdict -> QUICK_REASON_RES_SAFE
+                        (riskScore ?: 100) < 70 -> QUICK_REASON_RES_SUSPICIOUS
+                        else -> QUICK_REASON_RES_MALICIOUS
+                    }
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .horizontalScroll(rememberScrollState()),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        QUICK_REASON_RES.forEach { resId ->
+                        quickReasons.forEach { resId ->
                             val preset = stringResource(resId)
                             FilterChip(
                                 selected = reason.contains(preset),

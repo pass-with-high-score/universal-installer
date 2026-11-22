@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import app.pwhs.core.R
 import app.pwhs.core.billing.BillingManager
 import app.pwhs.core.billing.BillingPurchaseResult
+import app.pwhs.core.billing.ProEntitlement
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.util.openUriSafely
 import app.pwhs.core.telemetry.AnalyticsHelper
@@ -46,7 +47,7 @@ fun UpgradeProBottomSheet(
     val uriHandler = LocalUriHandler.current
     val activity = context as? Activity
 
-    val isPro by billingManager.isProUser.collectAsState()
+    val proEntitlement by billingManager.proEntitlement.collectAsState()
     val yearlyPrice by billingManager.yearlyPrice.collectAsState()
     val lifetimePrice by billingManager.lifetimePrice.collectAsState()
 
@@ -73,7 +74,7 @@ fun UpgradeProBottomSheet(
         Crossfade(
             targetState = when {
                 justPurchased -> SheetContentState.CELEBRATION
-                isPro -> SheetContentState.ALREADY_PRO
+                proEntitlement is ProEntitlement.Purchased -> SheetContentState.ALREADY_PRO
                 else -> SheetContentState.PAYWALL
             },
             label = "PaywallStateTransition",
@@ -85,6 +86,7 @@ fun UpgradeProBottomSheet(
 
                 SheetContentState.ALREADY_PRO -> {
                     ProSupporterView(
+                        planType = (proEntitlement as? ProEntitlement.Purchased)?.planType,
                         onManageSubscriptions = { uriHandler.openUriSafely(context, GOOGLE_PLAY_SUBS_URL) },
                         onDismiss = onDismissRequest,
                     )
@@ -93,6 +95,7 @@ fun UpgradeProBottomSheet(
                 SheetContentState.PAYWALL -> {
                     PaywallContent(
                         billingManager = billingManager,
+                        trialExpiresAtMillis = (proEntitlement as? ProEntitlement.Trial)?.expiresAtMillis,
                         yearlyPrice = yearlyPrice,
                         lifetimePrice = lifetimePrice,
                         selectedPlan = selectedPlan,

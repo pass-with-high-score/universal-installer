@@ -57,10 +57,16 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
     // 1. VirusTotal
     if (!vtDisabled) item(key = "virustotal") {
         val vtResult = apkInfo.vtResult
+        val isPrecheckClean = vtResult?.status == VtStatus.CLEAN && vtResult.isPrecheckOnly
+        val isTooLarge = apkInfo.fileSizeBytes > app.pwhs.core.domain.scanner.impl.VirusDetecScanner.MAX_FILE_SIZE_BYTES
         val vtErrorMsg = vtResult?.errorMessage?.takeIf { it.isNotBlank() }
         val extendedColors = LocalExtendedColors.current
         val vtDesc = when (vtResult?.status) {
-            VtStatus.CLEAN -> stringResource(R.string.apk_info_vt_clean)
+            VtStatus.CLEAN -> when {
+                isPrecheckClean && isTooLarge -> stringResource(R.string.apk_info_vt_precheck_too_large)
+                isPrecheckClean -> stringResource(R.string.apk_info_vt_precheck_clean)
+                else -> stringResource(R.string.apk_info_vt_clean)
+            }
             VtStatus.MALICIOUS -> stringResource(R.string.apk_info_vt_malicious, vtResult.malicious)
             VtStatus.SUSPICIOUS -> stringResource(R.string.apk_info_vt_suspicious, vtResult.suspicious)
             VtStatus.NOT_FOUND -> stringResource(R.string.apk_info_vt_not_found)
@@ -90,17 +96,21 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             }
             else -> stringResource(R.string.dialog_menu_virustotal_desc)
         }
-        val vtColor = when (vtResult?.status) {
-            VtStatus.CLEAN -> MaterialTheme.colorScheme.tertiary
-            VtStatus.MALICIOUS,
-            VtStatus.ERROR -> MaterialTheme.colorScheme.error
+        val vtColor = when {
+            isPrecheckClean && isTooLarge -> extendedColors.warning
+            isPrecheckClean -> MaterialTheme.colorScheme.onSurfaceVariant
+            vtResult?.status == VtStatus.CLEAN -> MaterialTheme.colorScheme.tertiary
+            vtResult?.status == VtStatus.MALICIOUS ||
+            vtResult?.status == VtStatus.ERROR -> MaterialTheme.colorScheme.error
             // NO_API_KEY / TOO_LARGE / SUSPICIOUS are "needs attention" — amber, not red,
             // and crucially not the neutral grey that made the no-key state invisible.
-            VtStatus.SUSPICIOUS,
-            VtStatus.NO_API_KEY,
-            VtStatus.INVALID_API_KEY,
-            VtStatus.RATE_LIMITED,
-            VtStatus.TOO_LARGE -> extendedColors.warning
+            vtResult?.status in setOf(
+                VtStatus.SUSPICIOUS,
+                VtStatus.NO_API_KEY,
+                VtStatus.INVALID_API_KEY,
+                VtStatus.RATE_LIMITED,
+                VtStatus.TOO_LARGE,
+            ) -> extendedColors.warning
             else -> MaterialTheme.colorScheme.onSurfaceVariant
         }
         val uriHandler = androidx.compose.ui.platform.LocalUriHandler.current
@@ -110,7 +120,7 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             descriptionColor = vtColor,
             icon = {
                 Icon(
-                    imageVector = if (vtResult?.status == VtStatus.CLEAN)
+                    imageVector = if (vtResult?.status == VtStatus.CLEAN && !isPrecheckClean)
                         Icons.Rounded.CheckCircle else Icons.Rounded.Security,
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
@@ -119,6 +129,7 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             },
             onClick = {
                 when {
+                    isPrecheckClean && !isTooLarge -> onCheckVirusTotal()
                     vtResult?.status in listOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS) -> {
                         onOpenDetail?.invoke()
                     }

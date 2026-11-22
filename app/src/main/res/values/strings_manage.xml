@@ -100,7 +100,6 @@
     <string name="batch_install_merged_splits">Merged</string>
     <string name="permissions_title">App permissions</string>
     <string name="permissions_subtitle">Review which permissions are active and grant the ones you need.</string>
-    <string name="permissions_menu_cd">Review permissions</string>
     <string name="permissions_granted">Granted</string>
     <string name="permissions_grant">Grant</string>
     <string name="permissions_open_settings">Open settings</string>
@@ -129,7 +128,6 @@
     <string name="uninstall_selected_action">Uninstall selected</string>
     <string name="uninstall_filter_cd">Filter</string>
     <string name="uninstall_logs_cd">Uninstall logs</string>
-    <string name="uninstall_confirm_single_title">Uninstall %s?</string>
     <string name="uninstall_confirm_single_text">This will remove %1$s (%2$s) from your device.</string>
     <string name="uninstall_system_badge">System app</string>
     <string name="uninstall_system_dialog_title_single">Remove system app?</string>
@@ -172,7 +170,6 @@
     <string name="manage_action_install_secure_folder">Install to Secure Folder</string>
     <string name="manage_action_install_secure_folder_done">Installed %s into Secure Folder</string>
     <string name="manage_action_install_secure_folder_failed">Failed to install into Secure Folder: %s</string>
-    <string name="manage_action_install_secure_folder_already">Installed · Tap to reinstall</string>
     <string name="manage_action_check_vt">Security Scan</string>
     <string name="manage_action_installer_source">Installed by %1$s</string>
     <string name="manage_action_add_to_server">Sync &amp; Share</string>

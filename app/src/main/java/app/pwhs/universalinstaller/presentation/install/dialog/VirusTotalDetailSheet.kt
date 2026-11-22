@@ -416,8 +416,8 @@ fun VirusTotalDetailSheet(
                             .padding(horizontal = 24.dp, vertical = 12.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        // ── False Positive Dispute Button ──
-                        if (apkInfo.sha256.isNotBlank() && (!isClean || vt.report?.verdict == Verdict.RISKWARE)) {
+                        // ── False Verdict Report Button (available for both flagged & clean verdicts) ──
+                        if (apkInfo.sha256.isNotBlank()) {
                             OutlinedButton(
                                 onClick = { showFpDialog = true },
                                 modifier = Modifier.fillMaxWidth(),
@@ -430,7 +430,10 @@ fun VirusTotalDetailSheet(
                                 )
                                 Spacer(Modifier.width(6.dp))
                                 Text(
-                                    text = stringResource(R.string.fp_dispute_button_title),
+                                    text = stringResource(
+                                        if (isClean && vt.report?.verdict != Verdict.RISKWARE) R.string.fn_report_button_title
+                                        else R.string.fp_dispute_button_title
+                                    ),
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis,
                                 )
@@ -456,6 +459,9 @@ fun VirusTotalDetailSheet(
             sha256 = apkInfo.sha256,
             packageName = apkInfo.packageName,
             appName = apkInfo.appName,
+            isCleanVerdict = isClean && vt.report?.verdict != Verdict.RISKWARE,
+            verdictLabel = vt.report?.verdict?.name ?: vt.status.name,
+            riskScore = vt.report?.riskScore,
             onDismiss = { showFpDialog = false },
         )
     }

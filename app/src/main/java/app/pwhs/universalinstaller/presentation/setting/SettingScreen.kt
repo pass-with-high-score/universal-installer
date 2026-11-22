@@ -205,6 +205,7 @@ private fun SettingUi(
     var showManageVisibleTabsSheet by rememberSaveable { mutableStateOf(false) }
     val billingManager: BillingManager = koinInject()
     val isProUser by billingManager.isProUser.collectAsState()
+    val proEntitlement by billingManager.proEntitlement.collectAsState()
 
     LaunchedEffect(Unit) {
         billingManager.startConnection()
@@ -363,6 +364,7 @@ private fun SettingUi(
                 if (matchesQuery(q, proLabels)) item {
                     SettingProBanner(
                         isProUser = isProUser,
+                        proEntitlement = proEntitlement,
                         isBillingAvailable = billingManager.isAvailable,
                         onUpgradeClick = { showUpgradeProSheet = true },
                     )

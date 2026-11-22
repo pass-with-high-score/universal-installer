@@ -91,7 +91,6 @@
     <string name="batch_install_merged_splits">Mesclado</string>
     <string name="permissions_title">Permissões do app</string>
     <string name="permissions_subtitle">Revise quais permissões estão ativas e conceda as que você precisa.</string>
-    <string name="permissions_menu_cd">Revisar permissões</string>
     <string name="permissions_granted">Concedida</string>
     <string name="permissions_grant">Conceder</string>
     <string name="permissions_open_settings">Abrir configurações</string>
@@ -118,7 +117,6 @@
     <string name="uninstall_selected_action">Desinstalar selecionados</string>
     <string name="uninstall_filter_cd">Filtrar</string>
     <string name="uninstall_logs_cd">Logs de desinstalação</string>
-    <string name="uninstall_confirm_single_title">Desinstalar %s?</string>
     <string name="uninstall_confirm_single_text">Isso removerá %1$s (%2$s) do seu dispositivo.</string>
     <string name="uninstall_system_badge">App do sistema</string>
     <string name="uninstall_system_dialog_title_single">Remover app do sistema?</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Instalar na Pasta Segura</string>
     <string name="manage_action_install_secure_folder_done">%s instalado na Pasta Segura</string>
     <string name="manage_action_install_secure_folder_failed">Falha ao instalar na Pasta Segura: %s</string>
-    <string name="manage_action_install_secure_folder_already">Instalado · Toque para reinstalar</string>
     <string name="manage_action_add_to_server">Sincronizar e Compartilhar</string>
     <string name="manage_action_add_to_server_sub">Compartilhar no Wi-Fi local</string>
     <string name="manage_action_added_to_server">%s adicionado ao Sincronizar e Compartilhar</string>

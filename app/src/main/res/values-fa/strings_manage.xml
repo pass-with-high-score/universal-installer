@@ -100,7 +100,6 @@
     <string name="batch_install_merged_splits">ادغام‌شده</string>
     <string name="permissions_title">مجوزهای برنامه</string>
     <string name="permissions_subtitle">بررسی کنید کدام مجوزها فعال هستند و مجوزهای مورد نیاز خود را اعطا کنید.</string>
-    <string name="permissions_menu_cd">بررسی مجوزها</string>
     <string name="permissions_granted">اعطا شده</string>
     <string name="permissions_grant">اعطا</string>
     <string name="permissions_open_settings">باز کردن تنظیمات</string>
@@ -128,7 +127,6 @@
     <string name="uninstall_selected_action">لغو نصب انتخاب‌شده‌ها</string>
     <string name="uninstall_filter_cd">فیلتر</string>
     <string name="uninstall_logs_cd">گزارش‌های لغو نصب</string>
-    <string name="uninstall_confirm_single_title">لغو نصب %s؟</string>
     <string name="uninstall_confirm_single_text">این عمل %1$s (%2$s) را از دستگاه شما حذف می‌کند.</string>
     <string name="uninstall_system_badge">برنامه سیستم</string>
     <string name="uninstall_system_dialog_title_single">حذف برنامه سیستم؟</string>
@@ -171,7 +169,6 @@
     <string name="manage_action_install_secure_folder">نصب در پوشه امن (Secure Folder)</string>
     <string name="manage_action_install_secure_folder_done">%s در پوشه امن نصب شد</string>
     <string name="manage_action_install_secure_folder_failed">نصب در پوشه امن ناموفق بود: %s</string>
-    <string name="manage_action_install_secure_folder_already">نصب‌شده · برای نصب مجدد ضربه بزنید</string>
     <string name="manage_action_check_vt">بررسی در VirusTotal</string>
     <string name="manage_action_installer_source">نصب‌شده توسط %1$s</string>
     <string name="manage_action_add_to_server">همگام‌سازی و اشتراک‌گذاری</string>

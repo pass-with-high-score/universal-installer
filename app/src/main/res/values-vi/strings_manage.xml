@@ -27,7 +27,6 @@
     <string name="uninstall_selected_action">Gỡ cài đặt các mục đã chọn</string>
     <string name="uninstall_filter_cd">Bộ lọc</string>
     <string name="uninstall_logs_cd">Nhật ký gỡ cài đặt</string>
-    <string name="uninstall_confirm_single_title">Gỡ cài đặt %s?</string>
     <string name="uninstall_confirm_single_text">Hành động này sẽ xóa %1$s (%2$s) khỏi thiết bị của bạn.</string>
     <string name="manage_filter_blocked">Đã chặn</string>
     <string name="manage_blocked_badge">Đã chặn</string>
@@ -43,7 +42,6 @@
     <string name="batch_install_dup_package">Gói bị trùng lặp</string>
     <string name="permissions_title">Quyền của ứng dụng</string>
     <string name="permissions_subtitle">Xem lại các quyền đang hoạt động và cấp những quyền bạn cần.</string>
-    <string name="permissions_menu_cd">Xem lại quyền</string>
     <string name="permissions_granted">Đã cấp</string>
     <string name="permissions_grant">Cấp</string>
     <string name="permissions_open_settings">Mở cài đặt</string>
@@ -169,7 +167,6 @@
     <string name="manage_action_install_secure_folder">Cài vào Thư mục bảo mật</string>
     <string name="manage_action_install_secure_folder_done">Đã cài đặt %s vào Thư mục bảo mật</string>
     <string name="manage_action_install_secure_folder_failed">Cài vào Thư mục bảo mật thất bại: %s</string>
-    <string name="manage_action_install_secure_folder_already">Đã cài đặt · Nhấn để cài lại</string>
     <string name="manage_action_check_vt">Quét bảo mật AppShield</string>
     <string name="manage_action_installer_source">Được cài bởi %1$s</string>
     <string name="manage_action_add_to_server">Sync &amp; Share</string>

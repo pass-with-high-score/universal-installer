@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">선택한 항목 제거</string>
     <string name="uninstall_filter_cd">필터</string>
     <string name="uninstall_logs_cd">제거 로그</string>
-    <string name="uninstall_confirm_single_title">%s 앱을 제거하시겠습니까?</string>
     <string name="uninstall_confirm_single_text">%1$s (%2$s) 앱이 기기에서 삭제됩니다.</string>
     <string name="batch_install_title">일괄 설치</string>
     <string name="batch_install_summary">패키지 %1$d개 · %2$s 선택됨</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">중복된 패키지</string>
     <string name="permissions_title">앱 권한</string>
     <string name="permissions_subtitle">활성화된 권한을 검토하고 필요한 권한을 부여하세요.</string>
-    <string name="permissions_menu_cd">권한 검토</string>
     <string name="permissions_granted">부여됨</string>
     <string name="permissions_grant">부여</string>
     <string name="permissions_open_settings">설정 열기</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">보안 폴더에 설치</string>
     <string name="manage_action_install_secure_folder_done">%s을(를) 보안 폴더에 설치했습니다</string>
     <string name="manage_action_install_secure_folder_failed">보안 폴더 설치 실패: %s</string>
-    <string name="manage_action_install_secure_folder_already">설치됨 · 탭하여 다시 설치</string>
     <string name="manage_action_add_to_server">동기화 및 공유</string>
     <string name="manage_action_add_to_server_sub">로컬 Wi-Fi에서 공유</string>
     <string name="manage_action_added_to_server">%s을(를) 동기화 및 공유에 추가했습니다</string>

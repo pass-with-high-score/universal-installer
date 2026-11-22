@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">Seçilenleri kaldır</string>
     <string name="uninstall_filter_cd">Filtrele</string>
     <string name="uninstall_logs_cd">Kaldırma günlükleri</string>
-    <string name="uninstall_confirm_single_title">%s kaldırılsın mı?</string>
     <string name="uninstall_confirm_single_text">Bu işlem, %1$s (%2$s) uygulamasını cihazınızdan kaldıracaktır.</string>
     <string name="batch_install_title">Toplu yükleme</string>
     <string name="batch_install_summary">%1$d paket · %2$s seçildi</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">Kopya paket</string>
     <string name="permissions_title">Uygulama izinleri</string>
     <string name="permissions_subtitle">Hangi izinlerin aktif olduğunu gözden geçirin ve ihtiyacınız olanları verin.</string>
-    <string name="permissions_menu_cd">İzinleri gözden geçir</string>
     <string name="permissions_granted">İzin verildi</string>
     <string name="permissions_grant">İzin ver</string>
     <string name="permissions_open_settings">Ayarları aç</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Güvenli Klasöre Yükle</string>
     <string name="manage_action_install_secure_folder_done">%s Güvenli Klasöre yüklendi</string>
     <string name="manage_action_install_secure_folder_failed">Güvenli Klasöre yüklenemedi: %s</string>
-    <string name="manage_action_install_secure_folder_already">Yüklendi · Yeniden yüklemek için dokunun</string>
     <string name="manage_action_add_to_server">Eşitle ve Paylaş</string>
     <string name="manage_action_add_to_server_sub">Yerel Wi-Fi üzerinden paylaş</string>
     <string name="manage_action_added_to_server">%s Eşitle ve Paylaş\'a eklendi</string>

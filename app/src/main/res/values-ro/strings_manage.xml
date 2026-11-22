@@ -84,7 +84,6 @@
     <string name="batch_install_merged_splits">Îmbinate</string>
     <string name="permissions_title">Permisiuni aplicație</string>
     <string name="permissions_subtitle">Revizuiește ce permisiuni sunt active și acordă-le pe cele de care ai nevoie.</string>
-    <string name="permissions_menu_cd">Revizuiește permisiunile</string>
     <string name="permissions_granted">Acordate</string>
     <string name="permissions_grant">Acordă</string>
     <string name="permissions_open_settings">Deschide setările</string>
@@ -110,7 +109,6 @@
     <string name="uninstall_selected_action">Dezinstalează selecția</string>
     <string name="uninstall_filter_cd">Filtru</string>
     <string name="uninstall_logs_cd">Jurnale dezinstalare</string>
-    <string name="uninstall_confirm_single_title">Dezinstalezi %s?</string>
     <string name="uninstall_confirm_single_text">Această acțiune va elimina %1$s (%2$s) de pe dispozitiv.</string>
     <string name="uninstall_system_badge">Aplicație de sistem</string>
     <string name="uninstall_system_dialog_title_single">Elimini aplicația de sistem?</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">Instalează în Folderul Securizat</string>
     <string name="manage_action_install_secure_folder_done">S-a instalat %s în Folderul Securizat</string>
     <string name="manage_action_install_secure_folder_failed">Instalarea în Folderul Securizat a eșuat: %s</string>
-    <string name="manage_action_install_secure_folder_already">Instalat · Atingeți pentru reinstalare</string>
     <string name="manage_action_add_to_server">Sincronizare și partajare</string>
     <string name="manage_action_add_to_server_sub">Partajare pe Wi-Fi local</string>
     <string name="manage_action_added_to_server">S-a adăugat %s la Sincronizare și partajare</string>

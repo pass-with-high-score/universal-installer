@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="txt_install">Cài đặt</string>
-    <string name="txt_updates">Cập nhật</string>
     <string name="cancel">Hủy</string>
     <string name="status_success">Thành công</string>
     <string name="status_failed">Thất bại</string>
@@ -15,7 +14,6 @@
     <string name="permission_notifications_desc">Hiển thị tiến trình tải xuống, sao chép OBB và quét bảo mật để bạn có thể rời khỏi ứng dụng trong các tác vụ dài.</string>
     <string name="permission_usage_title">Truy cập dữ liệu sử dụng</string>
     <string name="permission_usage_desc">Tùy chọn — cho phép màn hình Gỡ cài đặt sắp xếp ứng dụng theo lần sử dụng cuối và hiển thị thời gian sử dụng từng ứng dụng.</string>
-    <string name="txt_manage">Quản lý</string>
     <string name="edit">Chỉnh sửa</string>
     <string name="more_actions_cd">Thêm hành động</string>
     <string name="file_size_gb">%1$.1f GB</string>
@@ -63,7 +61,6 @@
     <string name="stats_op_update">Cập nhật</string>
     <string name="stats_op_downgrade">Hạ cấp</string>
     <string name="stats_total_uninstalled">Ứng dụng đã gỡ</string>
-    <string name="stats_total_downloads">Gói đã tải về</string>
 
     <string name="stats_section_storage_formats">Dung lượng &amp; Định dạng</string>
     <string name="stats_bytes_installed">Tổng dung lượng cài</string>

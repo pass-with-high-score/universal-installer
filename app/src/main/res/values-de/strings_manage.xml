@@ -26,7 +26,6 @@
     <string name="uninstall_selected_action">Ausgewählte deinstallieren</string>
     <string name="uninstall_filter_cd">Filtern</string>
     <string name="uninstall_logs_cd">Deinstallationsprotokolle</string>
-    <string name="uninstall_confirm_single_title">%s deinstallieren?</string>
     <string name="uninstall_confirm_single_text">Dadurch wird %1$s (%2$s) von deinem Gerät entfernt.</string>
     <string name="batch_install_title">Stapelinstallation</string>
     <string name="batch_install_summary">%1$d Pakete · %2$s ausgewählt</string>
@@ -36,7 +35,6 @@
     <string name="batch_install_dup_package">Doppeltes Paket</string>
     <string name="permissions_title">App-Berechtigungen</string>
     <string name="permissions_subtitle">Überprüfe, welche Berechtigungen aktiv sind, und gewähre die benötigten.</string>
-    <string name="permissions_menu_cd">Berechtigungen überprüfen</string>
     <string name="permissions_granted">Gewährt</string>
     <string name="permissions_grant">Gewähren</string>
     <string name="permissions_open_settings">Einstellungen öffnen</string>
@@ -195,7 +193,6 @@
     <string name="manage_action_install_secure_folder">In Sicheren Ordner installieren</string>
     <string name="manage_action_install_secure_folder_done">%s in Sicheren Ordner installiert</string>
     <string name="manage_action_install_secure_folder_failed">Installation im Sicheren Ordner fehlgeschlagen: %s</string>
-    <string name="manage_action_install_secure_folder_already">Installiert · Zum Neuinstallieren tippen</string>
     <string name="manage_action_add_to_server">Synchronisieren &amp; Teilen</string>
     <string name="manage_action_add_to_server_sub">Im lokalen WLAN teilen</string>
     <string name="manage_action_added_to_server">%s zu Synchronisieren &amp; Teilen hinzugefügt</string>

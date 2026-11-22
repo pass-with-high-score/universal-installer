@@ -99,7 +99,6 @@
     <string name="batch_install_merged_splits">Scalono</string>
     <string name="permissions_title">Uprawnienia aplikacji</string>
     <string name="permissions_subtitle">Sprawdź</string>
-    <string name="permissions_menu_cd">Przejrzyj uprawnienia</string>
     <string name="permissions_granted">Przyznano</string>
     <string name="permissions_grant">Przyznaj</string>
     <string name="permissions_open_settings">Otwórz ustawienia</string>
@@ -127,7 +126,6 @@
     <string name="uninstall_selected_action">Odinstaluj wybrane</string>
     <string name="uninstall_filter_cd">Filtruj</string>
     <string name="uninstall_logs_cd">Dzienniki odinstalowywania</string>
-    <string name="uninstall_confirm_single_title">Odinstalować %s?</string>
     <string name="uninstall_confirm_single_text">Spowoduje to usunięcie %1$s (%2$s) z Twojego urządzenia.</string>
     <string name="uninstall_system_badge">Aplikacja systemowa</string>
     <string name="uninstall_system_dialog_title_single">Usunąć aplikację systemową?</string>
@@ -194,7 +192,6 @@
     <string name="manage_action_install_secure_folder">Zainstaluj w Bezpiecznym folderze</string>
     <string name="manage_action_install_secure_folder_done">Zainstalowano %s w Bezpiecznym folderze</string>
     <string name="manage_action_install_secure_folder_failed">Nie udało się zainstalować w Bezpiecznym folderze: %s</string>
-    <string name="manage_action_install_secure_folder_already">Zainstalowano · Dotknij, aby zainstalować ponownie</string>
     <string name="manage_action_add_to_server">Synchronizuj i udostępniaj</string>
     <string name="manage_action_add_to_server_sub">Udostępniaj w lokalnej sieci Wi-Fi</string>
     <string name="manage_action_added_to_server">Dodano %s do Synchronizuj i udostępniaj</string>
