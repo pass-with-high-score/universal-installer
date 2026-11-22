@@ -167,7 +167,7 @@ platform :android do
     if wear_changed
       gradle(task: ":wearos:bundleRelease")
       upload_to_play_store(
-        track:                   options[:track],
+        track:                   "wear:#{options[:track]}",
         package_name:            "app.pwhs.universalinstaller",
         aab:                     WEAR_AAB,
         json_key:                "fastlane/play-store-key.json",
@@ -188,7 +188,7 @@ platform :android do
     if tv_changed
       gradle(task: ":tv:bundlePlayRelease")
       upload_to_play_store(
-        track:                   options[:track],
+        track:                   "tv:#{options[:track]}",
         package_name:            "app.pwhs.universalinstaller",
         aab:                     TV_AAB,
         json_key:                "fastlane/play-store-key.json",

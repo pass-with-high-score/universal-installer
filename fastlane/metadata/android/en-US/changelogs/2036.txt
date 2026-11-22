@@ -1,0 +1,5 @@
+• Synchronized deployment to dedicated Android TV production track
+• Enhanced UI contrast & borders on install and overview dialogs
+• Synchronized TV disconnection with phone Send-to-TV transfer
+• VirusTotal & AppShield security scan details on Android TV
+• Added Hungarian and Traditional Chinese translations
