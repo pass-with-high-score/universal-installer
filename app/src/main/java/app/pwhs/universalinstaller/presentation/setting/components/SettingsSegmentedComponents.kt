@@ -66,7 +66,7 @@ fun SettingsCardGroup(
                 )
                 Surface(
                     shape = shape,
-                    color = MaterialTheme.colorScheme.surfaceContainerLow,
+                    color = MaterialTheme.colorScheme.surfaceContainer,
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(shape),

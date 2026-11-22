@@ -116,10 +116,12 @@ private fun AppNavigationRail(
         }
     }
 
-    val hiddenTabs by produceState(initialValue = emptySet<String>(), context) {
+    val hiddenTabs by produceState(initialValue = HiddenTabsCache.current, context) {
         runCatching {
             context.dataStore.data.collect { prefs ->
-                value = prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+                val tabs = prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+                HiddenTabsCache.current = tabs
+                value = tabs
             }
         }
     }

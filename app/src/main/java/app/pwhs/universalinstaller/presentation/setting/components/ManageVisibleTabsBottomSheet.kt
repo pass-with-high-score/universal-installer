@@ -38,9 +38,11 @@ fun ManageVisibleTabsBottomSheet(
     val scope = rememberCoroutineScope()
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
-    val hiddenTabs by produceState(initialValue = emptySet<String>(), context) {
+    val hiddenTabs by produceState(initialValue = app.pwhs.universalinstaller.presentation.composable.HiddenTabsCache.current, context) {
         context.dataStore.data.collect { prefs ->
-            value = prefs[PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+            val tabs = prefs[PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+            app.pwhs.universalinstaller.presentation.composable.HiddenTabsCache.current = tabs
+            value = tabs
         }
     }
 
@@ -92,11 +94,9 @@ fun ManageVisibleTabsBottomSheet(
                                     scope.launch {
                                         context.dataStore.edit { prefs ->
                                             val current = prefs[PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
-                                            prefs[PreferencesKeys.HIDDEN_BOTTOM_TABS] = if (checked) {
-                                                current - tab.name
-                                            } else {
-                                                current + tab.name
-                                            }
+                                            val updated = if (checked) current - tab.name else current + tab.name
+                                            app.pwhs.universalinstaller.presentation.composable.HiddenTabsCache.current = updated
+                                            prefs[PreferencesKeys.HIDDEN_BOTTOM_TABS] = updated
                                         }
                                     }
                                 }

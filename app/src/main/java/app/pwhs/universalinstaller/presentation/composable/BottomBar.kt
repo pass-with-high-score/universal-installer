@@ -35,6 +35,11 @@ import app.pwhs.universalinstaller.presentation.setting.SettingActivity
 import app.pwhs.universalinstaller.presentation.stats.StatsActivity
 import app.pwhs.universalinstaller.util.extension.disableSceneTransition
 
+internal object HiddenTabsCache {
+    @Volatile
+    var current: Set<String> = emptySet()
+}
+
 enum class BottomBarItem(
     val activityClass: Class<*>?,
     val label: Int,
@@ -103,10 +108,12 @@ fun BottomBar(
         }
     }
 
-    val hiddenTabs by produceState(initialValue = emptySet<String>(), context) {
+    val hiddenTabs by produceState(initialValue = HiddenTabsCache.current, context) {
         runCatching {
             context.dataStore.data.collect { prefs ->
-                value = prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+                val tabs = prefs[app.pwhs.universalinstaller.presentation.setting.PreferencesKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+                HiddenTabsCache.current = tabs
+                value = tabs
             }
         }
     }
