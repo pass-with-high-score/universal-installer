@@ -38,8 +38,8 @@ android {
         applicationId = "app.pwhs.universalinstaller"
         minSdk = 30
         targetSdk = libs.versions.targetSdk.get().toInt()
-        versionCode = 1041
-        versionName = "1.21.0"
+        versionCode = 1042
+        versionName = "2.0.0"
     }
 
     // Same keystore as :app — a matching package name is not enough, the certificates must match too.

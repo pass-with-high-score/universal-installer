@@ -1,0 +1,3 @@
+• Added Hungarian and Traditional Chinese language support
+• UI refinements for round and square watch screens
+• Performance and stability improvements
