@@ -48,9 +48,9 @@ platform :android do
     smart_deploy(track: "beta", skip_screenshots: true, release_status: "completed")
   end
 
-  desc "Deploy to production track as draft (skips building modules with no version bump)"
+  desc "Deploy to production track and submit for review (skips building modules with no version bump)"
   lane :production do
-    smart_deploy(track: "production", skip_screenshots: false, release_status: "draft")
+    smart_deploy(track: "production", skip_screenshots: false, release_status: "completed")
   end
 
   # ---------------------------------------------------------------------------
