@@ -13,11 +13,18 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
+import java.util.concurrent.atomic.AtomicBoolean
 
 object VirusTotalQuotaStore {
 
+    private const val TIME_SYNC_COOLDOWN_MS = 30 * 60 * 1000L // 30 minutes
+    private val isSyncingTime = AtomicBoolean(false)
+
     @Volatile
     private var serverTimeOffsetMillis: Long? = null
+
+    @Volatile
+    private var lastTimeSyncElapsedMs: Long = 0L
 
     /**
      * Synchronizes monotonic clock with verified server timestamp from `/api/v1/time`.
@@ -28,18 +35,29 @@ object VirusTotalQuotaStore {
         if (serverTimestampMillis > 0) {
             val monotonicBootTime = SystemClock.elapsedRealtime()
             serverTimeOffsetMillis = serverTimestampMillis - monotonicBootTime
+            lastTimeSyncElapsedMs = monotonicBootTime
         }
     }
 
     /**
      * Asynchronously attempts to sync server time using [VirusDetecService].
-     * Non-blocking and fails gracefully if offline.
+     * Cached for [TIME_SYNC_COOLDOWN_MS] per process since [SystemClock.elapsedRealtime]
+     * is monotonic; fails gracefully if offline.
      */
     suspend fun syncWithServer(service: VirusDetecService) {
-        service.getServerTime().onSuccess { timeRes ->
-            syncServerTime(timeRes.timestamp)
-        }.onFailure {
-            Timber.d(it, "Could not sync server time for quota store, using monotonic rollback check")
+        val now = SystemClock.elapsedRealtime()
+        if (serverTimeOffsetMillis != null && (now - lastTimeSyncElapsedMs) < TIME_SYNC_COOLDOWN_MS) {
+            return
+        }
+        if (!isSyncingTime.compareAndSet(false, true)) return
+        try {
+            service.getServerTime().onSuccess { timeRes ->
+                syncServerTime(timeRes.timestamp)
+            }.onFailure {
+                Timber.d(it, "Could not sync server time for quota store, using monotonic rollback check")
+            }
+        } finally {
+            isSyncingTime.set(false)
         }
     }
 

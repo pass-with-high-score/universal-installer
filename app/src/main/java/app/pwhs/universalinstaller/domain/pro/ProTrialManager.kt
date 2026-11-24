@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller.domain.pro
 
 import android.content.Context
+import android.os.SystemClock
 import androidx.datastore.preferences.core.edit
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
@@ -10,10 +11,36 @@ import app.pwhs.core.network.VirusDetecService
 import app.pwhs.core.network.VirusTotalKeyManager
 import app.pwhs.core.network.VirusTotalQuotaStore
 import app.pwhs.universalinstaller.domain.stats.MilestoneId
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.concurrent.atomic.AtomicBoolean
 
 object ProTrialManager {
+
+    private const val SYNC_COOLDOWN_MS = 15 * 60 * 1000L // 15 minutes
+    private val syncScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val isSyncing = AtomicBoolean(false)
+
+    @Volatile
+    private var lastSyncElapsedMs: Long = 0L
+
+    fun triggerTrialSyncAsync(context: Context) {
+        val now = SystemClock.elapsedRealtime()
+        if (lastSyncElapsedMs > 0L && (now - lastSyncElapsedMs) < SYNC_COOLDOWN_MS) return
+        if (!isSyncing.compareAndSet(false, true)) return
+        val appContext = context.applicationContext
+        syncScope.launch {
+            try {
+                checkAndGrantNewUserTrialInternal(appContext)
+            } finally {
+                isSyncing.set(false)
+            }
+        }
+    }
 
     private fun createService(context: Context): VirusDetecService {
         return VirusDetecService(
@@ -43,12 +70,24 @@ object ProTrialManager {
     }
 
     suspend fun checkAndGrantNewUserTrial(context: Context) {
+        val now = SystemClock.elapsedRealtime()
+        if (lastSyncElapsedMs > 0L && (now - lastSyncElapsedMs) < SYNC_COOLDOWN_MS) return
+        if (!isSyncing.compareAndSet(false, true)) return
+        try {
+            checkAndGrantNewUserTrialInternal(context.applicationContext)
+        } finally {
+            isSyncing.set(false)
+        }
+    }
+
+    private suspend fun checkAndGrantNewUserTrialInternal(context: Context) {
         VirusTotalKeyManager.ensureRemoteConfigFetched()
 
         val newUserEnabled = VirusTotalKeyManager.isNewUserProTrialEnabled()
         val milestoneEnabled = VirusTotalKeyManager.isMilestoneProTrialEnabled()
 
         if (!newUserEnabled && !milestoneEnabled) {
+            lastSyncElapsedMs = SystemClock.elapsedRealtime()
             runCatching {
                 context.dataStore.edit { prefs ->
                     if ((prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L) > 0L) {
@@ -65,6 +104,7 @@ object ProTrialManager {
         // 1. Always sync authoritative server state first
         val serverStatus = service.getTrialStatus().getOrNull()
         if (serverStatus != null) {
+            lastSyncElapsedMs = SystemClock.elapsedRealtime()
             applyServerStatus(context, serverStatus)
         }
 

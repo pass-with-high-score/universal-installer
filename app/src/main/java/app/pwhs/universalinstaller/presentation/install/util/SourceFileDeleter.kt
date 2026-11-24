@@ -16,8 +16,20 @@ import java.io.File
 
 object SourceFileDeleter {
 
-    fun deleteSourceFile(context: Context, uri: Uri): Boolean =
-        app.pwhs.core.util.SourceFileDeleter.deleteSourceFile(context, uri)
+    fun deleteSourceFile(context: Context, uri: Uri): Boolean {
+        val realSource = AppCacheManager.resolveOriginalSourceForStaged(uri)
+        if (realSource != null) {
+            // Remove our staged cache copy, then delete the user's real external APK file.
+            app.pwhs.core.util.SourceFileDeleter.deleteSourceFile(context, uri)
+            val deleted = app.pwhs.core.util.SourceFileDeleter.deleteSourceFile(context, realSource)
+            if (deleted) {
+                AppCacheManager.forgetStagedSource(uri)
+            }
+            Timber.d("Deleted staged=$uri, realSource=$realSource, success=$deleted")
+            return deleted
+        }
+        return app.pwhs.core.util.SourceFileDeleter.deleteSourceFile(context, uri)
+    }
 
 
     suspend fun deleteSourceFileAndWarn(context: Context, uri: Uri) {

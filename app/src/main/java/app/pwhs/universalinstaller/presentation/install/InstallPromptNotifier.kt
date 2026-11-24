@@ -65,17 +65,15 @@ class InstallPromptNotifier(
             .setSmallIcon(R.drawable.logo_no_gradient)
             .setContentTitle(title)
             .setContentText(body)
-            .setStyle(NotificationCompat.BigTextStyle().bigText(body))
-            // A question needs to arrive, not wait in the shade to be discovered. HIGH + a
-            // full-screen-less heads-up is what makes it pop over the current app; DEFAULT only
-            // added a shade row, which meant swiping down to find it.
-            .setCategory(NotificationCompat.CATEGORY_RECOMMENDATION)
+            // Keep compact (no BigTextStyle / CATEGORY_RECOMMENDATION) and mark ongoing so
+            // Android & One UI place the prompt at the top of the shade with Install/Cancel
+            // actions immediately visible instead of collapsing them.
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
+            .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setAutoCancel(false)
-            // A prompt nobody answers must not linger as a dead button: swiping it away is
-            // treated the same as Cancel so the store entry is released.
+            // On Android 14+ ongoing notifications can still be swiped away; treat swipe as Cancel.
             .setDeleteIntent(cancelIntent(entry.id))
             .setContentIntent(openDialogIntent(entry.id))
             .addAction(0, context.getString(R.string.txt_install), installIntent(entry.id))

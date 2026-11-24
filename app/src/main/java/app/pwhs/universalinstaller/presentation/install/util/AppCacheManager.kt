@@ -1,11 +1,13 @@
 package app.pwhs.universalinstaller.presentation.install.util
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Manages local application cache and provides staging for external package URIs.
@@ -19,6 +21,22 @@ object AppCacheManager {
 
     private const val EXTERNAL_APKS_DIR = "external_apks"
     private const val STAGED_MAX_AGE_MS = 24 * 60 * 60 * 1000L // 24 hours
+
+    // Maps staged cache file path -> original external source URI (resolved to file:// when possible)
+    // so delete-after-install removes the user's real APK instead of only deleting our cache copy.
+    private val stagedToSource = ConcurrentHashMap<String, Uri>()
+
+    fun resolveOriginalSourceForStaged(uri: Uri): Uri? {
+        if (uri.scheme != ContentResolver.SCHEME_FILE) return null
+        val path = uri.path ?: return null
+        return stagedToSource[path]
+    }
+
+    fun forgetStagedSource(uri: Uri) {
+        if (uri.scheme == ContentResolver.SCHEME_FILE) {
+            uri.path?.let { stagedToSource.remove(it) }
+        }
+    }
 
     /**
      * Stages an external content URI into the app's internal cache directory.
@@ -37,9 +55,16 @@ object AppCacheManager {
                 .take(40)
             val dst = File(dir, "staged_${System.currentTimeMillis()}_$safeBaseName.$ext")
 
+            // Resolve real external file path while we still hold transient read permission on `uri`
+            val resolvedPath = app.pwhs.core.util.SourceFileDeleter.resolveFilePathFromUri(context, uri)
+            val sourceUri = if (resolvedPath != null) Uri.fromFile(File(resolvedPath)) else uri
+
             context.contentResolver.openInputStream(uri)?.use { input ->
-                dst.outputStream().use { output -> input.copyTo(output) }
+                dst.outputStream().use { output -> input.copyTo(output, bufferSize = 128 * 1024) }
             } ?: return@withContext null
+
+            stagedToSource[dst.absolutePath] = sourceUri
+            Timber.d("Staged external URI $uri -> ${dst.absolutePath} (realSource=$sourceUri)")
 
             Uri.fromFile(dst)
         } catch (e: Exception) {

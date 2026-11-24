@@ -50,9 +50,7 @@ abstract class BaseActivity : FragmentActivity() {
     override fun onStart() {
         super.onStart()
         if (this !is app.pwhs.universalinstaller.presentation.splash.SplashActivity) {
-            lifecycleScope.launch {
-                app.pwhs.universalinstaller.domain.pro.ProTrialManager.checkAndGrantNewUserTrial(applicationContext)
-            }
+            app.pwhs.universalinstaller.domain.pro.ProTrialManager.triggerTrialSyncAsync(applicationContext)
         }
     }
 

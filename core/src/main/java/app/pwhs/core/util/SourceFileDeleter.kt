@@ -110,7 +110,7 @@ object SourceFileDeleter {
 
     private const val VERIFY_PREFIX_BYTES = 4096
 
-    private fun resolveFilePathFromUri(context: Context, uri: Uri): String? {
+    fun resolveFilePathFromUri(context: Context, uri: Uri): String? {
         return runCatching {
             val rawPath = Uri.decode(uri.path) ?: uri.path
             if (rawPath != null) {
