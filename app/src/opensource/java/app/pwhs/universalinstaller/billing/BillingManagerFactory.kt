@@ -8,7 +8,6 @@ import app.pwhs.core.billing.ProEntitlement
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
-import app.pwhs.core.network.VirusTotalQuotaStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,14 +33,12 @@ private class NoOpBillingManager(context: Context) : BillingManager {
             context.dataStore.data.collectLatest { prefs ->
                 val isPurchasedPro = prefs[SharedPrefsKeys.IS_PRO_USER] ?: false
                 val planType = ProProductType.entries.find { it.name == prefs[SharedPrefsKeys.PRO_PLAN_TYPE] }
-                val trialExp = prefs[SharedPrefsKeys.PRO_TRIAL_EXPIRATION_TIMESTAMP] ?: 0L
-                val isTrial = trialExp > VirusTotalQuotaStore.currentTrueTimeMillis()
-                _proEntitlement.value = when {
-                    isPurchasedPro -> ProEntitlement.Purchased(planType)
-                    isTrial -> ProEntitlement.Trial(trialExp)
-                    else -> ProEntitlement.Free
+                _proEntitlement.value = if (isPurchasedPro) {
+                    ProEntitlement.Purchased(planType)
+                } else {
+                    ProEntitlement.Free
                 }
-                _isProUser.value = isPurchasedPro || isTrial
+                _isProUser.value = isPurchasedPro
             }
         }
     }

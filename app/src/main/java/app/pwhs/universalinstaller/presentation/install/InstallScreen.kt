@@ -769,7 +769,7 @@ private fun InstallUi(
         }
     }
     val activeTrial = proEntitlement as? app.pwhs.core.billing.ProEntitlement.Trial
-    if (activeTrial != null && trialWelcomeShown == false) {
+    if (billingManager.isAvailable && activeTrial != null && trialWelcomeShown == false) {
         app.pwhs.universalinstaller.presentation.pro.components.ProTrialWelcomeDialog(
             expiresAtMillis = activeTrial.expiresAtMillis,
             onDismiss = {

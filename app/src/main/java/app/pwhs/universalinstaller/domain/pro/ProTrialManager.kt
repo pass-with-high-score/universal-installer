@@ -47,13 +47,6 @@ object ProTrialManager {
 
         val newUserEnabled = VirusTotalKeyManager.isNewUserProTrialEnabled()
         val milestoneEnabled = VirusTotalKeyManager.isMilestoneProTrialEnabled()
-        val service = createService(context)
-
-        // 1. Always sync authoritative server state first (even if Remote Config disabled new grants)
-        val serverStatus = service.getTrialStatus().getOrNull()
-        if (serverStatus != null) {
-            applyServerStatus(context, serverStatus)
-        }
 
         if (!newUserEnabled && !milestoneEnabled) {
             runCatching {
@@ -65,6 +58,14 @@ object ProTrialManager {
                 }
             }
             return
+        }
+
+        val service = createService(context)
+
+        // 1. Always sync authoritative server state first
+        val serverStatus = service.getTrialStatus().getOrNull()
+        if (serverStatus != null) {
+            applyServerStatus(context, serverStatus)
         }
 
         if (serverStatus != null) {
