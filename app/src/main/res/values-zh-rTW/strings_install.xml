@@ -126,9 +126,9 @@
     <string name="virustotal_detail_sha256_copied">已將 SHA-256 複製到剪貼簿</string>
     <string name="virustotal_detail_close">關閉</string>
     <string name="apk_info_vt_uploading">正在上傳到 VirusTotal… %d%%</string>
-    <string name="apk_info_vt_queued">已在 VirusTotal 排隊…</string>
-    <string name="apk_info_vt_analyzing">正在 VirusTotal 上分析…</string>
-    <string name="apk_info_vt_too_large">檔案太大，無法使用 VirusTotal（%s）</string>
+    <string name="apk_info_vt_queued">正在排隊等待分析…</string>
+    <string name="apk_info_vt_analyzing">正在分析 APK…</string>
+    <string name="apk_info_vt_too_large">檔案過大，無法掃描（%s）</string>
     <string name="apk_info_vt_tally">%2$d 個引擎中有 %1$d 個標記了此檔案</string>
     <string name="apk_info_vt_engines_show">引擎結果</string>
     <string name="apk_info_vt_engines_hide">隱藏引擎結果</string>
@@ -223,7 +223,7 @@
     <string name="dialog_menu_title">選項</string>
     <string name="dialog_menu_permissions">權限</string>
     <string name="dialog_menu_permissions_desc">檢視要求的權限</string>
-    <string name="dialog_menu_virustotal">VirusTotal 掃描</string>
+    <string name="dialog_menu_virustotal">安全掃描</string>
     <string name="dialog_menu_virustotal_desc">安裝前掃描惡意軟體</string>
     <string name="dialog_menu_trackers">追蹤器與分析</string>
     <string name="dialog_menu_no_trackers_found">未偵測到已知的追蹤器</string>
@@ -315,11 +315,11 @@
     <string name="dialog_risk_proceed_warn">仍要安裝</string>
     <string name="dialog_risk_proceed_severe">風險自負，仍要安裝</string>
     <string name="dialog_risk_downgrade">降級：%1$s → %2$s。現有的應用程式資料可能會被清除。</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal：%1$d 個引擎將此檔案標記為惡意。</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal：%1$d 個引擎將此檔案標記為可疑。</string>
+    <string name="dialog_risk_vt_malicious">安全掃描：%1$d 個引擎將此檔案標記為惡意。</string>
+    <string name="dialog_risk_vt_suspicious">安全掃描：%1$d 個引擎將此檔案標記為可疑。</string>
     <string name="dialog_risk_signature_mismatch">已安裝的應用程式使用不同的金鑰簽署。Android 不會接受此檔案作為更新，必須先解除安裝現有的應用程式，其資料將會遺失。</string>
     <string name="dialog_risk_action_uninstall_existing">解除安裝現有應用程式</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal 掃描尚未完成</string>
+    <string name="dialog_risk_vt_unscanned">安全掃描未完成</string>
     <string name="dialog_risk_trackers_detected">Exodus Privacy 在此套件中偵測到 %1$d 個追蹤器。</string>
     <string name="scan_virustotal_btn">使用 VirusTotal 掃描</string>
     <string name="scanning_progress">掃描中…</string>
@@ -343,9 +343,9 @@
     <string name="profile_mapping_header">自動套用於此應用程式</string>
     <string name="profile_mapping_desc">安裝此套件時一律使用這個設定檔。</string>
     <string name="system_installer_frozen_warning">系統套件安裝程式已被凍結。請啟動 Shizuku，或在安全性設定中還原後再安裝。</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal 拒絕了這組 API 金鑰。請開啟「設定 → 進階 → VirusTotal API 金鑰」，確認金鑰已完整貼上。</string>
-    <string name="apk_info_vt_rate_limited">已達到 VirusTotal 的速率限制，免費方案每分鐘允許 4 次請求。請稍後再試。</string>
-    <string name="apk_info_vt_rate_limited_retry">已達到 VirusTotal 的速率限制，免費方案每分鐘允許 4 次請求。請在 %1$s 秒後再試。</string>
+    <string name="apk_info_vt_invalid_key">安全服務拒絕了此 API 金鑰。請開啟設定 → APK 安全掃描，檢查您的 VirusTotal API 金鑰。</string>
+    <string name="apk_info_vt_rate_limited">已達每日掃描次數或頻率上限。請稍後重試，或在設定中新增個人 VirusTotal API 金鑰。</string>
+    <string name="apk_info_vt_rate_limited_retry">已達掃描頻率上限，請在 %1$s 秒後重試。</string>
     <string name="aa_compatibility_title">Android Auto 相容性</string>
     <string name="aa_compatibility_ok">與 Android Auto 相容</string>
     <string name="aa_compatibility_ok_desc">由 Google Play 商店安裝。此應用程式符合 Android Auto 的顯示條件。</string>
@@ -471,6 +471,7 @@
     <string name="apk_info_vt_chip_rate_limited">已達免費上限 · 解鎖</string>
     <string name="apk_info_vt_chip_invalid_key">API 金鑰無效</string>
     <string name="apk_info_vt_chip_need_key">需要 API 金鑰 / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">需要 API 金鑰</string>
     <string name="install_recent_apks_title">最近的 APK</string>
     <string name="install_recent_apks_see_all">查看全部</string>
     <string name="apk_info_vt_precheck_clean">快速檢查未發現問題 — 點選「深度掃描」以檢查原始碼</string>

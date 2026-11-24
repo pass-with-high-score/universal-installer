@@ -188,8 +188,8 @@
     <string name="help_conflict_body">ثلاث مشكلات مختلفة تنتج عنها رسالة خطأ متشابهة. تثبيت إصدار أقدم يحتاج إلى «السماح بـ Downgrade» — و«استبدال الحالي» لا يغطي ذلك. أما التحديث العادي فيحتاج إلى «استبدال الحالي»، وهو مفعَّل افتراضيًا. وإذا كان التطبيق المثبَّت موقَّعًا بمفتاح مختلف فلن يفيد أي خيار: يجب إلغاء تثبيته أولًا وستُفقد بياناته.</string>
     <string name="help_profiles_title">ملفات تعريف المثبِّت</string>
     <string name="help_profiles_body">ملف التعريف هو مجموعة محفوظة من خيارات التثبيت يمكنك ربطها بتطبيقات محددة، حتى لا تضطر إلى تغيير المفاتيح قبل كل تثبيت. وبدون ملف تعريف تُطبَّق الخيارات العامة في هذه الشاشة.</string>
-    <string name="help_virustotal_title">الفحص عبر VirusTotal</string>
-    <string name="help_virustotal_body">يمكن فحص أي حزمة عبر VirusTotal قبل تثبيتها، لكن ذلك يتطلب مفتاح API مجانيًا من virustotal.com يُلصق في قسم متقدم. والفحص يدوي — اضغط «الفحص عبر VirusTotal» في شاشة التثبيت. فعّل الوضع الصارم لتحذيرك عندما تكون على وشك تثبيت شيء لم يُفحص قط.</string>
+    <string name="help_virustotal_title">فحص أمان APK</string>
+    <string name="help_virustotal_body">يمكن فحص الحزم قبل التثبيت باستخدام محرك AppShield المدمج (3 فحوصات مجانية يوميًا) أو بمفتاح VirusTotal API شخصي مجاني في الإعدادات ← فحص أمان APK. فعّل الوضع الصارم للتحذير قبل تثبيت ملف لم يُفحص.</string>
     <string name="help_delete_title">حذف ملف APK بعد التثبيت</string>
     <string name="help_delete_body">يعمل مع الملفات التي تختارها داخل التطبيق. أما عندما يسلّم تطبيق آخر ملف APK — وهو ما تفعله معظم مديري الملفات — فهو يشاركه عادةً بطريقة لا تمنح صلاحية حذفه، وستظهر لك رسالة بذلك. والحل هو حذفه من مدير الملفات نفسه.</string>
     <string name="help_source_title">تغيير مصدر التثبيت</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">مستوى الأمان</string>
     <string name="setting_security_normal">عادي</string>
     <string name="setting_security_strict">صارم</string>
-    <string name="setting_security_normal_sub">التثبيت هو الزر الرئيسي. ويظل VirusTotal متاحًا في التفاصيل عندما تحتاج إليه.</string>
-    <string name="setting_security_strict_sub">يصبح الفحص عبر VirusTotal هو الزر الرئيسي إلى أن تظهر نتيجة للملف، ويطلب تأكيدًا عند تثبيت شيء لم يُفحص. يتطلب مفتاح API.</string>
+    <string name="setting_security_normal_sub">التثبيت هو الزر الرئيسي. يظل فحص الأمان متاحًا في التفاصيل عند الحاجة.</string>
+    <string name="setting_security_strict_sub">يصبح فحص الأمان الزر الرئيسي حتى تظهر النتيجة، ويتطلب تثبيت ملف غير مفحوص تأكيدًا.</string>
     <string name="setting_section_privacy">الخصوصية</string>
     <string name="setting_analytics_title">مشاركة بيانات الاستخدام</string>
     <string name="setting_analytics_subtitle">يُبلغ عن طريقة التثبيت المستخدمة وما إذا كانت قد نجحت، إضافة إلى تقارير الأعطال. ولا يُبلغ أبدًا عن الحزم التي تثبّتها.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">الماسح الأساسي</string>
     <string name="setting_scanner_appshield_title">AppShield (مدمج • موصى به)</string>
     <string name="setting_scanner_appshield_desc">محرك فحص سحابي مدمج (3 فحوصات مجانية يومياً، غير محدود مع Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">محرك فحص سحابي مدمج (%1$d فحوصات مجانية يوميًا).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">فحص متقاطع عبر أكثر من 70 محرك مكافحة فيروسات عالمي باستخدام مفتاح API الشخصي.</string>
     <string name="setting_fallback_section_header">البديل الاحتياطي والتحليل دون اتصال</string>

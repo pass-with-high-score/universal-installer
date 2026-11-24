@@ -129,6 +129,12 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.securityTab(
             },
             onClick = {
                 when {
+                    vtResult?.status in listOf(
+                        VtStatus.SCANNING,
+                        VtStatus.UPLOADING,
+                        VtStatus.QUEUED,
+                        VtStatus.ANALYZING,
+                    ) -> Unit
                     isPrecheckClean && !isTooLarge -> onCheckVirusTotal()
                     vtResult?.status in listOf(VtStatus.CLEAN, VtStatus.MALICIOUS, VtStatus.SUSPICIOUS) -> {
                         onOpenDetail?.invoke()

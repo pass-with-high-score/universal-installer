@@ -43,8 +43,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.content.getSystemService
+import app.pwhs.core.billing.BillingManager
 import app.pwhs.universalinstaller.R
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 
 private const val VIRUSTOTAL_API_KEY_URL = "https://www.virustotal.com/gui/my-apikey"
 
@@ -54,6 +56,7 @@ fun VirusTotalSettingScreen(
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: VirusTotalSettingViewModel = koinViewModel(),
+    billingManager: BillingManager = koinInject(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
@@ -173,7 +176,14 @@ fun VirusTotalSettingScreen(
                         Column(modifier = Modifier.fillMaxWidth()) {
                             ScannerOptionItem(
                                 title = stringResource(R.string.setting_scanner_appshield_title),
-                                subtitle = stringResource(R.string.setting_scanner_appshield_desc),
+                                subtitle = if (billingManager.isAvailable) {
+                                    stringResource(R.string.setting_scanner_appshield_desc)
+                                } else {
+                                    stringResource(
+                                        R.string.setting_scanner_appshield_desc_opensource,
+                                        uiState.quotaStatus.dailyLimit,
+                                    )
+                                },
                                 isSelected = uiState.primaryScanner != "virustotal",
                                 onClick = { viewModel.setPrimaryScanner("virusdetec") },
                             )

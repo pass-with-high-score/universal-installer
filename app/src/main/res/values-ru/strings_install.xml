@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">Опции</string>
     <string name="dialog_menu_permissions">Разрешения</string>
     <string name="dialog_menu_permissions_desc">Обзор запрошенных разрешений</string>
-    <string name="dialog_menu_virustotal">Сканирование VirusTotal</string>
+    <string name="dialog_menu_virustotal">Проверка безопасности</string>
     <string name="dialog_menu_virustotal_desc">Проверка на вирусы перед установкой</string>
     <string name="dialog_menu_obb">Файлы OBB</string>
     <string name="dialog_menu_obb_desc">Управление прикрепленными файлами OBB</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">Все равно установить</string>
     <string name="dialog_risk_proceed_severe">Установить на свой страх и риск</string>
     <string name="dialog_risk_downgrade">Понижение версии: %1$s → %2$s. Существующие данные приложения могут быть удалены.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d движок(ов) пометили этот файл как вредоносный.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d движок(ов) пометили этот файл как подозрительный.</string>
+    <string name="dialog_risk_vt_malicious">Проверка безопасности: %1$d движок(ов) отметили этот файл как вредоносный.</string>
+    <string name="dialog_risk_vt_suspicious">Проверка безопасности: %1$d движок(ов) отметили этот файл как подозрительный.</string>
     <string name="dialog_risk_footer">Продолжайте только если доверяете источнику этого файла.</string>
     <string name="dialog_menu_remember_for_app">Запомнить для этого приложения</string>
     <string name="dialog_menu_remember_for_app_sub">Использовать этот источник установки при каждой установке этого приложения.</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Установлено</string>
     <string name="install_notif_result_failed_title">Ошибка установки</string>
-    <string name="apk_info_vt_queued">В очереди на VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Анализ на VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Файл слишком велик для VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">В очереди на анализ…</string>
+    <string name="apk_info_vt_analyzing">Анализ APK…</string>
+    <string name="apk_info_vt_too_large">Файл слишком большой для проверки (%s)</string>
     <string name="apk_info_permissions_empty">Это приложение не запрашивает разрешений</string>
     <string name="apk_info_vt_error">Ошибка сканирования — нажмите для повтора</string>
     <string name="dialog_failed_copy_error">Копировать ошибку</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Недоступно в этой сборке</string>
     <string name="installer_engine_root_request">Нажмите, чтобы предоставить root-доступ</string>
     <string name="dialog_failed_fallback_install">Установить через системный установщик</string>
-    <string name="dialog_risk_vt_unscanned">Проверка VirusTotal не завершена</string>
+    <string name="dialog_risk_vt_unscanned">Проверка безопасности не завершена</string>
     <string name="scan_virustotal_btn">Проверить в VirusTotal</string>
     <string name="scanning_progress">Проверка…</string>
     <string name="dialog_read_failed_title">Не удалось прочитать файл</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">На устройствах Xiaomi/HyperOS с Shizuku включите «Установка через USB» и «Отладка по USB (Настройки безопасности)» в параметрах разработчика (требуется SIM-карта и аккаунт Mi). Если ошибка повторяется, переключите режим установщика на «По умолчанию» в настройках.</string>
     <string name="dialog_risk_signature_mismatch">Установленное приложение подписано другим ключом. Android не примет этот файл как обновление — существующее приложение придётся сначала удалить, и его данные будут потеряны.</string>
     <string name="dialog_risk_action_uninstall_existing">Удалить существующее приложение</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal отклонил этот API-ключ. Откройте Настройки → Дополнительно → API-ключ VirusTotal и проверьте, что он вставлен полностью.</string>
-    <string name="apk_info_vt_rate_limited">Достигнут лимит запросов VirusTotal — бесплатный тариф допускает 4 запроса в минуту. Повторите попытку чуть позже.</string>
-    <string name="apk_info_vt_rate_limited_retry">Достигнут лимит запросов VirusTotal — бесплатный тариф допускает 4 запроса в минуту. Повторите попытку через %1$s с.</string>
+    <string name="apk_info_vt_invalid_key">Служба безопасности отклонила API-ключ. Откройте Настройки → Проверка безопасности APK и проверьте ключ VirusTotal API.</string>
+    <string name="apk_info_vt_rate_limited">Достигнут дневной лимит или ограничение частоты проверок. Попробуйте позже или добавьте личный API-ключ VirusTotal в Настройках.</string>
+    <string name="apk_info_vt_rate_limited_retry">Достигнут лимит частоты проверок. Повторите через %1$s с.</string>
     <string name="apk_info_root_requested">Запрошен Root</string>
     <string name="apk_info_shizuku_requested">Запрошен Shizuku</string>
     <string name="dialog_fallback_install_unavailable">Ни один другой установщик на этом устройстве не может открыть файлы APK</string>
@@ -480,6 +480,7 @@
     <string name="apk_info_vt_chip_rate_limited">Лимит исчерпан · Открыть</string>
     <string name="apk_info_vt_chip_invalid_key">Неверный API-ключ</string>
     <string name="apk_info_vt_chip_need_key">Нужен API-ключ / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Нужен API-ключ</string>
     <string name="install_recent_apks_title">Недавние APK</string>
     <string name="install_recent_apks_see_all">Все</string>
     <string name="apk_info_vt_precheck_clean">Быстрая проверка угроз не нашла — нажмите «Глубокая проверка» для анализа кода</string>

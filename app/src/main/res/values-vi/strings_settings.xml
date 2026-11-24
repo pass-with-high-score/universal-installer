@@ -65,8 +65,8 @@
     <string name="help_conflict_body">Ba vấn đề khác nhau tạo ra lỗi trông na ná nhau. Cài bản cũ hơn cần \"Cho phép hạ cấp\" — \"Thay thế bản hiện có\" không xử lý được. Cập nhật bình thường cần \"Thay thế bản hiện có\", vốn đã bật sẵn. Còn nếu ứng dụng đã cài được ký bằng khoá khác thì không tuỳ chọn nào cứu được: phải gỡ nó trước và dữ liệu sẽ mất.</string>
     <string name="help_profiles_title">Hồ sơ trình cài đặt</string>
     <string name="help_profiles_body">Hồ sơ là một bộ tuỳ chọn cài đặt đã lưu, gắn được vào từng ứng dụng cụ thể, để bạn không phải bật tắt thủ công trước mỗi lần cài. Không gắn hồ sơ thì các tuỳ chọn chung ở màn hình này được áp dụng.</string>
-    <string name="help_virustotal_title">Quét bằng VirusTotal</string>
-    <string name="help_virustotal_body">Mọi gói cài đều có thể kiểm tra bằng VirusTotal trước khi cài, nhưng cần API key miễn phí lấy ở virustotal.com rồi dán vào mục Nâng cao. Việc quét là thủ công — nhấn \"Kiểm tra bằng VirusTotal\" ở màn hình cài đặt. Bật chế độ nghiêm ngặt để được cảnh báo khi sắp cài thứ chưa từng được quét.</string>
+    <string name="help_virustotal_title">Quét bảo mật APK</string>
+    <string name="help_virustotal_body">Mọi gói cài đều có thể quét bảo mật trước khi cài bằng AppShield tích hợp sẵn (3 lượt miễn phí/ngày) hoặc bằng khóa API VirusTotal cá nhân miễn phí trong Cài đặt → Quét bảo mật APK. Bật chế độ nghiêm ngặt để được cảnh báo khi sắp cài tệp chưa từng được quét.</string>
     <string name="help_delete_title">Xoá APK sau khi cài</string>
     <string name="help_delete_body">Có tác dụng với file bạn chọn từ trong ứng dụng. Khi APK do ứng dụng khác chuyển sang — đa số trình quản lý file đều vậy — nó thường chia sẻ theo cách không cho quyền xoá, và bạn sẽ nhận được thông báo. Cách xử lý là xoá trong chính trình quản lý file đó.</string>
     <string name="help_source_title">Đổi nguồn cài đặt</string>
@@ -336,8 +336,8 @@
     <string name="setting_security_level_title">Mức bảo mật</string>
     <string name="setting_security_normal">Bình thường</string>
     <string name="setting_security_strict">Nghiêm ngặt</string>
-    <string name="setting_security_normal_sub">Cài đặt là nút chính. VirusTotal vẫn nằm trong phần chi tiết khi bạn cần.</string>
-    <string name="setting_security_strict_sub">Quét VirusTotal trở thành nút chính cho tới khi file có kết quả, và cài thứ chưa quét sẽ phải xác nhận. Cần API key.</string>
+    <string name="setting_security_normal_sub">Cài đặt là nút chính. Quét bảo mật vẫn nằm trong phần chi tiết khi bạn cần.</string>
+    <string name="setting_security_strict_sub">Quét bảo mật trở thành nút chính cho tới khi tệp có kết quả, và cài tệp chưa quét sẽ phải xác nhận.</string>
     <string name="setting_diagnostics_title">Chẩn đoán</string>
     <string name="setting_external_open_title">Khi ứng dụng khác mở một tệp APK</string>
     <string name="setting_external_open_dialog">Hỏi trên màn hình</string>
@@ -370,6 +370,7 @@
     <string name="setting_primary_scanner_header">Bộ quét chính</string>
     <string name="setting_scanner_appshield_title">AppShield (Tích hợp sẵn • Khuyên dùng)</string>
     <string name="setting_scanner_appshield_desc">Công nghệ quét đám mây tích hợp sẵn (3 lượt miễn phí/ngày, không giới hạn với Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Công nghệ quét đám mây tích hợp sẵn (%1$d lượt miễn phí/ngày).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Đối chiếu hơn 70 bộ máy diệt virus quốc tế bằng khóa API cá nhân của bạn.</string>
     <string name="setting_fallback_section_header">Cơ chế dự phòng &amp; Ngoại tuyến</string>

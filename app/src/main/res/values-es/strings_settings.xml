@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Tres problemas distintos producen un error de aspecto parecido. Instalar una versión más antigua necesita «Permitir downgrade» — «Reemplazar existente» no cubre ese caso. Una actualización normal necesita «Reemplazar existente», que está activado por defecto. Y si la app instalada se firmó con otra clave, ninguna opción sirve: hay que desinstalarla primero y se pierden sus datos.</string>
     <string name="help_profiles_title">Perfiles de instalación</string>
     <string name="help_profiles_body">Un perfil es un conjunto guardado de opciones de instalación que puedes asignar a apps concretas, para no tener que cambiar interruptores antes de cada instalación. Sin perfil se aplican las opciones globales de esta pantalla.</string>
-    <string name="help_virustotal_title">Análisis con VirusTotal</string>
-    <string name="help_virustotal_body">Cualquier paquete se puede comprobar en VirusTotal antes de instalarlo, pero hace falta pegar en Avanzado una clave API gratuita de virustotal.com. El análisis es manual — toca «Comprobar con VirusTotal» en la pantalla de instalación. Activa el modo estricto para que se te avise cuando vayas a instalar algo que nunca se ha analizado.</string>
+    <string name="help_virustotal_title">Análisis de seguridad APK</string>
+    <string name="help_virustotal_body">Los paquetes pueden analizarse antes de instalar con el motor integrado AppShield (3 análisis gratis al día) o con una clave API personal gratuita de VirusTotal en Ajustes → Análisis de seguridad APK. Activa el modo estricto para recibir avisos antes de instalar archivos sin analizar.</string>
     <string name="help_delete_title">Eliminar el APK después de instalar</string>
     <string name="help_delete_body">Funciona con los archivos que eliges dentro de la app. Cuando otra app entrega el APK — como hacen la mayoría de los gestores de archivos — suele compartirlo de una forma que no da permiso para eliminarlo, y verás un mensaje diciéndolo. La forma de evitarlo es eliminarlo desde ese gestor de archivos.</string>
     <string name="help_source_title">Cambiar la fuente de instalación</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Nivel de seguridad</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Estricto</string>
-    <string name="setting_security_normal_sub">Instalar es el botón principal. VirusTotal sigue estando en los detalles cuando lo necesites.</string>
-    <string name="setting_security_strict_sub">Analizar con VirusTotal pasa a ser el botón principal hasta que un archivo tenga veredicto, e instalar algo sin analizar pide confirmación. Necesita una clave API.</string>
+    <string name="setting_security_normal_sub">Instalar es el botón principal. El análisis de seguridad sigue disponible en los detalles.</string>
+    <string name="setting_security_strict_sub">El análisis de seguridad pasa a ser el botón principal hasta obtener un resultado, e instalar sin analizar pedirá confirmación.</string>
     <string name="setting_section_privacy">Privacidad</string>
     <string name="setting_analytics_title">Compartir datos de uso</string>
     <string name="setting_analytics_subtitle">Informa de qué método de instalación se usó y si funcionó, además de los informes de fallos. Nunca los paquetes que instalas.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Escáner principal</string>
     <string name="setting_scanner_appshield_title">AppShield (Integrado • Recomendado)</string>
     <string name="setting_scanner_appshield_desc">Motor de análisis en la nube integrado (3 análisis diarios gratis, ilimitados con Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Motor de análisis en la nube integrado (%1$d análisis gratis al día).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Compara con más de 70 motores antivirus internacionales usando tu clave de API personal.</string>
     <string name="setting_fallback_section_header">Respaldo y análisis sin conexión</string>

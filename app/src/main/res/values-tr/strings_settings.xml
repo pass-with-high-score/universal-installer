@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Birbirine benzeyen bir hatayı üç farklı sorun üretir. Daha eski bir sürümü yüklemek için “Downgrade\'e izin ver” gerekir — “Mevcut olanı değiştir” bunu kapsamaz. Normal bir güncelleme için varsayılan olarak açık olan “Mevcut olanı değiştir” gerekir. Yüklü uygulama farklı bir anahtarla imzalanmışsa hiçbir seçenek işe yaramaz: önce kaldırılması gerekir ve verileri kaybolur.</string>
     <string name="help_profiles_title">Yükleyici profilleri</string>
     <string name="help_profiles_body">Profil, belirli uygulamalara bağlayabileceğiniz kayıtlı bir yükleme seçenekleri kümesidir; böylece her yüklemeden önce anahtarları değiştirmeniz gerekmez. Profil yoksa bu ekrandaki genel seçenekler geçerli olur.</string>
-    <string name="help_virustotal_title">VirusTotal taraması</string>
-    <string name="help_virustotal_body">Her paket, yüklemeden önce VirusTotal ile denetlenebilir; bunun için virustotal.com adresinden alınan ücretsiz bir API anahtarının Gelişmiş bölümüne yapıştırılması gerekir. Tarama manueldir — yükleme ekranında “VirusTotal ile denetle” seçeneğine dokunun. Hiç taranmamış bir şeyi yüklemek üzereyken uyarılmak için katı modu açın.</string>
+    <string name="help_virustotal_title">APK Güvenlik Taraması</string>
+    <string name="help_virustotal_body">Paketler kurulumdan önce yerleşik AppShield motoruyla (günde 3 ücretsiz tarama) veya Ayarlar → APK Güvenlik Taraması bölümünden eklenen kişisel VirusTotal API anahtarıyla taranabilir. Taranmamış dosyalar için uyarı almak üzere katı modu açın.</string>
     <string name="help_delete_title">Yükledikten sonra APK\'yı sil</string>
     <string name="help_delete_body">Uygulama içinden seçtiğiniz dosyalar için çalışır. APK\'yı başka bir uygulama devrettiğinde — çoğu dosya yöneticisi böyle yapar — dosya genellikle silme izni vermeyen bir şekilde paylaşılır ve bunu belirten bir mesaj görürsünüz. Bunu aşmanın yolu, dosyayı o dosya yöneticisinden silmektir.</string>
     <string name="help_source_title">Yükleme kaynağını değiştirme</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Güvenlik düzeyi</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Katı</string>
-    <string name="setting_security_normal_sub">Ana düğme Yükle\'dir. İhtiyaç duyduğunuzda VirusTotal ayrıntılarda yerinde durur.</string>
-    <string name="setting_security_strict_sub">Bir dosyanın sonucu çıkana kadar ana düğme VirusTotal ile tara olur ve taranmamış bir şeyi yüklemek onay ister. Bir API anahtarı gerekir.</string>
+    <string name="setting_security_normal_sub">Yükle ana düğmedir. Güvenlik Taraması ayrıntılarda her zaman kullanılabilir.</string>
+    <string name="setting_security_strict_sub">Sonuç alınana kadar Güvenlik Taraması ana düğme olur ve taranmamış dosya yüklemesi onay gerektirir.</string>
     <string name="setting_section_privacy">Gizlilik</string>
     <string name="setting_analytics_title">Kullanım verilerini paylaş</string>
     <string name="setting_analytics_subtitle">Hangi yükleme yönteminin kullanıldığını ve işe yarayıp yaramadığını, ayrıca çökme raporlarını bildirir. Yüklediğiniz paketleri asla bildirmez.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Birincil Tarayıcı</string>
     <string name="setting_scanner_appshield_title">AppShield (Yerleşik • Önerilen)</string>
     <string name="setting_scanner_appshield_desc">Yerleşik bulut tarama motoru (günde 3 ücretsiz tarama, Pro ile sınırsız).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Yerleşik bulut tarama motoru (günde %1$d ücretsiz tarama).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Kişisel API anahtarınızı kullanarak 70\'ten fazla uluslararası antivirüs motoruyla çapraz kontrol yapın.</string>
     <string name="setting_fallback_section_header">Yedek ve Çevrimdışı Analiz</string>

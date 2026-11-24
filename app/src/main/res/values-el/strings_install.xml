@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">Επιλογές</string>
     <string name="dialog_menu_permissions">Άδειες</string>
     <string name="dialog_menu_permissions_desc">Έλεγχος ζητούμενων αδειών</string>
-    <string name="dialog_menu_virustotal">Σάρωση VirusTotal</string>
+    <string name="dialog_menu_virustotal">Έλεγχος ασφαλείας</string>
     <string name="dialog_menu_virustotal_desc">Σάρωση για κακόβουλο λογισμικό πριν την εγκατάσταση</string>
     <string name="dialog_menu_obb">Αρχεία OBB</string>
     <string name="dialog_menu_obb_desc">Διαχείριση συνημμένων αρχείων δεδομένων OBB</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">Εγκατάσταση ούτως ή άλλως</string>
     <string name="dialog_risk_proceed_severe">Εγκατάσταση με δική μου ευθύνη</string>
     <string name="dialog_risk_downgrade">Υποβάθμιση έκδοσης: %1$s → %2$s. Τα υπάρχοντα δεδομένα της εφαρμογής ενδέχεται να διαγραφούν.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d μηχανή(ές) επισήμαναν αυτό το αρχείο ως κακόβουλο.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d μηχανή(ές) επισήμαναν αυτό το αρχείο ως ύποπτο.</string>
+    <string name="dialog_risk_vt_malicious">Έλεγχος ασφαλείας: %1$d μηχανή/ές επισήμαναν αυτό το αρχείο ως κακόβουλο.</string>
+    <string name="dialog_risk_vt_suspicious">Έλεγχος ασφαλείας: %1$d μηχανή/ές επισήμαναν αυτό το αρχείο ως ύποπτο.</string>
     <string name="dialog_risk_footer">Συνεχίστε μόνο εάν εμπιστεύεστε την πηγή αυτού του αρχείου.</string>
     <string name="dialog_menu_remember_for_app">Απομνημόνευση για αυτήν την εφαρμογή</string>
     <string name="dialog_menu_remember_for_app_sub">Χρήση αυτής της πηγής εγκατάστασης κάθε φορά που εγκαθίσταται αυτή η εφαρμογή.</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Εγκαταστάθηκε</string>
     <string name="install_notif_result_failed_title">Η εγκατάσταση απέτυχε</string>
-    <string name="apk_info_vt_queued">Σε ουρά στο VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Ανάλυση στο VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Το αρχείο είναι πολύ μεγάλο για το VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">Σε ουρά για ανάλυση…</string>
+    <string name="apk_info_vt_analyzing">Ανάλυση APK…</string>
+    <string name="apk_info_vt_too_large">Το αρχείο είναι πολύ μεγάλο για έλεγχο (%s)</string>
     <string name="apk_info_permissions_empty">Αυτή η εφαρμογή δεν ζητά δικαιώματα</string>
     <string name="apk_info_vt_error">Η σάρωση απέτυχε — πατήστε για επανάληψη</string>
     <string name="dialog_failed_copy_error">Αντιγραφή σφάλματος</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Μη διαθέσιμο σε αυτή την έκδοση</string>
     <string name="installer_engine_root_request">Πατήστε για εκχώρηση πρόσβασης root</string>
     <string name="dialog_failed_fallback_install">Εγκατάσταση μέσω προγράμματος εγκατάστασης συστήματος</string>
-    <string name="dialog_risk_vt_unscanned">Η σάρωση VirusTotal δεν ολοκληρώθηκε</string>
+    <string name="dialog_risk_vt_unscanned">Ο έλεγχος ασφαλείας δεν ολοκληρώθηκε</string>
     <string name="scan_virustotal_btn">Σάρωση VirusTotal</string>
     <string name="scanning_progress">Γίνεται σάρωση…</string>
     <string name="dialog_read_failed_title">Δεν ήταν δυνατή η ανάγνωση του αρχείου</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Σε συσκευές Xiaomi/HyperOS με Shizuku, ενεργοποιήστε την «Εγκατάσταση μέσω USB» και τον «Εντοπισμό σφαλμάτων USB (Ρυθμίσεις ασφαλείας)» στις Επιλογές προγραμματιστή (απαιτείται SIM και λογαριασμός Mi). Αν το πρόβλημα παραμένει, δοκιμάστε να αλλάξετε τη λειτουργία εγκατάστασης σε Προεπιλογή στις Ρυθμίσεις.</string>
     <string name="dialog_risk_signature_mismatch">Η εγκατεστημένη εφαρμογή είναι υπογεγραμμένη με διαφορετικό κλειδί. Το Android δεν θα δεχτεί αυτό το αρχείο ως ενημέρωση — η υπάρχουσα εφαρμογή πρέπει να απεγκατασταθεί πρώτα και τα δεδομένα της θα χαθούν.</string>
     <string name="dialog_risk_action_uninstall_existing">Απεγκατάσταση της υπάρχουσας εφαρμογής</string>
-    <string name="apk_info_vt_invalid_key">Το VirusTotal απέρριψε αυτό το κλειδί API. Ανοίξτε Ρυθμίσεις → Για προχωρημένους → Κλειδί API VirusTotal και ελέγξτε ότι επικολλήθηκε ολόκληρο.</string>
-    <string name="apk_info_vt_rate_limited">Συμπληρώθηκε το όριο αιτημάτων του VirusTotal — η δωρεάν βαθμίδα επιτρέπει 4 αιτήματα ανά λεπτό. Δοκιμάστε ξανά σε λίγο.</string>
-    <string name="apk_info_vt_rate_limited_retry">Συμπληρώθηκε το όριο αιτημάτων του VirusTotal — η δωρεάν βαθμίδα επιτρέπει 4 αιτήματα ανά λεπτό. Δοκιμάστε ξανά σε %1$s δευτερόλεπτα.</string>
+    <string name="apk_info_vt_invalid_key">Η υπηρεσία ασφαλείας απέρριψε το κλειδί API. Άνοιξε Ρυθμίσεις → Έλεγχος ασφαλείας APK και έλεγξε το κλειδί VirusTotal API.</string>
+    <string name="apk_info_vt_rate_limited">Συμπληρώθηκε το ημερήσιο όριο ή το όριο συχνότητας. Δοκίμασε αργότερα ή πρόσθεσε προσωπικό κλειδί VirusTotal API στις Ρυθμίσεις.</string>
+    <string name="apk_info_vt_rate_limited_retry">Συμπληρώθηκε το όριο συχνότητας ελέγχου. Δοκίμασε ξανά σε %1$s δευτερόλεπτα.</string>
     <string name="apk_info_root_requested">Απαιτείται Root</string>
     <string name="apk_info_shizuku_requested">Απαιτείται Shizuku</string>
     <string name="dialog_fallback_install_unavailable">Καμία άλλη εφαρμογή εγκατάστασης σε αυτήν τη συσκευή δεν μπορεί να ανοίξει αρχεία APK</string>
@@ -478,6 +478,7 @@
     <string name="apk_info_vt_chip_rate_limited">Εξαντλήθηκε το δωρεάν όριο · Ξεκλείδωμα</string>
     <string name="apk_info_vt_chip_invalid_key">Μη έγκυρο κλειδί API</string>
     <string name="apk_info_vt_chip_need_key">Απαιτείται κλειδί API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Απαιτείται κλειδί API</string>
     <string name="install_recent_apks_title">Πρόσφατα APK</string>
     <string name="install_recent_apks_see_all">Προβολή όλων</string>
     <string name="apk_info_vt_precheck_clean">Ο γρήγορος έλεγχος δεν βρήκε προβλήματα — πατήστε Βαθιά σάρωση για έλεγχο του πηγαίου κώδικα</string>

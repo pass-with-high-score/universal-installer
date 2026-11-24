@@ -126,9 +126,9 @@
     <string name="virustotal_detail_sha256_copied">SHA-256 a vágólapra másolva</string>
     <string name="virustotal_detail_close">Bezárás</string>
     <string name="apk_info_vt_uploading">Feltöltés a VirusTotalra… %d%%</string>
-    <string name="apk_info_vt_queued">Sorban a VirusTotalon…</string>
-    <string name="apk_info_vt_analyzing">Elemzés a VirusTotalon…</string>
-    <string name="apk_info_vt_too_large">A fájl túl nagy a VirusTotalhoz (%s)</string>
+    <string name="apk_info_vt_queued">Elemzésre várakozik…</string>
+    <string name="apk_info_vt_analyzing">APK elemzése…</string>
+    <string name="apk_info_vt_too_large">A fájl túl nagy a vizsgálathoz (%s)</string>
     <string name="apk_info_vt_tally">%2$d motorból %1$d jelölte meg a fájlt</string>
     <string name="apk_info_vt_engines_show">Motorok eredményei</string>
     <string name="apk_info_vt_engines_hide">Motorok eredményeinek elrejtése</string>
@@ -223,7 +223,7 @@
     <string name="dialog_menu_title">Beállítások</string>
     <string name="dialog_menu_permissions">Engedélyek</string>
     <string name="dialog_menu_permissions_desc">Kért engedélyek áttekintése</string>
-    <string name="dialog_menu_virustotal">VirusTotal-ellenőrzés</string>
+    <string name="dialog_menu_virustotal">Biztonsági vizsgálat</string>
     <string name="dialog_menu_virustotal_desc">Kártevő-ellenőrzés telepítés előtt</string>
     <string name="dialog_menu_trackers">Nyomkövetők és analitika</string>
     <string name="dialog_menu_no_trackers_found">Nem észlelhető ismert nyomkövető</string>
@@ -315,11 +315,11 @@
     <string name="dialog_risk_proceed_warn">Telepítés mégis</string>
     <string name="dialog_risk_proceed_severe">Telepítés saját felelősségre</string>
     <string name="dialog_risk_downgrade">Visszaléptetés: %1$s → %2$s. A meglévő alkalmazásadatok törlődhetnek.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d motor kártékonynak jelölte ezt a fájlt.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d motor gyanúsnak jelölte ezt a fájlt.</string>
+    <string name="dialog_risk_vt_malicious">Biztonsági vizsgálat: %1$d motor kártékonynak jelölte ezt a fájlt.</string>
+    <string name="dialog_risk_vt_suspicious">Biztonsági vizsgálat: %1$d motor gyanúsnak jelölte ezt a fájlt.</string>
     <string name="dialog_risk_signature_mismatch">A telepített alkalmazás más kulccsal van aláírva. Az Android nem fogadja el ezt a fájlt frissítésként — előbb el kell távolítani a meglévő alkalmazást, és az adatai elvesznek.</string>
     <string name="dialog_risk_action_uninstall_existing">Meglévő alkalmazás eltávolítása</string>
-    <string name="dialog_risk_vt_unscanned">A VirusTotal-ellenőrzés nem fejeződött be</string>
+    <string name="dialog_risk_vt_unscanned">A biztonsági vizsgálat nem fejeződött be</string>
     <string name="dialog_risk_trackers_detected">Az Exodus Privacy %1$d nyomkövetőt észlelt ebben a csomagban.</string>
     <string name="scan_virustotal_btn">VirusTotal-ellenőrzés</string>
     <string name="scanning_progress">Ellenőrzés…</string>
@@ -343,9 +343,9 @@
     <string name="profile_mapping_header">Automatikus alkalmazás ehhez az apphoz</string>
     <string name="profile_mapping_desc">Mindig ezt a profilt használja a csomag telepítésekor.</string>
     <string name="system_installer_frozen_warning">A rendszer csomagtelepítője le van fagyasztva. A telepítéshez indítsd el a Shizukut, vagy állítsd vissza a Biztonsági beállításokban.</string>
-    <string name="apk_info_vt_invalid_key">A VirusTotal elutasította ezt az API-kulcsot. Nyisd meg a Beállítások → Speciális → VirusTotal API-kulcs menüt, és ellenőrizd, hogy a teljes kulcsot illesztetted-e be.</string>
-    <string name="apk_info_vt_rate_limited">Elérted a VirusTotal kéréskorlátját — az ingyenes csomag percenként 4 kérést enged. Próbáld újra hamarosan.</string>
-    <string name="apk_info_vt_rate_limited_retry">Elérted a VirusTotal kéréskorlátját — az ingyenes csomag percenként 4 kérést enged. Próbáld újra %1$s másodperc múlva.</string>
+    <string name="apk_info_vt_invalid_key">A biztonsági szolgáltatás elutasította az API-kulcsot. Nyisd meg a Beállítások → APK biztonsági vizsgálat menüt, és ellenőrizd a VirusTotal API-kulcsodat.</string>
+    <string name="apk_info_vt_rate_limited">Elérted a napi vagy gyakorisági korlátot. Próbáld később, vagy adj meg saját VirusTotal API-kulcsot a Beállításokban.</string>
+    <string name="apk_info_vt_rate_limited_retry">Elérted a vizsgálati gyakorisági korlátot. Próbáld újra %1$s másodperc múlva.</string>
     <string name="aa_compatibility_title">Android Auto-kompatibilitás</string>
     <string name="aa_compatibility_ok">Kompatibilis az Android Autóval</string>
     <string name="aa_compatibility_ok_desc">A Google Play Áruház telepítette. Ez az alkalmazás megfelel az Android Auto láthatósági követelményeinek.</string>
@@ -472,6 +472,7 @@
     <string name="apk_info_vt_chip_rate_limited">Ingyenes limit elérve · Feloldás</string>
     <string name="apk_info_vt_chip_invalid_key">Érvénytelen API-kulcs</string>
     <string name="apk_info_vt_chip_need_key">API-kulcs / Pro szükséges</string>
+    <string name="apk_info_vt_chip_need_key_opensource">API-kulcs szükséges</string>
     <string name="install_recent_apks_title">Legutóbbi APK-k</string>
     <string name="install_recent_apks_see_all">Összes</string>
     <string name="apk_info_vt_precheck_clean">A gyorsellenőrzés nem talált problémát — koppints a Mélyvizsgálatra a forráskód ellenőrzéséhez</string>

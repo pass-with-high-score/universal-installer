@@ -137,7 +137,7 @@
     <string name="dialog_menu_title">选项</string>
     <string name="dialog_menu_permissions">权限</string>
     <string name="dialog_menu_permissions_desc">查看请求的权限</string>
-    <string name="dialog_menu_virustotal">VirusTotal 扫描</string>
+    <string name="dialog_menu_virustotal">安全扫描</string>
     <string name="dialog_menu_virustotal_desc">安装前扫描恶意软件</string>
     <string name="dialog_menu_obb">OBB 文件</string>
     <string name="dialog_menu_obb_desc">管理附加的 OBB 数据文件</string>
@@ -185,8 +185,8 @@
     <string name="dialog_risk_proceed_warn">仍要安装</string>
     <string name="dialog_risk_proceed_severe">承担风险并安装</string>
     <string name="dialog_risk_downgrade">降级：%1$s → %2$s。现有的应用数据可能会被清除。</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal：%1$d 个引擎将此文件标记为恶意软件。</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal：%1$d 个引擎将此文件标记为可疑文件。</string>
+    <string name="dialog_risk_vt_malicious">安全扫描：%1$d 个引擎将此文件标记为恶意。</string>
+    <string name="dialog_risk_vt_suspicious">安全扫描：%1$d 个引擎将此文件标记为可疑。</string>
     <string name="dialog_risk_footer">仅当您信任此文件的来源时才继续操作。</string>
     <string name="dialog_menu_remember_for_app">记住此应用的设置</string>
     <string name="dialog_menu_remember_for_app_sub">每次安装此应用时都使用此安装程序来源。</string>
@@ -224,9 +224,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">已安装</string>
     <string name="install_notif_result_failed_title">安装失败</string>
-    <string name="apk_info_vt_queued">VirusTotal 排队中…</string>
-    <string name="apk_info_vt_analyzing">VirusTotal 分析中…</string>
-    <string name="apk_info_vt_too_large">文件太大，无法上传至 VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">正在排队等待分析…</string>
+    <string name="apk_info_vt_analyzing">正在分析 APK…</string>
+    <string name="apk_info_vt_too_large">文件过大，无法扫描（%s）</string>
     <string name="apk_info_permissions_empty">此应用不请求任何权限</string>
     <string name="apk_info_vt_error">扫描失败 — 点击重试</string>
     <string name="dialog_failed_copy_error">复制错误</string>
@@ -245,12 +245,12 @@
     <string name="dialog_failed_fallback_install">通过系统安装程序安装</string>
     <string name="dialog_risk_signature_mismatch">已安装的应用使用了不同的签名密钥。Android 不会将此文件视为更新 — 必须先卸载现有应用，其数据将丢失。</string>
     <string name="dialog_risk_action_uninstall_existing">卸载现有应用</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal 扫描未完成</string>
+    <string name="dialog_risk_vt_unscanned">安全扫描未完成</string>
     <string name="scan_virustotal_btn">扫描 VirusTotal</string>
     <string name="scanning_progress">正在扫描…</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal 拒绝了此 API 密钥。请打开“设置”→ Advanced →“VirusTotal API 密钥”，确认已完整粘贴。</string>
-    <string name="apk_info_vt_rate_limited">已达到 VirusTotal 的速率限制 — 免费版每分钟仅允许 4 次请求。请稍后重试。</string>
-    <string name="apk_info_vt_rate_limited_retry">已达到 VirusTotal 的速率限制 — 免费版每分钟仅允许 4 次请求。请在 %1$s 秒后重试。</string>
+    <string name="apk_info_vt_invalid_key">安全服务拒绝了此 API 密钥。请打开设置 → APK 安全扫描，检查您的 VirusTotal API 密钥。</string>
+    <string name="apk_info_vt_rate_limited">已达到每日扫描次数或频率上限。请稍后重试，或在设置中添加个人 VirusTotal API 密钥。</string>
+    <string name="apk_info_vt_rate_limited_retry">已达到扫描频率上限，请在 %1$s 秒后重试。</string>
     <string name="dialog_read_failed_title">无法读取该文件</string>
     <string name="dialog_read_failed_text">发送此安装包的应用不再允许访问它。请从该应用中重新打开文件。</string>
     <string name="dialog_parse_failed_title">不是可安装的安装包</string>
@@ -477,6 +477,7 @@
     <string name="apk_info_vt_chip_rate_limited">已达免费上限 · 解锁</string>
     <string name="apk_info_vt_chip_invalid_key">API 密钥无效</string>
     <string name="apk_info_vt_chip_need_key">需要 API 密钥 / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">需要 API 密钥</string>
     <string name="install_recent_apks_title">最近的 APK</string>
     <string name="install_recent_apks_see_all">查看全部</string>
     <string name="apk_info_vt_precheck_clean">快速检查未发现问题 — 点击深度扫描以检查源代码</string>

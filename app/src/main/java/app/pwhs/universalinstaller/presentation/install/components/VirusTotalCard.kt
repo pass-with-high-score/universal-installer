@@ -208,7 +208,7 @@ fun VirusTotalCard(
                 SecurityQuotaExhaustedSection(
                     onAddKey = onOpenSettings,
                     onGetKey = onGetKey,
-                    onUpgradeProClick = onUpgradeProClick ?: onOpenSettings,
+                    onUpgradeProClick = onUpgradeProClick,
                 )
             } else if (isPro && (status == VtStatus.NO_API_KEY || status == VtStatus.INVALID_API_KEY || status == VtStatus.RATE_LIMITED)) {
                 Spacer(Modifier.height(8.dp))

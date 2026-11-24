@@ -255,7 +255,10 @@ fun VirusTotalInstallPrompt(
                 val chipText = when (currentStatus) {
                     VtStatus.RATE_LIMITED -> stringResource(R.string.apk_info_vt_chip_rate_limited)
                     VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_chip_invalid_key)
-                    else -> stringResource(R.string.apk_info_vt_chip_need_key)
+                    else -> stringResource(
+                        if (billingManager.isAvailable) R.string.apk_info_vt_chip_need_key
+                        else R.string.apk_info_vt_chip_need_key_opensource
+                    )
                 }
                 Row(
                     modifier = Modifier
@@ -347,7 +350,11 @@ fun VirusTotalInstallPrompt(
                 showQuotaSheet = false
                 onScan()
             },
-            onUpgradeProClick = { showUpgradeProSheet = true },
+            onUpgradeProClick = if (billingManager.isAvailable) {
+                { showUpgradeProSheet = true }
+            } else {
+                null
+            },
         )
     }
 

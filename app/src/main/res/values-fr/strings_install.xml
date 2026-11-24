@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">Options</string>
     <string name="dialog_menu_permissions">Autorisations</string>
     <string name="dialog_menu_permissions_desc">Examiner les autorisations demandées</string>
-    <string name="dialog_menu_virustotal">Analyse VirusTotal</string>
+    <string name="dialog_menu_virustotal">Analyse de sécurité</string>
     <string name="dialog_menu_virustotal_desc">Rechercher des logiciels malveillants avant l\'installation</string>
     <string name="dialog_menu_obb">Fichiers OBB</string>
     <string name="dialog_menu_obb_desc">Gérer les fichiers de données OBB joints</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">Installer quand même</string>
     <string name="dialog_risk_proceed_severe">Installer à mes risques et périls</string>
     <string name="dialog_risk_downgrade">Rétrogradation : %1$s → %2$s. Les données de l\'application existante peuvent être effacées.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal : %1$d moteur(s) a/ont signalé ce fichier comme malveillant.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal : %1$d moteur(s) a/ont signalé ce fichier comme suspect.</string>
+    <string name="dialog_risk_vt_malicious">Analyse de sécurité : %1$d moteur(s) ont signalé ce fichier comme malveillant.</string>
+    <string name="dialog_risk_vt_suspicious">Analyse de sécurité : %1$d moteur(s) ont signalé ce fichier comme suspect.</string>
     <string name="dialog_risk_footer">Ne continuez que si vous faites confiance à la source de ce fichier.</string>
     <string name="dialog_menu_remember_for_app">Se souvenir pour cette application</string>
     <string name="dialog_menu_remember_for_app_sub">Utiliser cette source d\'installation chaque fois que cette application est installée.</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Installé</string>
     <string name="install_notif_result_failed_title">Échec de l\'installation</string>
-    <string name="apk_info_vt_queued">Mis en attente sur VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Analyse sur VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Fichier trop volumineux pour VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">En file d\'attente pour analyse…</string>
+    <string name="apk_info_vt_analyzing">Analyse de l\'APK en cours…</string>
+    <string name="apk_info_vt_too_large">Fichier trop volumineux pour l\'analyse (%s)</string>
     <string name="apk_info_permissions_empty">Cette application ne demande aucune autorisation</string>
     <string name="apk_info_vt_error">Échec de l\'analyse — appuyer pour réessayer</string>
     <string name="dialog_failed_copy_error">Copier l\'erreur</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Non disponible sur cette version</string>
     <string name="installer_engine_root_request">Appuyez pour accorder l\'accès root</string>
     <string name="dialog_failed_fallback_install">Installer via le programme d\'installation du système</string>
-    <string name="dialog_risk_vt_unscanned">Analyse VirusTotal non terminée</string>
+    <string name="dialog_risk_vt_unscanned">Analyse de sécurité non terminée</string>
     <string name="scan_virustotal_btn">Analyser avec VirusTotal</string>
     <string name="scanning_progress">Analyse en cours…</string>
     <string name="dialog_read_failed_title">Impossible de lire le fichier</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Sur les appareils Xiaomi/HyperOS avec Shizuku, activez « Installer via USB » et « Débogage USB (paramètres de sécurité) » dans les Options développeur (nécessite une carte SIM et un compte Mi). Si le problème persiste, passez au mode d\'installation par défaut dans les Paramètres.</string>
     <string name="dialog_risk_signature_mismatch">L\'application installée est signée avec une autre clé. Android n\'acceptera pas ce fichier comme mise à jour — l\'application existante doit d\'abord être désinstallée, et ses données seront perdues.</string>
     <string name="dialog_risk_action_uninstall_existing">Désinstaller l\'application existante</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal a rejeté cette clé API. Ouvrez Paramètres → Avancé → Clé API VirusTotal et vérifiez qu\'elle a été collée en entier.</string>
-    <string name="apk_info_vt_rate_limited">Limite de requêtes VirusTotal atteinte — l\'offre gratuite autorise 4 requêtes par minute. Réessayez dans un instant.</string>
-    <string name="apk_info_vt_rate_limited_retry">Limite de requêtes VirusTotal atteinte — l\'offre gratuite autorise 4 requêtes par minute. Réessayez dans %1$s secondes.</string>
+    <string name="apk_info_vt_invalid_key">Le service de sécurité a rejeté la clé API. Ouvrez Paramètres → Analyse de sécurité APK et vérifiez votre clé API VirusTotal.</string>
+    <string name="apk_info_vt_rate_limited">Limite quotidienne ou de fréquence atteinte. Réessayez plus tard ou ajoutez une clé API VirusTotal personnelle dans les Paramètres.</string>
+    <string name="apk_info_vt_rate_limited_retry">Limite de fréquence d\'analyse atteinte. Réessayez dans %1$s secondes.</string>
     <string name="apk_info_root_requested">Root demandé</string>
     <string name="apk_info_shizuku_requested">Shizuku demandé</string>
     <string name="dialog_fallback_install_unavailable">Aucun autre programme d\'installation sur cet appareil ne peut ouvrir les fichiers APK</string>
@@ -479,6 +479,7 @@
     <string name="apk_info_vt_chip_rate_limited">Limite atteinte · Débloquer</string>
     <string name="apk_info_vt_chip_invalid_key">Clé API invalide</string>
     <string name="apk_info_vt_chip_need_key">Clé API / Pro requise</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Clé API requise</string>
     <string name="install_recent_apks_title">APK récents</string>
     <string name="install_recent_apks_see_all">Tout voir</string>
     <string name="apk_info_vt_precheck_clean">Vérification rapide OK — touchez Analyse approfondie pour inspecter le code</string>

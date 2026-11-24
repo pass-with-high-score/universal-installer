@@ -146,8 +146,8 @@
     <string name="help_conflict_body">سه مشکل مختلف خطای مشابهی تولید می‌کنند. برای نصب نسخه قدیمی‌تر، \"اجازه برگشت به نسخه قبلی\" نیاز است — \"جایگزینی نسخه موجود\" آن را پوشش نمی‌دهد. یک به‌روزرسانی معمولی به \"جایگزینی نسخه موجود\" نیاز دارد که به‌طور پیش‌فرض روشن است. و اگر برنامه نصب‌شده با کلید متفاوتی امضا شده باشد، هیچ گزینه‌ای کمکی نمی‌کند: باید ابتدا لغو نصب شود و داده‌های آن از بین می‌رود.</string>
     <string name="help_profiles_title">پروفایل‌های نصب‌کننده</string>
     <string name="help_profiles_body">یک پروفایل، مجموعه‌ای ذخیره‌شده از گزینه‌های نصب است که می‌توانید به برنامه‌های خاص متصل کنید تا مجبور نباشید قبل از هر نصب کلیدها را تغییر دهید. بدون پروفایل، گزینه‌های سراسری در این صفحه اعمال می‌شوند.</string>
-    <string name="help_virustotal_title">اسکن VirusTotal</string>
-    <string name="help_virustotal_body">هر بسته‌ای را می‌توان قبل از نصب با VirusTotal بررسی کرد، اما نیاز به یک کلید API رایگان از virustotal.com دارد که در بخش پیشرفته چسبانده شود. اسکن دستی است — روی \"بررسی با VirusTotal\" در صفحه نصب ضربه بزنید. حالت سخت‌گیرانه را روشن کنید تا زمانی که بسته‌ای اسکن‌نشده را نصب می‌کنید به شما هشدار داده شود.</string>
+    <string name="help_virustotal_title">اسکن امنیتی APK</string>
+    <string name="help_virustotal_body">بسته‌ها را می‌توان پیش از نصب با موتور داخلی AppShield (۳ اسکن رایگان روزانه) یا با کلید شخصی VirusTotal API در تنظیمات ← اسکن امنیتی APK بررسی کرد. حالت سخت‌گیرانه را برای هشدار پیش از نصب فایل‌های اسکن‌نشده فعال کنید.</string>
     <string name="help_delete_title">حذف APK پس از نصب</string>
     <string name="help_delete_body">برای فایل‌هایی که در داخل برنامه انتخاب می‌کنید کار می‌کند. وقتی برنامه دیگری فایل APK را به این برنامه می‌دهد — بیشتر مدیران فایل این کار را می‌کنند — معمولاً آن را به‌گونه‌ای به اشتراک می‌گذارد که مجوزی برای حذف آن نمی‌دهد و پیامی دریافت خواهید کرد که این را اعلام می‌کند. حذف آن از داخل همان برنامه مدیریت فایل راه‌حل این موضوع است.</string>
     <string name="help_source_title">تغییر منبع نصب</string>
@@ -327,8 +327,8 @@
     <string name="setting_security_level_title">سطح امنیت</string>
     <string name="setting_security_normal">معمولی</string>
     <string name="setting_security_strict">سخت‌گیرانه</string>
-    <string name="setting_security_normal_sub">دکمه اصلی نصب است. اطلاعات VirusTotal در صورت تمایل همچنان در جزئیات در دسترس است.</string>
-    <string name="setting_security_strict_sub">اسکن با VirusTotal دکمه اصلی می‌شود تا زمانی که فایل ارزیابی شود، و نصب فایل اسکن‌نشده تأیید می‌خواهد. به کلید API نیاز دارد.</string>
+    <string name="setting_security_normal_sub">نصب دکمه اصلی است. اسکن امنیتی همچنان در جزئیات در دسترس است.</string>
+    <string name="setting_security_strict_sub">اسکن امنیتی تا دریافت نتیجه دکمه اصلی خواهد بود و نصب فایل اسکن‌نشده نیاز به تأیید دارد.</string>
     <string name="setting_diagnostics_title">عیب‌یابی</string>
     <string name="setting_section_backup">پشتیبان‌گیری و بازیابی</string>
     <string name="setting_backup_export_title">ایجاد نسخه پشتیبان</string>
@@ -351,6 +351,7 @@
     <string name="setting_primary_scanner_header">اسکنر اصلی</string>
     <string name="setting_scanner_appshield_title">AppShield (داخلی • پیشنهادی)</string>
     <string name="setting_scanner_appshield_desc">موتور اسکن ابری داخلی (۳ اسکن رایگان روزانه، نامحدود با Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">موتور اسکن ابری داخلی (%1$d اسکن رایگان روزانه).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">بررسی هم‌زمان با بیش از ۷۰ موتور آنتی‌ویروس بین‌المللی با کلید API شخصی شما.</string>
     <string name="setting_fallback_section_header">پشتیبان و تحلیل آفلاین</string>

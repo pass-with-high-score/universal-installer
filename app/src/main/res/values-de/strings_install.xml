@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">Optionen</string>
     <string name="dialog_menu_permissions">Berechtigungen</string>
     <string name="dialog_menu_permissions_desc">Angefragte Berechtigungen überprüfen</string>
-    <string name="dialog_menu_virustotal">VirusTotal-Scan</string>
+    <string name="dialog_menu_virustotal">Sicherheitsscan</string>
     <string name="dialog_menu_virustotal_desc">Vor der Installation auf Malware scannen</string>
     <string name="dialog_menu_obb">OBB-Dateien</string>
     <string name="dialog_menu_obb_desc">Angehängte OBB-Datendateien verwalten</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">Trotzdem installieren</string>
     <string name="dialog_risk_proceed_severe">Auf eigenes Risiko installieren</string>
     <string name="dialog_risk_downgrade">Downgrade: %1$s → %2$s. Vorhandene App-Daten können gelöscht werden.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d Engine(s) hat/haben diese Datei als bösartig eingestuft.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d Engine(s) hat/haben diese Datei als verdächtig eingestuft.</string>
+    <string name="dialog_risk_vt_malicious">Sicherheitsscan: %1$d Engine(s) haben diese Datei als schädlich eingestuft.</string>
+    <string name="dialog_risk_vt_suspicious">Sicherheitsscan: %1$d Engine(s) haben diese Datei als verdächtig eingestuft.</string>
     <string name="dialog_risk_footer">Fahren Sie nur fort</string>
     <string name="dialog_menu_remember_for_app">Für diese App merken</string>
     <string name="dialog_menu_remember_for_app_sub">Diese Installationsquelle verwenden</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Installiert</string>
     <string name="install_notif_result_failed_title">Installation fehlgeschlagen</string>
-    <string name="apk_info_vt_queued">In Warteschlange bei VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Analyse bei VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Datei zu groß für VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">In der Analyse-Warteschlange…</string>
+    <string name="apk_info_vt_analyzing">APK wird analysiert…</string>
+    <string name="apk_info_vt_too_large">Datei zu groß zum Scannen (%s)</string>
     <string name="apk_info_permissions_empty">Diese App erfordert keine Berechtigungen</string>
     <string name="apk_info_vt_error">Scan fehlgeschlagen – zum Wiederholen tippen</string>
     <string name="dialog_failed_copy_error">Fehler kopieren</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Für diesen Build nicht verfügbar</string>
     <string name="installer_engine_root_request">Tippen, um Root-Zugriff zu gewähren</string>
     <string name="dialog_failed_fallback_install">Über System-Installationsprogramm installieren</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal-Scan nicht abgeschlossen</string>
+    <string name="dialog_risk_vt_unscanned">Sicherheitsscan nicht abgeschlossen</string>
     <string name="scan_virustotal_btn">Mit VirusTotal scannen</string>
     <string name="scanning_progress">Wird gescannt…</string>
     <string name="dialog_read_failed_title">Datei konnte nicht gelesen werden</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Aktiviere auf Xiaomi/HyperOS-Geräten mit Shizuku in den Entwickleroptionen „Installation über USB“ und „USB-Debugging (Sicherheitseinstellungen)“ (erfordert SIM und Mi-Konto). Falls das Problem weiterhin besteht, wechsle in den Einstellungen zum Standard-Installationsmodus.</string>
     <string name="dialog_risk_signature_mismatch">Die installierte App ist mit einem anderen Schlüssel signiert. Android akzeptiert diese Datei nicht als Update — die vorhandene App muss zuerst deinstalliert werden, und ihre Daten gehen verloren.</string>
     <string name="dialog_risk_action_uninstall_existing">Vorhandene App deinstallieren</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal hat diesen API-Schlüssel abgelehnt. Öffne Einstellungen → Erweitert → VirusTotal API-Schlüssel und prüfe, ob er vollständig eingefügt wurde.</string>
-    <string name="apk_info_vt_rate_limited">VirusTotal-Ratenlimit erreicht — die kostenlose Stufe erlaubt 4 Anfragen pro Minute. Versuche es gleich noch einmal.</string>
-    <string name="apk_info_vt_rate_limited_retry">VirusTotal-Ratenlimit erreicht — die kostenlose Stufe erlaubt 4 Anfragen pro Minute. Versuche es in %1$s Sekunden erneut.</string>
+    <string name="apk_info_vt_invalid_key">Der Sicherheitsdienst hat den API-Schlüssel abgelehnt. Öffne Einstellungen → APK-Sicherheitsscan und prüfe deinen VirusTotal-API-Schlüssel.</string>
+    <string name="apk_info_vt_rate_limited">Tägliches Scan- oder Ratenlimit erreicht. Versuche es später erneut oder füge in den Einstellungen einen persönlichen VirusTotal-API-Schlüssel hinzu.</string>
+    <string name="apk_info_vt_rate_limited_retry">Scan-Ratenlimit erreicht. Versuche es in %1$s Sekunden erneut.</string>
     <string name="apk_info_root_requested">Root angefordert</string>
     <string name="apk_info_shizuku_requested">Shizuku angefordert</string>
     <string name="dialog_fallback_install_unavailable">Kein anderes Installationsprogramm auf diesem Gerät kann APK-Dateien öffnen</string>
@@ -478,6 +478,7 @@
     <string name="apk_info_vt_chip_rate_limited">Gratislimit erreicht · Freischalten</string>
     <string name="apk_info_vt_chip_invalid_key">Ungültiger API-Schlüssel</string>
     <string name="apk_info_vt_chip_need_key">API-Schlüssel / Pro nötig</string>
+    <string name="apk_info_vt_chip_need_key_opensource">API-Schlüssel nötig</string>
     <string name="install_recent_apks_title">Letzte APKs</string>
     <string name="install_recent_apks_see_all">Alle ansehen</string>
     <string name="apk_info_vt_precheck_clean">Schnellprüfung ohne Befund — für Quellcode-Prüfung auf Tiefenscan tippen</string>

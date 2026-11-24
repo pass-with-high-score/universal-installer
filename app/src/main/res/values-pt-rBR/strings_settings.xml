@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Três problemas diferentes geram um erro parecido. Instalar uma versão mais antiga exige “Permitir downgrade” — “Substituir existente” não cobre esse caso. Uma atualização normal exige “Substituir existente”, que já vem ativado. E se o app instalado foi assinado com outra chave, nenhuma opção resolve: ele precisa ser desinstalado primeiro e os dados dele são perdidos.</string>
     <string name="help_profiles_title">Perfis de instalação</string>
     <string name="help_profiles_body">Um perfil é um conjunto salvo de opções de instalação que você pode vincular a apps específicos, para não precisar mexer nas chaves antes de cada instalação. Sem um perfil, valem as opções globais desta tela.</string>
-    <string name="help_virustotal_title">Verificação no VirusTotal</string>
-    <string name="help_virustotal_body">Qualquer pacote pode ser verificado no VirusTotal antes de você instalá-lo, mas é preciso colar em Avançado uma chave de API gratuita do virustotal.com. A verificação é manual — toque em “Verificar com o VirusTotal” na tela de instalação. Ative o modo estrito para ser avisado quando estiver prestes a instalar algo que nunca foi verificado.</string>
+    <string name="help_virustotal_title">Verificação de segurança APK</string>
+    <string name="help_virustotal_body">Os pacotes podem ser verificados antes da instalação com o mecanismo integrado AppShield (3 verificações grátis por dia) ou com uma chave de API pessoal do VirusTotal em Configurações → Verificação de segurança APK. Ative o modo estrito para ser avisado ao instalar arquivos não verificados.</string>
     <string name="help_delete_title">Excluir o APK depois da instalação</string>
     <string name="help_delete_body">Funciona para arquivos que você escolhe dentro do app. Quando outro app entrega o APK — como fazem a maioria dos gerenciadores de arquivos — ele costuma compartilhá-lo de um jeito que não dá permissão para excluí-lo, e você verá uma mensagem informando isso. A saída é excluí-lo por esse gerenciador de arquivos.</string>
     <string name="help_source_title">Mudar a origem da instalação</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Nível de segurança</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Estrito</string>
-    <string name="setting_security_normal_sub">Instalar é o botão principal. O VirusTotal continua nos detalhes para quando você quiser.</string>
-    <string name="setting_security_strict_sub">Verificar com o VirusTotal vira o botão principal até o arquivo ter um veredito, e instalar algo não verificado pede confirmação. Precisa de uma chave de API.</string>
+    <string name="setting_security_normal_sub">Instalar é o botão principal. A verificação de segurança continua disponível nos detalhes.</string>
+    <string name="setting_security_strict_sub">A verificação de segurança passa a ser o botão principal até haver resultado, e instalar sem verificar pedirá confirmação.</string>
     <string name="setting_section_privacy">Privacidade</string>
     <string name="setting_analytics_title">Compartilhar dados de uso</string>
     <string name="setting_analytics_subtitle">Informa qual método de instalação foi usado e se funcionou, além de relatórios de falha. Nunca os pacotes que você instala.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Verificador principal</string>
     <string name="setting_scanner_appshield_title">AppShield (Integrado • Recomendado)</string>
     <string name="setting_scanner_appshield_desc">Mecanismo integrado de verificação na nuvem (3 verificações diárias gratuitas, ilimitadas com Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Mecanismo integrado de verificação na nuvem (%1$d verificações grátis por dia).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Compare com mais de 70 mecanismos antivírus internacionais usando sua chave de API pessoal.</string>
     <string name="setting_fallback_section_header">Alternativa e análise offline</string>

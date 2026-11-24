@@ -163,8 +163,8 @@
     <string name="help_conflict_body">Three different problems produce a similar-looking error. Installing an older version needs \&quot;Allow downgrade\&quot; — \&quot;Replace existing\&quot; does not cover it. A normal update needs \&quot;Replace existing\&quot;, which is on by default. And if the installed app was signed with a different key, no option helps: it has to be uninstalled first and its data is lost.</string>
     <string name="help_profiles_title">Installer profiles</string>
     <string name="help_profiles_body">A profile is a saved set of install options you can attach to specific apps, so you do not have to flip switches before each install. Without a profile the global options in this screen apply.</string>
-    <string name="help_virustotal_title">VirusTotal scanning</string>
-    <string name="help_virustotal_body">Any package can be checked against VirusTotal before you install it, but it needs a free API key from virustotal.com pasted into Advanced. Scanning is manual — tap \&quot;Check with VirusTotal\&quot; on the install screen. Turn on strict mode to be warned when you are about to install something that was never scanned.</string>
+    <string name="help_virustotal_title">APK Security Scanning</string>
+    <string name="help_virustotal_body">Packages can be scanned before installation with the built-in AppShield engine (3 free daily scans) or with a free personal VirusTotal API key configured in Settings → APK Security Scan. Turn on strict mode to be warned when you are about to install something that was never scanned.</string>
     <string name="help_delete_title">Delete APK after installation</string>
     <string name="help_delete_body">Works for files you pick inside the app. When another app hands the APK over — most file managers do — it usually shares it in a way that gives no permission to delete it, and you will get a message saying so. Deleting it from that file manager is the way around it.</string>
     <string name="help_source_title">Changing the installation source</string>
@@ -353,8 +353,8 @@
     <string name="setting_security_level_title">Security level</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Strict</string>
-    <string name="setting_security_normal_sub">Install is the main button. VirusTotal is still there in the details when you want it.</string>
-    <string name="setting_security_strict_sub">Scan with VirusTotal becomes the main button until a file has a verdict, and installing something unscanned asks for confirmation. Needs an API key.</string>
+    <string name="setting_security_normal_sub">Install is the main button. Security Scan is still there in the details when you want it.</string>
+    <string name="setting_security_strict_sub">Security Scan becomes the main button until a file has a verdict, and installing something unscanned asks for confirmation.</string>
     <string name="setting_diagnostics_title">Diagnostics</string>
     <string name="setting_section_backup">Backup &amp; Restore</string>
     <string name="setting_backup_export_title">Create Backup</string>
@@ -370,6 +370,7 @@
     <string name="setting_primary_scanner_header">Primary Scanner</string>
     <string name="setting_scanner_appshield_title">AppShield (Built-in • Recommended)</string>
     <string name="setting_scanner_appshield_desc">Built-in cloud scanning engine (3 free daily scans, unlimited with Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Built-in cloud scanning engine (%1$d free daily scans).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Cross-check against 70+ international antivirus engines using your personal API key.</string>
     <string name="setting_fallback_section_header">Fallback &amp; Offline Analysis</string>

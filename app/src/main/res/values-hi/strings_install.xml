@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">विकल्प</string>
     <string name="dialog_menu_permissions">अनुमतियां</string>
     <string name="dialog_menu_permissions_desc">अनुरोधित अनुमतियों की समीक्षा करें</string>
-    <string name="dialog_menu_virustotal">VirusTotal स्कैन</string>
+    <string name="dialog_menu_virustotal">सुरक्षा स्कैन</string>
     <string name="dialog_menu_virustotal_desc">इंस्टॉल करने से पहले मैलवेयर के लिए स्कैन करें</string>
     <string name="dialog_menu_obb">OBB फ़ाइलें</string>
     <string name="dialog_menu_obb_desc">संलग्न OBB डेटा फ़ाइलों को प्रबंधित करें</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">वैसे भी इंस्टॉल करें</string>
     <string name="dialog_risk_proceed_severe">अपने जोखिम पर इंस्टॉल करें</string>
     <string name="dialog_risk_downgrade">डाउनग्रेड: %1$s → %2$s. मौजूदा ऐप डेटा मिटाया जा सकता है।</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d इंजन(इंजनों) ने इस फ़ाइल को दुर्भावनापूर्ण के रूप में फ़्लैग किया है।</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d इंजन(इंजनों) ने इस फ़ाइल को संदिग्ध के रूप में फ़्लैग किया है।</string>
+    <string name="dialog_risk_vt_malicious">सुरक्षा स्कैन: %1$d इंजन ने इस फ़ाइल को दुर्भावनापूर्ण बताया है।</string>
+    <string name="dialog_risk_vt_suspicious">सुरक्षा स्कैन: %1$d इंजन ने इस फ़ाइल को संदिग्ध बताया है।</string>
     <string name="dialog_risk_footer">तभी आगे बढ़ें जब आपको इस फ़ाइल के स्रोत पर भरोसा हो।</string>
     <string name="dialog_menu_remember_for_app">इस ऐप के लिए याद रखें</string>
     <string name="dialog_menu_remember_for_app_sub">जब भी यह ऐप इंस्टॉल हो तो इस इंस्टॉलर स्रोत का उपयोग करें।</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">इंस्टॉल हो गया</string>
     <string name="install_notif_result_failed_title">इंस्टॉल विफल रहा</string>
-    <string name="apk_info_vt_queued">VirusTotal पर कतारबद्ध…</string>
-    <string name="apk_info_vt_analyzing">VirusTotal पर विश्लेषण किया जा रहा है…</string>
-    <string name="apk_info_vt_too_large">VirusTotal के लिए फ़ाइल बहुत बड़ी है (%s)</string>
+    <string name="apk_info_vt_queued">विश्लेषण कतार में…</string>
+    <string name="apk_info_vt_analyzing">APK का विश्लेषण हो रहा है…</string>
+    <string name="apk_info_vt_too_large">स्कैन के लिए फ़ाइल बहुत बड़ी है (%s)</string>
     <string name="apk_info_permissions_empty">यह ऐप कोई अनुमति नहीं मांगता है</string>
     <string name="apk_info_vt_error">स्कैन विफल रहा — पुनः प्रयास करने के लिए टैप करें</string>
     <string name="dialog_failed_copy_error">त्रुटi कॉपी करें</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">इस बिल्ड पर उपलब्ध नहीं</string>
     <string name="installer_engine_root_request">रूट एक्सेस देने के लिए टैप करें</string>
     <string name="dialog_failed_fallback_install">सिस्टम इंस्टॉलर के माध्यम से इंस्टॉल करें</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal स्कैन पूरा नहीं हुआ</string>
+    <string name="dialog_risk_vt_unscanned">सुरक्षा स्कैन पूरा नहीं हुआ</string>
     <string name="scan_virustotal_btn">VirusTotal से स्कैन करें</string>
     <string name="scanning_progress">स्कैन किया जा रहा है…</string>
     <string name="dialog_read_failed_title">फ़ाइल पढ़ी नहीं जा सकी</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Shizuku वाले Xiaomi/HyperOS डिवाइस पर, डेवलपर विकल्प में \"USB के ज़रिए इंस्टॉल करें\" और \"USB डिबगिंग (सुरक्षा सेटिंग)\" चालू करें (SIM और Mi खाते की आवश्यकता है)। यदि समस्या बनी रहती है, तो सेटिंग्स में इंस्टॉलर मोड को डिफ़ॉल्ट पर बदलने का प्रयास करें।</string>
     <string name="dialog_risk_signature_mismatch">इंस्टॉल किया गया ऐप किसी दूसरी कुंजी से साइन किया गया है। Android इस फ़ाइल को अपडेट के रूप में स्वीकार नहीं करेगा — मौजूदा ऐप को पहले अनइंस्टॉल करना होगा, और उसका डेटा चला जाएगा।</string>
     <string name="dialog_risk_action_uninstall_existing">मौजूदा ऐप अनइंस्टॉल करें</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal ने यह API कुंजी अस्वीकार कर दी। सेटिंग्स → उन्नत → VirusTotal API कुंजी खोलें और जाँचें कि वह पूरी चिपकाई गई थी।</string>
-    <string name="apk_info_vt_rate_limited">VirusTotal की सीमा पूरी हो गई — मुफ़्त प्लान में प्रति मिनट 4 अनुरोध ही मिलते हैं। थोड़ी देर बाद फिर कोशिश करें।</string>
-    <string name="apk_info_vt_rate_limited_retry">VirusTotal की सीमा पूरी हो गई — मुफ़्त प्लान में प्रति मिनट 4 अनुरोध ही मिलते हैं। %1$s सेकंड बाद फिर कोशिश करें।</string>
+    <string name="apk_info_vt_invalid_key">सुरक्षा सेवा ने API कुंजी अस्वीकार कर दी। सेटिंग्स → APK सुरक्षा स्कैन खोलें और अपनी VirusTotal API कुंजी जांचें।</string>
+    <string name="apk_info_vt_rate_limited">दैनिक स्कैन या दर सीमा पूरी हो गई है। बाद में प्रयास करें या सेटिंग्स में व्यक्तिगत VirusTotal API कुंजी जोड़ें।</string>
+    <string name="apk_info_vt_rate_limited_retry">स्कैन दर सीमा पूरी हो गई है। %1$s सेकंड में पुनः प्रयास करें।</string>
     <string name="apk_info_root_requested">Root का अनुरोध किया गया</string>
     <string name="apk_info_shizuku_requested">Shizuku का अनुरोध किया गया</string>
     <string name="dialog_fallback_install_unavailable">इस डिवाइस पर कोई अन्य इंस्टॉलर APK फ़ाइलें नहीं खोल सकता है</string>
@@ -478,6 +478,7 @@
     <string name="apk_info_vt_chip_rate_limited">निःशुल्क सीमा समाप्त · अनलॉक करें</string>
     <string name="apk_info_vt_chip_invalid_key">अमान्य API कुंजी</string>
     <string name="apk_info_vt_chip_need_key">API कुंजी / Pro आवश्यक</string>
+    <string name="apk_info_vt_chip_need_key_opensource">API कुंजी आवश्यक</string>
     <string name="install_recent_apks_title">हालिया APK</string>
     <string name="install_recent_apks_see_all">सभी देखें</string>
     <string name="apk_info_vt_precheck_clean">त्वरित जांच में कोई समस्या नहीं मिली — सोर्स कोड जांचने के लिए डीप स्कैन पर टैप करें</string>

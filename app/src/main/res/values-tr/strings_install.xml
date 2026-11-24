@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">Seçenekler</string>
     <string name="dialog_menu_permissions">İzinler</string>
     <string name="dialog_menu_permissions_desc">İstenen izinleri gözden geçir</string>
-    <string name="dialog_menu_virustotal">VirusTotal Taraması</string>
+    <string name="dialog_menu_virustotal">Güvenlik Taraması</string>
     <string name="dialog_menu_virustotal_desc">Yüklemeden önce kötü amaçlı yazılım taraması yap</string>
     <string name="dialog_menu_obb">OBB Dosyaları</string>
     <string name="dialog_menu_obb_desc">Ekli OBB veri dosyalarını yönet</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">Yine de yükle</string>
     <string name="dialog_risk_proceed_severe">Riski kabul ederek yükle</string>
     <string name="dialog_risk_downgrade">Eski sürüme düşürme: %1$s → %2$s. Mevcut uygulama verileri silinebilir.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d motor bu dosyayı kötü amaçlı olarak işaretledi.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d motor bu dosyayı şüpheli olarak işaretledi.</string>
+    <string name="dialog_risk_vt_malicious">Güvenlik Taraması: %1$d motor bu dosyayı zararlı olarak işaretledi.</string>
+    <string name="dialog_risk_vt_suspicious">Güvenlik Taraması: %1$d motor bu dosyayı şüpheli olarak işaretledi.</string>
     <string name="dialog_risk_footer">Sadece bu dosyanın kaynağına güveniyorsanız devam edin.</string>
     <string name="dialog_menu_remember_for_app">Bu uygulama için hatırla</string>
     <string name="dialog_menu_remember_for_app_sub">Bu uygulama ne zaman yüklenirse bu yükleyici kaynağını kullan.</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Yüklendi</string>
     <string name="install_notif_result_failed_title">Yükleme başarısız oldu</string>
-    <string name="apk_info_vt_queued">VirusTotal\'de kuyruğa alındı…</string>
-    <string name="apk_info_vt_analyzing">VirusTotal\'de analiz ediliyor…</string>
-    <string name="apk_info_vt_too_large">Dosya VirusTotal için çok lớn (%s)</string>
+    <string name="apk_info_vt_queued">Analiz kuyruğunda…</string>
+    <string name="apk_info_vt_analyzing">APK analiz ediliyor…</string>
+    <string name="apk_info_vt_too_large">Dosya tarama için çok büyük (%s)</string>
     <string name="apk_info_permissions_empty">Bu uygulama hiç izin istemiyor</string>
     <string name="apk_info_vt_error">Tarama başarısız — tekrar denemek için dokunun</string>
     <string name="dialog_failed_copy_error">Hatayı kopyala</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Bu sürümde kullanılamaz</string>
     <string name="installer_engine_root_request">Root erişimi vermek için dokunun</string>
     <string name="dialog_failed_fallback_install">Sistem Yükleyicisi aracılığıyla yükle</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal taraması tamamlanmadı</string>
+    <string name="dialog_risk_vt_unscanned">Güvenlik taraması tamamlanmadı</string>
     <string name="scan_virustotal_btn">VirusTotal\'da Tara</string>
     <string name="scanning_progress">Taranıyor…</string>
     <string name="dialog_read_failed_title">Dosya okunamadı</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Shizuku kullanan Xiaomi/HyperOS cihazlarda, Geliştirici seçeneklerinde \"USB üzerinden yükle\" ve \"USB hata ayıklama (Güvenlik ayarları)\" seçeneklerini açın (SIM ve Mi Hesabı gereklidir). Sorun devam ederse Ayarlar\'dan Yükleyici Modunu Varsayılan olarak değiştirmeyi deneyin.</string>
     <string name="dialog_risk_signature_mismatch">Yüklü uygulama farklı bir anahtarla imzalanmış. Android bu dosyayı güncelleme olarak kabul etmeyecek — mevcut uygulamanın önce kaldırılması gerekir ve verileri kaybolur.</string>
     <string name="dialog_risk_action_uninstall_existing">Mevcut uygulamayı kaldır</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal bu API anahtarını reddetti. Ayarlar → Gelişmiş → VirusTotal API Anahtarı bölümünü açın ve tam olarak yapıştırıldığını doğrulayın.</string>
-    <string name="apk_info_vt_rate_limited">VirusTotal istek sınırına ulaşıldı — ücretsiz kademe dakikada 4 isteğe izin verir. Kısa süre sonra yeniden deneyin.</string>
-    <string name="apk_info_vt_rate_limited_retry">VirusTotal istek sınırına ulaşıldı — ücretsiz kademe dakikada 4 isteğe izin verir. %1$s saniye sonra yeniden deneyin.</string>
+    <string name="apk_info_vt_invalid_key">Güvenlik hizmeti API anahtarını reddetti. Ayarlar → APK Güvenlik Taraması bölümünden VirusTotal API anahtarınızı kontrol edin.</string>
+    <string name="apk_info_vt_rate_limited">Günlük tarama veya hız sınırına ulaşıldı. Daha sonra tekrar deneyin veya Ayarlar\'da kişisel bir VirusTotal API anahtarı ekleyin.</string>
+    <string name="apk_info_vt_rate_limited_retry">Tarama hız sınırına ulaşıldı. %1$s saniye içinde tekrar deneyin.</string>
     <string name="apk_info_root_requested">Root İstendi</string>
     <string name="apk_info_shizuku_requested">Shizuku İstendi</string>
     <string name="dialog_fallback_install_unavailable">Bu cihazdaki başka hiçbir yükleyici APK dosyalarını açamaz</string>
@@ -478,6 +478,7 @@
     <string name="apk_info_vt_chip_rate_limited">Ücretsiz sınır doldu · Kilidi aç</string>
     <string name="apk_info_vt_chip_invalid_key">Geçersiz API anahtarı</string>
     <string name="apk_info_vt_chip_need_key">API Anahtarı / Pro Gerekli</string>
+    <string name="apk_info_vt_chip_need_key_opensource">API Anahtarı Gerekli</string>
     <string name="install_recent_apks_title">Son APK\'lar</string>
     <string name="install_recent_apks_see_all">Tümünü gör</string>
     <string name="apk_info_vt_precheck_clean">Hızlı kontrol sorun bulmadı — kaynak kodu incelemek için Derin Tarama\'ya dokunun</string>

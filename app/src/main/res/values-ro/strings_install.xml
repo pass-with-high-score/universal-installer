@@ -128,7 +128,7 @@
     <string name="dialog_menu_title">Opțiuni</string>
     <string name="dialog_menu_permissions">Permisiuni</string>
     <string name="dialog_menu_permissions_desc">Revizuiește permisiunile solicitate</string>
-    <string name="dialog_menu_virustotal">Scanare VirusTotal</string>
+    <string name="dialog_menu_virustotal">Scanare de securitate</string>
     <string name="dialog_menu_virustotal_desc">Scanează pentru malware înainte de instalare</string>
     <string name="dialog_menu_obb">Fișiere OBB</string>
     <string name="dialog_menu_obb_desc">Gestionează fișierele de date OBB atașate</string>
@@ -186,8 +186,8 @@
     <string name="dialog_risk_proceed_warn">Instalează oricum</string>
     <string name="dialog_risk_proceed_severe">Instalează pe propriul risc</string>
     <string name="dialog_risk_downgrade">Downgrade: %1$s → %2$s. Datele aplicației existente pot fi șterse.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d motor(oare) au marcat acest fișier ca fiind rău intenționat.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d motor(oare) au marcat acest fișier ca fiind suspect.</string>
+    <string name="dialog_risk_vt_malicious">Scanare de securitate: %1$d motor/motoare au semnalat acest fișier ca malițios.</string>
+    <string name="dialog_risk_vt_suspicious">Scanare de securitate: %1$d motor/motoare au semnalat acest fișier ca suspect.</string>
     <string name="dialog_risk_footer">Continuă doar dacă ai încredere în sursa acestui fișier.</string>
     <string name="dialog_menu_remember_for_app">Reține pentru această aplicație</string>
     <string name="dialog_menu_remember_for_app_sub">Folosește această sursă de instalare ori de câte ori este instalată această aplicație.</string>
@@ -215,9 +215,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Instalat</string>
     <string name="install_notif_result_failed_title">Instalarea a eșuat</string>
-    <string name="apk_info_vt_queued">În coadă pe VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Se analizează pe VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Fișier prea mare pentru VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">În coadă pentru analiză…</string>
+    <string name="apk_info_vt_analyzing">Se analizează APK…</string>
+    <string name="apk_info_vt_too_large">Fișier prea mare pentru scanare (%s)</string>
     <string name="apk_info_permissions_empty">Această aplicație nu solicită nicio permisiune</string>
     <string name="apk_info_vt_error">Scanare eșuată — atinge pentru reîncercare</string>
     <string name="dialog_failed_copy_error">Copiază eroarea</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Indisponibil pentru această versiune</string>
     <string name="installer_engine_root_request">Apăsați pentru a acorda acces root</string>
     <string name="dialog_failed_fallback_install">Instalați prin programul de instalare a sistemului</string>
-    <string name="dialog_risk_vt_unscanned">Scanarea VirusTotal nu a fost finalizată</string>
+    <string name="dialog_risk_vt_unscanned">Scanarea de securitate nu a fost finalizată</string>
     <string name="scan_virustotal_btn">Scanați cu VirusTotal</string>
     <string name="scanning_progress">Se scanează…</string>
     <string name="dialog_read_failed_title">Fișierul nu a putut fi citit</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Pe dispozitivele Xiaomi/HyperOS cu Shizuku, activați «Instalare prin USB» și «Depanare USB (Setări de securitate)» în Opțiuni dezvoltator (necesită cartelă SIM și cont Mi). Dacă problema persistă, schimbați Modul de instalare pe Implicit în Setări.</string>
     <string name="dialog_risk_signature_mismatch">Aplicația instalată este semnată cu altă cheie. Android nu va accepta acest fișier ca actualizare — aplicația existentă trebuie dezinstalată mai întâi, iar datele ei se vor pierde.</string>
     <string name="dialog_risk_action_uninstall_existing">Dezinstalează aplicația existentă</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal a respins această cheie API. Deschide Setări → Avansat → Cheie API VirusTotal și verifică dacă a fost lipită integral.</string>
-    <string name="apk_info_vt_rate_limited">Limita de cereri VirusTotal a fost atinsă — planul gratuit permite 4 cereri pe minut. Încearcă din nou în scurt timp.</string>
-    <string name="apk_info_vt_rate_limited_retry">Limita de cereri VirusTotal a fost atinsă — planul gratuit permite 4 cereri pe minut. Încearcă din nou peste %1$s secunde.</string>
+    <string name="apk_info_vt_invalid_key">Serviciul de securitate a respins cheia API. Deschide Setări → Scanare securitate APK și verifică cheia API VirusTotal.</string>
+    <string name="apk_info_vt_rate_limited">Limita zilnică sau de frecvență a fost atinsă. Încearcă mai târziu sau adaugă o cheie API VirusTotal personală în Setări.</string>
+    <string name="apk_info_vt_rate_limited_retry">Limita de frecvență a fost atinsă. Încearcă din nou în %1$s secunde.</string>
     <string name="apk_info_root_requested">Root Solicitat</string>
     <string name="apk_info_shizuku_requested">Shizuku Solicitat</string>
     <string name="dialog_fallback_install_unavailable">Niciun alt program de instalare de pe acest dispozitiv nu poate deschide fișiere APK</string>
@@ -479,6 +479,7 @@
     <string name="apk_info_vt_chip_rate_limited">Limită gratuită atinsă · Deblochează</string>
     <string name="apk_info_vt_chip_invalid_key">Cheie API invalidă</string>
     <string name="apk_info_vt_chip_need_key">Necesită cheie API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Necesită cheie API</string>
     <string name="install_recent_apks_title">APK-uri recente</string>
     <string name="install_recent_apks_see_all">Vezi tot</string>
     <string name="apk_info_vt_precheck_clean">Verificarea rapidă nu a găsit probleme — apasă Scanare profundă pentru codul sursă</string>

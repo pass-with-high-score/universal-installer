@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Trei probleme diferite produc o eroare care arată la fel. Instalarea unei versiuni mai vechi are nevoie de „Permite downgrade” — „Înlocuiește existentul” nu acoperă asta. O actualizare normală are nevoie de „Înlocuiește existentul”, care este activat implicit. Iar dacă aplicația instalată a fost semnată cu altă cheie, nicio opțiune nu ajută: trebuie dezinstalată mai întâi, iar datele ei se pierd.</string>
     <string name="help_profiles_title">Profiluri de instalare</string>
     <string name="help_profiles_body">Un profil este un set salvat de opțiuni de instalare pe care îl poți atașa unor aplicații anume, ca să nu fie nevoie să schimbi comutatoare înainte de fiecare instalare. Fără profil se aplică opțiunile globale din acest ecran.</string>
-    <string name="help_virustotal_title">Scanarea cu VirusTotal</string>
-    <string name="help_virustotal_body">Orice pachet poate fi verificat pe VirusTotal înainte de instalare, dar este nevoie de o cheie API gratuită de pe virustotal.com, lipită în Avansat. Scanarea este manuală — atinge „Verifică cu VirusTotal” în ecranul de instalare. Activează modul strict ca să fii avertizat când urmează să instalezi ceva ce nu a fost scanat niciodată.</string>
+    <string name="help_virustotal_title">Scanare de securitate APK</string>
+    <string name="help_virustotal_body">Pachetele pot fi scanate înainte de instalare cu motorul integrat AppShield (3 scanări gratuite pe zi) sau cu o cheie API VirusTotal personală în Setări → Scanare securitate APK. Activează modul strict pentru avertizări la fișierele nescanate.</string>
     <string name="help_delete_title">Șterge APK-ul după instalare</string>
     <string name="help_delete_body">Funcționează pentru fișierele pe care le alegi în aplicație. Când altă aplicație predă APK-ul — cum fac majoritatea managerelor de fișiere — de obicei îl partajează într-un mod care nu oferă permisiunea de a-l șterge, iar tu vei primi un mesaj în acest sens. Soluția este să îl ștergi din acel manager de fișiere.</string>
     <string name="help_source_title">Schimbarea sursei instalării</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Nivel de securitate</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Strict</string>
-    <string name="setting_security_normal_sub">Instalează este butonul principal. VirusTotal rămâne în detalii, pentru când ai nevoie de el.</string>
-    <string name="setting_security_strict_sub">Scanează cu VirusTotal devine butonul principal până când un fișier are un verdict, iar instalarea a ceva nescanat cere confirmare. Necesită o cheie API.</string>
+    <string name="setting_security_normal_sub">Instalează este butonul principal. Scanarea de securitate rămâne disponibilă în detalii.</string>
+    <string name="setting_security_strict_sub">Scanarea de securitate devine butonul principal până la rezultat, iar instalarea fișierelor nescanate cere confirmare.</string>
     <string name="setting_section_privacy">Confidențialitate</string>
     <string name="setting_analytics_title">Partajează datele de utilizare</string>
     <string name="setting_analytics_subtitle">Raportează ce metodă de instalare a fost folosită și dacă a funcționat, plus rapoartele de eroare. Niciodată pachetele pe care le instalezi.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Scaner principal</string>
     <string name="setting_scanner_appshield_title">AppShield (Integrat • Recomandat)</string>
     <string name="setting_scanner_appshield_desc">Motor de scanare în cloud integrat (3 scanări gratuite zilnic, nelimitat cu Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Motor integrat de scanare în cloud (%1$d scanări gratuite pe zi).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Verificare încrucișată cu peste 70 de motoare antivirus internaționale folosind cheia ta API personală.</string>
     <string name="setting_fallback_section_header">Rezervă &amp; Analiză offline</string>

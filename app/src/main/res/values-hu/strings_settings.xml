@@ -147,8 +147,8 @@
     <string name="help_conflict_body">Három különböző probléma okoz hasonló kinézetű hibát. Régebbi verzió telepítéséhez a „Visszaléptetés engedélyezése” kell — a „Meglévő felülírása” erre nem vonatkozik. Egy normál frissítéshez a „Meglévő felülírása” kell, ami alapból be van kapcsolva. Ha pedig a telepített alkalmazás más kulccsal van aláírva, egyik opció sem segít: előbb el kell távolítani, és az adatai elvesznek.</string>
     <string name="help_profiles_title">Telepítőprofilok</string>
     <string name="help_profiles_body">A profil telepítési opciók mentett készlete, amelyet adott alkalmazásokhoz rendelhetsz, így nem kell minden telepítés előtt kapcsolókat állítgatnod. Profil nélkül az ezen a képernyőn lévő globális opciók érvényesek.</string>
-    <string name="help_virustotal_title">VirusTotal-ellenőrzés</string>
-    <string name="help_virustotal_body">Bármelyik csomagot ellenőrizheted a VirusTotallal telepítés előtt, de ehhez egy ingyenes API-kulcs kell a virustotal.com oldalról, amelyet a Speciális részbe kell beillesztened. Az ellenőrzés kézi — koppints a „VirusTotal-ellenőrzés” gombra a telepítési képernyőn. Kapcsold be a szigorú módot, hogy figyelmeztetést kapj, ha olyasmit készülsz telepíteni, ami sosem volt ellenőrizve.</string>
+    <string name="help_virustotal_title">APK biztonsági vizsgálat</string>
+    <string name="help_virustotal_body">A csomagok telepítés előtt ellenőrizhetők a beépített AppShield motorral (napi 3 ingyenes vizsgálat) vagy személyes VirusTotal API-kulccsal a Beállítások → APK biztonsági vizsgálat menüben. A szigorú mód figyelmeztet, ha ellenőrizetlen fájlt telepítenél.</string>
     <string name="help_delete_title">APK törlése telepítés után</string>
     <string name="help_delete_body">Az alkalmazáson belül kiválasztott fájlokkal működik. Ha egy másik alkalmazás adja át az APK-t — a legtöbb fájlkezelő így tesz —, általában úgy osztja meg, hogy nincs engedély a törlésére, és erről üzenetet kapsz. Megoldásként töröld abból a fájlkezelőből.</string>
     <string name="help_source_title">A telepítési forrás módosítása</string>
@@ -328,8 +328,8 @@
     <string name="setting_security_level_title">Biztonsági szint</string>
     <string name="setting_security_normal">Normál</string>
     <string name="setting_security_strict">Szigorú</string>
-    <string name="setting_security_normal_sub">A telepítés a fő gomb. A VirusTotal a részleteknél továbbra is elérhető, ha szükséged van rá.</string>
-    <string name="setting_security_strict_sub">A VirusTotal-ellenőrzés lesz a fő gomb, amíg a fájlról nincs ítélet, és ellenőrizetlen fájl telepítése előtt megerősítést kér. API-kulcs szükséges.</string>
+    <string name="setting_security_normal_sub">A Telepítés a fő gomb. A biztonsági vizsgálat továbbra is elérhető a részleteknél.</string>
+    <string name="setting_security_strict_sub">Az eredményig a biztonsági vizsgálat a fő gomb, és az ellenőrizetlen fájlok telepítése megerősítést kér.</string>
     <string name="setting_diagnostics_title">Diagnosztika</string>
     <string name="setting_section_backup">Biztonsági mentés és visszaállítás</string>
     <string name="setting_backup_export_title">Biztonsági mentés készítése</string>
@@ -351,6 +351,7 @@
     <string name="setting_primary_scanner_header">Elsődleges vizsgáló</string>
     <string name="setting_scanner_appshield_title">AppShield (Beépített • Ajánlott)</string>
     <string name="setting_scanner_appshield_desc">Beépített felhőalapú vizsgálómotor (napi 3 ingyenes vizsgálat, Pro verzióval korlátlan).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Beépített felhőalapú vizsgálómotor (napi %1$d ingyenes vizsgálat).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Ellenőrzés 70+ nemzetközi víruskeresővel a saját API-kulcsod használatával.</string>
     <string name="setting_fallback_section_header">Tartalék és offline elemzés</string>

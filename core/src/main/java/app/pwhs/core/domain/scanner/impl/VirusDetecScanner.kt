@@ -180,7 +180,13 @@ class VirusDetecScanner(
         }
 
         // 5. Binary Upload and SSE Processing
-        val tempFile = createTempUploadFile(context, uri, fileName)
+        val directFile = if (uri.scheme == android.content.ContentResolver.SCHEME_FILE) {
+            uri.path?.let(::File)?.takeIf { it.isFile && it.canRead() }
+        } else {
+            null
+        }
+        val tempFile = directFile ?: createTempUploadFile(context, uri, fileName)
+        val shouldDeleteTemp = directFile == null
         if (tempFile == null || !tempFile.exists()) {
             send(ScanStep.Failed(ScanError.Generic(providerId, "Could not prepare file for upload")))
             return@channelFlow
@@ -236,7 +242,9 @@ class VirusDetecScanner(
             Timber.e(e, "VirusDetecScanner scan execution failed")
             send(ScanStep.Failed(mapExceptionToScanError(e)))
         } finally {
-            runCatching { tempFile.delete() }
+            if (shouldDeleteTemp) {
+                runCatching { tempFile.delete() }
+            }
         }
     }.flowOn(Dispatchers.IO)
 
@@ -275,6 +283,7 @@ class VirusDetecScanner(
                 ScanError.Timeout(providerId, 60_000L, "Connection timed out")
             t is java.net.ConnectException || t is java.net.UnknownHostException || msg == VirusDetecService.NETWORK_ERROR_TAG ->
                 ScanError.NetworkError(providerId, t, "Network unavailable")
+            msg.contains("Binary upload failed") -> ScanError.ServerError(providerId, 502, msg)
             msg.contains("429") -> ScanError.RateLimited(providerId, message = "AppShield rate limit reached")
             msg.contains("401") || msg.contains("403") -> ScanError.InvalidApiKey(providerId, "AppShield client unauthorized")
             msg.contains("500") || msg.contains("502") || msg.contains("503") || msg.contains("504") ->
@@ -304,7 +313,7 @@ class VirusDetecScanner(
             val ext = fileName.substringAfterLast('.', "apk").ifBlank { "apk" }
             val f = File(context.cacheDir, "vd_upload_${System.currentTimeMillis()}.$ext")
             context.contentResolver.openInputStream(uri)?.use { input ->
-                f.outputStream().use { output -> input.copyTo(output) }
+                f.outputStream().use { output -> input.copyTo(output, bufferSize = 128 * 1024) }
             }
             f
         }.getOrNull()

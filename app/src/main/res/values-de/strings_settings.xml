@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Drei verschiedene Probleme führen zu einem ähnlich aussehenden Fehler. Für die Installation einer älteren Version braucht es „Downgrade zulassen“ — „Vorhandene ersetzen“ deckt das nicht ab. Ein normales Update braucht „Vorhandene ersetzen“, was standardmäßig aktiv ist. Und wenn die installierte App mit einem anderen Schlüssel signiert wurde, hilft keine Option: Sie muss zuerst deinstalliert werden, und ihre Daten gehen verloren.</string>
     <string name="help_profiles_title">Installer-Profile</string>
     <string name="help_profiles_body">Ein Profil ist ein gespeicherter Satz von Installationsoptionen, den du bestimmten Apps zuweisen kannst, damit du nicht vor jeder Installation Schalter umlegen musst. Ohne Profil gelten die globalen Optionen auf diesem Bildschirm.</string>
-    <string name="help_virustotal_title">VirusTotal-Prüfung</string>
-    <string name="help_virustotal_body">Jedes Paket kann vor der Installation mit VirusTotal geprüft werden, dafür muss aber ein kostenloser API-Schlüssel von virustotal.com unter Erweitert eingefügt werden. Die Prüfung ist manuell — tippe auf dem Installationsbildschirm auf „Mit VirusTotal prüfen“. Aktiviere den strengen Modus, um gewarnt zu werden, wenn du etwas installierst, das nie geprüft wurde.</string>
+    <string name="help_virustotal_title">APK-Sicherheitsscan</string>
+    <string name="help_virustotal_body">Pakete können vor der Installation mit der integrierten AppShield-Engine (3 kostenlose Scans täglich) oder mit einem persönlichen VirusTotal-API-Schlüssel unter Einstellungen → APK-Sicherheitsscan geprüft werden. Aktiviere den strengen Modus, um vor ungeprüften Dateien gewarnt zu werden.</string>
     <string name="help_delete_title">APK nach der Installation löschen</string>
     <string name="help_delete_body">Funktioniert für Dateien, die du in der App auswählst. Wenn eine andere App die APK übergibt — was die meisten Dateimanager tun —, wird sie meist so geteilt, dass keine Berechtigung zum Löschen besteht, und du bekommst eine entsprechende Meldung. Der Weg drumherum ist, sie in diesem Dateimanager zu löschen.</string>
     <string name="help_source_title">Installationsquelle ändern</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Sicherheitsstufe</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Streng</string>
-    <string name="setting_security_normal_sub">Installieren ist die Hauptschaltfläche. VirusTotal findest du weiterhin in den Details, wenn du es brauchst.</string>
-    <string name="setting_security_strict_sub">Mit VirusTotal prüfen wird zur Hauptschaltfläche, bis eine Datei ein Ergebnis hat, und die Installation von etwas Ungeprüftem verlangt eine Bestätigung. Benötigt einen API-Schlüssel.</string>
+    <string name="setting_security_normal_sub">Installieren ist die Hauptschaltfläche. Der Sicherheitsscan bleibt in den Details verfügbar.</string>
+    <string name="setting_security_strict_sub">Der Sicherheitsscan ist die Hauptschaltfläche, bis ein Ergebnis vorliegt, und ungescannte Dateien erfordern eine Bestätigung.</string>
     <string name="setting_section_privacy">Datenschutz</string>
     <string name="setting_analytics_title">Nutzungsdaten teilen</string>
     <string name="setting_analytics_subtitle">Meldet, welche Installationsmethode verwendet wurde und ob sie funktioniert hat, dazu Absturzberichte. Nie die Pakete, die du installierst.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Primärer Scanner</string>
     <string name="setting_scanner_appshield_title">AppShield (Integriert • Empfohlen)</string>
     <string name="setting_scanner_appshield_desc">Integrierte Cloud-Scan-Engine (3 kostenlose Scans täglich, unbegrenzt mit Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Integrierte Cloud-Scan-Engine (%1$d kostenlose Scans täglich).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Abgleich mit über 70 internationalen Antivirus-Engines über deinen persönlichen API-Schlüssel.</string>
     <string name="setting_fallback_section_header">Fallback &amp; Offline-Analyse</string>

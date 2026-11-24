@@ -27,6 +27,7 @@ import app.pwhs.universalinstaller.R
 fun InstallTopBarActions(
     isProUser: Boolean,
     isSyncRunning: Boolean,
+    showPro: Boolean,
     showWatch: Boolean,
     onOpenPro: () -> Unit,
     onOpenWatch: () -> Unit,
@@ -38,26 +39,28 @@ fun InstallTopBarActions(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // High-visibility Pro Crown / Medal Button
-        IconButton(
-            onClick = onOpenPro,
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (isProUser) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-                        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
-                    ),
-                contentAlignment = Alignment.Center,
+        if (showPro) {
+            // High-visibility Pro Crown / Medal Button
+            IconButton(
+                onClick = onOpenPro,
             ) {
-                Icon(
-                    imageVector = Icons.Rounded.WorkspacePremium,
-                    contentDescription = stringResource(CoreR.string.pro_upgrade_sheet_title),
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(22.dp),
-                )
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isProUser) MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
+                            else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.35f)
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.WorkspacePremium,
+                        contentDescription = stringResource(CoreR.string.pro_upgrade_sheet_title),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
             }
         }
 

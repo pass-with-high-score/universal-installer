@@ -13,12 +13,10 @@ import app.pwhs.core.domain.model.Verdict
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.onUpload
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
-import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsChannel
@@ -26,7 +24,6 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
-import io.ktor.util.cio.readChannel
 import io.ktor.utils.io.readUTF8Line
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -231,23 +228,11 @@ open class VirusDetecService(
         uploadUrl: String,
         file: File,
         onProgress: (Int) -> Unit = {},
-    ): Result<Unit> = withContext(Dispatchers.IO) {
-        runCatching {
-            val response: HttpResponse = client.put(uploadUrl) {
-                contentType(ContentType.parse("application/vnd.android.package-archive"))
-                setBody(file.readChannel())
-                onUpload { bytesSentTotal, contentLength ->
-                    if (contentLength != null && contentLength > 0) {
-                        val progress = ((bytesSentTotal.toDouble() / contentLength) * 100).toInt().coerceIn(0, 100)
-                        onProgress(progress)
-                    }
-                }
-            }
-            if (!response.status.isSuccess()) {
-                throw IllegalStateException("Binary upload failed with HTTP ${response.status.value}")
-            }
-        }
-    }
+    ): Result<Unit> = BinaryUploadClient.putFile(
+        uploadUrl = uploadUrl,
+        file = file,
+        onProgress = onProgress,
+    )
 
     open suspend fun startScan(
         jobId: String,

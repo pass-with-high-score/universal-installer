@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Tiga masalah berbeda menghasilkan galat yang tampak serupa. Memasang versi lebih lama butuh “Izinkan downgrade” — “Ganti yang ada” tidak mencakup itu. Pembaruan biasa butuh “Ganti yang ada”, yang aktif secara bawaan. Dan jika aplikasi yang terpasang ditandatangani dengan kunci berbeda, tidak ada opsi yang membantu: aplikasi itu harus dicopot dulu dan datanya akan hilang.</string>
     <string name="help_profiles_title">Profil pemasang</string>
     <string name="help_profiles_body">Profil adalah kumpulan opsi pemasangan tersimpan yang bisa kamu kaitkan ke aplikasi tertentu, sehingga kamu tidak perlu mengubah sakelar sebelum tiap pemasangan. Tanpa profil, opsi global di layar ini yang berlaku.</string>
-    <string name="help_virustotal_title">Pemindaian VirusTotal</string>
-    <string name="help_virustotal_body">Paket apa pun bisa diperiksa di VirusTotal sebelum kamu memasangnya, tetapi perlu kunci API gratis dari virustotal.com yang ditempel di Lanjutan. Pemindaian dilakukan manual — ketuk “Periksa dengan VirusTotal” di layar pemasangan. Aktifkan mode ketat agar kamu diperingatkan saat hendak memasang sesuatu yang belum pernah dipindai.</string>
+    <string name="help_virustotal_title">Pemindaian Keamanan APK</string>
+    <string name="help_virustotal_body">Paket dapat dipindai sebelum dipasang menggunakan mesin bawaan AppShield (3 pemindaian gratis per hari) atau kunci API VirusTotal pribadi di Pengaturan → Pemindaian Keamanan APK. Aktifkan mode ketat untuk peringatan sebelum memasang file yang belum dipindai.</string>
     <string name="help_delete_title">Hapus APK setelah pemasangan</string>
     <string name="help_delete_body">Berlaku untuk file yang kamu pilih di dalam aplikasi. Saat aplikasi lain yang menyerahkan APK — dan kebanyakan pengelola file begitu — biasanya file dibagikan dengan cara yang tidak memberi izin untuk menghapusnya, dan kamu akan melihat pesan tentang itu. Jalan keluarnya adalah menghapusnya dari pengelola file tersebut.</string>
     <string name="help_source_title">Mengubah sumber pemasangan</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Tingkat keamanan</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Ketat</string>
-    <string name="setting_security_normal_sub">Instal adalah tombol utama. VirusTotal tetap tersedia di bagian detail saat kamu membutuhkannya.</string>
-    <string name="setting_security_strict_sub">Pindai dengan VirusTotal menjadi tombol utama sampai sebuah file punya hasil, dan memasang sesuatu yang belum dipindai akan meminta konfirmasi. Perlu kunci API.</string>
+    <string name="setting_security_normal_sub">Pasang adalah tombol utama. Pemindaian Keamanan tetap tersedia di detail saat dibutuhkan.</string>
+    <string name="setting_security_strict_sub">Pemindaian Keamanan menjadi tombol utama hingga ada hasil, dan memasang file yang belum dipindai memerlukan konfirmasi.</string>
     <string name="setting_section_privacy">Privasi</string>
     <string name="setting_analytics_title">Bagikan data penggunaan</string>
     <string name="setting_analytics_subtitle">Melaporkan metode pemasangan yang dipakai dan apakah berhasil, ditambah laporan error. Tidak pernah paket yang kamu pasang.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Pemindai Utama</string>
     <string name="setting_scanner_appshield_title">AppShield (Bawaan • Disarankan)</string>
     <string name="setting_scanner_appshield_desc">Mesin pemindaian cloud bawaan (3 pemindaian gratis harian, tanpa batas dengan Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Mesin pemindaian cloud bawaan (%1$d pemindaian gratis per hari).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Periksa silang dengan 70+ mesin antivirus internasional menggunakan kunci API pribadi Anda.</string>
     <string name="setting_fallback_section_header">Cadangan &amp; Analisis Offline</string>

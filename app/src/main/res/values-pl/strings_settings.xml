@@ -173,8 +173,8 @@
     <string name="help_conflict_body">Trzy różne problemy dają podobnie wyglądający błąd. Instalacja starszej wersji wymaga opcji „Zezwalaj na obniżenie wersji” — „Zastąp istniejące” tego nie obejmuje. Zwykła aktualizacja wymaga opcji „Zastąp istniejące”, która jest domyślnie włączona. A jeśli zainstalowana aplikacja została podpisana innym kluczem, żadna opcja nie pomoże: trzeba ją najpierw odinstalować, a jej dane zostaną utracone.</string>
     <string name="help_profiles_title">Profile instalatora</string>
     <string name="help_profiles_body">Profil to zapisany zestaw opcji instalacji, który możesz przypisać do konkretnych aplikacji, żeby nie przestawiać przełączników przed każdą instalacją. Bez profilu obowiązują globalne opcje z tego ekranu.</string>
-    <string name="help_virustotal_title">Skanowanie w VirusTotal</string>
-    <string name="help_virustotal_body">Każdy pakiet można przed instalacją sprawdzić w VirusTotal, ale potrzebny jest darmowy klucz API z virustotal.com wklejony w sekcji Zaawansowane. Skanowanie jest ręczne — dotknij „Sprawdź w VirusTotal” na ekranie instalacji. Włącz tryb ścisły, aby otrzymywać ostrzeżenie, gdy zamierzasz zainstalować coś, co nigdy nie było skanowane.</string>
+    <string name="help_virustotal_title">Skanowanie bezpieczeństwa APK</string>
+    <string name="help_virustotal_body">Pakiety można skanować przed instalacją za pomocą wbudowanego silnika AppShield (3 bezpłatne skanowania dziennie) lub własnego klucza API VirusTotal w Ustawieniach → Skanowanie bezpieczeństwa APK. Włącz tryb ścisły, aby otrzymywać ostrzeżenie przed instalacją nieskanowanych plików.</string>
     <string name="help_delete_title">Usuwanie pliku APK po instalacji</string>
     <string name="help_delete_body">Działa dla plików wybieranych wewnątrz aplikacji. Gdy plik APK przekazuje inna aplikacja — a tak robi większość menedżerów plików — zwykle udostępnia go w sposób, który nie daje uprawnienia do usunięcia, i zobaczysz stosowny komunikat. Obejściem jest usunięcie go z poziomu tego menedżera plików.</string>
     <string name="help_source_title">Zmiana źródła instalacji</string>
@@ -190,8 +190,8 @@
     <string name="setting_security_level_title">Poziom bezpieczeństwa</string>
     <string name="setting_security_normal">Normalny</string>
     <string name="setting_security_strict">Ścisły</string>
-    <string name="setting_security_normal_sub">Zainstaluj jest przyciskiem głównym. VirusTotal nadal znajdziesz w szczegółach, gdy będzie potrzebny.</string>
-    <string name="setting_security_strict_sub">Skanuj w VirusTotal staje się przyciskiem głównym, dopóki plik nie ma werdyktu, a instalacja czegoś nieprzeskanowanego wymaga potwierdzenia. Wymaga klucza API.</string>
+    <string name="setting_security_normal_sub">Zainstaluj to główny przycisk. Skanowanie bezpieczeństwa jest nadal dostępne w szczegółach.</string>
+    <string name="setting_security_strict_sub">Skanowanie bezpieczeństwa staje się głównym przyciskiem do czasu uzyskania wyniku, a instalacja nieskanowanego pliku wymaga potwierdzenia.</string>
     <string name="setting_section_privacy">Prywatność</string>
     <string name="setting_analytics_title">Udostępniaj dane o użytkowaniu</string>
     <string name="setting_analytics_subtitle">Zgłasza, której metody instalacji użyto i czy zadziałała, oraz raporty o awariach. Nigdy pakietów, które instalujesz.</string>
@@ -351,6 +351,7 @@
     <string name="setting_primary_scanner_header">Główny skaner</string>
     <string name="setting_scanner_appshield_title">AppShield (Wbudowany • Zalecany)</string>
     <string name="setting_scanner_appshield_desc">Wbudowany silnik skanowania w chmurze (3 darmowe skany dziennie, bez limitu z Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Wbudowany silnik skanowania w chmurze (%1$d bezpłatne skanowania dziennie).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Weryfikacja w ponad 70 silnikach antywirusowych z użyciem własnego klucza API.</string>
     <string name="setting_fallback_section_header">Zapasowy skan i analiza offline</string>

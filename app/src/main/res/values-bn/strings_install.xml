@@ -109,9 +109,9 @@
     <string name="apk_info_vt_upload_action">আপলোড এবং স্ক্যান করুন</string>
     <string name="apk_info_vt_no_api_key">কোনো VirusTotal API কী কনফিগার করা নেই। সেটিংস → উন্নত → VirusTotal API কী-তে একটি যোগ করুন — virustotal.com/gui/my-apikey থেকে বিনামূল্যে পাওয়া যাবে।</string>
     <string name="apk_info_vt_uploading">VirusTotal-এ আপলোড হচ্ছে… %d%%</string>
-    <string name="apk_info_vt_queued">VirusTotal-এ সারিবদ্ধ রয়েছে…</string>
-    <string name="apk_info_vt_analyzing">VirusTotal-এ বিশ্লেষণ করা হচ্ছে…</string>
-    <string name="apk_info_vt_too_large">VirusTotal-এর জন্য ফাইলটি খুব বড় (%s)</string>
+    <string name="apk_info_vt_queued">বিশ্লেষণের সারিতে অপেক্ষমাণ…</string>
+    <string name="apk_info_vt_analyzing">APK বিশ্লেষণ করা হচ্ছে…</string>
+    <string name="apk_info_vt_too_large">ফাইলটি স্ক্যান করার জন্য খুব বড় (%s)</string>
     <string name="apk_info_vt_tally">%2$dটি ইঞ্জিনের মধ্যে %1$dটি এই ফাইলটিকে চিহ্নিত করেছে</string>
     <string name="apk_info_vt_engines_show">ইঞ্জিন ফলাফল</string>
     <string name="apk_info_vt_engines_hide">ইঞ্জিনের ফলাফল লুকান</string>
@@ -194,7 +194,7 @@
     <string name="dialog_menu_title">বিকল্পসমূহ</string>
     <string name="dialog_menu_permissions">অনুমতিসমূহ</string>
     <string name="dialog_menu_permissions_desc">অনুরোধ করা অনুমতি পর্যালোচনা করুন</string>
-    <string name="dialog_menu_virustotal">VirusTotal স্ক্যান</string>
+    <string name="dialog_menu_virustotal">নিরাপত্তা স্ক্যান</string>
     <string name="dialog_menu_virustotal_desc">ইনস্টল করার আগে ম্যালওয়্যারের জন্য স্ক্যান করুন</string>
     <string name="dialog_menu_trackers">ট্র্যাকার এবং অ্যানালিটিক্স</string>
     <string name="dialog_menu_no_trackers_found">কোনো পরিচিত ট্র্যাকার শনাক্ত হয়নি</string>
@@ -277,11 +277,11 @@
     <string name="dialog_risk_proceed_warn">তবুও ইনস্টল করুন</string>
     <string name="dialog_risk_proceed_severe">নিজের ঝুঁকিতে ইনস্টল করুন</string>
     <string name="dialog_risk_downgrade">ডাউনগ্রেড: %1$s → %2$s। বিদ্যমান অ্যাপের ডেটা মুছে যেতে পারে।</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$dটি ইঞ্জিন এই ফাইলটিকে ক্ষতিকারক হিসেবে চিহ্নিত করেছে।</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$dটি ইঞ্জিন এই ফাইলটিকে সন্দেহজনক হিসেবে চিহ্নিত করেছে।</string>
+    <string name="dialog_risk_vt_malicious">নিরাপত্তা স্ক্যান: %1$dটি ইঞ্জিন এই ফাইলটিকে ক্ষতিকর হিসেবে চিহ্নিত করেছে।</string>
+    <string name="dialog_risk_vt_suspicious">নিরাপত্তা স্ক্যান: %1$dটি ইঞ্জিন এই ফাইলটিকে সন্দেহজনক হিসেবে চিহ্নিত করেছে।</string>
     <string name="dialog_risk_signature_mismatch">ইনস্টল করা অ্যাপটি একটি ভিন্ন কী দিয়ে স্বাক্ষরিত। Android এই ফাইলটিকে আপডেট হিসেবে গ্রহণ করবে না — বিদ্যমান অ্যাপটি প্রথমে আনইনস্টল করতে হবে এবং এর ডেটা মুছে যাবে।</string>
     <string name="dialog_risk_action_uninstall_existing">বিদ্যমান অ্যাপ আনইনস্টল করুন</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal স্ক্যান সম্পন্ন হয়নি</string>
+    <string name="dialog_risk_vt_unscanned">নিরাপত্তা স্ক্যান সম্পন্ন হয়নি</string>
     <string name="scan_virustotal_btn">VirusTotal স্ক্যান করুন</string>
     <string name="scanning_progress">স্ক্যান করা হচ্ছে…</string>
     <string name="dialog_risk_footer">শুধুমাত্র যদি আপনি এই ফাইলের উৎস বিশ্বাস করেন তবেই এগিয়ে যান।</string>
@@ -304,9 +304,9 @@
     <string name="profile_mapping_header">এই অ্যাপের জন্য স্বয়ংক্রিয়ভাবে প্রয়োগ করুন</string>
     <string name="profile_mapping_desc">এই প্যাকেজটি ইনস্টল করার সময় সর্বদা এই প্রোফাইলটি ব্যবহার করুন।</string>
     <string name="system_installer_frozen_warning">সিস্টেম প্যাকেজ ইনস্টলারটি ফ্রিজ করা আছে। ইনস্টল করতে অনুগ্রহ করে Shizuku চালু করুন বা নিরাপত্তা সেটিংসে এটি পুনরুদ্ধার করুন।</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal এই API কীটি প্রত্যাখ্যান করেছে। সেটিংস → উন্নত → VirusTotal API কী খুলুন এবং এটি সম্পূর্ণ পেস্ট করা হয়েছে কিনা পরীক্ষা করুন।</string>
-    <string name="apk_info_vt_rate_limited">VirusTotal রেট সীমায় পৌঁছেছে — বিনামূল্যের স্তর প্রতি মিনিটে ৪টি অনুরোধের অনুমতি দেয়। কিছুক্ষণ পর আবার চেষ্টা করুন।</string>
-    <string name="apk_info_vt_rate_limited_retry">VirusTotal রেট সীমায় পৌঁছেছে — বিনামূল্যের স্তর প্রতি মিনিটে ৪টি অনুরোধের অনুমতি দেয়। %1$s সেকেন্ডের মধ্যে আবার চেষ্টা করুন।</string>
+    <string name="apk_info_vt_invalid_key">নিরাপত্তা পরিষেবা API কী প্রত্যাখ্যান করেছে। সেটিংস → APK নিরাপত্তা স্ক্যান খুলে আপনার VirusTotal API কী যাচাই করুন।</string>
+    <string name="apk_info_vt_rate_limited">দৈনিক স্ক্যান সীমা বা রেট সীমা পূর্ণ হয়েছে। পরে চেষ্টা করুন অথবা সেটিংসে ব্যক্তিগত VirusTotal API কী যোগ করুন।</string>
+    <string name="apk_info_vt_rate_limited_retry">স্ক্যান রেট সীমা পূর্ণ হয়েছে। %1$s সেকেন্ড পরে আবার চেষ্টা করুন।</string>
     <string name="aa_compatibility_title">Android Auto সামঞ্জস্যতা</string>
     <string name="aa_compatibility_ok">Android Auto এর সাথে সামঞ্জস্যপূর্ণ</string>
     <string name="aa_compatibility_ok_desc">Google Play Store দ্বারা ইনস্টল করা হয়েছে। এই অ্যাপটি Android Auto দৃশ্যমানতার প্রয়োজনীয়তা পূরণ করে।</string>
@@ -472,6 +472,7 @@
     <string name="apk_info_vt_chip_rate_limited">ফ্রি সীমা শেষ · আনলক করুন</string>
     <string name="apk_info_vt_chip_invalid_key">অবৈধ API কী</string>
     <string name="apk_info_vt_chip_need_key">API কী / Pro প্রয়োজন</string>
+    <string name="apk_info_vt_chip_need_key_opensource">API কী প্রয়োজন</string>
     <string name="install_recent_apks_title">সাম্প্রতিক APK</string>
     <string name="install_recent_apks_see_all">সব দেখুন</string>
     <string name="apk_info_vt_precheck_clean">দ্রুত পরীক্ষায় কোনো সমস্যা পাওয়া যায়নি — সোর্স কোড পরীক্ষা করতে গভীর স্ক্যানে ট্যাপ করুন</string>

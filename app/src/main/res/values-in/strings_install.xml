@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">Opsi</string>
     <string name="dialog_menu_permissions">Izin</string>
     <string name="dialog_menu_permissions_desc">Tinjau izin yang diminta</string>
-    <string name="dialog_menu_virustotal">Pemindaian VirusTotal</string>
+    <string name="dialog_menu_virustotal">Pemindaian Keamanan</string>
     <string name="dialog_menu_virustotal_desc">Pindai malware sebelum menginstal</string>
     <string name="dialog_menu_obb">File OBB</string>
     <string name="dialog_menu_obb_desc">Kelola file data OBB yang dilampirkan</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">Tetap instal</string>
     <string name="dialog_risk_proceed_severe">Instal dengan risiko ditanggung sendiri</string>
     <string name="dialog_risk_downgrade">Turunkan versi: %1$s → %2$s. Data aplikasi yang ada mungkin dihapus.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d mesin menandai file ini sebagai berbahaya.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d mesin menandai file ini sebagai mencurigakan.</string>
+    <string name="dialog_risk_vt_malicious">Pemindaian Keamanan: %1$d mesin menandai file ini sebagai berbahaya.</string>
+    <string name="dialog_risk_vt_suspicious">Pemindaian Keamanan: %1$d mesin menandai file ini sebagai mencurigakan.</string>
     <string name="dialog_risk_footer">Lanjutkan hanya jika Anda memercayai sumber file ini.</string>
     <string name="dialog_menu_remember_for_app">Ingat untuk aplikasi ini</string>
     <string name="dialog_menu_remember_for_app_sub">Gunakan sumber penginstal ini setiap kali aplikasi ini diinstal.</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Terinstal</string>
     <string name="install_notif_result_failed_title">Instalasi gagal</string>
-    <string name="apk_info_vt_queued">Antre di VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Menganalisis di VirusTotal…</string>
-    <string name="apk_info_vt_too_large">File quá lớn cho VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">Dalam antrean analisis…</string>
+    <string name="apk_info_vt_analyzing">Menganalisis APK…</string>
+    <string name="apk_info_vt_too_large">File terlalu besar untuk dipindai (%s)</string>
     <string name="apk_info_permissions_empty">Ứng dụng này không yêu cầu bất kỳ quyền nào</string>
     <string name="apk_info_vt_error">Pemindaian gagal — ketuk untuk mencoba lagi</string>
     <string name="dialog_failed_copy_error">Salin lỗi</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Tidak tersedia di versi ini</string>
     <string name="installer_engine_root_request">Ketuk untuk memberikan akses root</string>
     <string name="dialog_failed_fallback_install">Instal melalui Penginstal Sistem</string>
-    <string name="dialog_risk_vt_unscanned">Pemindaian VirusTotal belum selesai</string>
+    <string name="dialog_risk_vt_unscanned">Pemindaian keamanan belum selesai</string>
     <string name="scan_virustotal_btn">Pindai dengan VirusTotal</string>
     <string name="scanning_progress">Memindai…</string>
     <string name="dialog_read_failed_title">Tidak bisa membaca file</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Pada perangkat Xiaomi/HyperOS dengan Shizuku, aktifkan \"Instal melalui USB\" dan \"Debugging USB (Setelan keamanan)\" di Opsi pengembang (memerlukan SIM dan Akun Mi). Jika masalah berlanjut, coba ubah Mode Pemasang ke Default di Pengaturan.</string>
     <string name="dialog_risk_signature_mismatch">Aplikasi yang terpasang ditandatangani dengan kunci berbeda. Android tidak akan menerima file ini sebagai pembaruan — aplikasi yang ada harus dicopot dulu, dan datanya akan hilang.</string>
     <string name="dialog_risk_action_uninstall_existing">Copot aplikasi yang ada</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal menolak kunci API ini. Buka Pengaturan → Lanjutan → Kunci API VirusTotal dan periksa apakah kuncinya tertempel utuh.</string>
-    <string name="apk_info_vt_rate_limited">Batas permintaan VirusTotal tercapai — paket gratis hanya mengizinkan 4 permintaan per menit. Coba lagi sebentar lagi.</string>
-    <string name="apk_info_vt_rate_limited_retry">Batas permintaan VirusTotal tercapai — paket gratis hanya mengizinkan 4 permintaan per menit. Coba lagi dalam %1$s detik.</string>
+    <string name="apk_info_vt_invalid_key">Layanan keamanan menolak kunci API. Buka Pengaturan → Pemindaian Keamanan APK dan periksa kunci API VirusTotal Anda.</string>
+    <string name="apk_info_vt_rate_limited">Batas pemindaian harian atau frekuensi tercapai. Coba lagi nanti atau tambahkan kunci API VirusTotal pribadi di Pengaturan.</string>
+    <string name="apk_info_vt_rate_limited_retry">Batas frekuensi pemindaian tercapai. Coba lagi dalam %1$s detik.</string>
     <string name="apk_info_root_requested">Root Diminta</string>
     <string name="apk_info_shizuku_requested">Shizuku Diminta</string>
     <string name="dialog_fallback_install_unavailable">Tidak ada penginstal lain di perangkat ini yang dapat membuka file APK</string>
@@ -477,6 +477,7 @@
     <string name="apk_info_vt_chip_rate_limited">Batas gratis habis · Buka</string>
     <string name="apk_info_vt_chip_invalid_key">Kunci API tidak valid</string>
     <string name="apk_info_vt_chip_need_key">Perlu Kunci API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Perlu Kunci API</string>
     <string name="install_recent_apks_title">APK Terbaru</string>
     <string name="install_recent_apks_see_all">Lihat semua</string>
     <string name="apk_info_vt_precheck_clean">Pemeriksaan cepat aman — ketuk Pindai Mendalam untuk memeriksa kode sumber</string>

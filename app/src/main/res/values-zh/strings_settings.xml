@@ -42,8 +42,8 @@
     <string name="help_conflict_body">三种不同的问题会产生看起来相似的错误。安装旧版本需要\"允许降级\"，\"替换现有应用\"解决不了。普通更新需要\"替换现有应用\"，它默认开启。如果已安装的应用使用了不同的签名密钥，任何选项都无济于事：必须先卸载，其数据会丢失。</string>
     <string name="help_profiles_title">安装器配置</string>
     <string name="help_profiles_body">配置是一组保存好的安装选项，可以绑定到特定应用，这样每次安装前就不必逐个切换开关。未绑定配置时，使用本页的全局选项。</string>
-    <string name="help_virustotal_title">VirusTotal 扫描</string>
-    <string name="help_virustotal_body">安装前可以用 VirusTotal 检查任何安装包，但需要在\"高级\"中填入 virustotal.com 的免费 API 密钥。扫描是手动的 — 在安装界面点击\"使用 VirusTotal 检查\"。开启严格模式后，安装从未扫描过的文件时会收到警告。</string>
+    <string name="help_virustotal_title">APK 安全扫描</string>
+    <string name="help_virustotal_body">安装前可使用内置 AppShield 引擎（每日 3 次免费扫描）或在设置 → APK 安全扫描中配置个人免费 VirusTotal API 密钥进行扫描。开启严格模式可在安装未扫描文件前发出提醒。</string>
     <string name="help_delete_title">安装后删除 APK</string>
     <string name="help_delete_body">对在应用内选取的文件有效。当由其他应用传来 APK 时（多数文件管理器如此），它通常以不授予删除权限的方式共享，此时您会收到提示。解决办法是在那个文件管理器里删除。</string>
     <string name="help_source_title">更改安装来源</string>
@@ -194,8 +194,8 @@
     <string name="setting_security_level_title">安全级别</string>
     <string name="setting_security_normal">普通</string>
     <string name="setting_security_strict">严格</string>
-    <string name="setting_security_normal_sub">安装是主按钮。需要时仍可在详情中使用 VirusTotal。</string>
-    <string name="setting_security_strict_sub">在文件有扫描结果之前，VirusTotal 扫描会成为主按钮；安装未扫描的文件时会要求确认。需要 API 密钥。</string>
+    <string name="setting_security_normal_sub">“安装”为主按钮，需要时仍可在详情中使用安全扫描。</string>
+    <string name="setting_security_strict_sub">在得出结果前“安全扫描”将作为主按钮，安装未扫描文件时会要求确认。</string>
     <string name="setting_external_open_title">当其他应用打开 APK 时</string>
     <string name="setting_external_open_dialog">在屏幕上询问</string>
     <string name="setting_external_open_dialog_sub">在你打开它的应用上方显示安装卡片。</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">主扫描引擎</string>
     <string name="setting_scanner_appshield_title">AppShield（内置 • 推荐）</string>
     <string name="setting_scanner_appshield_desc">内置云端扫描引擎（每日 3 次免费扫描，Pro 用户无限次）。</string>
+    <string name="setting_scanner_appshield_desc_opensource">内置云端扫描引擎（每日 %1$d 次免费扫描）。</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">使用你的个人 API 密钥，通过 70 余个国际杀毒引擎进行交叉检测。</string>
     <string name="setting_fallback_section_header">备用与离线分析</string>

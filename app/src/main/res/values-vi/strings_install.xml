@@ -181,7 +181,7 @@
     <string name="dialog_menu_title">Tùy chọn</string>
     <string name="dialog_menu_permissions">Quyền</string>
     <string name="dialog_menu_permissions_desc">Xem xét các quyền được yêu cầu</string>
-    <string name="dialog_menu_virustotal">Quét VirusTotal</string>
+    <string name="dialog_menu_virustotal">Quét bảo mật</string>
     <string name="dialog_menu_virustotal_desc">Quét phần mềm độc hại trước khi cài</string>
     <string name="dialog_menu_trackers">Bộ theo dõi &amp; Phân tích</string>
     <string name="dialog_menu_no_trackers_found">Không phát hiện bộ theo dõi nào</string>
@@ -252,11 +252,11 @@
     <string name="dialog_risk_proceed_warn">Vẫn cài đặt</string>
     <string name="dialog_risk_proceed_severe">Cài đặt và tự chịu rủi ro</string>
     <string name="dialog_risk_downgrade">Hạ cấp: %1$s → %2$s. Dữ liệu ứng dụng hiện tại có thể bị xóa.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d công cụ đánh giá tệp này là độc hại.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d công cụ đánh giá tệp này là đáng ngờ.</string>
+    <string name="dialog_risk_vt_malicious">Quét bảo mật: %1$d công cụ đánh giá tệp này là độc hại.</string>
+    <string name="dialog_risk_vt_suspicious">Quét bảo mật: %1$d công cụ đánh giá tệp này là đáng ngờ.</string>
     <string name="dialog_risk_signature_mismatch">Ứng dụng đã cài được ký bằng khoá khác. Android sẽ không nhận file này là bản cập nhật — phải gỡ ứng dụng hiện có trước, và dữ liệu của nó sẽ mất.</string>
     <string name="dialog_risk_action_uninstall_existing">Gỡ ứng dụng hiện có</string>
-    <string name="dialog_risk_vt_unscanned">Chưa quét VirusTotal</string>
+    <string name="dialog_risk_vt_unscanned">Chưa quét bảo mật</string>
     <string name="dialog_risk_trackers_detected">Exodus Privacy đã phát hiện %1$d trình theo dõi trong gói cài đặt này.</string>
     <string name="scan_virustotal_btn">Quét bảo mật</string>
     <string name="scanning_progress">Đang quét…</string>
@@ -308,9 +308,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Đã cài đặt</string>
     <string name="install_notif_result_failed_title">Cài đặt thất bại</string>
-    <string name="apk_info_vt_queued">Đang chờ hàng đợi trên VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Đang phân tích trên VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Tệp quá lớn đối với VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">Đang chờ hàng đợi phân tích…</string>
+    <string name="apk_info_vt_analyzing">Đang phân tích APK…</string>
+    <string name="apk_info_vt_too_large">Tệp quá lớn để quét (%s)</string>
     <string name="apk_info_permissions_empty">Ứng dụng này không yêu cầu quyền nào</string>
     <string name="apk_info_vt_error">Quét thất bại — chạm để thử lại</string>
     <string name="apk_info_vt_network_error">Lỗi kết nối mạng — kiểm tra kết nối và thử lại</string>
@@ -330,9 +330,9 @@
     <string name="installer_engine_root_unsupported">Không khả dụng trên bản dựng này</string>
     <string name="installer_engine_root_request">Nhấn để cấp quyền root</string>
     <string name="dialog_failed_fallback_install">Cài đặt qua trình cài đặt hệ thống</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal từ chối khóa API này. Mở Cài đặt → Advanced → Khóa API VirusTotal và kiểm tra xem đã dán đầy đủ chưa.</string>
-    <string name="apk_info_vt_rate_limited">Đã đạt giới hạn của VirusTotal — gói miễn phí chỉ cho 4 yêu cầu mỗi phút. Hãy thử lại sau giây lát.</string>
-    <string name="apk_info_vt_rate_limited_retry">Đã đạt giới hạn của VirusTotal — gói miễn phí chỉ cho 4 yêu cầu mỗi phút. Hãy thử lại sau %1$s giây.</string>
+    <string name="apk_info_vt_invalid_key">Khóa API bị từ chối. Mở Cài đặt → Quét bảo mật APK và kiểm tra lại khóa API VirusTotal của bạn.</string>
+    <string name="apk_info_vt_rate_limited">Đã hết lượt quét miễn phí hôm nay hoặc bị giới hạn tần suất. Hãy thử lại sau hoặc nhập khóa API VirusTotal cá nhân trong Cài đặt.</string>
+    <string name="apk_info_vt_rate_limited_retry">Đã đạt giới hạn tần suất quét. Hãy thử lại sau %1$s giây.</string>
     <string name="dialog_read_failed_title">Không đọc được tệp</string>
     <string name="dialog_read_failed_text">Ứng dụng đã gửi gói này không còn cho phép truy cập vào nó nữa. Hãy mở lại tệp từ ứng dụng đó.</string>
     <string name="dialog_parse_failed_title">Không phải gói cài đặt được</string>
@@ -484,6 +484,7 @@
     <string name="apk_info_vt_chip_rate_limited">Hết lượt miễn phí · Mở khóa</string>
     <string name="apk_info_vt_chip_invalid_key">API Key không hợp lệ</string>
     <string name="apk_info_vt_chip_need_key">Cần API Key / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Cần API Key</string>
     <string name="install_recent_apks_title">APK mới thêm gần đây</string>
     <string name="install_recent_apks_see_all">Xem tất cả</string>
     <string name="apk_info_vt_precheck_clean">Kiểm tra nhanh chưa thấy bất thường — bấm Quét sâu để kiểm tra mã nguồn</string>

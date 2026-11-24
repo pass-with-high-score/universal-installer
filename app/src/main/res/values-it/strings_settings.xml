@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Tre problemi diversi producono un errore dall\'aspetto simile. Installare una versione più vecchia richiede «Consenti downgrade» — «Sostituisci esistente» non copre questo caso. Un aggiornamento normale richiede «Sostituisci esistente», che è attivo per impostazione predefinita. E se l\'app installata è stata firmata con una chiave diversa, nessuna opzione può aiutare: va disinstallata prima e i suoi dati andranno persi.</string>
     <string name="help_profiles_title">Profili di installazione</string>
     <string name="help_profiles_body">Un profilo è un insieme salvato di opzioni di installazione che puoi associare ad app specifiche, così non devi cambiare interruttori prima di ogni installazione. Senza un profilo valgono le opzioni globali di questa schermata.</string>
-    <string name="help_virustotal_title">Scansione VirusTotal</string>
-    <string name="help_virustotal_body">Qualsiasi pacchetto può essere controllato su VirusTotal prima di installarlo, ma serve una chiave API gratuita di virustotal.com incollata in Avanzate. La scansione è manuale — tocca «Controlla con VirusTotal» nella schermata di installazione. Attiva la modalità rigorosa per essere avvisato quando stai per installare qualcosa che non è mai stato analizzato.</string>
+    <string name="help_virustotal_title">Scansione di sicurezza APK</string>
+    <string name="help_virustotal_body">I pacchetti possono essere scansionati prima dell\'installazione con il motore integrato AppShield (3 scansioni gratuite al giorno) o con una chiave API VirusTotal personale in Impostazioni → Scansione sicurezza APK. Attiva la modalità rigorosa per ricevere un avviso prima di installare file non scansionati.</string>
     <string name="help_delete_title">Elimina l\'APK dopo l\'installazione</string>
     <string name="help_delete_body">Funziona per i file che scegli dentro l\'app. Quando è un\'altra app a passare l\'APK — come fa la maggior parte dei gestori di file — di solito lo condivide in un modo che non concede il permesso di eliminarlo, e riceverai un messaggio che te lo dice. La soluzione è eliminarlo da quel gestore di file.</string>
     <string name="help_source_title">Cambiare la fonte di installazione</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Livello di sicurezza</string>
     <string name="setting_security_normal">Normale</string>
     <string name="setting_security_strict">Rigoroso</string>
-    <string name="setting_security_normal_sub">Installa è il pulsante principale. VirusTotal resta comunque nei dettagli quando ti serve.</string>
-    <string name="setting_security_strict_sub">Scansiona con VirusTotal diventa il pulsante principale finché un file non ha un verdetto, e installare qualcosa mai analizzato richiede conferma. Serve una chiave API.</string>
+    <string name="setting_security_normal_sub">Installa è il pulsante principale. La scansione di sicurezza resta disponibile nei dettagli.</string>
+    <string name="setting_security_strict_sub">La scansione di sicurezza diventa il pulsante principale fino al risultato e l\'installazione di file non scansionati richiede conferma.</string>
     <string name="setting_section_privacy">Privacy</string>
     <string name="setting_analytics_title">Condividi i dati di utilizzo</string>
     <string name="setting_analytics_subtitle">Segnala quale metodo di installazione è stato usato e se ha funzionato, oltre ai report di arresto anomalo. Mai i pacchetti che installi.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Scanner principale</string>
     <string name="setting_scanner_appshield_title">AppShield (Integrato • Consigliato)</string>
     <string name="setting_scanner_appshield_desc">Motore di scansione cloud integrato (3 scansioni gratuite al giorno, illimitate con Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Motore di scansione cloud integrato (%1$d scansioni gratuite al giorno).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Controllo incrociato con oltre 70 motori antivirus internazionali usando la tua chiave API personale.</string>
     <string name="setting_fallback_section_header">Fallback e analisi offline</string>

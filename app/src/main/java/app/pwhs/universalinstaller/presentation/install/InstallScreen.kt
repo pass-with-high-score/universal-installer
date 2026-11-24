@@ -710,7 +710,11 @@ private fun InstallUi(
                 strictSecurity = strictSecurity,
                 onMergeSplits = onMergeSplits,
                 installError = installError,
-                onUpgradeProClick = { showUpgradeProSheet = true },
+                onUpgradeProClick = if (billingManager.isAvailable) {
+                    { showUpgradeProSheet = true }
+                } else {
+                    null
+                },
             )
         }
     }
@@ -816,6 +820,7 @@ private fun InstallUi(
                     InstallTopBarActions(
                         isProUser = isProUser,
                         isSyncRunning = isSyncRunning,
+                        showPro = billingManager.isAvailable,
                         showWatch = WearApkSender.isAvailable,
                         onOpenPro = { showUpgradeProSheet = true },
                         onOpenWatch = {
@@ -878,10 +883,10 @@ private fun InstallUi(
                 }
             }
 
-            if (selectedTab == SourceTab.Local) {
+            if (selectedTab == SourceTab.Local && (billingManager.isAvailable || isProUser)) {
                 item(key = "recent_apks") {
                     app.pwhs.universalinstaller.presentation.install.components.RecentApksSection(
-                        isUnlocked = isProUser || !billingManager.isAvailable,
+                        isUnlocked = isProUser,
                         onPick = onPickFromScan,
                         onRequirePro = { showUpgradeProSheet = true },
                         onSeeAll = onStartDeviceScan,

@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Три різні проблеми дають схожу на вигляд помилку. Для встановлення старішої версії потрібне «Дозволити зниження версії» — «Замінити наявний» цього не покриває. Для звичайного оновлення потрібне «Замінити наявний», і воно ввімкнене за замовчуванням. А якщо встановлений застосунок підписано іншим ключем, не допоможе жоден параметр: його доведеться спочатку видалити, і його дані буде втрачено.</string>
     <string name="help_profiles_title">Профілі встановлювача</string>
     <string name="help_profiles_body">Профіль — це збережений набір параметрів встановлення, який можна прив\'язати до конкретних застосунків, щоб не перемикати налаштування перед кожним встановленням. Без профілю діють загальні параметри з цього екрана.</string>
-    <string name="help_virustotal_title">Перевірка через VirusTotal</string>
-    <string name="help_virustotal_body">Будь-який пакет можна перевірити на VirusTotal перед встановленням, але для цього потрібен безкоштовний ключ API з virustotal.com, вставлений у розділ «Додатково». Перевірка запускається вручну — торкніться «Перевірити через VirusTotal» на екрані встановлення. Увімкніть суворий режим, щоб отримувати попередження, коли ви збираєтеся встановити щось, що жодного разу не перевірялося.</string>
+    <string name="help_virustotal_title">Перевірка безпеки APK</string>
+    <string name="help_virustotal_body">Пакети можна перевіряти перед встановленням за допомогою вбудованого AppShield (3 безкоштовні перевірки на день) або особистого API-ключа VirusTotal у Налаштуваннях → Перевірка безпеки APK. Увімкніть суворий режим для попереджень перед встановленням неперевірених файлів.</string>
     <string name="help_delete_title">Видалення APK після встановлення</string>
     <string name="help_delete_body">Працює для файлів, які ви обираєте всередині застосунку. Коли APK передає інший застосунок — а так робить більшість файлових менеджерів — він зазвичай ділиться файлом так, що прав на видалення не надається, і ви побачите відповідне повідомлення. Обхідний шлях — видалити файл із того файлового менеджера.</string>
     <string name="help_source_title">Зміна джерела встановлення</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Рівень безпеки</string>
     <string name="setting_security_normal">Звичайний</string>
     <string name="setting_security_strict">Суворий</string>
-    <string name="setting_security_normal_sub">«Встановити» — основна кнопка. VirusTotal і далі доступний у подробицях, коли він вам потрібен.</string>
-    <string name="setting_security_strict_sub">«Перевірити через VirusTotal» стає основною кнопкою, доки файл не має вердикту, а встановлення неперевіреного файлу потребує підтвердження. Потрібен ключ API.</string>
+    <string name="setting_security_normal_sub">Встановити — основна кнопка. Перевірка безпеки залишається доступною в деталях.</string>
+    <string name="setting_security_strict_sub">Перевірка безпеки стає основною кнопкою до отримання результату, а встановлення без перевірки потребує підтвердження.</string>
     <string name="setting_section_privacy">Конфіденційність</string>
     <string name="setting_analytics_title">Надсилати дані про використання</string>
     <string name="setting_analytics_subtitle">Повідомляє, який спосіб встановлення було використано і чи спрацював він, а також звіти про збої. Ніколи — пакети, які ви встановлюєте.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Основний сканер</string>
     <string name="setting_scanner_appshield_title">AppShield (Вбудований • Рекомендовано)</string>
     <string name="setting_scanner_appshield_desc">Вбудований хмарний сканер (3 безкоштовні перевірки на день, безліміт із Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Вбудований хмарний сканер (%1$d безкоштовні перевірки на день).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Перевірка за понад 70 антивірусними рушіями з використанням вашого API-ключа.</string>
     <string name="setting_fallback_section_header">Резерв і офлайн-аналіз</string>

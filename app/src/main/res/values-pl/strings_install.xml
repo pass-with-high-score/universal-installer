@@ -81,9 +81,9 @@
     <string name="apk_info_vt_upload_action">Prześlij i skanuj</string>
     <string name="apk_info_vt_no_api_key">Nie skonfigurowano klucza API VirusTotal. Otwórz Ustawienia → Zaawansowane → Klucz API VirusTotal</string>
     <string name="apk_info_vt_uploading">Przesyłanie do VirusTotal… %d%%</string>
-    <string name="apk_info_vt_queued">W kolejce do VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Analizowanie w VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Plik jest zbyt duży dla VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">W kolejce do analizy…</string>
+    <string name="apk_info_vt_analyzing">Analizowanie pliku APK…</string>
+    <string name="apk_info_vt_too_large">Plik jest za duży do skanowania (%s)</string>
     <string name="vt_notif_channel_name">Skanowania VirusTotal</string>
     <string name="vt_notif_channel_description">Postęp przesyłania i analiz w VirusTotal</string>
     <string name="vt_notif_hashing">Obliczanie skrótu pliku…</string>
@@ -142,7 +142,7 @@
     <string name="dialog_menu_title">Opcje</string>
     <string name="dialog_menu_permissions">Uprawnienia</string>
     <string name="dialog_menu_permissions_desc">Przejrzyj żądane uprawnienia</string>
-    <string name="dialog_menu_virustotal">Skanowanie VirusTotal</string>
+    <string name="dialog_menu_virustotal">Skanowanie bezpieczeństwa</string>
     <string name="dialog_menu_virustotal_desc">Skanuj w poszukiwaniu złośliwego oprogramowania przed instalacją</string>
     <string name="dialog_menu_obb">Pliki OBB</string>
     <string name="dialog_menu_obb_desc">Zarządzaj załączonymi plikami danych OBB</string>
@@ -201,9 +201,9 @@
     <string name="dialog_risk_proceed_warn">Zainstaluj mimo to</string>
     <string name="dialog_risk_proceed_severe">Zainstaluj na własne ryzyko</string>
     <string name="dialog_risk_downgrade">Starsza wersja: %1$s → %2$s. Istniejące dane aplikacji mogą zostać usunięte.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d silnik(ów) oznaczyło ten plik jako złośliwy.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d silnik(ów) oznaczyło ten plik jako podejrzany.</string>
-    <string name="dialog_risk_vt_unscanned">Skanowanie VirusTotal nie zostało zakończone</string>
+    <string name="dialog_risk_vt_malicious">Skanowanie bezpieczeństwa: %1$d silnik(i) oznaczyło ten plik jako złośliwy.</string>
+    <string name="dialog_risk_vt_suspicious">Skanowanie bezpieczeństwa: %1$d silnik(i) oznaczyło ten plik jako podejrzany.</string>
+    <string name="dialog_risk_vt_unscanned">Skanowanie bezpieczeństwa nie zostało ukończone</string>
     <string name="scan_virustotal_btn">Skanuj w VirusTotal</string>
     <string name="scanning_progress">Skanowanie…</string>
     <string name="dialog_risk_footer">Kontynuuj tylko</string>
@@ -257,9 +257,9 @@
     <string name="install_error_miui_shizuku_hint">Na urządzeniach Xiaomi/HyperOS z Shizuku włącz „Instaluj przez USB” i „Debugowanie USB (Ustawienia zabezpieczeń)” w Opcjach programisty (wymaga karty SIM i konta Mi). Jeśli problem nadal występuje, spróbuj zmienić Tryb instalatora na Domyślny w Ustawieniach.</string>
     <string name="dialog_risk_signature_mismatch">Zainstalowana aplikacja jest podpisana innym kluczem. Android nie przyjmie tego pliku jako aktualizacji — istniejącą aplikację trzeba najpierw odinstalować, a jej dane zostaną utracone.</string>
     <string name="dialog_risk_action_uninstall_existing">Odinstaluj istniejącą aplikację</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal odrzucił ten klucz API. Otwórz Ustawienia → Zaawansowane → Klucz API VirusTotal i sprawdź, czy został wklejony w całości.</string>
-    <string name="apk_info_vt_rate_limited">Osiągnięto limit zapytań VirusTotal — darmowy plan pozwala na 4 zapytania na minutę. Spróbuj ponownie za chwilę.</string>
-    <string name="apk_info_vt_rate_limited_retry">Osiągnięto limit zapytań VirusTotal — darmowy plan pozwala na 4 zapytania na minutę. Spróbuj ponownie za %1$s s.</string>
+    <string name="apk_info_vt_invalid_key">Usługa bezpieczeństwa odrzuciła klucz API. Otwórz Ustawienia → Skanowanie bezpieczeństwa APK i sprawdź klucz API VirusTotal.</string>
+    <string name="apk_info_vt_rate_limited">Osiągnięto dzienny limit lub limit częstotliwości skanowania. Spróbuj później lub dodaj własny klucz API VirusTotal w Ustawieniach.</string>
+    <string name="apk_info_vt_rate_limited_retry">Osiągnięto limit częstotliwości skanowania. Spróbuj ponownie za %1$s s.</string>
     <string name="apk_info_root_requested">Wymagany Root</string>
     <string name="apk_info_shizuku_requested">Wymagany Shizuku</string>
     <string name="dialog_fallback_install_unavailable">Żaden inny instalator na tym urządzeniu nie może otwierać plików APK</string>
@@ -474,6 +474,7 @@
     <string name="apk_info_vt_chip_rate_limited">Limit darmowy · Odblokuj</string>
     <string name="apk_info_vt_chip_invalid_key">Nieprawidłowy klucz API</string>
     <string name="apk_info_vt_chip_need_key">Wymagany klucz API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Wymagany klucz API</string>
     <string name="install_recent_apks_title">Ostatnie pliki APK</string>
     <string name="install_recent_apks_see_all">Wszystkie</string>
     <string name="apk_info_vt_precheck_clean">Szybki test nie wykrył problemów — dotknij Głęboki skan, aby sprawdzić kod</string>

@@ -85,9 +85,9 @@
     <string name="apk_info_vt_upload_action">Enviar e verificar</string>
     <string name="apk_info_vt_no_api_key">Nenhuma chave de API do VirusTotal configurada. Abra Configurações → Advanced → Chave da API do VirusTotal para adicionar uma — obtenha uma chave gratuita em virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">Enviando para o VirusTotal… %d%%</string>
-    <string name="apk_info_vt_queued">Na fila do VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Analisando no VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Arquivo muito grande para o VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">Na fila para análise…</string>
+    <string name="apk_info_vt_analyzing">Analisando APK…</string>
+    <string name="apk_info_vt_too_large">Arquivo grande demais para verificação (%s)</string>
     <string name="vt_notif_channel_name">Verificações do VirusTotal</string>
     <string name="vt_notif_channel_description">Progresso dos uploads e análises do VirusTotal</string>
     <string name="vt_notif_hashing">Calculando hash do arquivo…</string>
@@ -144,7 +144,7 @@
     <string name="dialog_menu_title">Opções</string>
     <string name="dialog_menu_permissions">Permissões</string>
     <string name="dialog_menu_permissions_desc">Revisar as permissões solicitadas</string>
-    <string name="dialog_menu_virustotal">Verificação do VirusTotal</string>
+    <string name="dialog_menu_virustotal">Verificação de segurança</string>
     <string name="dialog_menu_virustotal_desc">Verificar se há malware antes de instalar</string>
     <string name="dialog_menu_obb">Arquivos OBB</string>
     <string name="dialog_menu_obb_desc">Gerenciar arquivos de dados OBB anexados</string>
@@ -202,8 +202,8 @@
     <string name="dialog_risk_proceed_warn">Instalar mesmo assim</string>
     <string name="dialog_risk_proceed_severe">Instalar por minha conta e risco</string>
     <string name="dialog_risk_downgrade">Downgrade: %1$s → %2$s. Os dados do app existente podem ser apagados.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d mecanismo(s) sinalizou(aram) este arquivo como malicioso.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d mecanismo(s) sinalizou(aram) este arquivo como suspeito.</string>
+    <string name="dialog_risk_vt_malicious">Verificação de segurança: %1$d mecanismo(s) marcaram este arquivo como malicioso.</string>
+    <string name="dialog_risk_vt_suspicious">Verificação de segurança: %1$d mecanismo(s) marcaram este arquivo como suspeito.</string>
     <string name="dialog_risk_footer">Prossiga apenas se você confiar na fonte deste arquivo.</string>
     <string name="dialog_menu_remember_for_app">Lembrar para este app</string>
     <string name="dialog_menu_remember_for_app_sub">Usar esta fonte de instalador sempre que este app for instalado.</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">Indisponível nesta versão</string>
     <string name="installer_engine_root_request">Toque para conceder acesso root</string>
     <string name="dialog_failed_fallback_install">Instalar pelo instalador do sistema</string>
-    <string name="dialog_risk_vt_unscanned">Verificação do VirusTotal não concluída</string>
+    <string name="dialog_risk_vt_unscanned">Verificação de segurança não concluída</string>
     <string name="scan_virustotal_btn">Verificar no VirusTotal</string>
     <string name="scanning_progress">Verificando…</string>
     <string name="dialog_read_failed_title">Não foi possível ler o arquivo</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Em dispositivos Xiaomi/HyperOS com Shizuku, ative «Instalar via USB» e «Depuração USB (Configurações de segurança)» nas Opções do desenvolvedor (requer chip SIM e Conta Mi). Se o problema persistir, mude o Modo do instalador para Padrão nas Configurações.</string>
     <string name="dialog_risk_signature_mismatch">O app instalado está assinado com outra chave. O Android não vai aceitar este arquivo como atualização — o app existente precisa ser desinstalado primeiro e os dados dele serão perdidos.</string>
     <string name="dialog_risk_action_uninstall_existing">Desinstalar o app existente</string>
-    <string name="apk_info_vt_invalid_key">O VirusTotal rejeitou esta chave de API. Abra Configurações → Avançado → Chave da API do VirusTotal e confira se ela foi colada por inteiro.</string>
-    <string name="apk_info_vt_rate_limited">Limite de requisições do VirusTotal atingido — o plano gratuito permite 4 requisições por minuto. Tente de novo em instantes.</string>
-    <string name="apk_info_vt_rate_limited_retry">Limite de requisições do VirusTotal atingido — o plano gratuito permite 4 requisições por minuto. Tente de novo em %1$s segundos.</string>
+    <string name="apk_info_vt_invalid_key">O serviço de segurança rejeitou a chave de API. Abra Configurações → Verificação de segurança APK e verifique sua chave de API do VirusTotal.</string>
+    <string name="apk_info_vt_rate_limited">Limite diário ou de frequência atingido. Tente novamente mais tarde ou adicione uma chave de API pessoal do VirusTotal nas Configurações.</string>
+    <string name="apk_info_vt_rate_limited_retry">Limite de frequência atingido. Tente novamente em %1$s segundos.</string>
     <string name="apk_info_root_requested">Root Solicitado</string>
     <string name="apk_info_shizuku_requested">Shizuku Solicitado</string>
     <string name="dialog_fallback_install_unavailable">Nenhum outro instalador neste dispositivo pode abrir arquivos APK</string>
@@ -479,6 +479,7 @@
     <string name="apk_info_vt_chip_rate_limited">Limite gratuito atingido · Desbloquear</string>
     <string name="apk_info_vt_chip_invalid_key">Chave de API inválida</string>
     <string name="apk_info_vt_chip_need_key">Requer chave de API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Chave de API necessária</string>
     <string name="install_recent_apks_title">APKs recentes</string>
     <string name="install_recent_apks_see_all">Ver tudo</string>
     <string name="apk_info_vt_precheck_clean">A verificação rápida não encontrou problemas — toque em Análise profunda para inspecionar o código-fonte</string>

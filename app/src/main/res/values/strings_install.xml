@@ -229,7 +229,7 @@
     <string name="dialog_menu_title">Options</string>
     <string name="dialog_menu_permissions">Permissions</string>
     <string name="dialog_menu_permissions_desc">Review requested permissions</string>
-    <string name="dialog_menu_virustotal">VirusTotal Scan</string>
+    <string name="dialog_menu_virustotal">Security Scan</string>
     <string name="dialog_menu_virustotal_desc">Scan for malware before install</string>
     <string name="dialog_menu_trackers">Trackers &amp; Analytics</string>
     <string name="dialog_menu_no_trackers_found">No known trackers detected</string>
@@ -325,11 +325,11 @@
     <string name="dialog_risk_proceed_warn">Install anyway</string>
     <string name="dialog_risk_proceed_severe">Install at my own risk</string>
     <string name="dialog_risk_downgrade">Downgrade: %1$s → %2$s. Existing app data may be wiped.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d engine(s) flagged this file as malicious.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d engine(s) flagged this file as suspicious.</string>
+    <string name="dialog_risk_vt_malicious">Security Scan: %1$d engine(s) flagged this file as malicious.</string>
+    <string name="dialog_risk_vt_suspicious">Security Scan: %1$d engine(s) flagged this file as suspicious.</string>
     <string name="dialog_risk_signature_mismatch">The installed app is signed with a different key. Android will not accept this file as an update — the existing app has to be uninstalled first, and its data will be lost.</string>
     <string name="dialog_risk_action_uninstall_existing">Uninstall existing app</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal scan not completed</string>
+    <string name="dialog_risk_vt_unscanned">Security scan not completed</string>
     <string name="dialog_risk_trackers_detected">Exodus Privacy detected %1$d tracker(s) in this package.</string>
     <string name="scan_virustotal_btn">Security Scan</string>
     <string name="scanning_progress">Scanning…</string>
@@ -353,9 +353,9 @@
     <string name="profile_mapping_header">Auto-apply for this app</string>
     <string name="profile_mapping_desc">Always use this profile when installing this package.</string>
     <string name="system_installer_frozen_warning">The system package installer is frozen. Please start Shizuku or restore it in Security settings to install.</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal rejected this API key. Open Settings → Advanced → VirusTotal API Key and check it was pasted in full.</string>
-    <string name="apk_info_vt_rate_limited">VirusTotal rate limit reached — the free tier allows 4 requests per minute. Try again shortly.</string>
-    <string name="apk_info_vt_rate_limited_retry">VirusTotal rate limit reached — the free tier allows 4 requests per minute. Try again in %1$s seconds.</string>
+    <string name="apk_info_vt_invalid_key">Security service rejected the API key. Open Settings → APK Security Scan and verify your VirusTotal API key.</string>
+    <string name="apk_info_vt_rate_limited">Daily scan limit or rate limit reached. Try again later or add a personal VirusTotal API key in Settings.</string>
+    <string name="apk_info_vt_rate_limited_retry">Scan rate limit reached. Try again in %1$s seconds.</string>
     <string name="aa_compatibility_title">Android Auto Compatibility</string>
     <string name="aa_compatibility_ok">Compatible with Android Auto</string>
     <string name="aa_compatibility_ok_desc">Installed by Google Play Store. This app meets Android Auto visibility requirements.</string>
@@ -484,6 +484,7 @@
     <string name="apk_info_vt_chip_rate_limited">Free limit reached · Unlock</string>
     <string name="apk_info_vt_chip_invalid_key">Invalid API key</string>
     <string name="apk_info_vt_chip_need_key">Need API Key / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Need API Key</string>
     <string name="install_recent_apks_title">Recent APKs</string>
     <string name="install_recent_apks_see_all">See all</string>
     <string name="apk_info_vt_precheck_clean">Quick check found no issues — tap Deep Scan to inspect source code</string>

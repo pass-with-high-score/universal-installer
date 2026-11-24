@@ -188,8 +188,8 @@
     <string name="help_conflict_body">見た目の似たエラーは、3 つの異なる原因で起こります。古いバージョンのインストールには「Downgrade を許可」が必要で、「既存のパッケージを置き換える」ではカバーできません。通常の更新には「既存のパッケージを置き換える」が必要で、これは既定でオンです。そしてインストール済みアプリが別の鍵で署名されている場合はどのオプションも効きません。先にアンインストールする必要があり、そのデータは失われます。</string>
     <string name="help_profiles_title">インストーラープロファイル</string>
     <string name="help_profiles_body">プロファイルは、特定のアプリに紐づけられる保存済みのインストールオプションのセットです。インストールのたびにスイッチを切り替える必要がなくなります。プロファイルがない場合は、この画面の全体設定が適用されます。</string>
-    <string name="help_virustotal_title">VirusTotal によるスキャン</string>
-    <string name="help_virustotal_body">どのパッケージもインストール前に VirusTotal で確認できますが、virustotal.com で取得した無料の API キーを詳細設定に貼り付ける必要があります。スキャンは手動です — インストール画面で「VirusTotal で確認」をタップしてください。厳格モードをオンにすると、一度もスキャンされていないものをインストールしようとしたときに警告されます。</string>
+    <string name="help_virustotal_title">APK セキュリティスキャン</string>
+    <string name="help_virustotal_body">インストール前に内蔵の AppShield エンジン（1日3回無料）または設定 → APK セキュリティスキャンで設定した個人の VirusTotal API キーでパッケージをスキャンできます。厳格モードを有効にすると未スキャンのファイルを確認できます。</string>
     <string name="help_delete_title">インストール後に APK を削除</string>
     <string name="help_delete_body">アプリ内で選んだファイルに対して機能します。APK を他のアプリから受け取った場合 — ほとんどのファイルマネージャーがこれに当たります — 通常は削除の権限が与えられない形で共有されるため、その旨のメッセージが表示されます。その場合は、そのファイルマネージャー側で削除してください。</string>
     <string name="help_source_title">インストール元の変更</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">セキュリティレベル</string>
     <string name="setting_security_normal">標準</string>
     <string name="setting_security_strict">厳格</string>
-    <string name="setting_security_normal_sub">インストールがメインのボタンです。VirusTotal は必要なときに詳細から利用できます。</string>
-    <string name="setting_security_strict_sub">ファイルの判定が出るまでは VirusTotal でスキャンがメインのボタンになり、未スキャンのものをインストールする際は確認を求めます。APIキーが必要です。</string>
+    <string name="setting_security_normal_sub">インストールがメインボタンです。セキュリティスキャンは詳細からいつでも実行できます。</string>
+    <string name="setting_security_strict_sub">結果が出るまでセキュリティスキャンがメインボタンになり、未スキャンのインストールには確認が必要です。</string>
     <string name="setting_section_privacy">プライバシー</string>
     <string name="setting_analytics_title">利用データを共有</string>
     <string name="setting_analytics_subtitle">どのインストール方法が使われ、成功したかどうかを報告します。クラッシュレポートも含みます。インストールしたパッケージが送信されることはありません。</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">プライマリスキャナー</string>
     <string name="setting_scanner_appshield_title">AppShield (内蔵 • 推奨)</string>
     <string name="setting_scanner_appshield_desc">内蔵のクラウドスキャンエンジン（1日3回まで無料、Pro で無制限）。</string>
+    <string name="setting_scanner_appshield_desc_opensource">内蔵クラウドスキャンエンジン（1日 %1$d 回まで無料）。</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">個人の API キーを使って 70 以上のウイルス対策エンジンで照合します。</string>
     <string name="setting_fallback_section_header">フォールバック &amp; オフライン解析</string>

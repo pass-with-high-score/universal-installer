@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">Opciones</string>
     <string name="dialog_menu_permissions">Permisos</string>
     <string name="dialog_menu_permissions_desc">Revisar los permisos solicitados</string>
-    <string name="dialog_menu_virustotal">Escaneo de VirusTotal</string>
+    <string name="dialog_menu_virustotal">Análisis de seguridad</string>
     <string name="dialog_menu_virustotal_desc">Buscar malware antes de instalar</string>
     <string name="dialog_menu_obb">Archivos OBB</string>
     <string name="dialog_menu_obb_desc">Administrar archivos de datos OBB adjuntos</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">Instalar de todos modos</string>
     <string name="dialog_risk_proceed_severe">Instalar bajo mi propia responsabilidad</string>
     <string name="dialog_risk_downgrade">Downgrade: %1$s → %2$s. Es posible que se borren los datos de la aplicación existente.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d motor(es) marcó/marcaron este archivo como malicioso.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d motor(es) marcó/marcaron este archivo como sospechoso.</string>
+    <string name="dialog_risk_vt_malicious">Análisis de seguridad: %1$d motor(es) marcaron este archivo como malicioso.</string>
+    <string name="dialog_risk_vt_suspicious">Análisis de seguridad: %1$d motor(es) marcaron este archivo como sospechoso.</string>
     <string name="dialog_risk_footer">Procede solo si confías en la fuente de este archivo.</string>
     <string name="dialog_menu_remember_for_app">Recordar para esta aplicación</string>
     <string name="dialog_menu_remember_for_app_sub">Usar este origen de instalación siempre que se instale esta aplicación.</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">Instalado</string>
     <string name="install_notif_result_failed_title">Error al instalar</string>
-    <string name="apk_info_vt_queued">En cola en VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">Analizando en VirusTotal…</string>
-    <string name="apk_info_vt_too_large">Archivo demasiado grande para VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">En cola para análisis…</string>
+    <string name="apk_info_vt_analyzing">Analizando APK…</string>
+    <string name="apk_info_vt_too_large">Archivo demasiado grande para analizar (%s)</string>
     <string name="apk_info_permissions_empty">Esta aplicación no solicita permisos</string>
     <string name="apk_info_vt_error">Error en el escaneo: toca para reintentar</string>
     <string name="dialog_failed_copy_error">Copiar error</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">No disponible en esta versión</string>
     <string name="installer_engine_root_request">Toca para conceder acceso root</string>
     <string name="dialog_failed_fallback_install">Instalar mediante el instalador del sistema</string>
-    <string name="dialog_risk_vt_unscanned">Análisis de VirusTotal no completado</string>
+    <string name="dialog_risk_vt_unscanned">Análisis de seguridad no completado</string>
     <string name="scan_virustotal_btn">Analizar con VirusTotal</string>
     <string name="scanning_progress">Analizando…</string>
     <string name="dialog_read_failed_title">No se pudo leer el archivo</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">En dispositivos Xiaomi/HyperOS con Shizuku, activa «Instalar vía USB» y «Depuración USB (Ajustes de seguridad)» en Opciones de desarrollador (requiere SIM y cuenta Mi). Si el problema persiste, cambia el modo de instalación a Predeterminado en Ajustes.</string>
     <string name="dialog_risk_signature_mismatch">La app instalada está firmada con otra clave. Android no aceptará este archivo como actualización — hay que desinstalar primero la app existente y se perderán sus datos.</string>
     <string name="dialog_risk_action_uninstall_existing">Desinstalar la app existente</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal rechazó esta clave API. Abre Configuración → Avanzado → Clave API de VirusTotal y comprueba que se pegó completa.</string>
-    <string name="apk_info_vt_rate_limited">Se alcanzó el límite de peticiones de VirusTotal — el plan gratuito permite 4 peticiones por minuto. Inténtalo de nuevo en un momento.</string>
-    <string name="apk_info_vt_rate_limited_retry">Se alcanzó el límite de peticiones de VirusTotal — el plan gratuito permite 4 peticiones por minuto. Inténtalo de nuevo en %1$s segundos.</string>
+    <string name="apk_info_vt_invalid_key">El servicio de seguridad rechazó la clave API. Abre Ajustes → Análisis de seguridad APK y verifica tu clave API de VirusTotal.</string>
+    <string name="apk_info_vt_rate_limited">Se alcanzó el límite diario o de frecuencia de análisis. Inténtalo más tarde o añade una clave API personal de VirusTotal en Ajustes.</string>
+    <string name="apk_info_vt_rate_limited_retry">Se alcanzó el límite de frecuencia de análisis. Inténtalo de nuevo en %1$s segundos.</string>
     <string name="apk_info_root_requested">Root solicitado</string>
     <string name="apk_info_shizuku_requested">Shizuku solicitado</string>
     <string name="dialog_fallback_install_unavailable">Ningún otro instalador en este dispositivo puede abrir archivos APK</string>
@@ -479,6 +479,7 @@
     <string name="apk_info_vt_chip_rate_limited">Límite gratuito · Desbloquear</string>
     <string name="apk_info_vt_chip_invalid_key">Clave de API no válida</string>
     <string name="apk_info_vt_chip_need_key">Requiere clave API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">Necesita clave API</string>
     <string name="install_recent_apks_title">APK recientes</string>
     <string name="install_recent_apks_see_all">Ver todo</string>
     <string name="apk_info_vt_precheck_clean">La revisión rápida no encontró problemas — toca Análisis profundo para inspeccionar el código</string>

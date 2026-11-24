@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">خيارات</string>
     <string name="dialog_menu_permissions">الأذونات</string>
     <string name="dialog_menu_permissions_desc">مراجعة الأذونات المطلوبة</string>
-    <string name="dialog_menu_virustotal">فحص VirusTotal</string>
+    <string name="dialog_menu_virustotal">فحص الأمان</string>
     <string name="dialog_menu_virustotal_desc">فحص البرامج الضارة قبل التثبيت</string>
     <string name="dialog_menu_obb">ملفات OBB</string>
     <string name="dialog_menu_obb_desc">إدارة ملفات بيانات OBB المرفقة</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">التثبيت على أي حال</string>
     <string name="dialog_risk_proceed_severe">التثبيت على مسؤوليتي الخاصة</string>
     <string name="dialog_risk_downgrade">إرجاع للإصدار الأقدم: %1$s → %2$s. قد يتم مسح بيانات التطبيق الحالية.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: صنف(ت) %1$d محرك(محركات) هذا الملف على أنه ضار.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: صنف(ت) %1$d محرك(محركات) هذا الملف على أنه مشبوه.</string>
+    <string name="dialog_risk_vt_malicious">فحص الأمان: صنّف %1$d محركًا هذا الملف كضار.</string>
+    <string name="dialog_risk_vt_suspicious">فحص الأمان: صنّف %1$d محركًا هذا الملف كمريب.</string>
     <string name="dialog_risk_footer">استمر فقط إذا كنت تثق في مصدر هذا الملف.</string>
     <string name="dialog_menu_remember_for_app">تذكر لهذا التطبيق</string>
     <string name="dialog_menu_remember_for_app_sub">استخدم مصدر المثبت هذا متى تم تثبيت هذا التطبيق.</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">تم التثبيت</string>
     <string name="install_notif_result_failed_title">فشل التثبيت</string>
-    <string name="apk_info_vt_queued">قيد الانتظار على VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">جاري التحليل على VirusTotal…</string>
-    <string name="apk_info_vt_too_large">الملف كبير جداً بالنسبة لـ VirusTotal (%s)</string>
+    <string name="apk_info_vt_queued">في قائمة انتظار التحليل…</string>
+    <string name="apk_info_vt_analyzing">جارٍ تحليل ملف APK…</string>
+    <string name="apk_info_vt_too_large">الملف كبير جدًا للفحص (%s)</string>
     <string name="apk_info_permissions_empty">لا يطلب هذا التطبيق أي أذونات</string>
     <string name="apk_info_vt_error">فشل الفحص - اضغط لإعادة المحاولة</string>
     <string name="dialog_failed_copy_error">نسخ الخطأ</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">غير متوفر في هذا الإصدار</string>
     <string name="installer_engine_root_request">اضغط لمنح صلاحيات الروت</string>
     <string name="dialog_failed_fallback_install">التثبيت عبر مثبت النظام</string>
-    <string name="dialog_risk_vt_unscanned">فحص VirusTotal لم يكتمل</string>
+    <string name="dialog_risk_vt_unscanned">لم يكتمل فحص الأمان</string>
     <string name="scan_virustotal_btn">فحص باستخدام VirusTotal</string>
     <string name="scanning_progress">جارٍ الفحص…</string>
     <string name="dialog_read_failed_title">تعذّر قراءة الملف</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">على أجهزة Xiaomi/HyperOS التي تستخدم Shizuku، فعّل «التثبيت عبر USB» و«تصحيح أخطاء USB (إعدادات الأمان)» في خيارات المطور (يتطلب شريحة SIM وحساب Mi). إذا استمرت المشكلة، فجرّب تبديل وضع المثبت إلى الافتراضي في الإعدادات.</string>
     <string name="dialog_risk_signature_mismatch">التطبيق المثبَّت موقَّع بمفتاح مختلف. لن يقبل Android هذا الملف كتحديث — يجب إلغاء تثبيت التطبيق الحالي أولًا، وستُفقد بياناته.</string>
     <string name="dialog_risk_action_uninstall_existing">إلغاء تثبيت التطبيق الحالي</string>
-    <string name="apk_info_vt_invalid_key">رفض VirusTotal مفتاح API هذا. افتح الإعدادات → متقدم → مفتاح VirusTotal API وتأكد من لصقه كاملًا.</string>
-    <string name="apk_info_vt_rate_limited">تم بلوغ حد طلبات VirusTotal — تسمح الخطة المجانية بـ 4 طلبات في الدقيقة. أعد المحاولة بعد قليل.</string>
-    <string name="apk_info_vt_rate_limited_retry">تم بلوغ حد طلبات VirusTotal — تسمح الخطة المجانية بـ 4 طلبات في الدقيقة. أعد المحاولة بعد %1$s ثانية.</string>
+    <string name="apk_info_vt_invalid_key">رفضت خدمة الأمان مفتاح API. افتح الإعدادات ← فحص أمان APK وتحقق من مفتاح VirusTotal API الخاص بك.</string>
+    <string name="apk_info_vt_rate_limited">تم الوصول إلى الحد اليومي أو حد معدل الفحص. حاول لاحقًا أو أضف مفتاح VirusTotal API شخصيًا في الإعدادات.</string>
+    <string name="apk_info_vt_rate_limited_retry">تم الوصول إلى حد معدل الفحص. حاول مجددًا بعد %1$s ثانية.</string>
     <string name="apk_info_root_requested">مطلوب صلاحية Root</string>
     <string name="apk_info_shizuku_requested">مطلوب صلاحية Shizuku</string>
     <string name="dialog_fallback_install_unavailable">لا يوجد برنامج تثبيت آخر على هذا الجهاز يمكنه فتح ملفات APK</string>
@@ -482,6 +482,7 @@
     <string name="apk_info_vt_chip_rate_limited">انتهى الحد المجاني · فتح</string>
     <string name="apk_info_vt_chip_invalid_key">مفتاح API غير صالح</string>
     <string name="apk_info_vt_chip_need_key">يلزم مفتاح API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">يلزم مفتاح API</string>
     <string name="install_recent_apks_title">ملفات APK الأخيرة</string>
     <string name="install_recent_apks_see_all">عرض الكل</string>
     <string name="apk_info_vt_precheck_clean">لم يعثر الفحص السريع على مشاكل — انقر على الفحص العميق لفحص الكود المصدري</string>

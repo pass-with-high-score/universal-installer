@@ -129,8 +129,8 @@
     <string name="help_conflict_body">তিনটি ভিন্ন সমস্যার কারণে একই রকম ত্রুটি দেখা দেয়। একটি পুরানো সংস্করণ ইনস্টল করার জন্য \&quot;ডাউনগ্রেডের অনুমতি দিন\&quot; প্রয়োজন — \&quot;বিদ্যমান প্রতিস্থাপন করুন\&quot; এটি কভার করে না। একটি স্বাভাবিক আপডেটের জন্য \&quot;বিদ্যমান প্রতিস্থাপন করুন\&quot; প্রয়োজন, যা ডিফল্টভাবেই চালু থাকে। আর যদি ইনস্টল করা অ্যাপটি একটি ভিন্ন কী দিয়ে স্বাক্ষরিত হয়, তবে কোনো বিকল্পই সাহায্য করে না: এটিকে প্রথমে আনইনস্টল করতে হবে এবং এর ডেটা হারিয়ে যাবে।</string>
     <string name="help_profiles_title">ইনস্টলার প্রোফাইলসমূহ</string>
     <string name="help_profiles_body">একটি প্রোফাইল হলো ইনস্টল বিকল্পগুলোর একটি সংরক্ষিত সেট যা আপনি নির্দিষ্ট অ্যাপের সাথে সংযুক্ত করতে পারেন, যাতে প্রতিটি ইনস্টলেশনের আগে আপনাকে সুইচ পরিবর্তন করতে না হয়। প্রোফাইল ছাড়া এই স্ক্রিনের গ্লোবাল বিকল্পগুলো প্রযোজ্য হবে।</string>
-    <string name="help_virustotal_title">VirusTotal স্ক্যানিং</string>
-    <string name="help_virustotal_body">ইনস্টল করার আগে যেকোনো প্যাকেজ VirusTotal-এ পরীক্ষা করা যেতে পারে, তবে এর জন্য virustotal.com থেকে একটি বিনামূল্যের API কী নিয়ে Advanced-এ পেস্ট করতে হবে। স্ক্যানিং ম্যানুয়াল — ইনস্টল স্ক্রিনে \&quot;VirusTotal দিয়ে পরীক্ষা করুন\&quot; ট্যাপ করুন। কখনও স্ক্যান করা হয়নি এমন কিছু ইনস্টল করার সময় সতর্ক হতে কঠোর মোড চালু করুন।</string>
+    <string name="help_virustotal_title">APK নিরাপত্তা স্ক্যানিং</string>
+    <string name="help_virustotal_body">ইনস্টল করার আগে বিল্ট-ইন AppShield ইঞ্জিন (দিনে ৩টি ফ্রি স্ক্যান) বা সেটিংস → APK নিরাপত্তা স্ক্যানে ব্যক্তিগত VirusTotal API কী দিয়ে প্যাকেজ স্ক্যান করা যায়। স্ক্যান না করা ফাইল ইনস্টলের আগে সতর্কতার জন্য স্ট্রিক্ট মোড চালু করুন।</string>
     <string name="help_delete_title">ইনস্টলেশনের পরে APK মুছুন</string>
     <string name="help_delete_body">অ্যাপের ভেতর থেকে যে ফাইলগুলো বেছে নেন সেগুলোর জন্য কাজ করে। যখন অন্য কোনো অ্যাপ APK হস্তান্তর করে — বেশিরভাগ ফাইল ম্যানেজার করে — তখন এটি সাধারণত এমনভাবে শেয়ার করে যাতে এটি মুছে ফেলার কোনো অনুমতি থাকে না এবং আপনি এমন একটি বার্তা পাবেন। সেই ফাইল ম্যানেজার থেকে এটি মুছে ফেলা এর একমাত্র সমাধান।</string>
     <string name="help_source_title">ইনস্টলেশনের উৎস পরিবর্তন করা</string>
@@ -295,8 +295,8 @@
     <string name="setting_security_level_title">নিরাপত্তা স্তর</string>
     <string name="setting_security_normal">সাধারণ</string>
     <string name="setting_security_strict">কঠোর</string>
-    <string name="setting_security_normal_sub">ইনস্টল হলো প্রধান বোতাম। আপনি চাইলে বিস্তারিত তথ্যে VirusTotal দেখতে পাবেন।</string>
-    <string name="setting_security_strict_sub">কোনো ফাইলের ফলাফল না আসা পর্যন্ত VirusTotal দিয়ে স্ক্যান প্রধান বোতাম হয়ে থাকে এবং স্ক্যান না করা কিছু ইনস্টল করার সময় নিশ্চিতকরণ চাইবে। এর জন্য একটি API কী প্রয়োজন।</string>
+    <string name="setting_security_normal_sub">ইনস্টল হলো মূল বোতাম। প্রয়োজন হলে বিস্তারিত অংশে নিরাপত্তা স্ক্যান পাবেন।</string>
+    <string name="setting_security_strict_sub">ফলাফল না পাওয়া পর্যন্ত নিরাপত্তা স্ক্যান মূল বোতাম থাকবে এবং স্ক্যান না করা ফাইল ইনস্টলে নিশ্চিতকরণ লাগবে।</string>
     <string name="setting_diagnostics_title">ডায়াগনস্টিকস</string>
     <string name="setting_section_backup">ব্যাকআপ এবং পুনরুদ্ধার</string>
     <string name="setting_backup_export_title">ব্যাকআপ তৈরি করুন</string>
@@ -352,6 +352,7 @@
     <string name="setting_primary_scanner_header">প্রাথমিক স্ক্যানার</string>
     <string name="setting_scanner_appshield_title">AppShield (বিল্ট-ইন • সুপারিশকৃত)</string>
     <string name="setting_scanner_appshield_desc">বিল্ট-ইন ক্লাউড স্ক্যানিং ইঞ্জিন (দৈনিক 3টি ফ্রি স্ক্যান, Pro-তে সীমাহীন)।</string>
+    <string name="setting_scanner_appshield_desc_opensource">বিল্ট-ইন ক্লাউড স্ক্যানিং ইঞ্জিন (দিনে %1$dটি ফ্রি স্ক্যান)।</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">আপনার ব্যক্তিগত API কী ব্যবহার করে 70+ আন্তর্জাতিক অ্যান্টিভাইরাস ইঞ্জিনের সাথে যাচাই করুন।</string>
     <string name="setting_fallback_section_header">বিকল্প ও অফলাইন বিশ্লেষণ</string>

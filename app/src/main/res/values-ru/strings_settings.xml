@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Три разные проблемы дают похожую на вид ошибку. Для установки более старой версии нужно «Разрешить Downgrade» — «Заменить существующие» этого не покрывает. Для обычного обновления нужно «Заменить существующие», и оно включено по умолчанию. А если установленное приложение подписано другим ключом, не поможет ни один параметр: его придётся сначала удалить, и его данные будут потеряны.</string>
     <string name="help_profiles_title">Профили установщика</string>
     <string name="help_profiles_body">Профиль — это сохранённый набор параметров установки, который можно привязать к конкретным приложениям, чтобы не переключать настройки перед каждой установкой. Без профиля действуют общие параметры с этого экрана.</string>
-    <string name="help_virustotal_title">Проверка через VirusTotal</string>
-    <string name="help_virustotal_body">Любой пакет можно проверить в VirusTotal перед установкой, но для этого нужен бесплатный API-ключ с virustotal.com, вставленный в раздел «Дополнительно». Проверка запускается вручную — нажмите «Проверить в VirusTotal» на экране установки. Включите строгий режим, чтобы получать предупреждение, когда вы собираетесь установить то, что ни разу не проверялось.</string>
+    <string name="help_virustotal_title">Проверка безопасности APK</string>
+    <string name="help_virustotal_body">Пакеты можно проверять перед установкой с помощью встроенного движка AppShield (3 бесплатные проверки в день) или личного API-ключа VirusTotal в Настройках → Проверка безопасности APK. Включите строгий режим для предупреждения перед установкой непроверенных файлов.</string>
     <string name="help_delete_title">Удаление APK после установки</string>
     <string name="help_delete_body">Работает для файлов, которые вы выбираете внутри приложения. Когда APK передаёт другое приложение — а так делают большинство файловых менеджеров — оно обычно делится файлом так, что права на удаление не выдаются, и вы увидите соответствующее сообщение. Обходной путь — удалить файл из самого файлового менеджера.</string>
     <string name="help_source_title">Изменение источника установки</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Уровень безопасности</string>
     <string name="setting_security_normal">Обычный</string>
     <string name="setting_security_strict">Строгий</string>
-    <string name="setting_security_normal_sub">«Установить» — основная кнопка. VirusTotal по-прежнему доступен в подробностях, когда он вам нужен.</string>
-    <string name="setting_security_strict_sub">«Проверить в VirusTotal» становится основной кнопкой, пока у файла нет вердикта, а установка непроверенного файла требует подтверждения. Нужен API-ключ.</string>
+    <string name="setting_security_normal_sub">Установить — основная кнопка. Проверка безопасности остаётся доступной в деталях.</string>
+    <string name="setting_security_strict_sub">Проверка безопасности становится основной кнопкой до получения результата, а установка без проверки требует подтверждения.</string>
     <string name="setting_section_privacy">Конфиденциальность</string>
     <string name="setting_analytics_title">Отправлять данные об использовании</string>
     <string name="setting_analytics_subtitle">Сообщает, какой способ установки использовался и сработал ли он, а также отчёты о сбоях. Никогда — пакеты, которые вы устанавливаете.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Основной сканер</string>
     <string name="setting_scanner_appshield_title">AppShield (Встроенный • Рекомендуется)</string>
     <string name="setting_scanner_appshield_desc">Встроенный облачный сканер (3 бесплатные проверки в день, безлимит с Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Встроенный облачный сканер (%1$d бесплатных проверок в день).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Проверка по 70+ антивирусам с вашим личным API-ключом.</string>
     <string name="setting_fallback_section_header">Резерв и офлайн-анализ</string>

@@ -188,8 +188,8 @@
     <string name="help_conflict_body">तीन अलग-अलग समस्याएँ लगभग एक जैसी दिखने वाली गड़बड़ी पैदा करती हैं। पुराना वर्शन इंस्टॉल करने के लिए “Downgrade की अनुमति दें” चाहिए — “मौजूदा को बदलें” इसे कवर नहीं करता। सामान्य अपडेट के लिए “मौजूदा को बदलें” चाहिए, जो डिफ़ॉल्ट रूप से चालू रहता है। और अगर इंस्टॉल किया गया ऐप किसी दूसरी कुंजी से साइन किया गया है, तो कोई विकल्प काम नहीं आता: उसे पहले अनइंस्टॉल करना पड़ेगा और उसका डेटा चला जाएगा।</string>
     <string name="help_profiles_title">इंस्टॉलर प्रोफ़ाइल</string>
     <string name="help_profiles_body">प्रोफ़ाइल इंस्टॉल विकल्पों का सहेजा हुआ सेट है, जिसे आप कुछ खास ऐप्स से जोड़ सकते हैं, ताकि हर इंस्टॉल से पहले स्विच बदलने न पड़ें। प्रोफ़ाइल न हो तो इस स्क्रीन के सामान्य विकल्प लागू होते हैं।</string>
-    <string name="help_virustotal_title">VirusTotal से स्कैनिंग</string>
-    <string name="help_virustotal_body">किसी भी पैकेज को इंस्टॉल करने से पहले VirusTotal पर जाँचा जा सकता है, पर इसके लिए virustotal.com से मिली मुफ़्त API कुंजी को उन्नत में चिपकाना होगा। स्कैन मैन्युअल है — इंस्टॉल स्क्रीन पर “VirusTotal से जाँचें” पर टैप करें। सख़्त मोड चालू करें ताकि ऐसा कुछ इंस्टॉल करते समय चेतावनी मिले जो कभी स्कैन नहीं हुआ।</string>
+    <string name="help_virustotal_title">APK सुरक्षा स्कैनिंग</string>
+    <string name="help_virustotal_body">इंस्टॉल से पहले इनबिल्ट AppShield इंजन (प्रतिदिन 3 मुफ्त स्कैन) या सेटिंग्स → APK सुरक्षा स्कैन में व्यक्तिगत VirusTotal API कुंजी से पैकेज स्कैन किए जा सकते हैं। बिना स्कैन की गई फ़ाइल इंस्टॉल करने से पहले चेतावनी के लिए सख्त मोड चालू करें।</string>
     <string name="help_delete_title">इंस्टॉल के बाद APK हटाएँ</string>
     <string name="help_delete_body">यह उन फ़ाइलों के लिए काम करता है जिन्हें आप ऐप के अंदर चुनते हैं। जब कोई दूसरा ऐप APK सौंपता है — ज़्यादातर फ़ाइल मैनेजर ऐसा ही करते हैं — तो वह उसे आम तौर पर ऐसे साझा करता है जिससे उसे हटाने की अनुमति नहीं मिलती, और आपको इसका संदेश दिखेगा। इसका तरीका यही है कि उसे उसी फ़ाइल मैनेजर से हटाएँ।</string>
     <string name="help_source_title">इंस्टॉलेशन स्रोत बदलना</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">सुरक्षा स्तर</string>
     <string name="setting_security_normal">सामान्य</string>
     <string name="setting_security_strict">सख़्त</string>
-    <string name="setting_security_normal_sub">इंस्टॉल मुख्य बटन है। ज़रूरत पड़ने पर VirusTotal विवरण में मौजूद रहता है।</string>
-    <string name="setting_security_strict_sub">जब तक फ़ाइल का नतीजा न आ जाए, VirusTotal से स्कैन करें मुख्य बटन बन जाता है, और बिना स्कैन की गई चीज़ इंस्टॉल करने पर पुष्टि माँगी जाती है। इसके लिए API कुंजी चाहिए।</string>
+    <string name="setting_security_normal_sub">इंस्टॉल मुख्य बटन है। जरूरत होने पर विवरण में सुरक्षा स्कैन उपलब्ध रहता है।</string>
+    <string name="setting_security_strict_sub">परिणाम आने तक सुरक्षा स्कैन मुख्य बटन रहेगा, और बिना स्कैन की फ़ाइल इंस्टॉल करने पर पुष्टि मांगी जाएगी।</string>
     <string name="setting_section_privacy">गोपनीयता</string>
     <string name="setting_analytics_title">उपयोग डेटा साझा करें</string>
     <string name="setting_analytics_subtitle">बताता है कि कौन-सा इंस्टॉल तरीका इस्तेमाल हुआ और वह काम आया या नहीं, साथ ही क्रैश रिपोर्ट। आप जो पैकेज इंस्टॉल करते हैं, वे कभी नहीं।</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">प्राथमिक स्कैनर</string>
     <string name="setting_scanner_appshield_title">AppShield (बिल्ट-इन • अनुशंसित)</string>
     <string name="setting_scanner_appshield_desc">बिल्ट-इन क्लाउड स्कैनिंग इंजन (प्रतिदिन 3 निःशुल्क स्कैन, Pro के साथ असीमित)।</string>
+    <string name="setting_scanner_appshield_desc_opensource">इनबिल्ट क्लाउड स्कैनिंग इंजन (प्रतिदिन %1$d मुफ्त स्कैन)।</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">अपनी व्यक्तिगत API कुंजी का उपयोग करके 70+ अंतरराष्ट्रीय एंटीवायरस इंजन से जांच करें।</string>
     <string name="setting_fallback_section_header">फ़ॉलबैक और ऑफ़लाइन विश्लेषण</string>

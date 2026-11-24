@@ -113,9 +113,9 @@
     <string name="apk_info_vt_upload_action">بارگذاری و اسکن</string>
     <string name="apk_info_vt_no_api_key">کلید API برای VirusTotal تنظیم نشده است. تنظیمات ← پیشرفته ← کلید API برای VirusTotal را باز کرده و آن را اضافه کنید — کلید رایگان در virustotal.com/gui/my-apikey.</string>
     <string name="apk_info_vt_uploading">در حال بارگذاری در VirusTotal… %d%%</string>
-    <string name="apk_info_vt_queued">در صف انتظار VirusTotal…</string>
-    <string name="apk_info_vt_analyzing">در حال تحلیل در VirusTotal…</string>
-    <string name="apk_info_vt_too_large">حجم فایل برای VirusTotal بسیار زیاد است (%s)</string>
+    <string name="apk_info_vt_queued">در صف تحلیل…</string>
+    <string name="apk_info_vt_analyzing">در حال تحلیل APK…</string>
+    <string name="apk_info_vt_too_large">فایل برای اسکن بیش از حد بزرگ است (%s)</string>
     <string name="apk_info_vt_tally">%1$d از %2$d موتور این فایل را علامت‌گذاری کردند</string>
     <string name="apk_info_vt_engines_show">نتایج موتورها</string>
     <string name="apk_info_vt_engines_hide">پنهان کردن نتایج موتورها</string>
@@ -210,7 +210,7 @@
     <string name="dialog_menu_title">گزینه‌ها</string>
     <string name="dialog_menu_permissions">مجوزها</string>
     <string name="dialog_menu_permissions_desc">بررسی مجوزهای درخواستی</string>
-    <string name="dialog_menu_virustotal">اسکن VirusTotal</string>
+    <string name="dialog_menu_virustotal">اسکن امنیتی</string>
     <string name="dialog_menu_virustotal_desc">اسکن بدافزار قبل از نصب</string>
     <string name="dialog_menu_trackers">ردیاب‌ها و تحلیل‌گرها</string>
     <string name="dialog_menu_no_trackers_found">هیچ ردیاب شناخته‌شده‌ای شناسایی نشد</string>
@@ -302,11 +302,11 @@
     <string name="dialog_risk_proceed_warn">نصب در هر صورت</string>
     <string name="dialog_risk_proceed_severe">نصب با مسئولیت خودم</string>
     <string name="dialog_risk_downgrade">برگشت به نسخه قبل: %1$s ← %2$s. داده‌های موجود برنامه ممکن است پاک شوند.</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d موتور این فایل را مخرب تشخیص دادند.</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d موتور این فایل را مشکوک تشخیص دادند.</string>
+    <string name="dialog_risk_vt_malicious">اسکن امنیتی: %1$d موتور این فایل را مخرب تشخیص داد.</string>
+    <string name="dialog_risk_vt_suspicious">اسکن امنیتی: %1$d موتور این فایل را مشکوک تشخیص داد.</string>
     <string name="dialog_risk_signature_mismatch">برنامه نصب‌شده با کلید متفاوتی امضا شده است. اندروید این فایل را به‌عنوان به‌روزرسانی نمی‌پذیرد — برنامه فعلی باید ابتدا لغو نصب شود و داده‌های آن از دست خواهد رفت.</string>
     <string name="dialog_risk_action_uninstall_existing">لغو نصب برنامه موجود</string>
-    <string name="dialog_risk_vt_unscanned">اسکن VirusTotal کامل نشده است</string>
+    <string name="dialog_risk_vt_unscanned">اسکن امنیتی تکمیل نشد</string>
     <string name="dialog_risk_trackers_detected">سامانه Exodus Privacy تعداد %1$d ردیاب را در این بسته شناسایی کرد.</string>
     <string name="scan_virustotal_btn">اسکن VirusTotal</string>
     <string name="scanning_progress">در حال اسکن…</string>
@@ -330,9 +330,9 @@
     <string name="profile_mapping_header">اعمال خودکار برای این برنامه</string>
     <string name="profile_mapping_desc">همیشه هنگام نصب این بسته از این پروفایل استفاده شود.</string>
     <string name="system_installer_frozen_warning">نصب‌کننده بسته سیستم منجمد شده است. لطفاً Shizuku را راه‌اندازی کنید یا آن را در تنظیمات امنیت بازیابی کنید تا بتوانید نصب کنید.</string>
-    <string name="apk_info_vt_invalid_key">سامانه VirusTotal این کلید API را رد کرد. تنظیمات ← پیشرفته ← کلید API برای VirusTotal را باز کنید و بررسی کنید که کامل چسبانده شده باشد.</string>
-    <string name="apk_info_vt_rate_limited">محدودیت درخواست‌های VirusTotal پر شد — پلن رایگان ۴ درخواست در دقیقه مجاز می‌داند. کمی بعد دوباره امتحان کنید.</string>
-    <string name="apk_info_vt_rate_limited_retry">محدودیت درخواست‌های VirusTotal پر شد — پلن رایگان ۴ درخواست در دقیقه مجاز می‌داند. در %1$s ثانیه دیگر دوباره امتحان کنید.</string>
+    <string name="apk_info_vt_invalid_key">سرویس امنیتی کلید API را رد کرد. به تنظیمات ← اسکن امنیتی APK بروید و کلید VirusTotal API خود را بررسی کنید.</string>
+    <string name="apk_info_vt_rate_limited">سقف روزانه یا محدودیت نرخ اسکن تکمیل شده است. بعداً تلاش کنید یا کلید شخصی VirusTotal API را در تنظیمات وارد کنید.</string>
+    <string name="apk_info_vt_rate_limited_retry">محدودیت نرخ اسکن تکمیل شده است. پس از %1$s ثانیه دوباره تلاش کنید.</string>
     <string name="aa_compatibility_title">سازگاری با Android Auto</string>
     <string name="aa_compatibility_ok">سازگار با Android Auto</string>
     <string name="aa_compatibility_ok_desc">نصب‌شده توسط Google Play Store. این برنامه الزامات نمایش در Android Auto را داراست.</string>
@@ -472,6 +472,7 @@
     <string name="apk_info_vt_chip_rate_limited">پایان سهمیه رایگان · باز کردن قفل</string>
     <string name="apk_info_vt_chip_invalid_key">کلید API نامعتبر</string>
     <string name="apk_info_vt_chip_need_key">نیاز به کلید API / Pro</string>
+    <string name="apk_info_vt_chip_need_key_opensource">نیاز به کلید API</string>
     <string name="install_recent_apks_title">APKهای اخیر</string>
     <string name="install_recent_apks_see_all">مشاهده همه</string>
     <string name="apk_info_vt_precheck_clean">بررسی سریع مشکلی نیافت — برای بررسی کد منبع روی اسکن عمیق بزنید</string>

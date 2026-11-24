@@ -122,7 +122,7 @@
     <string name="dialog_menu_title">オプション</string>
     <string name="dialog_menu_permissions">権限</string>
     <string name="dialog_menu_permissions_desc">要求された権限を確認</string>
-    <string name="dialog_menu_virustotal">VirusTotal スキャン</string>
+    <string name="dialog_menu_virustotal">セキュリティスキャン</string>
     <string name="dialog_menu_virustotal_desc">インストール前にマルウェアをスキャン</string>
     <string name="dialog_menu_obb">OBB ファイル</string>
     <string name="dialog_menu_obb_desc">添付された OBB データファイルを管理</string>
@@ -170,8 +170,8 @@
     <string name="dialog_risk_proceed_warn">とにかくインストール</string>
     <string name="dialog_risk_proceed_severe">自己責任でインストール</string>
     <string name="dialog_risk_downgrade">ダウングレード: %1$s → %2$s。既存のアプリデータが消去される可能性があります。</string>
-    <string name="dialog_risk_vt_malicious">VirusTotal: %1$d つのエンジンがこのファイルを悪意のあるものとしてフラグ付けしました。</string>
-    <string name="dialog_risk_vt_suspicious">VirusTotal: %1$d つのエンジンがこのファイルを疑わしいものとしてフラグ付けしました。</string>
+    <string name="dialog_risk_vt_malicious">セキュリティスキャン: %1$d 個のエンジンがこのファイルを悪意ありと判定しました。</string>
+    <string name="dialog_risk_vt_suspicious">セキュリティスキャン: %1$d 個のエンジンがこのファイルを不審と判定しました。</string>
     <string name="dialog_risk_footer">このファイルの提供元を信頼する場合にのみ続行してください。</string>
     <string name="dialog_menu_remember_for_app">このアプリ用に記憶する</string>
     <string name="dialog_menu_remember_for_app_sub">このアプリをインストールする際は、常にこのインストール元を使用します。</string>
@@ -209,9 +209,9 @@
     <string name="install_notif_progress_text">%1$d%%</string>
     <string name="install_notif_result_success_title">インストール完了</string>
     <string name="install_notif_result_failed_title">インストール失敗</string>
-    <string name="apk_info_vt_queued">VirusTotalで待機中…</string>
-    <string name="apk_info_vt_analyzing">VirusTotalで分析中…</string>
-    <string name="apk_info_vt_too_large">VirusTotalに対してファイルが大きすぎます (%s)</string>
+    <string name="apk_info_vt_queued">解析キューで待機中…</string>
+    <string name="apk_info_vt_analyzing">APK を解析中…</string>
+    <string name="apk_info_vt_too_large">ファイルが大きすぎてスキャンできません (%s)</string>
     <string name="apk_info_permissions_empty">このアプリは権限を要求しません</string>
     <string name="apk_info_vt_error">スキャン失敗 — タップして再試行</string>
     <string name="dialog_failed_copy_error">エラーをコピー</string>
@@ -228,7 +228,7 @@
     <string name="installer_engine_root_unsupported">このビルドでは利用不可</string>
     <string name="installer_engine_root_request">タップしてrootアクセスを許可</string>
     <string name="dialog_failed_fallback_install">システムインストーラー経由でインストール</string>
-    <string name="dialog_risk_vt_unscanned">VirusTotal のスキャンが完了していません</string>
+    <string name="dialog_risk_vt_unscanned">セキュリティスキャンが完了していません</string>
     <string name="scan_virustotal_btn">VirusTotal でスキャン</string>
     <string name="scanning_progress">スキャン中…</string>
     <string name="dialog_read_failed_title">ファイルを読み取れませんでした</string>
@@ -263,9 +263,9 @@
     <string name="install_error_miui_shizuku_hint">Shizuku を使用する Xiaomi/HyperOS 端末では、開発者向けオプションで「USB 経由でインストール」および「USB デバッグ (セキュリティ設定)」を有効にしてください (SIM と Mi アカウントが必要です)。問題が解決しない場合は、設定でインストーラーモードを「デフォルト」に切り替えてみてください。</string>
     <string name="dialog_risk_signature_mismatch">インストール済みアプリは別の鍵で署名されています。Android はこのファイルを更新として受け付けません — 既存のアプリを先にアンインストールする必要があり、そのデータは失われます。</string>
     <string name="dialog_risk_action_uninstall_existing">既存のアプリをアンインストール</string>
-    <string name="apk_info_vt_invalid_key">VirusTotal がこのAPIキーを拒否しました。設定 → 詳細 → VirusTotal APIキー を開き、全体が貼り付けられているか確認してください。</string>
-    <string name="apk_info_vt_rate_limited">VirusTotal のレート制限に達しました — 無料プランでは 1 分あたり 4 リクエストまでです。しばらくしてからもう一度お試しください。</string>
-    <string name="apk_info_vt_rate_limited_retry">VirusTotal のレート制限に達しました — 無料プランでは 1 分あたり 4 リクエストまでです。%1$s 秒後にもう一度お試しください。</string>
+    <string name="apk_info_vt_invalid_key">セキュリティサービスが API キーを拒否しました。設定 → APK セキュリティスキャンで VirusTotal API キーを確認してください。</string>
+    <string name="apk_info_vt_rate_limited">1日のスキャン上限またはレート制限に達しました。後で再試行するか、設定で個人の VirusTotal API キーを追加してください。</string>
+    <string name="apk_info_vt_rate_limited_retry">スキャンのレート制限に達しました。%1$s 秒後に再試行してください。</string>
     <string name="apk_info_root_requested">Rootが必要</string>
     <string name="apk_info_shizuku_requested">Shizukuが必要</string>
     <string name="dialog_fallback_install_unavailable">このデバイス上の他のインストーラーはAPKファイルを開けません</string>
@@ -477,6 +477,7 @@
     <string name="apk_info_vt_chip_rate_limited">無料上限に到達 · 解除</string>
     <string name="apk_info_vt_chip_invalid_key">無効な API キー</string>
     <string name="apk_info_vt_chip_need_key">API キー / Pro が必要</string>
+    <string name="apk_info_vt_chip_need_key_opensource">API キーが必要</string>
     <string name="install_recent_apks_title">最近の APK</string>
     <string name="install_recent_apks_see_all">すべて表示</string>
     <string name="apk_info_vt_precheck_clean">簡易チェックでは問題なし — ソースコードを検査するには詳細スキャンをタップ</string>

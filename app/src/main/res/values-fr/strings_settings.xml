@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Trois problèmes différents produisent une erreur d\'apparence similaire. Installer une version plus ancienne nécessite « Autoriser le Downgrade » — « Remplacer l\'existant » ne couvre pas ce cas. Une mise à jour normale nécessite « Remplacer l\'existant », qui est activé par défaut. Et si l\'application installée a été signée avec une autre clé, aucune option n\'aide : elle doit d\'abord être désinstallée et ses données seront perdues.</string>
     <string name="help_profiles_title">Profils d\'installation</string>
     <string name="help_profiles_body">Un profil est un ensemble enregistré d\'options d\'installation que vous pouvez associer à des applications précises, pour ne pas avoir à modifier des réglages avant chaque installation. Sans profil, les options globales de cet écran s\'appliquent.</string>
-    <string name="help_virustotal_title">Analyse VirusTotal</string>
-    <string name="help_virustotal_body">N\'importe quel paquet peut être vérifié sur VirusTotal avant l\'installation, mais il faut coller dans Avancé une clé API gratuite obtenue sur virustotal.com. L\'analyse est manuelle — appuyez sur « Vérifier avec VirusTotal » sur l\'écran d\'installation. Activez le mode strict pour être averti lorsque vous êtes sur le point d\'installer quelque chose qui n\'a jamais été analysé.</string>
+    <string name="help_virustotal_title">Analyse de sécurité APK</string>
+    <string name="help_virustotal_body">Les paquets peuvent être analysés avant l\'installation avec le moteur intégré AppShield (3 analyses gratuites par jour) ou avec une clé API VirusTotal personnelle dans Paramètres → Analyse de sécurité APK. Activez le mode strict pour être averti avant d\'installer un fichier non analysé.</string>
     <string name="help_delete_title">Supprimer l\'APK après l\'installation</string>
     <string name="help_delete_body">Fonctionne pour les fichiers que vous choisissez dans l\'application. Quand une autre application transmet l\'APK — ce que font la plupart des gestionnaires de fichiers — elle le partage généralement d\'une manière qui ne donne aucune autorisation de suppression, et un message vous l\'indiquera. Le contournement consiste à le supprimer depuis ce gestionnaire de fichiers.</string>
     <string name="help_source_title">Changer la source d\'installation</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Niveau de sécurité</string>
     <string name="setting_security_normal">Normal</string>
     <string name="setting_security_strict">Strict</string>
-    <string name="setting_security_normal_sub">Installer est le bouton principal. VirusTotal reste disponible dans les détails quand vous en avez besoin.</string>
-    <string name="setting_security_strict_sub">Analyser avec VirusTotal devient le bouton principal tant qu\'un fichier n\'a pas de verdict, et installer quelque chose de non analysé demande une confirmation. Nécessite une clé API.</string>
+    <string name="setting_security_normal_sub">Installer est le bouton principal. L\'analyse de sécurité reste accessible dans les détails.</string>
+    <string name="setting_security_strict_sub">L\'analyse de sécurité devient le bouton principal jusqu\'au verdict, et installer un fichier non analysé demande confirmation.</string>
     <string name="setting_section_privacy">Confidentialité</string>
     <string name="setting_analytics_title">Partager les données d\'utilisation</string>
     <string name="setting_analytics_subtitle">Signale quelle méthode d\'installation a été utilisée et si elle a fonctionné, ainsi que les rapports de plantage. Jamais les paquets que vous installez.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Analyseur principal</string>
     <string name="setting_scanner_appshield_title">AppShield (Intégré • Recommandé)</string>
     <string name="setting_scanner_appshield_desc">Moteur d\'analyse cloud intégré (3 analyses gratuites/jour, illimité avec Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Moteur d\'analyse cloud intégré (%1$d analyses gratuites par jour).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Vérifiez avec plus de 70 moteurs antivirus via votre clé API personnelle.</string>
     <string name="setting_fallback_section_header">Secours &amp; analyse hors ligne</string>

@@ -188,8 +188,8 @@
     <string name="help_conflict_body">Τρία διαφορετικά προβλήματα παράγουν ένα παρόμοιο σφάλμα. Η εγκατάσταση παλαιότερης έκδοσης χρειάζεται την επιλογή «Να επιτρέπεται η εγκατάσταση παλαιότερης έκδοσης» — η «Αντικατάσταση υπάρχοντος» δεν το καλύπτει. Μια κανονική ενημέρωση χρειάζεται την «Αντικατάσταση υπάρχοντος», που είναι ενεργή από προεπιλογή. Και αν η εγκατεστημένη εφαρμογή έχει υπογραφεί με διαφορετικό κλειδί, καμία επιλογή δεν βοηθά: πρέπει πρώτα να απεγκατασταθεί και τα δεδομένα της χάνονται.</string>
     <string name="help_profiles_title">Προφίλ εγκατάστασης</string>
     <string name="help_profiles_body">Ένα προφίλ είναι ένα αποθηκευμένο σύνολο επιλογών εγκατάστασης που μπορείτε να συνδέσετε με συγκεκριμένες εφαρμογές, ώστε να μη χρειάζεται να αλλάζετε διακόπτες πριν από κάθε εγκατάσταση. Χωρίς προφίλ ισχύουν οι γενικές επιλογές αυτής της οθόνης.</string>
-    <string name="help_virustotal_title">Σάρωση με VirusTotal</string>
-    <string name="help_virustotal_body">Οποιοδήποτε πακέτο μπορεί να ελεγχθεί στο VirusTotal πριν το εγκαταστήσετε, αλλά χρειάζεται ένα δωρεάν κλειδί API από το virustotal.com επικολλημένο στις ρυθμίσεις για προχωρημένους. Η σάρωση γίνεται χειροκίνητα — πατήστε «Έλεγχος με VirusTotal» στην οθόνη εγκατάστασης. Ενεργοποιήστε την αυστηρή λειτουργία για να προειδοποιείστε όταν πρόκειται να εγκαταστήσετε κάτι που δεν έχει σαρωθεί ποτέ.</string>
+    <string name="help_virustotal_title">Έλεγχος ασφαλείας APK</string>
+    <string name="help_virustotal_body">Τα πακέτα μπορούν να ελεγχθούν πριν την εγκατάσταση με το ενσωματωμένο AppShield (3 δωρεάν έλεγχοι/ημέρα) ή με προσωπικό κλειδί VirusTotal API στις Ρυθμίσεις → Έλεγχος ασφαλείας APK. Ενεργοποίησε την αυστηρή λειτουργία για προειδοποίηση σε μη ελεγμένα αρχεία.</string>
     <string name="help_delete_title">Διαγραφή του APK μετά την εγκατάσταση</string>
     <string name="help_delete_body">Λειτουργεί για αρχεία που επιλέγετε μέσα στην εφαρμογή. Όταν το APK το παραδίδει άλλη εφαρμογή — όπως κάνουν οι περισσότεροι διαχειριστές αρχείων — συνήθως το μοιράζεται με τρόπο που δεν δίνει δικαίωμα διαγραφής, και θα δείτε σχετικό μήνυμα. Η λύση είναι να το διαγράψετε μέσα από εκείνον τον διαχειριστή αρχείων.</string>
     <string name="help_source_title">Αλλαγή της πηγής εγκατάστασης</string>
@@ -205,8 +205,8 @@
     <string name="setting_security_level_title">Επίπεδο ασφάλειας</string>
     <string name="setting_security_normal">Κανονικό</string>
     <string name="setting_security_strict">Αυστηρό</string>
-    <string name="setting_security_normal_sub">Η Εγκατάσταση είναι το κύριο κουμπί. Το VirusTotal παραμένει στις λεπτομέρειες, όποτε το θέλετε.</string>
-    <string name="setting_security_strict_sub">Η σάρωση με VirusTotal γίνεται το κύριο κουμπί μέχρι ένα αρχείο να έχει ετυμηγορία, και η εγκατάσταση κάτι μη σαρωμένου ζητά επιβεβαίωση. Χρειάζεται κλειδί API.</string>
+    <string name="setting_security_normal_sub">Η εγκατάσταση είναι το κύριο κουμπί. Ο έλεγχος ασφαλείας παραμένει στις λεπτομέρειες.</string>
+    <string name="setting_security_strict_sub">Ο έλεγχος ασφαλείας γίνεται το κύριο κουμπί μέχρι να υπάρξει αποτέλεσμα, και απαιτείται επιβεβαίωση για μη ελεγμένα αρχεία.</string>
     <string name="setting_section_privacy">Απόρρητο</string>
     <string name="setting_analytics_title">Κοινή χρήση δεδομένων χρήσης</string>
     <string name="setting_analytics_subtitle">Αναφέρει ποια μέθοδος εγκατάστασης χρησιμοποιήθηκε και αν λειτούργησε, καθώς και αναφορές σφαλμάτων. Ποτέ τα πακέτα που εγκαθιστάτε.</string>
@@ -366,6 +366,7 @@
     <string name="setting_primary_scanner_header">Κύριος σαρωτής</string>
     <string name="setting_scanner_appshield_title">AppShield (Ενσωματωμένο • Προτείνεται)</string>
     <string name="setting_scanner_appshield_desc">Ενσωματωμένη μηχανή σάρωσης cloud (3 δωρεάν σαρώσεις ημερησίως, απεριόριστες με Pro).</string>
+    <string name="setting_scanner_appshield_desc_opensource">Ενσωματωμένη μηχανή ελέγχου cloud (%1$d δωρεάν έλεγχοι ημερησίως).</string>
     <string name="setting_scanner_virustotal_title">VirusTotal</string>
     <string name="setting_scanner_virustotal_desc">Διασταύρωση με 70+ διεθνείς μηχανές antivirus χρησιμοποιώντας το προσωπικό σας κλειδί API.</string>
     <string name="setting_fallback_section_header">Εφεδρεία &amp; ανάλυση εκτός σύνδεσης</string>

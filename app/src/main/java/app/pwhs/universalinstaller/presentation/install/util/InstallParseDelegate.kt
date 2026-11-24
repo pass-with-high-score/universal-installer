@@ -240,10 +240,10 @@ class InstallParseDelegate(
     }
 
     fun scanVirusTotal(context: Context) {
+        if (scanJob?.isActive == true) return
         val uri = pendingOriginalUri ?: return
         val fileName = pendingFileName ?: "APK"
         val current = _pendingApkInfo.value ?: return
-        scanJob?.cancel()
         scanJob = scope.launch {
             if (InstallVirusTotalHelper.isDisabled(context, securityScannerOrchestrator)) return@launch
             Telemetry.feature(TelemetryEvents.FEATURE_VIRUSTOTAL)
