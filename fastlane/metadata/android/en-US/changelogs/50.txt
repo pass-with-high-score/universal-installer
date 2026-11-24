@@ -1,0 +1,5 @@
+- Added per-install ABI override option for Shizuku, Root, and Custom Shell installs.
+- Fixed APK files not being deleted after installation when opened from Download Manager or external apps.
+- Fixed open-source builds flashing the Free Pro Trial popup and showing Pro upsells.
+- Faster security scan uploads with live progress and reduced background API requests.
+- Improved install prompt notification so Install/Cancel actions appear cleanly.

@@ -1,0 +1,2 @@
+- Fixed APK files not being deleted after installation when opened from Download Manager or MediaStore URIs.
+- Faster security scan uploads and reduced background API requests.
