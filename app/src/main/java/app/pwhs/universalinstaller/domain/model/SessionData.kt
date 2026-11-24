@@ -23,6 +23,7 @@ data class SessionData(
     val deleteAfterInstall: Boolean = false,
     val allowDowngrade: Boolean = false,
     val targetUserId: Int? = null,
+    val abiOverride: String? = null,
     val installerMode: String? = null,
     val operationType: String? = null,
     val fileSizeBytes: Long = 0,

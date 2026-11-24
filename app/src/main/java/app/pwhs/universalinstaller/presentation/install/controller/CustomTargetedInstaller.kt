@@ -34,11 +34,12 @@ object CustomTargetedInstaller {
         userId: Int,
         packageName: String = "",
         allowDowngrade: Boolean = false,
+        abiOverride: String? = null,
         onProgress: (Float) -> Unit = {},
     ): Result<Unit> = withContext(Dispatchers.IO) {
         runCatching {
             val isKnox = isKnoxOrSecureFolder(userId)
-            val createArgs = buildCreateArgs(context, packageName, allowDowngrade)
+            val createArgs = buildCreateArgs(context, packageName, allowDowngrade, abiOverride)
             val stagingDir = File(context.cacheDir, "custom_install_${UUID.randomUUID()}").apply {
                 mkdirs()
             }
@@ -162,6 +163,7 @@ object CustomTargetedInstaller {
         context: Context,
         packageName: String,
         allowDowngrade: Boolean,
+        abiOverride: String?,
     ): List<String> {
         val prefs = runCatching { context.dataStore.data.first() }.getOrNull()
         val args = mutableListOf<String>()
@@ -182,6 +184,8 @@ object CustomTargetedInstaller {
         if (prefs?.get(PreferencesKeys.ROOT_REQUEST_UPDATE_OWNERSHIP) == true &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
         ) args += "--update-ownership"
+        val sanitizedAbi = app.pwhs.universalinstaller.presentation.install.util.AbiOverrideUtil.sanitize(abiOverride)
+        if (sanitizedAbi != null) args += "--abi $sanitizedAbi"
         if (prefs?.get(PreferencesKeys.ROOT_SET_INSTALL_SOURCE) == true) {
             val override = if (packageName.isNotBlank()) {
                 InstallerOverrides.get(prefs[PreferencesKeys.INSTALLER_OVERRIDES], packageName)

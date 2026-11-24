@@ -104,6 +104,7 @@ interface InstallerBackendFactory {
         uris: List<android.net.Uri>,
         userId: Int,
         packageName: String = "",
+        abiOverride: String? = null,
         onProgress: (Float) -> Unit = {},
     ): Result<Unit>
 

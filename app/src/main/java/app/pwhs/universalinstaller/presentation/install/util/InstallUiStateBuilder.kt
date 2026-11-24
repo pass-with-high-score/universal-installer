@@ -41,6 +41,7 @@ object InstallUiStateBuilder {
             batchDetailUri = flows[18] as Uri?,
             dialogDownloadProgress = flows[19] as app.pwhs.core.network.DownloadProgress?,
             watchSendState = flows[20] as WatchSendState,
+            abiOverride = flows[21] as String?,
         )
     }
 }

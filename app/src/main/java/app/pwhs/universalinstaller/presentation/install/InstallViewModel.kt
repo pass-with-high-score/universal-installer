@@ -180,6 +180,7 @@ class InstallViewModel(
 
     private val _mergeSplits = MutableStateFlow(false)
     private val _selectedProfileId = MutableStateFlow<String?>(null)
+    private val _abiOverride = MutableStateFlow<String?>(null)
     private val _installError = MutableStateFlow<String?>(null)
     val installError: StateFlow<String?> = _installError.asStateFlow()
 
@@ -217,6 +218,7 @@ class InstallViewModel(
             batchDelegate.batchDetailUri,
             dialogDelegate.downloadProgress,
             wearDelegate.sendState,
+            _abiOverride,
         )
     ) { flows ->
         InstallUiStateBuilder.build(flows)
@@ -259,6 +261,10 @@ class InstallViewModel(
         viewModelScope.launch {
             InstallActionDelegate.setUserId(application, id)
         }
+    }
+
+    fun setAbiOverride(abi: String?) {
+        _abiOverride.value = app.pwhs.universalinstaller.presentation.install.util.AbiOverrideUtil.sanitize(abi)
     }
 
     // ── Dialog Delegates ────────────────────────────────────────────────────
@@ -340,6 +346,7 @@ class InstallViewModel(
         fileName: String,
         isAndroidAuto: Boolean? = null,
     ) {
+        _abiOverride.value = null
         parseDelegate.parseApkInfo(
             context = context,
             uri = uri,
@@ -355,6 +362,7 @@ class InstallViewModel(
     fun toggleSplit(index: Int) = parseDelegate.toggleSplit(index)
     fun dismissPendingInstall() {
         _installError.value = null
+        _abiOverride.value = null
         parseDelegate.dismissPendingInstall()
     }
     suspend fun stashPendingInstall() = parseDelegate.stashPendingInstall()
@@ -407,6 +415,7 @@ class InstallViewModel(
         dialogDelegate.resetRetry()
         _installError.value = null
 
+        val abiOverride = _abiOverride.value
         val installScope = appScope
         installScope.launch {
             InstallExecutionCoordinator.executeSingleInstall(
@@ -422,6 +431,7 @@ class InstallViewModel(
                 obbEntries = obbEntries,
                 attachedObbs = attachedObbs,
                 currentProfileId = _selectedProfileId.value,
+                abiOverride = abiOverride,
                 rootController = rootController,
                 backendFactory = backendFactory,
                 manualController = manualController,

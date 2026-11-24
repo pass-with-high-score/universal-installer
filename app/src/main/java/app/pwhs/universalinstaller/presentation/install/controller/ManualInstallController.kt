@@ -86,17 +86,30 @@ class ManualInstallController(
             }
 
             val result: Result<Unit> = when (backend) {
-                TargetedBackend.SHIZUKU -> ManualTargetedInstaller.install(
-                    context = application,
-                    uris = uris,
-                    userId = userId,
-                    onProgress = onProgress,
-                )
+                TargetedBackend.SHIZUKU -> if (app.pwhs.universalinstaller.presentation.install.util.AbiOverrideUtil.sanitize(data.abiOverride) != null) {
+                    ShizukuShellInstaller.install(
+                        context = application,
+                        uris = uris,
+                        userId = userId,
+                        packageName = data.packageName,
+                        allowDowngrade = data.allowDowngrade,
+                        abiOverride = data.abiOverride,
+                        onProgress = onProgress,
+                    )
+                } else {
+                    ManualTargetedInstaller.install(
+                        context = application,
+                        uris = uris,
+                        userId = userId,
+                        onProgress = onProgress,
+                    )
+                }
                 TargetedBackend.ROOT -> backendFactory.installTargetedViaRoot(
                     context = application,
                     uris = uris,
                     userId = userId,
                     packageName = data.packageName,
+                    abiOverride = data.abiOverride,
                     onProgress = onProgress,
                 )
             }

@@ -500,4 +500,13 @@
     <string name="fn_preset_permissions">Excessive / suspicious permissions</string>
     <string name="fp_preset_normal_permissions">Normal permissions for this app</string>
     <string name="fp_current_verdict_label">Current: %1$s (%2$d/100)</string>
+
+    <!-- ABI Override -->
+    <string name="dialog_menu_abi_override">ABI Override (--abi)</string>
+    <string name="dialog_menu_abi_override_auto">Auto (system default)</string>
+    <string name="dialog_menu_abi_override_forced">Force %1$s for this install</string>
+    <string name="dialog_menu_abi_override_in_apk">%1$s · in APK</string>
+    <string name="dialog_menu_abi_override_single_abi_warning">This device only supports %1$s. Forcing another ABI is not supported and will likely fail with INSTALL_FAILED_NO_MATCHING_ABIS.</string>
+    <string name="dialog_menu_abi_override_unsupported_warning">%1$s is not in this device\'s supported ABIs (%2$s). Installation will likely be rejected by Android.</string>
+    <string name="dialog_menu_abi_override_rom_note">Applies to this install only via Shizuku, Root, or Custom Shell. Some devices and OEM ROMs do not allow forcing an ABI.</string>
 </resources>

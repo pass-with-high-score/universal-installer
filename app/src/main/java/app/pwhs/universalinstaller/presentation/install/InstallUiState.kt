@@ -179,6 +179,7 @@ data class InstallUiState(
     val selectedProfileId: String? = null,
     val allUsers: Boolean = false,
     val selectedUserId: Int? = null,
+    val abiOverride: String? = null,
     val isApk: Boolean = false,
     val dialogDownloadProgress: app.pwhs.core.network.DownloadProgress? = null,
     val watchSendState: WatchSendState = WatchSendState.Idle,

@@ -94,6 +94,7 @@ class RootInstallController(
                 userId = userId,
                 packageName = sessionData.packageName,
                 allowDowngrade = allowDowngrade,
+                abiOverride = sessionData.abiOverride,
                 onProgress = onProgress,
             )
             result.fold(

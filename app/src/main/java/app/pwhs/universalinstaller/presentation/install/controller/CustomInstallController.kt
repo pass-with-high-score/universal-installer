@@ -76,6 +76,7 @@ class CustomInstallController(
                 userId = userId,
                 packageName = sessionData.packageName,
                 allowDowngrade = allowDowngrade,
+                abiOverride = sessionData.abiOverride,
                 onProgress = onProgress,
             )
 

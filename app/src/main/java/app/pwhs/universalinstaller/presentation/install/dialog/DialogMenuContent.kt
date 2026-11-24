@@ -129,6 +129,7 @@ fun DialogMenuContent(
     attachedObbFiles: List<AttachedObb>,
     allUsers: Boolean,
     selectedUserId: Int?,
+    abiOverride: String? = null,
     onBack: () -> Unit,
     onInstall: () -> Unit,
     onCheckVirusTotal: () -> Unit,
@@ -137,6 +138,7 @@ fun DialogMenuContent(
     onAttachObb: () -> Unit = {},
     onToggleAllUsers: (Boolean) -> Unit = {},
     onSelectUserId: (Int?) -> Unit = {},
+    onSelectAbiOverride: (String?) -> Unit = {},
     onMergeSplits: (() -> Unit)? = null,
     initialTab: Int = 0,
 ) {
@@ -366,6 +368,7 @@ fun DialogMenuContent(
                         onMergeSplits = onMergeSplits,
                         allUsers = allUsers,
                         selectedUserId = selectedUserId,
+                        abiOverride = abiOverride,
                         spoofSource = spoofSource,
                         installerPkg = installerPkg,
                         rememberForThisApp = packageOverride != null,
@@ -379,9 +382,12 @@ fun DialogMenuContent(
                         disableVerification = prefs?.get(PreferencesKeys.SHIZUKU_DISABLE_VERIFICATION) ?: false,
                         enableRollback = prefs?.get(PreferencesKeys.SHIZUKU_ENABLE_ROLLBACK) ?: false,
                         requestUpdateOwnership = prefs?.get(PreferencesKeys.SHIZUKU_REQUEST_UPDATE_OWNERSHIP) ?: false,
-                        showAdvancedFlags = (prefs?.get(PreferencesKeys.USE_SHIZUKU) == true) || (prefs?.get(PreferencesKeys.USE_ROOT) == true),
+                        showAdvancedFlags = (prefs?.get(PreferencesKeys.USE_SHIZUKU) == true) ||
+                            (prefs?.get(PreferencesKeys.USE_ROOT) == true) ||
+                            (prefs?.get(PreferencesKeys.USE_CUSTOM_AUTHORIZER) == true),
                         onToggleAllUsers = onToggleAllUsers,
                         onSelectUserId = onSelectUserId,
+                        onSelectAbiOverride = onSelectAbiOverride,
                         onToggleSpoofSource = onToggleSpoofSource,
                         onChangeInstallerPkg = onChangeInstallerPkg,
                         onSetRemember = onSetRemember,

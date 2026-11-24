@@ -179,12 +179,14 @@ class FullInstallerBackendFactory : InstallerBackendFactory {
         uris: List<android.net.Uri>,
         userId: Int,
         packageName: String,
+        abiOverride: String?,
         onProgress: (Float) -> Unit,
     ): Result<Unit> = RootTargetedInstaller.install(
         context = context,
         uris = uris,
         userId = userId,
         packageName = packageName,
+        abiOverride = abiOverride,
         onProgress = onProgress,
     )
 

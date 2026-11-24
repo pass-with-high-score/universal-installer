@@ -61,6 +61,7 @@ fun generateDialogParams(
     onRetry: (() -> Unit)? = null,
     onToggleAllUsers: (Boolean) -> Unit,
     onSelectUserId: (Int?) -> Unit,
+    onSelectAbiOverride: (String?) -> Unit = {},
     onSkipParse: (() -> Unit)? = null,
     onFallbackInstall: (() -> Unit)? = null,
     onGrantInstallPermission: () -> Unit = {},
@@ -194,6 +195,7 @@ fun generateDialogParams(
                             attachedObbFiles = uiState.attachedObbFiles,
                             allUsers = uiState.allUsers,
                             selectedUserId = uiState.selectedUserId,
+                            abiOverride = uiState.abiOverride,
                             onBack = onMenuBack,
                             onInstall = onInstall,
                             onCheckVirusTotal = onCheckVirusTotal,
@@ -202,6 +204,7 @@ fun generateDialogParams(
                             onAttachObb = onAttachObb,
                             onToggleAllUsers = onToggleAllUsers,
                             onSelectUserId = onSelectUserId,
+                            onSelectAbiOverride = onSelectAbiOverride,
                             onMergeSplits = onMergeSplits,
                             initialTab = stage.initialTab,
                         )

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.AdminPanelSettings
 import androidx.compose.material.icons.rounded.CallMerge
 import androidx.compose.material.icons.rounded.Folder
+import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material.icons.rounded.Splitscreen
 import androidx.compose.material.icons.rounded.Store
@@ -34,6 +35,7 @@ import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.ApkInfo
 import app.pwhs.universalinstaller.presentation.install.AttachedObb
 import app.pwhs.universalinstaller.presentation.install.InstallTargetPicker
+import app.pwhs.universalinstaller.presentation.install.dialog.components.AbiOverridePicker
 import app.pwhs.universalinstaller.presentation.install.dialog.components.AdvancedToggle
 import app.pwhs.universalinstaller.presentation.install.dialog.components.InstallerSourcePicker
 import app.pwhs.universalinstaller.presentation.install.dialog.components.MenuCard
@@ -50,6 +52,7 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     onMergeSplits: (() -> Unit)? = null,
     allUsers: Boolean,
     selectedUserId: Int?,
+    abiOverride: String? = null,
     spoofSource: Boolean,
     installerPkg: String,
     rememberForThisApp: Boolean,
@@ -66,6 +69,7 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
     showAdvancedFlags: Boolean,
     onToggleAllUsers: (Boolean) -> Unit,
     onSelectUserId: (Int?) -> Unit,
+    onSelectAbiOverride: (String?) -> Unit = {},
     onToggleSpoofSource: (Boolean) -> Unit,
     onChangeInstallerPkg: (String) -> Unit,
     onSetRemember: (Boolean) -> Unit,
@@ -275,8 +279,38 @@ internal fun androidx.compose.foundation.lazy.LazyListScope.advancedTab(
         )
     }
 
-    // 4. Advanced Install Flags
+    // 4. ABI Override (--abi) & Advanced Install Flags
     if (showAdvancedFlags) {
+        item(key = "abi_override") {
+            var expanded by remember { mutableStateOf(abiOverride != null) }
+            val description = if (abiOverride != null) {
+                stringResource(R.string.dialog_menu_abi_override_forced, abiOverride)
+            } else {
+                stringResource(R.string.dialog_menu_abi_override_auto)
+            }
+            MenuCard(
+                title = stringResource(R.string.dialog_menu_abi_override),
+                description = description,
+                icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Memory,
+                        contentDescription = null,
+                        modifier = Modifier.size(24.dp),
+                    )
+                },
+                expanded = expanded,
+                onClick = { expanded = !expanded },
+                badge = abiOverride,
+            ) {
+                AbiOverridePicker(
+                    apkAbis = apkInfo.supportedAbis,
+                    selectedAbi = abiOverride,
+                    onSelectAbi = onSelectAbiOverride,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp),
+                )
+            }
+        }
+
         item(key = "advanced_flags") {
             var expanded by remember { mutableStateOf(false) }
             MenuCard(

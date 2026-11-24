@@ -368,6 +368,7 @@ fun DialogInstallContent(
                             onRetry = { viewModel.retryDialogInstall() },
                             onToggleAllUsers = viewModel::setAllUsers,
                             onSelectUserId = { viewModel.setUserId(it) },
+                            onSelectAbiOverride = viewModel::setAbiOverride,
                             onSkipParse = if (isApk) {
                                 { viewModel.skipParseAndInstallSingle() }
                             } else {

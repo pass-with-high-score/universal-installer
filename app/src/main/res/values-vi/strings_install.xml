@@ -500,4 +500,13 @@
     <string name="fn_preset_permissions">Xin quyền quá mức / bất thường</string>
     <string name="fp_preset_normal_permissions">Quyền hợp lệ với chức năng app</string>
     <string name="fp_current_verdict_label">Hiện tại: %1$s (%2$d/100)</string>
+
+    <!-- ABI Override -->
+    <string name="dialog_menu_abi_override">Ép kiến trúc ABI (--abi)</string>
+    <string name="dialog_menu_abi_override_auto">Tự động (mặc định hệ thống)</string>
+    <string name="dialog_menu_abi_override_forced">Ép dùng %1$s cho lần cài này</string>
+    <string name="dialog_menu_abi_override_in_apk">%1$s · có trong APK</string>
+    <string name="dialog_menu_abi_override_single_abi_warning">Thiết bị này chỉ hỗ trợ %1$s. Không thể ép sang ABI khác và cài đặt gần như chắc chắn sẽ báo lỗi INSTALL_FAILED_NO_MATCHING_ABIS.</string>
+    <string name="dialog_menu_abi_override_unsupported_warning">%1$s không nằm trong danh sách ABI thiết bị hỗ trợ (%2$s). Android nhiều khả năng sẽ từ chối cài đặt.</string>
+    <string name="dialog_menu_abi_override_rom_note">Chỉ áp dụng cho lần cài này qua Shizuku, Root hoặc Custom Shell. Một số thiết bị và ROM hãng không cho phép ép ABI.</string>
 </resources>
