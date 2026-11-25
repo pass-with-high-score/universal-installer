@@ -111,9 +111,16 @@ class InstallActivity : BaseActivity() {
         maybeRequestNotificationPermission()
         observeReviewOpportunities()
         setContentWithTheme {
+            val isStoreUser = remember {
+                app.pwhs.core.util.InstallationSourceHelper.isInstalledFromStore(
+                    this@InstallActivity,
+                    isStoreFlavor = app.pwhs.universalinstaller.BuildConfig.FLAVOR == "play",
+                )
+            }
             var unlockedMilestone by remember { mutableStateOf<MilestoneId?>(null) }
 
-            LaunchedEffect(Unit) {
+            LaunchedEffect(isStoreUser) {
+                if (!isStoreUser) return@LaunchedEffect
                 UserStatsTracker.milestoneEvents.collect { milestone ->
                     unlockedMilestone = milestone
                     delay(6_000L)

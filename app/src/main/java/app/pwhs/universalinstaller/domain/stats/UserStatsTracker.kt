@@ -9,6 +9,8 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.util.InstallationSourceHelper
+import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.data.local.DownloadHistoryEntity
 import app.pwhs.universalinstaller.data.local.InstallHistoryEntity
 import app.pwhs.universalinstaller.data.local.UninstallLogEntity
@@ -385,10 +387,19 @@ object UserStatsTracker {
         emitPopup: Boolean,
         mutator: (MutablePreferences) -> Unit,
     ) {
+        val isStoreUser = InstallationSourceHelper.isInstalledFromStore(
+            context,
+            isStoreFlavor = BuildConfig.FLAVOR == "play",
+        )
         val newlyUnlocked = mutableListOf<MilestoneId>()
         runCatching {
             context.dataStore.edit { prefs ->
                 mutator(prefs)
+                if (!isStoreUser) {
+                    prefs[KEY_UNSEEN_MILESTONES] = emptySet()
+                    prefs[SharedPrefsKeys.UNSEEN_MILESTONE_COUNT] = 0
+                    return@edit
+                }
                 val announced = prefs[KEY_ANNOUNCED_MILESTONES].orEmpty().toMutableSet()
                 val unseen = prefs[KEY_UNSEEN_MILESTONES].orEmpty().toMutableSet()
 

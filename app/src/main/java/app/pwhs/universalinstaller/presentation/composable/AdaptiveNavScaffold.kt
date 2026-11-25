@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.dp
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.presentation.adaptive.LocalAdaptiveLayoutInfo
+import app.pwhs.core.util.InstallationSourceHelper
+import app.pwhs.universalinstaller.BuildConfig
 import app.pwhs.universalinstaller.util.extension.disableSceneTransition
 
 /**
@@ -108,7 +110,18 @@ private fun AppNavigationRail(
         }
     }
 
-    val unseenMilestoneCount by produceState(initialValue = 0, context) {
+    val isStoreUser = remember(context) {
+        InstallationSourceHelper.isInstalledFromStore(
+            context,
+            isStoreFlavor = BuildConfig.FLAVOR == "play",
+        )
+    }
+
+    val unseenMilestoneCount by produceState(initialValue = 0, context, isStoreUser) {
+        if (!isStoreUser) {
+            value = 0
+            return@produceState
+        }
         runCatching {
             context.dataStore.data.collect { prefs ->
                 value = prefs[SharedPrefsKeys.UNSEEN_MILESTONE_COUNT] ?: 0
