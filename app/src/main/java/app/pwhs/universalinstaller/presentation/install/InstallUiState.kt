@@ -68,6 +68,10 @@ data class DialogTarget(
 
 sealed interface DownloadState {
     data object Idle : DownloadState
+
+    /** Set synchronously on Download tap so the button locks before any network work. */
+    data object Preparing : DownloadState
+
     data class Running(
         val url: String,
         val bytesRead: Long,
