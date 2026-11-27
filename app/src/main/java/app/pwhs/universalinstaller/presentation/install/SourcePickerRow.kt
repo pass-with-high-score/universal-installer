@@ -39,8 +39,10 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -317,9 +319,23 @@ private fun DownloadSourceContent(
     val context = LocalContext.current
     val resource = LocalResources.current
     var url by rememberSaveable { mutableStateOf("") }
+    // Optimistic lock so the button grays out on the same frame as the tap,
+    // before StateFlow → Compose collection catches up.
+    var pendingStart by remember { mutableStateOf(false) }
+    LaunchedEffect(downloadState) {
+        when (downloadState) {
+            is DownloadState.Preparing,
+            is DownloadState.Running,
+            is DownloadState.Error,
+            -> pendingStart = false
+            DownloadState.Idle -> Unit
+        }
+    }
     val running = downloadState as? DownloadState.Running
     val error = (downloadState as? DownloadState.Error)?.message
     val isRunning = running != null
+    val isPreparing = pendingStart || downloadState is DownloadState.Preparing
+    val isBusy = isPreparing || isRunning
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -340,7 +356,7 @@ private fun DownloadSourceContent(
                 .fillMaxWidth()
                 .heightIn(min = 140.dp),
             placeholder = { Text(stringResource(R.string.source_download_hint)) },
-            enabled = !isRunning,
+            enabled = !isBusy,
             shape = RoundedCornerShape(16.dp),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Uri,
@@ -368,19 +384,49 @@ private fun DownloadSourceContent(
         ) {
             Button(
                 onClick = {
-                    if (isRunning) onCancelDownload() else onStartDownload(url)
+                    if (isRunning) {
+                        onCancelDownload()
+                    } else if (!isPreparing) {
+                        pendingStart = true
+                        onStartDownload(url)
+                        // Invalid URLs reject synchronously as Error. A second tap with the
+                        // same message does not re-emit StateFlow (equals), so LaunchedEffect
+                        // would never clear pendingStart — unlock here for rejected starts.
+                        // Accepted starts set Preparing before returning; keep the optimistic
+                        // lock until LaunchedEffect sees Preparing/Running.
+                        val trimmed = url.trim()
+                        val accepted = trimmed.startsWith("http://", ignoreCase = true) ||
+                            trimmed.startsWith("https://", ignoreCase = true)
+                        if (!accepted) pendingStart = false
+                    }
                 },
-                enabled = isRunning || url.isNotBlank(),
+                enabled = when {
+                    isPreparing -> false
+                    isRunning -> true
+                    else -> url.isNotBlank()
+                },
                 modifier = Modifier
                     .weight(1f)
                     .defaultMinSize(minHeight = 56.dp),
                 shape = RoundedCornerShape(16.dp),
             ) {
-                Text(
-                    text = if (isRunning) stringResource(R.string.remote_download_cancel)
-                           else stringResource(R.string.source_download_start),
-                    style = MaterialTheme.typography.titleSmall,
-                )
+                if (isPreparing) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        text = stringResource(R.string.source_download_start),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                } else {
+                    Text(
+                        text = if (isRunning) stringResource(R.string.remote_download_cancel)
+                               else stringResource(R.string.source_download_start),
+                        style = MaterialTheme.typography.titleSmall,
+                    )
+                }
             }
             IconButton(
                 onClick = {
@@ -391,7 +437,7 @@ private fun DownloadSourceContent(
                             Toast.LENGTH_SHORT,
                         ).show()
                 },
-                enabled = !isRunning,
+                enabled = !isBusy,
                 modifier = Modifier.size(56.dp),
             ) {
                 Icon(

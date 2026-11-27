@@ -44,11 +44,18 @@ class InstallScanDelegate(
     }
 
     fun downloadFromUrl(context: Context, url: String) {
+        // Ignore double-taps while already preparing or downloading.
+        when (_downloadState.value) {
+            is DownloadState.Preparing, is DownloadState.Running -> return
+            else -> Unit
+        }
         val trimmed = url.trim()
         if (!trimmed.startsWith("http://", ignoreCase = true) && !trimmed.startsWith("https://", ignoreCase = true)) {
             _downloadState.value = DownloadState.Error(context.getString(R.string.remote_download_invalid_url))
             return
         }
+        // Lock the Download button immediately — before any coroutine / network work.
+        _downloadState.value = DownloadState.Preparing
         downloadJob?.cancel()
         Telemetry.feature(TelemetryEvents.FEATURE_URL_DOWNLOAD)
         downloadJob = scope.launch {
