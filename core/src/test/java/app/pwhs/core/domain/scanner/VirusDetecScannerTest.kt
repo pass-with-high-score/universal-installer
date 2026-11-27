@@ -118,7 +118,7 @@ class VirusDetecScannerTest {
         override suspend fun lookup(request: LookupRequest, language: String): Result<LookupResponse> = lookupResult
         override suspend fun createUploadTicket(sha256: String, fileSize: Long, language: String): Result<UploadTicketResponse> = uploadTicketResult
         override suspend fun uploadBinary(uploadUrl: String, file: File, onProgress: (Int) -> Unit): Result<Unit> = Result.success(Unit)
-        override suspend fun startScan(jobId: String, language: String): Result<String> = startScanResult
+        override suspend fun startScan(jobId: String, language: String, appName: String): Result<String> = startScanResult
     }
 
     @Test

@@ -218,7 +218,11 @@ class VirusDetecScanner(
             }
 
             send(ScanStep.Queued(queuePosition = null, message = "Scan queued", analysisId = ticket.jobId))
-            val startRes = service.startScan(ticket.jobId, options.preferredLanguage)
+            val startRes = service.startScan(
+                jobId = ticket.jobId,
+                language = options.preferredLanguage,
+                appName = metadata.appName,
+            )
             if (startRes.isFailure) {
                 send(ScanStep.Failed(mapExceptionToScanError(startRes.exceptionOrNull())))
                 return@channelFlow

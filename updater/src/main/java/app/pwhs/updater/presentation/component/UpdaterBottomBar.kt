@@ -42,35 +42,50 @@ import app.pwhs.core.data.local.dataStore
 import app.pwhs.core.util.InstallationSourceHelper
 import app.pwhs.core.util.disableSceneTransition
 
+private object UpdaterHiddenTabsCache {
+    @Volatile
+    var current: Set<String> = emptySet()
+}
+
 private enum class UpdaterBottomNavDestination(
+    val tabKey: String,
     val targetActivityClassName: String?,
     val labelRes: Int,
     val icon: ImageVector,
+    val isAlwaysVisible: Boolean = false,
 ) {
     INSTALL(
+        tabKey = "Install",
         targetActivityClassName = "app.pwhs.universalinstaller.presentation.install.InstallActivity",
         labelRes = CoreR.string.nav_install,
         icon = Icons.Rounded.MoveToInbox,
+        isAlwaysVisible = true,
     ),
     UPDATES(
+        tabKey = "Updates",
         targetActivityClassName = null,
         labelRes = CoreR.string.nav_updates,
         icon = Icons.Rounded.RocketLaunch,
+        isAlwaysVisible = true,
     ),
     MANAGE(
+        tabKey = "Manage",
         targetActivityClassName = "app.pwhs.universalinstaller.presentation.manage.ManageActivity",
         labelRes = CoreR.string.nav_manage,
         icon = Icons.Rounded.Apps,
     ),
     STATS(
+        tabKey = "Stats",
         targetActivityClassName = "app.pwhs.universalinstaller.presentation.stats.StatsActivity",
         labelRes = CoreR.string.nav_stats,
         icon = Icons.Rounded.QueryStats,
     ),
     SETTINGS(
+        tabKey = "Settings",
         targetActivityClassName = "app.pwhs.universalinstaller.presentation.setting.SettingActivity",
         labelRes = CoreR.string.nav_settings,
         icon = Icons.Rounded.Settings,
+        isAlwaysVisible = true,
     ),
 }
 
@@ -104,8 +119,24 @@ fun UpdaterBottomBar(
         }
     }
 
+    val hiddenTabs by produceState(initialValue = UpdaterHiddenTabsCache.current, context) {
+        runCatching {
+            context.dataStore.data.collect { prefs ->
+                val tabs = prefs[SharedPrefsKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+                UpdaterHiddenTabsCache.current = tabs
+                value = tabs
+            }
+        }
+    }
+
+    val destinations = remember(hiddenTabs) {
+        UpdaterBottomNavDestination.entries.filter {
+            it.isAlwaysVisible || it.tabKey !in hiddenTabs
+        }
+    }
+
     NavigationBar {
-        UpdaterBottomNavDestination.entries.forEach { destination ->
+        destinations.forEach { destination ->
             val isSelected = destination == UpdaterBottomNavDestination.UPDATES
             NavigationBarItem(
                 selected = isSelected,
@@ -187,6 +218,22 @@ fun UpdaterNavigationRail(
         }
     }
 
+    val hiddenTabs by produceState(initialValue = UpdaterHiddenTabsCache.current, context) {
+        runCatching {
+            context.dataStore.data.collect { prefs ->
+                val tabs = prefs[SharedPrefsKeys.HIDDEN_BOTTOM_TABS] ?: emptySet()
+                UpdaterHiddenTabsCache.current = tabs
+                value = tabs
+            }
+        }
+    }
+
+    val destinations = remember(hiddenTabs) {
+        UpdaterBottomNavDestination.entries.filter {
+            it.isAlwaysVisible || it.tabKey !in hiddenTabs
+        }
+    }
+
     val isAmoled = colors.background == Color.Black && colors.surface == Color.Black
 
     NavigationRail(
@@ -198,7 +245,7 @@ fun UpdaterNavigationRail(
             verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            UpdaterBottomNavDestination.entries.forEach { destination ->
+            destinations.forEach { destination ->
                 val isSelected = destination == UpdaterBottomNavDestination.UPDATES
                 NavigationRailItem(
                     selected = isSelected,

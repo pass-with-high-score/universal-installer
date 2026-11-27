@@ -214,9 +214,15 @@ open class VirusDetecService(
     open suspend fun startScan(
         jobId: String,
         language: String = Locale.getDefault().language.ifBlank { "vi" },
+        appName: String = "",
     ): Result<String> = withContext(Dispatchers.IO) {
         runCatching {
-            val payload = JSONObject().apply { put("job_id", jobId) }
+            val payload = JSONObject().apply {
+                put("job_id", jobId)
+                if (appName.isNotBlank()) {
+                    put("app_name", appName.trim())
+                }
+            }
             val response = executeWithFallback { url ->
                 client.post("$url/api/v1/scan/start") {
                     attachCommonHeaders(language)

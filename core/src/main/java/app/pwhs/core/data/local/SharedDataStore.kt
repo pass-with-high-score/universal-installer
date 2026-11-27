@@ -93,6 +93,9 @@ object SharedPrefsKeys {
     /** Set of milestone IDs that have already granted their Pro trial hours. */
     val PRO_TRIAL_CLAIMED_MILESTONES = stringSetPreferencesKey("pro_trial_claimed_milestones")
 
+    /** Set of BottomBarItem names hidden by the user in Settings (e.g. "Stats", "Manage", "Updates"). */
+    val HIDDEN_BOTTOM_TABS = stringSetPreferencesKey("hidden_bottom_tabs")
+
     /**
      * Whether the Play build may report anonymous install statistics and crashes. Absent means
      * on — the onboarding page presents it opted in, and the open-source build ignores the key
