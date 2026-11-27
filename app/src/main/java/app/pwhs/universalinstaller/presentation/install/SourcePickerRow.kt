@@ -389,6 +389,15 @@ private fun DownloadSourceContent(
                     } else if (!isPreparing) {
                         pendingStart = true
                         onStartDownload(url)
+                        // Invalid URLs reject synchronously as Error. A second tap with the
+                        // same message does not re-emit StateFlow (equals), so LaunchedEffect
+                        // would never clear pendingStart — unlock here for rejected starts.
+                        // Accepted starts set Preparing before returning; keep the optimistic
+                        // lock until LaunchedEffect sees Preparing/Running.
+                        val trimmed = url.trim()
+                        val accepted = trimmed.startsWith("http://", ignoreCase = true) ||
+                            trimmed.startsWith("https://", ignoreCase = true)
+                        if (!accepted) pendingStart = false
                     }
                 },
                 enabled = when {
