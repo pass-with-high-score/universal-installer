@@ -496,4 +496,21 @@
     <string name="fn_preset_permissions">Autorizzazioni eccessive / sospette</string>
     <string name="fp_preset_normal_permissions">Autorizzazioni normali per questa app</string>
     <string name="fp_current_verdict_label">Attuale: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Scansione di sicurezza</string>
+    <string name="vt_scan_step_hashing">Calcolo hash SHA-256</string>
+    <string name="vt_scan_step_lookup">Controllo database di sicurezza</string>
+    <string name="vt_scan_step_upload">Caricamento APK per scansione approfondita</string>
+    <string name="vt_scan_step_upload_progress">Caricamento APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">In attesa nella coda di analisi</string>
+    <string name="vt_scan_step_analyzing">Analisi bytecode e firme</string>
+    <string name="vt_scan_step_fallback">Passaggio allo scanner di riserva</string>
+    <string name="vt_scan_step_counter">Passaggio %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Salta e installa ora</string>
+    <string name="vt_scan_sheet_run_background">Nascondi (esegui in background)</string>
+    <string name="vt_scan_sheet_install_now">Continua installazione</string>
+    <string name="vt_scan_sheet_clean_proceeding">Nessuna minaccia — avvio installazione…</string>
+    <string name="vt_scan_card_tap_details">Tocca per i dettagli</string>
+    <string name="virustotal_detail_score_desc">Punteggio di rischio: %1$d/100</string>
 </resources>

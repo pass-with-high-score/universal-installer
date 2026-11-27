@@ -1,6 +1,7 @@
 package app.pwhs.universalinstaller.presentation.install.components
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.CloudUpload
@@ -21,11 +23,12 @@ import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -34,15 +37,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.pwhs.core.network.VirusTotalKeyManager
 import app.pwhs.core.network.VtQuotaStatus
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
+import app.pwhs.universalinstaller.presentation.install.dialog.activeScanStepLabel
+import app.pwhs.universalinstaller.presentation.install.dialog.computeScanUiProgress
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
 
 @Composable
@@ -141,18 +149,62 @@ fun VirusTotalCard(
                     text = stringResource(R.string.apk_info_vt_scan_title),
                     style = MaterialTheme.typography.labelLarge,
                     color = vtColor,
+                    modifier = Modifier.weight(1f),
                 )
                 if (inProgress) {
-                    Spacer(Modifier.width(8.dp))
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp,
-                        color = vtColor,
+                    val uiProgress = computeScanUiProgress(vt, sha256.isNotBlank())
+                    Text(
+                        text = stringResource(
+                            R.string.vt_scan_step_counter,
+                            uiProgress.stepIndex,
+                            uiProgress.totalSteps,
+                        ),
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
 
-            if (vtDesc != null) {
+            if (inProgress) {
+                val hasSha256 = sha256.isNotBlank()
+                val uiProgress = computeScanUiProgress(vt, hasSha256)
+                val animatedProgress by animateFloatAsState(
+                    targetValue = uiProgress.fraction,
+                    animationSpec = ProgressIndicatorDefaults.ProgressAnimationSpec,
+                    label = "VtCardLinearProgress",
+                )
+                Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = activeScanStepLabel(vt, hasSha256),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Spacer(Modifier.width(8.dp))
+                    Text(
+                        text = "${(animatedProgress * 100).toInt()}%",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+                Spacer(Modifier.height(6.dp))
+                LinearProgressIndicator(
+                    progress = { animatedProgress },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(50)),
+                    color = MaterialTheme.colorScheme.primary,
+                    trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
+                    strokeCap = StrokeCap.Round,
+                )
+            } else if (vtDesc != null) {
                 Spacer(Modifier.height(8.dp))
                 Text(vtDesc, style = MaterialTheme.typography.bodySmall, color = vtColor)
             }
@@ -168,7 +220,14 @@ fun VirusTotalCard(
                     warningColor = extendedColors.warning,
                     cleanColor = extendedColors.success,
                 )
-                if (total > 0) {
+                if (vt.report != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(R.string.virustotal_detail_score_desc, vt.report!!.riskScore),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                } else if (total > 0) {
                     Spacer(Modifier.height(8.dp))
                     Text(
                         text = stringResource(

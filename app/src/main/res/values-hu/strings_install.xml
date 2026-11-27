@@ -489,4 +489,21 @@
     <string name="fn_preset_permissions">Túlzott / gyanús engedélyek</string>
     <string name="fp_preset_normal_permissions">Normál engedélyek ehhez az apphoz</string>
     <string name="fp_current_verdict_label">Jelenlegi: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Biztonsági vizsgálat</string>
+    <string name="vt_scan_step_hashing">SHA-256 hash számítása</string>
+    <string name="vt_scan_step_lookup">Biztonsági adatbázis ellenőrzése</string>
+    <string name="vt_scan_step_upload">APK feltöltése mélyvizsgálathoz</string>
+    <string name="vt_scan_step_upload_progress">APK feltöltése (%1$d%%)</string>
+    <string name="vt_scan_step_queued">Várakozás az elemzési sorban</string>
+    <string name="vt_scan_step_analyzing">Bájtkód és aláírások elemzése</string>
+    <string name="vt_scan_step_fallback">Váltás tartalék keresőre</string>
+    <string name="vt_scan_step_counter">%1$d/%2$d. lépés</string>
+    <string name="vt_scan_sheet_skip_install">Kihagyás és telepítés most</string>
+    <string name="vt_scan_sheet_run_background">Elrejtés (futtatás a háttérben)</string>
+    <string name="vt_scan_sheet_install_now">Telepítés folytatása</string>
+    <string name="vt_scan_sheet_clean_proceeding">Nem található fenyegetés — telepítés indítása…</string>
+    <string name="vt_scan_card_tap_details">Koppintson a részletekért</string>
+    <string name="virustotal_detail_score_desc">Kockázati pontszám: %1$d/100</string>
 </resources>

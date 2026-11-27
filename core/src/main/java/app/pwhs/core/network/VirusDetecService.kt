@@ -38,39 +38,12 @@ import java.io.InputStream
 import java.security.MessageDigest
 import java.util.Locale
 
-data class RateLimitInfo(
-    val limit: Int? = null,
-    val remaining: Int? = null,
-    val reset: Long? = null,
-)
-
-data class ServerTimeResponse(
-    val timestamp: Long,
-    val iso: String,
-    val dateUtc: String,
-)
-
-data class TrialStatusResponse(
-    val granted: Boolean = false,
-    val newUserTrialClaimed: Boolean = false,
-    val claimedMilestones: Set<String> = emptySet(),
-    val trialExpiresAt: Long = 0L,
-    val serverTime: Long = 0L,
-    val isTrialActive: Boolean = false,
-)
-
-data class VirusDetecApiException(
-    val httpCode: Int,
-    val errorCode: String?,
-    override val message: String,
-    val rateLimit: RateLimitInfo? = null,
-) : RuntimeException(message)
-
 open class VirusDetecService(
     private val client: HttpClient = defaultClient,
     private val baseUrl: String = PRIMARY_BASE_URL,
     private val apiKey: String = DEFAULT_CLIENT_API_KEY,
     var deviceIdProvider: (suspend () -> String?)? = null,
+    var proTokenProvider: (suspend () -> String?)? = null,
 ) {
     companion object {
         const val PRIMARY_BASE_URL = "https://virusdetect.pwhs.app"
@@ -96,6 +69,10 @@ open class VirusDetecService(
         val devId = runCatching { deviceIdProvider?.invoke() }.getOrNull()
         if (!devId.isNullOrBlank()) {
             header("X-Device-ID", devId)
+        }
+        val proToken = runCatching { proTokenProvider?.invoke() }.getOrNull()
+        if (!proToken.isNullOrBlank()) {
+            header("X-Pro-Token", proToken)
         }
     }
 
@@ -259,11 +236,15 @@ open class VirusDetecService(
     ): Flow<ScanStepUpdate> = flow {
         val streamUrl = "$baseUrl/api/v1/scan/jobs/$jobId/stream?lang=$language"
         val devId = runCatching { deviceIdProvider?.invoke() }.getOrNull()
+        val proToken = runCatching { proTokenProvider?.invoke() }.getOrNull()
         val response: HttpResponse = client.get(streamUrl) {
             header("X-API-Key", apiKey)
             header("Accept-Language", language)
             if (!devId.isNullOrBlank()) {
                 header("X-Device-ID", devId)
+            }
+            if (!proToken.isNullOrBlank()) {
+                header("X-Pro-Token", proToken)
             }
         }
 
@@ -366,6 +347,39 @@ open class VirusDetecService(
                 handleApiError(response)
             }
             parseTrialStatusResponse(JSONObject(response.bodyAsText()))
+        }
+    }
+
+    open suspend fun verifyGooglePlayPurchase(
+        purchaseToken: String,
+        productId: String,
+        productType: String,
+        packageName: String,
+        language: String = Locale.getDefault().language.ifBlank { "vi" },
+    ): Result<ProVerifyResponse> = withContext(Dispatchers.IO) {
+        runCatching {
+            val payload = JSONObject().apply {
+                put("purchase_token", purchaseToken)
+                put("product_id", productId)
+                put("product_type", productType)
+                put("package_name", packageName)
+            }
+            val response = executeWithFallback { url ->
+                client.post("$url/api/v1/billing/google/verify") {
+                    attachCommonHeaders(language)
+                    setBody(payload.toString())
+                }
+            }
+            if (!response.status.isSuccess()) {
+                handleApiError(response)
+            }
+            val json = JSONObject(response.bodyAsText())
+            ProVerifyResponse(
+                proToken = json.optString("pro_token"),
+                expiresAt = json.optLong("expires_at", 0L),
+                orderId = json.optString("order_id"),
+                productId = json.optString("product_id"),
+            )
         }
     }
 

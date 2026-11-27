@@ -510,4 +510,21 @@
     <string name="dialog_menu_abi_override_single_abi_warning">This device only supports %1$s. Forcing another ABI is not supported and will likely fail with INSTALL_FAILED_NO_MATCHING_ABIS.</string>
     <string name="dialog_menu_abi_override_unsupported_warning">%1$s is not in this device\'s supported ABIs (%2$s). Installation will likely be rejected by Android.</string>
     <string name="dialog_menu_abi_override_rom_note">Applies to this install only via Shizuku, Root, or Custom Shell. Some devices and OEM ROMs do not allow forcing an ABI.</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Security Scan</string>
+    <string name="vt_scan_step_hashing">Calculating SHA-256 hash</string>
+    <string name="vt_scan_step_lookup">Checking security database</string>
+    <string name="vt_scan_step_upload">Uploading APK for deep scan</string>
+    <string name="vt_scan_step_upload_progress">Uploading APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">Waiting in analysis queue</string>
+    <string name="vt_scan_step_analyzing">Analyzing bytecode &amp; signatures</string>
+    <string name="vt_scan_step_fallback">Switching to backup scanner</string>
+    <string name="vt_scan_step_counter">Step %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Skip &amp; Install now</string>
+    <string name="vt_scan_sheet_run_background">Hide (run in background)</string>
+    <string name="vt_scan_sheet_install_now">Continue to install</string>
+    <string name="vt_scan_sheet_clean_proceeding">No threats found — starting install…</string>
+    <string name="vt_scan_card_tap_details">Tap for details</string>
+    <string name="virustotal_detail_score_desc">Risk score: %1$d/100</string>
 </resources>

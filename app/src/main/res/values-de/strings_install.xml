@@ -495,4 +495,21 @@
     <string name="fn_preset_permissions">Übermäßige / verdächtige Berechtigungen</string>
     <string name="fp_preset_normal_permissions">Normale Berechtigungen für diese App</string>
     <string name="fp_current_verdict_label">Aktuell: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Sicherheitsscan</string>
+    <string name="vt_scan_step_hashing">SHA-256-Hash wird berechnet</string>
+    <string name="vt_scan_step_lookup">Sicherheitsdatenbank wird geprüft</string>
+    <string name="vt_scan_step_upload">APK wird für Tiefenscan hochgeladen</string>
+    <string name="vt_scan_step_upload_progress">APK wird hochgeladen (%1$d%%)</string>
+    <string name="vt_scan_step_queued">In der Analyse-Warteschlange</string>
+    <string name="vt_scan_step_analyzing">Bytecode &amp; Signaturen werden analysiert</string>
+    <string name="vt_scan_step_fallback">Wechsle zum Backup-Scanner</string>
+    <string name="vt_scan_step_counter">Schritt %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Überspringen &amp; jetzt installieren</string>
+    <string name="vt_scan_sheet_run_background">Ausblenden (im Hintergrund ausführen)</string>
+    <string name="vt_scan_sheet_install_now">Weiter zur Installation</string>
+    <string name="vt_scan_sheet_clean_proceeding">Keine Bedrohungen gefunden — Installation startet…</string>
+    <string name="vt_scan_card_tap_details">Für Details tippen</string>
+    <string name="virustotal_detail_score_desc">Risikobewertung: %1$d/100</string>
 </resources>

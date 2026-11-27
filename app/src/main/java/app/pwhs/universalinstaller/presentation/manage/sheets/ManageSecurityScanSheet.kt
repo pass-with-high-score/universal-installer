@@ -200,10 +200,15 @@ fun ManageSecurityScanSheet(
             } else {
                 when (status) {
                     VtStatus.CLEAN -> {
+                        val report = vtResult?.report
                         ScanResultBanner(
                             isClean = true,
                             title = stringResource(R.string.virustotal_detail_clean_title),
-                            desc = stringResource(R.string.virustotal_detail_clean_desc, totalEngines),
+                            desc = if (report != null) {
+                                stringResource(R.string.virustotal_detail_score_desc, report.riskScore)
+                            } else {
+                                stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
+                            },
                         )
                         if (vtResult != null) {
                             VtBreakdownSection(

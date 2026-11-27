@@ -78,6 +78,10 @@ object SharedPrefsKeys {
     /** Whether the user has unlocked Universal Installer Pro (unlimited built-in VirusTotal). */
     val IS_PRO_USER = booleanPreferencesKey("is_pro_user")
     val PRO_PLAN_TYPE = stringPreferencesKey("pro_plan_type")
+    /** Signed Pro JWT issued by VirusDetec backend after verifying Google Play purchase. */
+    val PRO_TOKEN = stringPreferencesKey("pro_token")
+    /** Expiration timestamp (epoch ms) of [PRO_TOKEN]. */
+    val PRO_TOKEN_EXPIRES_AT = longPreferencesKey("pro_token_expires_at")
 
     /** Whether the 3-day new user Pro trial has already been claimed on this device. */
     val NEW_USER_TRIAL_CLAIMED = booleanPreferencesKey("new_user_trial_claimed")

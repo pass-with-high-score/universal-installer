@@ -85,7 +85,11 @@ import app.pwhs.universalinstaller.presentation.install.components.VirusTotalQui
 import app.pwhs.universalinstaller.presentation.install.components.VtStatusChip
 import app.pwhs.universalinstaller.presentation.install.dialog.DialogKeepApkOption
 import app.pwhs.universalinstaller.presentation.install.dialog.InstallSupportBottomSheet
+import app.pwhs.universalinstaller.presentation.install.dialog.TrackerScanCard
+import app.pwhs.universalinstaller.presentation.install.dialog.VirusScanProgressBottomSheet
 import app.pwhs.universalinstaller.presentation.install.dialog.VirusTotalDetailSheet
+import app.pwhs.universalinstaller.presentation.install.dialog.VirusTotalInstallPrompt
+import app.pwhs.universalinstaller.presentation.install.dialog.isScanInProgress
 import app.pwhs.universalinstaller.presentation.setting.SettingActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -131,6 +135,8 @@ internal fun ApkInfoContent(
     var showAbiWarningDialog by rememberSaveable { mutableStateOf(false) }
     var showSupportSheet by rememberSaveable { mutableStateOf(false) }
     var showVtDetailSheet by rememberSaveable { mutableStateOf(false) }
+    var showScanProgressSheet by rememberSaveable { mutableStateOf(false) }
+    var scanSheetPendingInstall by rememberSaveable { mutableStateOf(false) }
     var showVtKeyDialog by rememberSaveable { mutableStateOf(false) }
     var showQuotaUnlockDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -191,6 +197,24 @@ internal fun ApkInfoContent(
                 onOpenSettings = { showQuotaUnlockDialog = true },
                 onOpenDetail = { showVtDetailSheet = true },
                 modifier = Modifier.fillMaxWidth(),
+            )
+
+            if (!vtDisabled) {
+                Spacer(Modifier.height(12.dp))
+                VirusTotalInstallPrompt(
+                    apkInfo = apkInfo,
+                    onScan = onCheckVirusTotal,
+                    onOpenScanProgress = {
+                        scanSheetPendingInstall = false
+                        showScanProgressSheet = true
+                    },
+                )
+            }
+
+            TrackerScanCard(
+                apkInfo = apkInfo,
+                onShowTrackers = { showTrackersDialog = true },
+                modifier = Modifier.padding(top = 8.dp),
             )
 
             if (isExpanded) {
@@ -344,16 +368,20 @@ internal fun ApkInfoContent(
             onExpand = { isExpanded = true },
             onCollapse = { isExpanded = false },
             onInstall = {
-                if (apkInfo.isAbiIncompatible) {
-                    showAbiWarningDialog = true
-                } else {
-                    onInstall()
+                when {
+                    apkInfo.isAbiIncompatible -> showAbiWarningDialog = true
+                    !vtDisabled && apkInfo.vtResult.isScanInProgress() -> {
+                        scanSheetPendingInstall = true
+                        showScanProgressSheet = true
+                    }
+                    else -> onInstall()
                 }
             },
             onCancel = onCancel,
             onCheckVirusTotal = {
-                if (!isExpanded) isExpanded = true
                 onCheckVirusTotal()
+                scanSheetPendingInstall = false
+                showScanProgressSheet = true
             },
         )
 
@@ -389,6 +417,24 @@ internal fun ApkInfoContent(
                 target = target,
                 errorMessage = installError,
                 onDismiss = { showSupportSheet = false },
+            )
+        }
+
+        if (showScanProgressSheet && !vtDisabled) {
+            VirusScanProgressBottomSheet(
+                apkInfo = apkInfo,
+                pendingInstall = scanSheetPendingInstall,
+                onDismiss = {
+                    showScanProgressSheet = false
+                    scanSheetPendingInstall = false
+                },
+                onProceedInstall = {
+                    showScanProgressSheet = false
+                    scanSheetPendingInstall = false
+                    onInstall()
+                },
+                onViewDetails = { showVtDetailSheet = true },
+                onRetryScan = onCheckVirusTotal,
             )
         }
 

@@ -497,4 +497,21 @@
     <string name="fn_preset_permissions">Лишние или подозрительные разрешения</string>
     <string name="fp_preset_normal_permissions">Обычные разрешения для этого приложения</string>
     <string name="fp_current_verdict_label">Текущий статус: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Проверка безопасности</string>
+    <string name="vt_scan_step_hashing">Вычисление хэша SHA-256</string>
+    <string name="vt_scan_step_lookup">Проверка в базе безопасности</string>
+    <string name="vt_scan_step_upload">Загрузка APK для глубокой проверки</string>
+    <string name="vt_scan_step_upload_progress">Загрузка APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">Ожидание в очереди анализа</string>
+    <string name="vt_scan_step_analyzing">Анализ байт-кода и подписей</string>
+    <string name="vt_scan_step_fallback">Переключение на резервный сканер</string>
+    <string name="vt_scan_step_counter">Шаг %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Пропустить и установить</string>
+    <string name="vt_scan_sheet_run_background">Скрыть (работать в фоне)</string>
+    <string name="vt_scan_sheet_install_now">Продолжить установку</string>
+    <string name="vt_scan_sheet_clean_proceeding">Угроз не найдено — запуск установки…</string>
+    <string name="vt_scan_card_tap_details">Нажмите для подробностей</string>
+    <string name="virustotal_detail_score_desc">Оценка риска: %1$d/100</string>
 </resources>

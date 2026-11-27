@@ -495,4 +495,21 @@
     <string name="fn_preset_permissions">अत्यधिक / संदिग्ध अनुमतियां</string>
     <string name="fp_preset_normal_permissions">इस ऐप के लिए सामान्य अनुमतियां</string>
     <string name="fp_current_verdict_label">वर्तमान: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">सुरक्षा स्कैन</string>
+    <string name="vt_scan_step_hashing">SHA-256 हैश की गणना हो रही है</string>
+    <string name="vt_scan_step_lookup">सुरक्षा डेटाबेस की जांच हो रही है</string>
+    <string name="vt_scan_step_upload">डीप स्कैन के लिए APK अपलोड हो रहा है</string>
+    <string name="vt_scan_step_upload_progress">APK अपलोड हो रहा है (%1$d%%)</string>
+    <string name="vt_scan_step_queued">विश्लेषण कतार में प्रतीक्षा कर रहा है</string>
+    <string name="vt_scan_step_analyzing">बाइटकोड और हस्ताक्षर का विश्लेषण हो रहा है</string>
+    <string name="vt_scan_step_fallback">बैकअप स्कैनर पर स्विच किया जा रहा है</string>
+    <string name="vt_scan_step_counter">चरण %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">छोड़ें और अभी इंस्टॉल करें</string>
+    <string name="vt_scan_sheet_run_background">छिपाएं (बैकग्राउंड में चलाएं)</string>
+    <string name="vt_scan_sheet_install_now">इंस्टॉल जारी रखें</string>
+    <string name="vt_scan_sheet_clean_proceeding">कोई खतरा नहीं मिला — इंस्टॉल शुरू हो रहा है…</string>
+    <string name="vt_scan_card_tap_details">विवरण के लिए टैप करें</string>
+    <string name="virustotal_detail_score_desc">जोखिम स्कोर: %1$d/100</string>
 </resources>

@@ -18,9 +18,15 @@ fun DialogPrepareModals(
     showAbiWarningDialog: Boolean,
     onDismissAbiWarningDialog: () -> Unit,
     onInstallAnyway: () -> Unit,
+    showScanProgressSheet: Boolean = false,
+    scanSheetPendingInstall: Boolean = false,
+    onDismissScanProgressSheet: () -> Unit = {},
+    onProceedInstallFromScan: () -> Unit = {},
+    onRetryScan: () -> Unit = {},
     billingManager: BillingManager = koinInject(),
 ) {
     var showUpgradeProSheet by remember { mutableStateOf(false) }
+    var showVtDetailFromScanSheet by remember { mutableStateOf(false) }
 
     if (showTrackersDialog && apkInfo.trackers.isNotEmpty()) {
         TrackersDetailDialog(
@@ -34,6 +40,26 @@ fun DialogPrepareModals(
             apkAbis = apkInfo.supportedAbis,
             onDismiss = onDismissAbiWarningDialog,
             onInstallAnyway = onInstallAnyway,
+        )
+    }
+
+    if (showScanProgressSheet) {
+        VirusScanProgressBottomSheet(
+            apkInfo = apkInfo,
+            pendingInstall = scanSheetPendingInstall,
+            onDismiss = onDismissScanProgressSheet,
+            onProceedInstall = onProceedInstallFromScan,
+            onViewDetails = { showVtDetailFromScanSheet = true },
+            onRetryScan = onRetryScan,
+        )
+    }
+
+    val detailVt = apkInfo.vtResult
+    if (showVtDetailFromScanSheet && detailVt != null) {
+        VirusTotalDetailSheet(
+            vt = detailVt,
+            apkInfo = apkInfo,
+            onDismiss = { showVtDetailFromScanSheet = false },
         )
     }
 

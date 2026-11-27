@@ -139,10 +139,14 @@ fun VtStatusChip(
     val extendedColors = LocalExtendedColors.current
     when (vt?.status) {
         VtStatus.CLEAN -> {
-            val totalEngines = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
-            val tallySuffix = if (totalEngines > 0) " (0/$totalEngines)" else ""
+            val scoreSuffix = if (vt.report != null) {
+                " (${vt.report!!.riskScore}/100)"
+            } else {
+                val totalEngines = vt.malicious + vt.suspicious + vt.harmless + vt.undetected
+                if (totalEngines > 0) " (0/$totalEngines)" else ""
+            }
             InfoChip(
-                label = stringResource(R.string.apk_info_vt_chip_clean) + tallySuffix,
+                label = stringResource(R.string.apk_info_vt_chip_clean) + scoreSuffix,
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Rounded.GppGood,

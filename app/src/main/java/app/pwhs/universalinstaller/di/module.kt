@@ -98,12 +98,21 @@ val appModule = module {
                     // keeps multipart APK uploads out of logcat. Bump to LogLevel.BODY when
                     // you need to inspect JSON payloads (VT responses etc.).
                     level = LogLevel.HEADERS
-                    sanitizeHeader { header -> header.equals("x-apikey", ignoreCase = true) }
+                    sanitizeHeader { header ->
+                        header.equals("x-apikey", ignoreCase = true) ||
+                            header.equals("x-pro-token", ignoreCase = true)
+                    }
                 }
             }
         }
     }
-    single { VirusDetecService(get(), deviceIdProvider = { DeviceIdProvider.getDeviceId(androidContext()) }) }
+    single {
+        VirusDetecService(
+            client = get(),
+            deviceIdProvider = { DeviceIdProvider.getDeviceId(androidContext()) },
+            proTokenProvider = { app.pwhs.core.network.ProTokenStore.getValidToken(androidContext()) },
+        )
+    }
     single { VirusTotalService(get()) }
     single { VirusDetecScanner(get<VirusDetecService>()) }
     single { VirusTotalScanner(get<VirusTotalService>()) }

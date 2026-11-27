@@ -30,6 +30,16 @@ data class VtEngineResult(
     val result: String?,
 )
 
+enum class VtScanPhase {
+    NONE,
+    HASHING,
+    LOOKUP_CACHE,
+    UPLOADING,
+    QUEUED,
+    ANALYZING,
+    FALLBACK,
+}
+
 data class VtResult(
     val malicious: Int = 0,
     val suspicious: Int = 0,
@@ -37,10 +47,14 @@ data class VtResult(
     val undetected: Int = 0,
     val status: VtStatus = VtStatus.NO_API_KEY,
     val errorMessage: String = "",
-    val uploadProgress: Int = 0,   // 0..100, meaningful only when status = UPLOADING
+    val uploadProgress: Int = 0,   // 0..100, meaningful for UPLOADING / ANALYZING
     val analysisId: String = "",
     val engineResults: List<VtEngineResult> = emptyList(),
     val report: ScanReport? = null,
     /** True when the report came only from lightweight metadata precheck (no DEX/binary scan). */
     val isPrecheckOnly: Boolean = false,
+    /** Granular active phase while a scan is in progress. */
+    val scanPhase: VtScanPhase = VtScanPhase.NONE,
+    /** Optional backend-provided description of the active analysis stage. */
+    val stageDescription: String = "",
 )

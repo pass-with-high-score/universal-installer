@@ -216,10 +216,13 @@ fun VirusTotalDetailSheet(
                             )
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
-                                text = if (isClean) {
-                                    stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
-                                } else {
-                                    stringResource(R.string.virustotal_detail_flagged_desc)
+                                text = when {
+                                    vt.report != null -> stringResource(
+                                        R.string.virustotal_detail_score_desc,
+                                        vt.report!!.riskScore,
+                                    )
+                                    isClean -> stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
+                                    else -> stringResource(R.string.virustotal_detail_flagged_desc)
                                 },
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,

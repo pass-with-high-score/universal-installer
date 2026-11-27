@@ -15,6 +15,7 @@ import app.pwhs.core.domain.scanner.ScannerProviderId
 import app.pwhs.core.domain.scanner.SecurityScanResult
 import app.pwhs.core.domain.scanner.toSecurityScanResult
 import app.pwhs.core.network.DeviceIdProvider
+import app.pwhs.core.network.ProTokenStore
 import app.pwhs.core.network.VirusDetecApiException
 import app.pwhs.core.network.VirusDetecService
 import app.pwhs.core.network.VirusTotalKeyManager
@@ -82,6 +83,9 @@ class VirusDetecScanner(
         if (service.deviceIdProvider == null) {
             service.deviceIdProvider = { DeviceIdProvider.getDeviceId(context) }
         }
+        if (service.proTokenProvider == null) {
+            service.proTokenProvider = { ProTokenStore.getValidToken(context) }
+        }
         VirusTotalQuotaStore.syncWithServer(service)
         if (!isBuiltInQuotaAvailable(context, sha256)) {
             return@withContext Result.failure(
@@ -130,6 +134,9 @@ class VirusDetecScanner(
     ): Flow<ScanStep> = channelFlow {
         if (service.deviceIdProvider == null) {
             service.deviceIdProvider = { DeviceIdProvider.getDeviceId(context) }
+        }
+        if (service.proTokenProvider == null) {
+            service.proTokenProvider = { ProTokenStore.getValidToken(context) }
         }
         VirusTotalQuotaStore.syncWithServer(service)
         // 1. File size verification

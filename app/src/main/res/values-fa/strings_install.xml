@@ -489,4 +489,21 @@
     <string name="fn_preset_permissions">مجوزهای بیش‌ازحد / مشکوک</string>
     <string name="fp_preset_normal_permissions">مجوزهای عادی برای این برنامه</string>
     <string name="fp_current_verdict_label">وضعیت فعلی: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">اسکن امنیتی</string>
+    <string name="vt_scan_step_hashing">در حال محاسبه هش SHA-256</string>
+    <string name="vt_scan_step_lookup">در حال بررسی پایگاه داده امنیتی</string>
+    <string name="vt_scan_step_upload">در حال آپلود APK برای اسکن عمیق</string>
+    <string name="vt_scan_step_upload_progress">در حال آپلود APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">در صف انتظار تحلیل</string>
+    <string name="vt_scan_step_analyzing">در حال تحلیل کد و امضاها</string>
+    <string name="vt_scan_step_fallback">در حال تغییر به اسکنر پشتیبان</string>
+    <string name="vt_scan_step_counter">مرحله %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">رد شدن و نصب فوری</string>
+    <string name="vt_scan_sheet_run_background">پنهان کردن (اجرا در پس‌زمینه)</string>
+    <string name="vt_scan_sheet_install_now">ادامه نصب</string>
+    <string name="vt_scan_sheet_clean_proceeding">تهدیدی یافت نشد — در حال شروع نصب…</string>
+    <string name="vt_scan_card_tap_details">برای جزئیات ضربه بزنید</string>
+    <string name="virustotal_detail_score_desc">امتیاز ریسک: %1$d/100</string>
 </resources>

@@ -494,4 +494,21 @@
     <string name="fn_preset_permissions">過剰または不審な権限</string>
     <string name="fp_preset_normal_permissions">このアプリに相応しい通常の権限</string>
     <string name="fp_current_verdict_label">現在: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">セキュリティスキャン</string>
+    <string name="vt_scan_step_hashing">SHA-256ハッシュを計算中</string>
+    <string name="vt_scan_step_lookup">セキュリティデータベースを照会中</string>
+    <string name="vt_scan_step_upload">詳細スキャン用にAPKをアップロード中</string>
+    <string name="vt_scan_step_upload_progress">APKをアップロード中 (%1$d%%)</string>
+    <string name="vt_scan_step_queued">解析キューで待機中</string>
+    <string name="vt_scan_step_analyzing">バイトコードと署名を解析中</string>
+    <string name="vt_scan_step_fallback">バックアップスキャナーに切り替え中</string>
+    <string name="vt_scan_step_counter">ステップ %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">スキップして今すぐインストール</string>
+    <string name="vt_scan_sheet_run_background">隠す（バックグラウンド実行）</string>
+    <string name="vt_scan_sheet_install_now">インストールを続行</string>
+    <string name="vt_scan_sheet_clean_proceeding">脅威なし — インストールを開始中…</string>
+    <string name="vt_scan_card_tap_details">タップして詳細を表示</string>
+    <string name="virustotal_detail_score_desc">リスクスコア: %1$d/100</string>
 </resources>

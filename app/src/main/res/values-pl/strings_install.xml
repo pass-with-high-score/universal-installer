@@ -491,4 +491,21 @@
     <string name="fn_preset_permissions">Nadmierne / podejrzane uprawnienia</string>
     <string name="fp_preset_normal_permissions">Typowe uprawnienia dla tej aplikacji</string>
     <string name="fp_current_verdict_label">Obecnie: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Skanowanie bezpieczeństwa</string>
+    <string name="vt_scan_step_hashing">Obliczanie skrótu SHA-256</string>
+    <string name="vt_scan_step_lookup">Sprawdzanie bazy bezpieczeństwa</string>
+    <string name="vt_scan_step_upload">Przesyłanie APK do głębokiego skanowania</string>
+    <string name="vt_scan_step_upload_progress">Przesyłanie APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">Oczekiwanie w kolejce analizy</string>
+    <string name="vt_scan_step_analyzing">Analiza kodu bajtowego i podpisów</string>
+    <string name="vt_scan_step_fallback">Przełączanie na zapasowy skaner</string>
+    <string name="vt_scan_step_counter">Krok %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Pomiń i zainstaluj teraz</string>
+    <string name="vt_scan_sheet_run_background">Ukryj (działaj w tle)</string>
+    <string name="vt_scan_sheet_install_now">Kontynuuj instalację</string>
+    <string name="vt_scan_sheet_clean_proceeding">Brak zagrożeń — rozpoczynanie instalacji…</string>
+    <string name="vt_scan_card_tap_details">Dotknij, aby zobaczyć szczegóły</string>
+    <string name="virustotal_detail_score_desc">Ocena ryzyka: %1$d/100</string>
 </resources>

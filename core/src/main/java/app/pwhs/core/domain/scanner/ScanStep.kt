@@ -1,6 +1,7 @@
 package app.pwhs.core.domain.scanner
 
 import app.pwhs.core.domain.model.VtResult
+import app.pwhs.core.domain.model.VtScanPhase
 import app.pwhs.core.domain.model.VtStatus
 import app.pwhs.core.network.VirusDetecService
 
@@ -143,27 +144,43 @@ sealed class ScanStep {
  * Maps a [ScanStep] to legacy [VtResult] for direct UI backward compatibility.
  */
 fun ScanStep.toVtResult(sha256: String = ""): VtResult = when (this) {
-    is ScanStep.Hashing -> VtResult(status = VtStatus.SCANNING, analysisId = sha256)
-    is ScanStep.LookupCache -> VtResult(status = VtStatus.SCANNING, analysisId = sha256)
+    is ScanStep.Hashing -> VtResult(
+        status = VtStatus.SCANNING,
+        scanPhase = VtScanPhase.HASHING,
+        uploadProgress = progressPercent ?: 0,
+        analysisId = sha256,
+    )
+    is ScanStep.LookupCache -> VtResult(
+        status = VtStatus.SCANNING,
+        scanPhase = VtScanPhase.LOOKUP_CACHE,
+        analysisId = sha256,
+    )
     is ScanStep.Uploading -> VtResult(
         status = VtStatus.UPLOADING,
+        scanPhase = VtScanPhase.UPLOADING,
         uploadProgress = progressPercent,
         analysisId = sha256,
     )
     is ScanStep.Queued -> VtResult(
         status = VtStatus.QUEUED,
+        scanPhase = VtScanPhase.QUEUED,
         errorMessage = message,
+        stageDescription = message,
         analysisId = analysisId.ifBlank { sha256 },
     )
     is ScanStep.Analyzing -> VtResult(
         status = VtStatus.ANALYZING,
-        uploadProgress = progressPercent ?: 100,
+        scanPhase = VtScanPhase.ANALYZING,
+        uploadProgress = progressPercent ?: 0,
         errorMessage = stageDescription.orEmpty(),
+        stageDescription = stageDescription.orEmpty(),
         analysisId = sha256,
     )
     is ScanStep.FallbackTriggered -> VtResult(
         status = VtStatus.SCANNING,
+        scanPhase = VtScanPhase.FALLBACK,
         errorMessage = "Fallback to ${fallbackProvider.displayName}...",
+        stageDescription = fallbackProvider.displayName,
         analysisId = sha256,
     )
     is ScanStep.Completed -> result.toVtResult()

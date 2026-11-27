@@ -131,43 +131,6 @@ fun ApkInfoChipsRow(
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
             )
         }
-        if (!vtDisabled) {
-            VtStatusChip(
-                vt = apkInfo.vtResult,
-                onClick = onCheckVirusTotal,
-                onOpenWeb = onOpenDetail ?: onCheckVirusTotal,
-                onOpenSettings = onOpenSettings,
-            )
-        }
-        if (apkInfo.isScanningTrackers) {
-            InfoChip(
-                label = stringResource(R.string.dialog_chip_trackers_scanning),
-                leadingIcon = {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(12.dp),
-                        strokeWidth = 1.5.dp,
-                        color = MaterialTheme.colorScheme.tertiary,
-                    )
-                },
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f),
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-            )
-        } else if (apkInfo.trackers.isNotEmpty()) {
-            InfoChip(
-                label = stringResource(R.string.dialog_chip_trackers, apkInfo.trackers.size),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Rounded.Shield,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.tertiary,
-                    )
-                },
-                containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f),
-                contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                onClick = onShowTrackers,
-            )
-        }
         if (apkInfo.fileSizeBytes > 0) {
             InfoChip(
                 label = Formatter.formatShortFileSize(context, apkInfo.fileSizeBytes),

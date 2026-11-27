@@ -494,4 +494,21 @@
     <string name="fn_preset_permissions">过度 / 可疑权限</string>
     <string name="fp_preset_normal_permissions">此应用的正常所需权限</string>
     <string name="fp_current_verdict_label">当前判定：%1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">安全扫描</string>
+    <string name="vt_scan_step_hashing">正在计算 SHA-256 哈希</string>
+    <string name="vt_scan_step_lookup">正在查询安全数据库</string>
+    <string name="vt_scan_step_upload">正在上传 APK 进行深度扫描</string>
+    <string name="vt_scan_step_upload_progress">正在上传 APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">正在分析队列中等待</string>
+    <string name="vt_scan_step_analyzing">正在分析字节码和签名</string>
+    <string name="vt_scan_step_fallback">正在切换至备用扫描引擎</string>
+    <string name="vt_scan_step_counter">步骤 %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">跳过并立即安装</string>
+    <string name="vt_scan_sheet_run_background">隐藏（后台运行）</string>
+    <string name="vt_scan_sheet_install_now">继续安装</string>
+    <string name="vt_scan_sheet_clean_proceeding">未发现威胁 — 正在开始安装…</string>
+    <string name="vt_scan_card_tap_details">点击查看详情</string>
+    <string name="virustotal_detail_score_desc">风险评分：%1$d/100</string>
 </resources>

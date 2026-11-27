@@ -13,6 +13,7 @@ import app.pwhs.core.domain.scanner.impl.VirusDetecScanner
 import app.pwhs.core.domain.scanner.impl.VirusTotalScanner
 import app.pwhs.core.domain.scanner.toVtResult
 import app.pwhs.core.network.VirusDetecService
+import app.pwhs.core.domain.model.VtScanPhase
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.remote.VirusTotalNotifier
 import app.pwhs.universalinstaller.domain.model.ApkInfo
@@ -63,10 +64,12 @@ object InstallVirusTotalHelper {
         originalUri: Uri,
         scannerOrchestrator: SecurityScannerOrchestrator,
         apkInfo: ApkInfo? = null,
+        onHashingStart: () -> Unit = {},
         onAutoLookupStart: () -> Unit = {},
     ): Pair<String, VtResult?> = withContext(Dispatchers.IO) {
         if (isDisabled(context, scannerOrchestrator)) return@withContext "" to null
         return@withContext try {
+            onHashingStart()
             val sha256 = computeSha256(context, originalUri)
             if (sha256.isBlank()) {
                 "" to VtResult(status = VtStatus.ERROR, errorMessage = "Could not hash file")
@@ -157,7 +160,12 @@ object InstallVirusTotalHelper {
         var scanFinished = false
 
         try {
-            onProgress(VtResult(status = VtStatus.SCANNING))
+            onProgress(
+                VtResult(
+                    status = VtStatus.SCANNING,
+                    scanPhase = if (current.sha256.isBlank()) VtScanPhase.HASHING else VtScanPhase.LOOKUP_CACHE,
+                )
+            )
 
             val sha256 = current.sha256.ifBlank {
                 computeSha256(context, uri)

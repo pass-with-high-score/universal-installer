@@ -82,6 +82,8 @@ fun DialogPrepareContent(
     val context = LocalContext.current
     var showTrackersDialog by remember { mutableStateOf(false) }
     var showAbiWarningDialog by remember { mutableStateOf(false) }
+    var showScanProgressSheet by remember { mutableStateOf(false) }
+    var scanSheetPendingInstall by remember { mutableStateOf(false) }
     val storedPrefs by context.dataStore.data.collectAsState(initial = null)
     val vtDisabled = storedPrefs?.get(SharedPrefsKeys.DISABLE_VIRUSTOTAL) ?: false
     val isUpdate = installedVersionCode != null && installedVersionCode > 0
@@ -291,42 +293,28 @@ fun DialogPrepareContent(
                     onClick = { showAbiWarningDialog = true },
                 )
             }
-            if (!vtDisabled) VirusTotalInstallPrompt(
-                apkInfo = apkInfo,
-                onScan = onCheckVirusTotal,
-            )
-            if (apkInfo.isScanningTrackers) {
-                DialogPill(
-                    label = stringResource(R.string.dialog_chip_trackers_scanning),
-                    leadingIcon = {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(12.dp),
-                            strokeWidth = 1.5.dp,
-                            color = MaterialTheme.colorScheme.onTertiaryContainer,
-                        )
-                    },
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f),
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                )
-            } else if (apkInfo.trackers.isNotEmpty()) {
-                DialogPill(
-                    label = stringResource(R.string.dialog_chip_trackers, apkInfo.trackers.size),
-                    leadingIcon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Shield,
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp),
-                            tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                        )
-                    },
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.6f),
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                    onClick = { showTrackersDialog = true },
-                )
-            }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // ── Security Scan Card (LinearProgressIndicator + active step) ──
+        if (!vtDisabled) {
+            VirusTotalInstallPrompt(
+                apkInfo = apkInfo,
+                onScan = onCheckVirusTotal,
+                onOpenScanProgress = {
+                    scanSheetPendingInstall = false
+                    showScanProgressSheet = true
+                },
+                modifier = Modifier.padding(bottom = 8.dp),
+            )
+        }
+
+        TrackerScanCard(
+            apkInfo = apkInfo,
+            onShowTrackers = { showTrackersDialog = true },
+            modifier = Modifier.padding(bottom = 12.dp),
+        )
 
         // ── Buttons: [Menu] [Install] ──
         if (apkInfo.isAbiIncompatible) {
@@ -403,10 +391,13 @@ fun DialogPrepareContent(
             // Install/Update/Downgrade button
             Button(
                 onClick = {
-                    if (apkInfo.isAbiIncompatible) {
-                        showAbiWarningDialog = true
-                    } else {
-                        onInstall()
+                    when {
+                        apkInfo.isAbiIncompatible -> showAbiWarningDialog = true
+                        !vtDisabled && apkInfo.vtResult.isScanInProgress() -> {
+                            scanSheetPendingInstall = true
+                            showScanProgressSheet = true
+                        }
+                        else -> onInstall()
                     }
                 },
                 modifier = Modifier.weight(1f),
@@ -452,6 +443,18 @@ fun DialogPrepareContent(
                 showAbiWarningDialog = false
                 onInstall()
             },
+            showScanProgressSheet = showScanProgressSheet,
+            scanSheetPendingInstall = scanSheetPendingInstall,
+            onDismissScanProgressSheet = {
+                showScanProgressSheet = false
+                scanSheetPendingInstall = false
+            },
+            onProceedInstallFromScan = {
+                showScanProgressSheet = false
+                scanSheetPendingInstall = false
+                onInstall()
+            },
+            onRetryScan = onCheckVirusTotal,
         )
     }
 }

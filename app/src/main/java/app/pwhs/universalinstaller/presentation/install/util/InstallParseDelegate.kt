@@ -285,10 +285,23 @@ class InstallParseDelegate(
                 originalUri = originalUri,
                 scannerOrchestrator = securityScannerOrchestrator,
                 apkInfo = _pendingApkInfo.value,
+                onHashingStart = {
+                    if (isStillCurrent()) {
+                        _pendingApkInfo.value = _pendingApkInfo.value?.copy(
+                            vtResult = VtResult(
+                                status = VtStatus.SCANNING,
+                                scanPhase = app.pwhs.core.domain.model.VtScanPhase.HASHING,
+                            ),
+                        )
+                    }
+                },
                 onAutoLookupStart = {
                     if (isStillCurrent()) {
                         _pendingApkInfo.value = _pendingApkInfo.value?.copy(
-                            vtResult = VtResult(status = VtStatus.SCANNING),
+                            vtResult = VtResult(
+                                status = VtStatus.SCANNING,
+                                scanPhase = app.pwhs.core.domain.model.VtScanPhase.LOOKUP_CACHE,
+                            ),
                         )
                     }
                 },

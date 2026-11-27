@@ -510,4 +510,21 @@
     <string name="dialog_menu_abi_override_single_abi_warning">Thiết bị này chỉ hỗ trợ %1$s. Không thể ép sang ABI khác và cài đặt gần như chắc chắn sẽ báo lỗi INSTALL_FAILED_NO_MATCHING_ABIS.</string>
     <string name="dialog_menu_abi_override_unsupported_warning">%1$s không nằm trong danh sách ABI thiết bị hỗ trợ (%2$s). Android nhiều khả năng sẽ từ chối cài đặt.</string>
     <string name="dialog_menu_abi_override_rom_note">Chỉ áp dụng cho lần cài này qua Shizuku, Root hoặc Custom Shell. Một số thiết bị và ROM hãng không cho phép ép ABI.</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Kiểm tra bảo mật</string>
+    <string name="vt_scan_step_hashing">Tính mã băm SHA-256</string>
+    <string name="vt_scan_step_lookup">Tra cứu cơ sở dữ liệu bảo mật</string>
+    <string name="vt_scan_step_upload">Tải tệp APK lên phân tích</string>
+    <string name="vt_scan_step_upload_progress">Đang tải tệp lên (%1$d%%)</string>
+    <string name="vt_scan_step_queued">Đang chờ hàng đợi phân tích</string>
+    <string name="vt_scan_step_analyzing">Phân tích mã nguồn &amp; chữ ký</string>
+    <string name="vt_scan_step_fallback">Đang chuyển sang máy quét dự phòng</string>
+    <string name="vt_scan_step_counter">Bước %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Bỏ qua &amp; Cài ngay</string>
+    <string name="vt_scan_sheet_run_background">Thu gọn (chạy nền)</string>
+    <string name="vt_scan_sheet_install_now">Tiếp tục cài đặt</string>
+    <string name="vt_scan_sheet_clean_proceeding">An toàn — đang bắt đầu cài đặt…</string>
+    <string name="vt_scan_card_tap_details">Chạm để xem chi tiết</string>
+    <string name="virustotal_detail_score_desc">Điểm rủi ro: %1$d/100</string>
 </resources>

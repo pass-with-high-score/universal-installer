@@ -499,4 +499,21 @@
     <string name="fn_preset_permissions">أذونات مفرطة / مشبوهة</string>
     <string name="fp_preset_normal_permissions">أذونات طبيعية لهذا التطبيق</string>
     <string name="fp_current_verdict_label">الحالي: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">فحص الأمان</string>
+    <string name="vt_scan_step_hashing">جارٍ حساب تجزئة SHA-256</string>
+    <string name="vt_scan_step_lookup">جارٍ فحص قاعدة بيانات الأمان</string>
+    <string name="vt_scan_step_upload">جارٍ رفع ملف APK للفحص العميق</string>
+    <string name="vt_scan_step_upload_progress">جارٍ رفع ملف APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">بانتظار الدور في قائمة التحليل</string>
+    <string name="vt_scan_step_analyzing">جارٍ تحليل الشيفرة والتوقيعات</string>
+    <string name="vt_scan_step_fallback">جارٍ التبديل إلى الماسح الاحتياطي</string>
+    <string name="vt_scan_step_counter">الخطوة %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">تخطي والتثبيت الآن</string>
+    <string name="vt_scan_sheet_run_background">إخفاء (تشغيل في الخلفية)</string>
+    <string name="vt_scan_sheet_install_now">متابعة التثبيت</string>
+    <string name="vt_scan_sheet_clean_proceeding">لا توجد تهديدات — جارٍ بدء التثبيت…</string>
+    <string name="vt_scan_card_tap_details">اضغط لعرض التفاصيل</string>
+    <string name="virustotal_detail_score_desc">درجة المخاطرة: %1$d/100</string>
 </resources>

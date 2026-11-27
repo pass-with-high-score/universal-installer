@@ -496,4 +496,21 @@
     <string name="fn_preset_permissions">Permisiuni excesive / suspecte</string>
     <string name="fp_preset_normal_permissions">Permisiuni normale pentru această aplicație</string>
     <string name="fp_current_verdict_label">Curent: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Scanare de securitate</string>
+    <string name="vt_scan_step_hashing">Se calculează hash-ul SHA-256</string>
+    <string name="vt_scan_step_lookup">Se verifică baza de date de securitate</string>
+    <string name="vt_scan_step_upload">Se încarcă APK pentru scanare profundă</string>
+    <string name="vt_scan_step_upload_progress">Se încarcă APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">În așteptare în coada de analiză</string>
+    <string name="vt_scan_step_analyzing">Se analizează bytecode-ul și semnăturile</string>
+    <string name="vt_scan_step_fallback">Se comută la scannerul de rezervă</string>
+    <string name="vt_scan_step_counter">Pasul %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Omite și instalează acum</string>
+    <string name="vt_scan_sheet_run_background">Ascunde (rulează în fundal)</string>
+    <string name="vt_scan_sheet_install_now">Continuă instalarea</string>
+    <string name="vt_scan_sheet_clean_proceeding">Nicio amenințare — se începe instalarea…</string>
+    <string name="vt_scan_card_tap_details">Atinge pentru detalii</string>
+    <string name="virustotal_detail_score_desc">Scor de risc: %1$d/100</string>
 </resources>

@@ -9,6 +9,9 @@ import app.pwhs.core.billing.ProEntitlement
 import app.pwhs.core.billing.ProProductType
 import app.pwhs.core.data.local.SharedPrefsKeys
 import app.pwhs.core.data.local.dataStore
+import app.pwhs.core.network.DeviceIdProvider
+import app.pwhs.core.network.ProTokenStore
+import app.pwhs.core.network.VirusDetecService
 import app.pwhs.core.network.VirusTotalQuotaStore
 import app.pwhs.universalinstaller.domain.stats.UserStatsTracker
 import com.android.billingclient.api.AcknowledgePurchaseParams
@@ -222,14 +225,37 @@ private class PlayBillingManager(
                     else -> null
                 }
 
+                val validSubPurchase = if (subsOk) {
+                    subsPurchases.firstOrNull { purchase ->
+                        purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                            purchase.products.contains(SUBSCRIPTION_PRODUCT_ID)
+                    }
+                } else null
+                val validInAppPurchase = if (inAppOk) {
+                    inAppPurchases.firstOrNull { purchase ->
+                        purchase.purchaseState == Purchase.PurchaseState.PURCHASED &&
+                            purchase.products.contains(LIFETIME_PRODUCT_ID)
+                    }
+                } else null
+
                 if (subsOk && inAppOk) {
                     val isPro = hasValidSub || hasValidInApp
                     Timber.d("PlayBillingManager: queryPurchases result isPro=$isPro (subs=$hasValidSub, inApp=$hasValidInApp)")
                     updateProStatus(isPro, detectedPlan)
+                    if (validInAppPurchase != null) {
+                        syncProTokenWithBackend(validInAppPurchase, LIFETIME_PRODUCT_ID, "inapp")
+                    } else if (validSubPurchase != null) {
+                        syncProTokenWithBackend(validSubPurchase, SUBSCRIPTION_PRODUCT_ID, "subs")
+                    }
                     deliver(isPro)
                 } else if (hasValidSub || hasValidInApp) {
                     Timber.d("PlayBillingManager: Found valid purchase despite partial query failure (subs=$hasValidSub, inApp=$hasValidInApp)")
                     updateProStatus(true, detectedPlan)
+                    if (validInAppPurchase != null) {
+                        syncProTokenWithBackend(validInAppPurchase, LIFETIME_PRODUCT_ID, "inapp")
+                    } else if (validSubPurchase != null) {
+                        syncProTokenWithBackend(validSubPurchase, SUBSCRIPTION_PRODUCT_ID, "subs")
+                    }
                     deliver(true)
                 } else {
                     Timber.w("PlayBillingManager: Failed to query purchases (subs=${subsResult.responseCode}, inApp=${inAppResult.responseCode})")
@@ -353,6 +379,8 @@ private class PlayBillingManager(
                     if (!purchase.isAcknowledged) {
                         acknowledge(purchase)
                     }
+                    val productType = if (productId == SUBSCRIPTION_PRODUCT_ID) "subs" else "inapp"
+                    syncProTokenWithBackend(purchase, productId, productType, forceRefresh = true)
                 }
             }
         }
@@ -384,6 +412,36 @@ private class PlayBillingManager(
             app.pwhs.core.telemetry.AnalyticsHelper.updateIsProUser(isPro)
             if (isPro) {
                 UserStatsTracker.recordProStatusChanged(context)
+            } else {
+                ProTokenStore.clearToken(context)
+            }
+        }
+    }
+
+    private fun syncProTokenWithBackend(
+        purchase: Purchase,
+        productId: String,
+        productType: String,
+        forceRefresh: Boolean = false,
+    ) {
+        scope.launch(Dispatchers.IO) {
+            if (!forceRefresh && !ProTokenStore.needsRefresh(context)) return@launch
+            val service = VirusDetecService(
+                deviceIdProvider = { DeviceIdProvider.getDeviceId(context) },
+            )
+            val result = service.verifyGooglePlayPurchase(
+                purchaseToken = purchase.purchaseToken,
+                productId = productId,
+                productType = productType,
+                packageName = context.packageName,
+            )
+            result.onSuccess { verified ->
+                if (verified.proToken.isNotBlank()) {
+                    ProTokenStore.saveToken(context, verified.proToken, verified.expiresAt)
+                    Timber.i("PlayBillingManager: Synced backend Pro token (order=${verified.orderId}, exp=${verified.expiresAt})")
+                }
+            }.onFailure { err ->
+                Timber.w(err, "PlayBillingManager: Failed to sync backend Pro token")
             }
         }
     }

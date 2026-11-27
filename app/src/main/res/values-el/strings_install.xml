@@ -495,4 +495,21 @@
     <string name="fn_preset_permissions">Υπερβολικά / ύποπτα δικαιώματα</string>
     <string name="fp_preset_normal_permissions">Κανονικά δικαιώματα για αυτήν την εφαρμογή</string>
     <string name="fp_current_verdict_label">Τρέχον: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Έλεγχος ασφαλείας</string>
+    <string name="vt_scan_step_hashing">Υπολογισμός SHA-256 hash</string>
+    <string name="vt_scan_step_lookup">Έλεγχος βάσης δεδομένων ασφαλείας</string>
+    <string name="vt_scan_step_upload">Μεταφόρτωση APK για βαθύ έλεγχο</string>
+    <string name="vt_scan_step_upload_progress">Μεταφόρτωση APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">Αναμονή στην ουρά ανάλυσης</string>
+    <string name="vt_scan_step_analyzing">Ανάλυση κώδικα &amp; υπογραφών</string>
+    <string name="vt_scan_step_fallback">Εναλλαγή σε εφεδρικό σαρωτή</string>
+    <string name="vt_scan_step_counter">Βήμα %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Παράλειψη &amp; Εγκατάσταση τώρα</string>
+    <string name="vt_scan_sheet_run_background">Απόκρυψη (εκτέλεση στο παρασκήνιο)</string>
+    <string name="vt_scan_sheet_install_now">Συνέχεια στην εγκατάσταση</string>
+    <string name="vt_scan_sheet_clean_proceeding">Δεν βρέθηκαν απειλές — έναρξη εγκατάστασης…</string>
+    <string name="vt_scan_card_tap_details">Πατήστε για λεπτομέρειες</string>
+    <string name="virustotal_detail_score_desc">Βαθμολογία κινδύνου: %1$d/100</string>
 </resources>

@@ -494,4 +494,21 @@
     <string name="fn_preset_permissions">Izin berlebihan / mencurigakan</string>
     <string name="fp_preset_normal_permissions">Izin wajar untuk aplikasi ini</string>
     <string name="fp_current_verdict_label">Saat ini: %1$s (%2$d/100)</string>
+
+    <!-- Security Scan Progress Card & BottomSheet -->
+    <string name="vt_scan_sheet_title">Pemindaian Keamanan</string>
+    <string name="vt_scan_step_hashing">Menghitung hash SHA-256</string>
+    <string name="vt_scan_step_lookup">Memeriksa basis data keamanan</string>
+    <string name="vt_scan_step_upload">Mengunggah APK untuk pemindaian mendalam</string>
+    <string name="vt_scan_step_upload_progress">Mengunggah APK (%1$d%%)</string>
+    <string name="vt_scan_step_queued">Menunggu dalam antrean analisis</string>
+    <string name="vt_scan_step_analyzing">Menganalisis bytecode &amp; tanda tangan</string>
+    <string name="vt_scan_step_fallback">Beralih ke pemindai cadangan</string>
+    <string name="vt_scan_step_counter">Langkah %1$d/%2$d</string>
+    <string name="vt_scan_sheet_skip_install">Lewati &amp; Instal sekarang</string>
+    <string name="vt_scan_sheet_run_background">Sembunyikan (jalankan di latar belakang)</string>
+    <string name="vt_scan_sheet_install_now">Lanjutkan instalasi</string>
+    <string name="vt_scan_sheet_clean_proceeding">Tidak ada ancaman — memulai instalasi…</string>
+    <string name="vt_scan_card_tap_details">Ketuk untuk detail</string>
+    <string name="virustotal_detail_score_desc">Skor risiko: %1$d/100</string>
 </resources>
