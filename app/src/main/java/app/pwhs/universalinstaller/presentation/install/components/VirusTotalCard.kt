@@ -104,11 +104,9 @@ fun VirusTotalCard(
         status == VtStatus.INVALID_API_KEY -> stringResource(R.string.apk_info_vt_desc_invalid_key)
         status == VtStatus.RATE_LIMITED -> vt?.errorMessage?.takeIf { it.isNotBlank() }
             ?: stringResource(R.string.apk_info_vt_desc_rate_limited_default)
-        status == VtStatus.ERROR -> if (vt?.errorMessage.isNullOrBlank()) {
-            stringResource(R.string.apk_info_vt_desc_error_default)
-        } else {
-            vt.errorMessage
-        }
+        status == VtStatus.ERROR -> app.pwhs.universalinstaller.presentation.install.dialog.resolveVtErrorMessage(
+            vt?.errorMessage
+        )
         status == VtStatus.TOO_LARGE -> stringResource(R.string.apk_info_vt_too_large, vt?.errorMessage.orEmpty())
         status == VtStatus.SCANNING -> stringResource(R.string.apk_info_vt_desc_scanning)
         status == VtStatus.UPLOADING -> stringResource(R.string.apk_info_vt_desc_uploading, vt?.uploadProgress ?: 0)

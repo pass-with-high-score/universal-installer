@@ -319,8 +319,11 @@ object InstallVirusTotalHelper {
             VtStatus.NO_API_KEY,
             VtStatus.INVALID_API_KEY,
             VtStatus.TOO_LARGE,
-            VtStatus.ERROR -> context.getString(R.string.vt_notif_result_error) to
-                    (result.errorMessage.ifBlank { "" })
+            VtStatus.ERROR -> context.getString(R.string.vt_notif_result_error) to when {
+                result.errorMessage == VirusDetecService.NETWORK_ERROR_TAG ->
+                    context.getString(R.string.apk_info_vt_network_error)
+                else -> result.errorMessage.ifBlank { "" }
+            }
             else -> context.getString(R.string.vt_notif_result_done) to ""
         }
     }

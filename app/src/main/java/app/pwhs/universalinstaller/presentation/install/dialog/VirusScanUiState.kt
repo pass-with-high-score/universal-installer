@@ -3,6 +3,7 @@ package app.pwhs.universalinstaller.presentation.install.dialog
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import app.pwhs.core.domain.model.VtScanPhase
+import app.pwhs.core.network.VirusDetecService
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.VtResult
 import app.pwhs.universalinstaller.domain.model.VtStatus
@@ -76,4 +77,11 @@ internal fun activeScanStepLabel(vt: VtResult?, hasSha256: Boolean): String {
         else ->
             stringResource(R.string.vt_scan_step_hashing)
     }
+}
+
+@Composable
+internal fun resolveVtErrorMessage(errorMessage: String?): String = when {
+    errorMessage.isNullOrBlank() -> stringResource(R.string.apk_info_vt_desc_error_default)
+    errorMessage == VirusDetecService.NETWORK_ERROR_TAG -> stringResource(R.string.apk_info_vt_network_error)
+    else -> errorMessage
 }

@@ -206,8 +206,7 @@ fun VirusScanProgressBottomSheet(
                         (vt?.malicious ?: 0) + (vt?.suspicious ?: 0),
                     )
                     vt?.status == VtStatus.NOT_FOUND -> stringResource(R.string.apk_info_vt_not_found)
-                    else -> vt?.errorMessage?.ifBlank { stringResource(R.string.apk_info_vt_desc_error_default) }
-                        ?: stringResource(R.string.apk_info_vt_desc_error_default)
+                    else -> resolveVtErrorMessage(vt?.errorMessage)
                 }
                 Text(
                     text = statusLabel,

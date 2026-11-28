@@ -55,6 +55,7 @@ import app.pwhs.core.domain.model.VtStatus
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.domain.model.InstalledApp
 import app.pwhs.universalinstaller.presentation.install.components.AppShieldDailyQuotaBadge
+import app.pwhs.universalinstaller.presentation.install.dialog.resolveVtErrorMessage
 import app.pwhs.universalinstaller.presentation.install.components.SecurityFindingsSection
 import app.pwhs.universalinstaller.presentation.install.components.VtBreakdownSection
 import app.pwhs.universalinstaller.ui.theme.LocalExtendedColors
@@ -205,40 +206,39 @@ fun ManageSecurityScanSheet(
                 when (status) {
                     VtStatus.CLEAN -> {
                         val report = vtResult?.report
-                        ScanResultBanner(
-                            isClean = true,
-                            title = stringResource(R.string.virustotal_detail_clean_title),
-                            desc = if (report != null) {
-                                stringResource(R.string.virustotal_detail_score_desc, report.riskScore)
-                            } else {
-                                stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
-                            },
-                        )
-                        if (vtResult != null) {
-                            VtBreakdownSection(
-                                vt = vtResult,
-                                warningColor = MaterialTheme.colorScheme.error,
-                                cleanColor = extendedColors.success,
+                        if (report != null) {
+                            SecurityFindingsSection(report = report)
+                        } else {
+                            ScanResultBanner(
+                                isClean = true,
+                                title = stringResource(R.string.virustotal_detail_clean_title),
+                                desc = stringResource(R.string.virustotal_detail_clean_desc, totalEngines),
                             )
-                            vtResult.report?.let { report ->
-                                SecurityFindingsSection(report = report)
+                            if (vtResult != null) {
+                                VtBreakdownSection(
+                                    vt = vtResult,
+                                    warningColor = MaterialTheme.colorScheme.error,
+                                    cleanColor = extendedColors.success,
+                                )
                             }
                         }
                     }
                     VtStatus.MALICIOUS, VtStatus.SUSPICIOUS -> {
-                        ScanResultBanner(
-                            isClean = false,
-                            title = stringResource(R.string.virustotal_detail_flagged_title, threatCount),
-                            desc = stringResource(R.string.virustotal_detail_flagged_desc),
-                        )
-                        if (vtResult != null) {
-                            VtBreakdownSection(
-                                vt = vtResult,
-                                warningColor = MaterialTheme.colorScheme.error,
-                                cleanColor = extendedColors.success,
+                        val report = vtResult?.report
+                        if (report != null) {
+                            SecurityFindingsSection(report = report)
+                        } else {
+                            ScanResultBanner(
+                                isClean = false,
+                                title = stringResource(R.string.virustotal_detail_flagged_title, threatCount),
+                                desc = stringResource(R.string.virustotal_detail_flagged_desc),
                             )
-                            vtResult.report?.let { report ->
-                                SecurityFindingsSection(report = report)
+                            if (vtResult != null) {
+                                VtBreakdownSection(
+                                    vt = vtResult,
+                                    warningColor = MaterialTheme.colorScheme.error,
+                                    cleanColor = extendedColors.success,
+                                )
                             }
                         }
                     }
@@ -328,8 +328,7 @@ fun ManageSecurityScanSheet(
                                 )
                                 Column {
                                     Text(
-                                        text = vtResult?.errorMessage?.ifBlank { null }
-                                            ?: stringResource(R.string.apk_info_vt_desc_error_default),
+                                        text = resolveVtErrorMessage(vtResult?.errorMessage),
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onErrorContainer,
                                     )

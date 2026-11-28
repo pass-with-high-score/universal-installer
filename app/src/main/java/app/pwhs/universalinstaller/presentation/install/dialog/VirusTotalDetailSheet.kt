@@ -172,96 +172,97 @@ fun VirusTotalDetailSheet(
             if (report != null) {
                 SecurityFindingsSection(report = report)
             } else {
-                // ── Status Banner Card ──
-                Surface(
-                    shape = RoundedCornerShape(16.dp),
-                    color = if (isClean) {
-                        extendedColors.success.copy(alpha = 0.12f)
-                    } else {
-                        MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
-                    },
-                    border = androidx.compose.foundation.BorderStroke(
-                        width = 1.dp,
+                val showLegacyEngineHeader = vt.report == null || sortedEngines.isNotEmpty()
+
+                if (showLegacyEngineHeader) {
+                    // ── Status Banner Card ──
+                    Surface(
+                        shape = RoundedCornerShape(16.dp),
                         color = if (isClean) {
-                            extendedColors.success.copy(alpha = 0.35f)
+                            extendedColors.success.copy(alpha = 0.12f)
                         } else {
-                            MaterialTheme.colorScheme.error.copy(alpha = 0.4f)
+                            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.5f)
                         },
-                    ),
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Row(
-                        modifier = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                        border = androidx.compose.foundation.BorderStroke(
+                            width = 1.dp,
+                            color = if (isClean) {
+                                extendedColors.success.copy(alpha = 0.35f)
+                            } else {
+                                MaterialTheme.colorScheme.error.copy(alpha = 0.4f)
+                            },
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Icon(
-                            imageVector = if (isClean) Icons.Rounded.GppGood else Icons.Rounded.Warning,
-                            contentDescription = null,
-                            tint = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
-                            modifier = Modifier.size(36.dp),
-                        )
-
-                        Spacer(modifier = Modifier.width(14.dp))
-
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = if (isClean) {
-                                    stringResource(R.string.virustotal_detail_clean_title)
-                                } else {
-                                    stringResource(R.string.virustotal_detail_flagged_title, threatCount)
-                                },
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
+                        Row(
+                            modifier = Modifier.padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(
+                                imageVector = if (isClean) Icons.Rounded.GppGood else Icons.Rounded.Warning,
+                                contentDescription = null,
+                                tint = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
+                                modifier = Modifier.size(36.dp),
                             )
-                            Spacer(modifier = Modifier.height(2.dp))
-                            Text(
-                                text = when {
-                                    vt.report != null -> stringResource(
-                                        R.string.virustotal_detail_score_desc,
-                                        vt.report!!.riskScore,
-                                    )
-                                    isClean -> stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
-                                    else -> stringResource(R.string.virustotal_detail_flagged_desc)
-                                },
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
+
+                            Spacer(modifier = Modifier.width(14.dp))
+
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = if (isClean) {
+                                        stringResource(R.string.virustotal_detail_clean_title)
+                                    } else {
+                                        stringResource(R.string.virustotal_detail_flagged_title, threatCount)
+                                    },
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isClean) extendedColors.success else MaterialTheme.colorScheme.error,
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text(
+                                    text = if (isClean) {
+                                        stringResource(R.string.virustotal_detail_clean_desc, totalEngines)
+                                    } else {
+                                        stringResource(R.string.virustotal_detail_flagged_desc)
+                                    },
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                )
+                            }
                         }
                     }
-                }
 
-                // ── Engine Stats Counter & Breakdown Bar ──
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
-                    Row(
+                    // ── Engine Stats Counter & Breakdown Bar ──
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
                     ) {
-                        VtCounterBadge(
-                            label = stringResource(R.string.virustotal_detail_stat_clean),
-                            count = vt.harmless + vt.undetected,
-                            color = extendedColors.success,
-                        )
-                        VtCounterBadge(
-                            label = stringResource(R.string.virustotal_detail_stat_suspicious),
-                            count = vt.suspicious,
-                            color = extendedColors.warning,
-                        )
-                        VtCounterBadge(
-                            label = stringResource(R.string.virustotal_detail_stat_malicious),
-                            count = vt.malicious,
-                            color = MaterialTheme.colorScheme.error,
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                        ) {
+                            VtCounterBadge(
+                                label = stringResource(R.string.virustotal_detail_stat_clean),
+                                count = vt.harmless + vt.undetected,
+                                color = extendedColors.success,
+                            )
+                            VtCounterBadge(
+                                label = stringResource(R.string.virustotal_detail_stat_suspicious),
+                                count = vt.suspicious,
+                                color = extendedColors.warning,
+                            )
+                            VtCounterBadge(
+                                label = stringResource(R.string.virustotal_detail_stat_malicious),
+                                count = vt.malicious,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+
+                        VtBreakdownSection(
+                            vt = vt,
+                            warningColor = extendedColors.warning,
+                            cleanColor = extendedColors.success,
                         )
                     }
-
-                    VtBreakdownSection(
-                        vt = vt,
-                        warningColor = extendedColors.warning,
-                        cleanColor = extendedColors.success,
-                    )
                 }
 
                 // ── Scrollable Antivirus Engine Results List ──
