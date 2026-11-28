@@ -511,4 +511,10 @@
     <string name="vt_scan_sheet_clean_proceeding">위협 없음 — 설치를 시작하는 중…</string>
     <string name="vt_scan_card_tap_details">탭하여 세부정보 보기</string>
     <string name="virustotal_detail_score_desc">위험 점수: %1$d/100</string>
+
+    <!-- Parallel URL Download Queue UI -->
+    <string name="source_download_active_section">다운로드 중 (%1$d)</string>
+    <string name="source_download_preparing">연결 중…</string>
+    <string name="source_download_paused">일시 중지됨</string>
+    <string name="source_download_threads">%1$dx</string>
 </resources>

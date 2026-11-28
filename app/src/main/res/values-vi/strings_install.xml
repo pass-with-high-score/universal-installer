@@ -527,4 +527,10 @@
     <string name="vt_scan_sheet_clean_proceeding">An toàn — đang bắt đầu cài đặt…</string>
     <string name="vt_scan_card_tap_details">Chạm để xem chi tiết</string>
     <string name="virustotal_detail_score_desc">Điểm rủi ro: %1$d/100</string>
+
+    <!-- Parallel URL Download Queue UI -->
+    <string name="source_download_active_section">Đang tải (%1$d)</string>
+    <string name="source_download_preparing">Đang kết nối…</string>
+    <string name="source_download_paused">Đã tạm dừng</string>
+    <string name="source_download_threads">%1$d luồng</string>
 </resources>

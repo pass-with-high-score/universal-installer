@@ -60,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.platform.LocalResources
 import androidx.core.content.getSystemService
 import app.pwhs.universalinstaller.R
+import app.pwhs.universalinstaller.presentation.install.components.DownloadSourceContent
 
 enum class SourceTab { Local, Download }
 
@@ -79,6 +80,10 @@ internal fun SourcePicker(
     onOpenDownloadHistory: () -> Unit,
     modifier: Modifier = Modifier,
     showDownloadTab: Boolean = true,
+    activeDownloads: List<ActiveDownloadItem> = emptyList(),
+    onPauseDownload: ((String) -> Unit)? = null,
+    onResumeDownload: ((String) -> Unit)? = null,
+    onCancelDownloadItem: ((String) -> Unit)? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
         if (showDownloadTab) {
@@ -110,6 +115,10 @@ internal fun SourcePicker(
                     onCancelDownload = onCancelDownload,
                     onDismissDownloadError = onDismissDownloadError,
                     onOpenHistory = onOpenDownloadHistory,
+                    activeDownloads = activeDownloads,
+                    onPauseDownload = onPauseDownload,
+                    onResumeDownload = onResumeDownload,
+                    onCancelItem = onCancelDownloadItem,
                 )
             }
         }
@@ -306,222 +315,5 @@ private fun LocalSourceAction(
             )
         }
     }
-}
-
-@Composable
-private fun DownloadSourceContent(
-    downloadState: DownloadState,
-    onStartDownload: (String) -> Unit,
-    onCancelDownload: () -> Unit,
-    onDismissDownloadError: () -> Unit,
-    onOpenHistory: () -> Unit,
-) {
-    val context = LocalContext.current
-    val resource = LocalResources.current
-    var url by rememberSaveable { mutableStateOf("") }
-    // Optimistic lock so the button grays out on the same frame as the tap,
-    // before StateFlow → Compose collection catches up.
-    var pendingStart by remember { mutableStateOf(false) }
-    LaunchedEffect(downloadState) {
-        when (downloadState) {
-            is DownloadState.Preparing,
-            is DownloadState.Running,
-            is DownloadState.Error,
-            -> pendingStart = false
-            DownloadState.Idle -> Unit
-        }
-    }
-    val running = downloadState as? DownloadState.Running
-    val error = (downloadState as? DownloadState.Error)?.message
-    val isRunning = running != null
-    val isPreparing = pendingStart || downloadState is DownloadState.Preparing
-    val isBusy = isPreparing || isRunning
-
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
-    ) {
-        Text(
-            text = stringResource(R.string.source_download_header),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-        OutlinedTextField(
-            value = url,
-            onValueChange = {
-                if (error != null) onDismissDownloadError()
-                url = it
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .heightIn(min = 140.dp),
-            placeholder = { Text(stringResource(R.string.source_download_hint)) },
-            enabled = !isBusy,
-            shape = RoundedCornerShape(16.dp),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Uri,
-                imeAction = ImeAction.Go,
-            ),
-            isError = error != null,
-            supportingText = error?.let { { Text(it, color = MaterialTheme.colorScheme.error) } },
-            colors = TextFieldDefaults.colors(
-                focusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                disabledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                focusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                unfocusedTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                disabledTextColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                focusedPlaceholderColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
-                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.6f),
-                focusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                unfocusedIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-                disabledIndicatorColor = androidx.compose.ui.graphics.Color.Transparent,
-            ),
-        )
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Button(
-                onClick = {
-                    if (isRunning) {
-                        onCancelDownload()
-                    } else if (!isPreparing) {
-                        pendingStart = true
-                        onStartDownload(url)
-                        // Invalid URLs reject synchronously as Error. A second tap with the
-                        // same message does not re-emit StateFlow (equals), so LaunchedEffect
-                        // would never clear pendingStart — unlock here for rejected starts.
-                        // Accepted starts set Preparing before returning; keep the optimistic
-                        // lock until LaunchedEffect sees Preparing/Running.
-                        val trimmed = url.trim()
-                        val accepted = trimmed.startsWith("http://", ignoreCase = true) ||
-                            trimmed.startsWith("https://", ignoreCase = true)
-                        if (!accepted) pendingStart = false
-                    }
-                },
-                enabled = when {
-                    isPreparing -> false
-                    isRunning -> true
-                    else -> url.isNotBlank()
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .defaultMinSize(minHeight = 56.dp),
-                shape = RoundedCornerShape(16.dp),
-            ) {
-                if (isPreparing) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp,
-                    )
-                    Spacer(Modifier.size(8.dp))
-                    Text(
-                        text = stringResource(R.string.source_download_start),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                } else {
-                    Text(
-                        text = if (isRunning) stringResource(R.string.remote_download_cancel)
-                               else stringResource(R.string.source_download_start),
-                        style = MaterialTheme.typography.titleSmall,
-                    )
-                }
-            }
-            IconButton(
-                onClick = {
-                    pasteFromClipboard(context)?.let { url = it }
-                        ?: Toast.makeText(
-                            context,
-                            resource.getString(R.string.remote_download_clipboard_empty),
-                            Toast.LENGTH_SHORT,
-                        ).show()
-                },
-                enabled = !isBusy,
-                modifier = Modifier.size(56.dp),
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.ContentPaste,
-                    contentDescription = stringResource(R.string.source_download_paste),
-                )
-            }
-        }
-        if (running != null) {
-            val percent = running.progressPercent
-            val downloadedStr = Formatter.formatFileSize(context, running.bytesRead)
-            val totalStr = if (running.totalBytes > 0) Formatter.formatFileSize(context, running.totalBytes) else "—"
-
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                if (percent != null) {
-                    LinearProgressIndicator(
-                        progress = { percent / 100f },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                    )
-                } else {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
-                    )
-                }
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    val sizeText = "$downloadedStr / $totalStr"
-                    val speedStr = app.pwhs.core.util.TransferFormatter.formatSpeed(running.speedBytesPerSec)
-                    val leftText = if (speedStr.isNotEmpty()) "$sizeText • $speedStr" else sizeText
-                    Text(
-                        text = leftText,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    )
-                    val etaStr = app.pwhs.core.util.TransferFormatter.formatEta(context, running.etaSeconds)
-                    val rightText = when {
-                        percent != null && etaStr != null -> "$percent% ($etaStr)"
-                        percent != null -> "$percent%"
-                        etaStr != null -> etaStr
-                        else -> stringResource(R.string.dialog_downloading_package)
-                    }
-                    Text(
-                        text = rightText,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                }
-            }
-        }
-
-        Spacer(Modifier.height(4.dp))
-        OutlinedButton(
-            onClick = onOpenHistory,
-            modifier = Modifier
-                .fillMaxWidth()
-                .defaultMinSize(minHeight = 48.dp),
-            shape = RoundedCornerShape(16.dp),
-        ) {
-            Text(
-                text = stringResource(R.string.download_history_open_button),
-                style = MaterialTheme.typography.titleSmall,
-            )
-        }
-    }
-}
-
-private fun pasteFromClipboard(context: Context): String? {
-    val clipboard = context.getSystemService<ClipboardManager>() ?: return null
-    val clip = clipboard.primaryClip ?: return null
-    if (clip.itemCount == 0) return null
-    val text = clip.getItemAt(0).coerceToText(context)?.toString()?.trim()
-    return text?.takeIf { it.isNotEmpty() }
 }
 

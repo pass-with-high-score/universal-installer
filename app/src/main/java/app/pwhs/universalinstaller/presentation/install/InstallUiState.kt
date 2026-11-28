@@ -86,6 +86,42 @@ sealed interface DownloadState {
     data class Error(val message: String) : DownloadState
 }
 
+enum class ActiveDownloadStatus {
+    PREPARING,
+    DOWNLOADING,
+    PAUSED,
+    COMPLETED,
+    FAILED,
+}
+
+/** Represents a byte-range segment for multi-connection / dynamic part splitting UI. */
+data class DownloadPartProgress(
+    val startByte: Long,
+    val currentByte: Long,
+    val endByte: Long,
+)
+
+/**
+ * Parallel-ready download item model for rendering concurrent URL downloads,
+ * per-card progress, segmented part bars, and future Pause/Resume controls.
+ */
+data class ActiveDownloadItem(
+    val id: String,
+    val url: String,
+    val fileName: String,
+    val bytesRead: Long = 0L,
+    val totalBytes: Long = -1L,
+    val speedBytesPerSec: Long = 0L,
+    val etaSeconds: Long? = null,
+    val status: ActiveDownloadStatus = ActiveDownloadStatus.PREPARING,
+    val errorMessage: String? = null,
+    val threadCount: Int = 1,
+    val parts: List<DownloadPartProgress> = emptyList(),
+) {
+    val progressPercent: Int?
+        get() = if (totalBytes > 0) ((bytesRead * 100L) / totalBytes).toInt().coerceIn(0, 100) else null
+}
+
 sealed interface ScanState {
     data object Idle : ScanState
     data object PermissionNeeded : ScanState

@@ -508,4 +508,10 @@
     <string name="vt_scan_sheet_clean_proceeding">Brak zagrożeń — rozpoczynanie instalacji…</string>
     <string name="vt_scan_card_tap_details">Dotknij, aby zobaczyć szczegóły</string>
     <string name="virustotal_detail_score_desc">Ocena ryzyka: %1$d/100</string>
+
+    <!-- Parallel URL Download Queue UI -->
+    <string name="source_download_active_section">Pobieranie (%1$d)</string>
+    <string name="source_download_preparing">Łączenie…</string>
+    <string name="source_download_paused">Wstrzymano</string>
+    <string name="source_download_threads">%1$dx</string>
 </resources>

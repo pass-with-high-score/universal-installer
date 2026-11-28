@@ -207,10 +207,12 @@ fun InstallScreen(
     } else null
 
     val installError by viewModel.installError.collectAsState()
+    val activeDownloads by viewModel.activeDownloads.collectAsState()
 
     InstallUi(
         modifier = modifier,
         uiState = uiState,
+        activeDownloads = activeDownloads,
         history = history,
         installError = installError,
         showDownloadTab = showDownloadTab,
@@ -218,6 +220,9 @@ fun InstallScreen(
             viewModel.parseApkInfo(context, uri, splitPackage, fileName)
         },
         onDownloadFromUrl = { url -> viewModel.downloadFromUrl(context, url) },
+        onPauseDownload = viewModel::pauseDownload,
+        onResumeDownload = { id -> viewModel.resumeDownload(context, id) },
+        onCancelDownloadItem = viewModel::cancelDownloadItem,
         onCancelDownload = viewModel::cancelDownload,
         onDismissDownloadError = viewModel::dismissDownloadError,
         onConfirmInstall = {
@@ -350,12 +355,16 @@ fun InstallScreen(
 private fun InstallUi(
     modifier: Modifier = Modifier,
     uiState: InstallUiState = InstallUiState(),
+    activeDownloads: List<ActiveDownloadItem> = emptyList(),
     history: List<InstallHistoryEntity> = emptyList(),
     installError: String? = null,
     showDownloadTab: Boolean = true,
     onMergeSplits: (() -> Unit)? = null,
     onFilePicked: (uri: Uri, splitPackage: SplitPackage.Provider, fileName: String) -> Unit = { _, _, _ -> },
     onDownloadFromUrl: (String) -> Unit = {},
+    onPauseDownload: (String) -> Unit = {},
+    onResumeDownload: (String) -> Unit = {},
+    onCancelDownloadItem: (String) -> Unit = {},
     onCancelDownload: () -> Unit = {},
     onDismissDownloadError: () -> Unit = {},
     onConfirmInstall: () -> Unit = {},
@@ -909,6 +918,10 @@ private fun InstallUi(
                     onCancelDownload = onCancelDownload,
                     onDismissDownloadError = onDismissDownloadError,
                     onOpenDownloadHistory = onOpenDownloadHistory,
+                    activeDownloads = activeDownloads,
+                    onPauseDownload = onPauseDownload,
+                    onResumeDownload = onResumeDownload,
+                    onCancelDownloadItem = onCancelDownloadItem,
                 )
             }
 

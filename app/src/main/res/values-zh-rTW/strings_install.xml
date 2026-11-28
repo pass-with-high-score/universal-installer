@@ -505,4 +505,10 @@
     <string name="vt_scan_sheet_clean_proceeding">未發現威脅 — 正在開始安裝…</string>
     <string name="vt_scan_card_tap_details">點擊查看詳情</string>
     <string name="virustotal_detail_score_desc">風險評分：%1$d/100</string>
+
+    <!-- Parallel URL Download Queue UI -->
+    <string name="source_download_active_section">正在下載 (%1$d)</string>
+    <string name="source_download_preparing">正在連線…</string>
+    <string name="source_download_paused">已暫停</string>
+    <string name="source_download_threads">%1$d 執行緒</string>
 </resources>

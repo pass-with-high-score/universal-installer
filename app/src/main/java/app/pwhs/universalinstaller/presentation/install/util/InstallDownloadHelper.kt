@@ -6,6 +6,7 @@ import android.os.Environment
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.DownloadHistoryDao
 import app.pwhs.universalinstaller.data.local.DownloadHistoryEntity
+import app.pwhs.universalinstaller.data.remote.DownloadSegment
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
 import app.pwhs.universalinstaller.presentation.install.DownloadNotifier
 import app.pwhs.universalinstaller.presentation.install.DownloadState
@@ -106,6 +107,97 @@ object InstallDownloadHelper {
                     e.message ?: e::class.java.simpleName,
                 )
                 onProgress(DownloadState.Error(msg))
+                downloadNotifier.notifyFailed(msg)
+            },
+        )
+    }
+
+    fun prepareDestinationFile(context: Context, url: String): Pair<File, String> {
+        val displayName = url.trim().substringAfterLast('/').substringBefore('?')
+            .ifBlank { "download_${System.currentTimeMillis()}" }
+        val downloadsDir = resolveDownloadDir(context)
+        val destination = File(downloadsDir, uniqueFileName(downloadsDir, displayName)).apply {
+            parentFile?.mkdirs()
+        }
+        return destination to displayName
+    }
+
+    suspend fun executeSegmentedDownload(
+        context: Context,
+        url: String,
+        destination: File,
+        displayName: String,
+        packageDownloadService: PackageDownloadService,
+        downloadNotifier: DownloadNotifier,
+        downloadHistoryDao: DownloadHistoryDao,
+        initialSegments: List<DownloadSegment> = emptyList(),
+        knownTotalBytes: Long = -1L,
+        shouldKeepPartialOnCancel: () -> Boolean = { false },
+        onProgress: (
+            bytesRead: Long,
+            totalBytes: Long,
+            speedBytesPerSec: Long,
+            etaSeconds: Long?,
+            segments: List<DownloadSegment>,
+            activeThreads: Int,
+        ) -> Unit,
+        onError: (String) -> Unit,
+        onSuccess: (File, String, String) -> Unit,
+    ) {
+        val trimmed = url.trim()
+        val estimator = app.pwhs.core.util.TransferEstimator()
+        val result = packageDownloadService.downloadWithSegments(
+            url = trimmed,
+            destination = destination,
+            initialSegments = initialSegments,
+            knownTotalBytes = knownTotalBytes,
+            knownFileName = displayName,
+            shouldKeepPartialOnCancel = shouldKeepPartialOnCancel,
+        ) { read, total, segments, activeThreads ->
+            val est = estimator.update(read, total)
+            onProgress(read, total, est.speedBytesPerSec, est.etaSeconds, segments, activeThreads)
+            downloadNotifier.notifyProgress(displayName, read, total)
+        }
+
+        result.fold(
+            onSuccess = { downloaded ->
+                val ext = downloaded.fileName.substringAfterLast('.', "").lowercase()
+                val validExtensions = listOf("apk", "apks", "xapk", "apkm", "zip")
+                if (ext !in validExtensions) {
+                    downloaded.file.delete()
+                    val msg = context.getString(R.string.remote_download_unsupported)
+                    onError(msg)
+                    downloadNotifier.notifyFailed(msg)
+                    return@fold
+                }
+                val finalFile = renameToDisplayName(downloaded.file, downloaded.fileName)
+                MediaScannerConnection.scanFile(context, arrayOf(finalFile.absolutePath), null, null)
+                downloadNotifier.notifyDone(finalFile.name, android.net.Uri.fromFile(finalFile))
+                runCatching {
+                    downloadHistoryDao.insert(
+                        DownloadHistoryEntity(
+                            url = trimmed,
+                            fileName = finalFile.name,
+                            filePath = finalFile.absolutePath,
+                            sizeBytes = finalFile.length(),
+                        )
+                    )
+                }.onFailure { Timber.e(it, "Failed to insert download history") }
+                onSuccess(finalFile, finalFile.name, ext)
+            },
+            onFailure = { e ->
+                if (e is CancellationException) {
+                    if (!shouldKeepPartialOnCancel()) {
+                        downloadNotifier.cancel()
+                    }
+                    throw e
+                }
+                Timber.e(e, "Segmented download failed")
+                val msg = context.getString(
+                    R.string.remote_download_failed,
+                    e.message ?: e::class.java.simpleName,
+                )
+                onError(msg)
                 downloadNotifier.notifyFailed(msg)
             },
         )

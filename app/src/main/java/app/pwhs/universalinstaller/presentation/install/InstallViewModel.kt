@@ -525,7 +525,12 @@ class InstallViewModel(
 
     // ── Download & Device Scan Delegates ────────────────────────────────────
 
+    val activeDownloads: StateFlow<List<ActiveDownloadItem>> = scanDelegate.activeDownloads
+
     fun downloadFromUrl(context: Context, url: String) = scanDelegate.downloadFromUrl(context, url)
+    fun pauseDownload(id: String) = scanDelegate.pauseDownload(id)
+    fun resumeDownload(context: Context, id: String) = scanDelegate.resumeDownload(context, id)
+    fun cancelDownloadItem(id: String) = scanDelegate.cancelDownload(id)
     fun cancelDownload() = scanDelegate.cancelDownload()
     fun dismissDownloadError() = scanDelegate.dismissDownloadError()
     fun startDeviceScan(context: Context) = scanDelegate.startDeviceScan(context)

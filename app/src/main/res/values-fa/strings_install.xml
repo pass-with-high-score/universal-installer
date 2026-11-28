@@ -506,4 +506,10 @@
     <string name="vt_scan_sheet_clean_proceeding">تهدیدی یافت نشد — در حال شروع نصب…</string>
     <string name="vt_scan_card_tap_details">برای جزئیات ضربه بزنید</string>
     <string name="virustotal_detail_score_desc">امتیاز ریسک: %1$d/100</string>
+
+    <!-- Parallel URL Download Queue UI -->
+    <string name="source_download_active_section">در حال دانلود (%1$d)</string>
+    <string name="source_download_preparing">در حال اتصال…</string>
+    <string name="source_download_paused">متوقف شده</string>
+    <string name="source_download_threads">%1$dx</string>
 </resources>

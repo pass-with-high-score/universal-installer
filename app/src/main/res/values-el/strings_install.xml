@@ -512,4 +512,10 @@
     <string name="vt_scan_sheet_clean_proceeding">Δεν βρέθηκαν απειλές — έναρξη εγκατάστασης…</string>
     <string name="vt_scan_card_tap_details">Πατήστε για λεπτομέρειες</string>
     <string name="virustotal_detail_score_desc">Βαθμολογία κινδύνου: %1$d/100</string>
+
+    <!-- Parallel URL Download Queue UI -->
+    <string name="source_download_active_section">Λήψη (%1$d)</string>
+    <string name="source_download_preparing">Σύνδεση…</string>
+    <string name="source_download_paused">Σε παύση</string>
+    <string name="source_download_threads">%1$dx</string>
 </resources>
