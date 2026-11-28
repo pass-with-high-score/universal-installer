@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">Получить бесплатно</string>
     <string name="quota_unlock_pro_badge_btn">Перейти на Pro</string>
     <string name="quota_unlock_advanced_settings">Дополнительные настройки</string>
+    <string name="setting_group_downloads">Загрузки</string>
+    <string name="setting_download_threads_title">Потоки загрузки</string>
+    <string name="setting_download_threads_subtitle">Макс. число параллельных подключений на одну загрузку по URL. Ускоряет скачивание крупных файлов (по умолчанию: 4x).</string>
 </resources>

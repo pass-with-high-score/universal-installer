@@ -387,4 +387,7 @@
     <string name="quota_unlock_get_free_key">取得免費金鑰</string>
     <string name="quota_unlock_pro_badge_btn">升級 Pro</string>
     <string name="quota_unlock_advanced_settings">進階設定</string>
+    <string name="setting_group_downloads">下載</string>
+    <string name="setting_download_threads_title">下載執行緒數</string>
+    <string name="setting_download_threads_subtitle">每個 URL 下載的最大平行連線數。數值越高，大檔案下載越快（預設：4x）。</string>
 </resources>

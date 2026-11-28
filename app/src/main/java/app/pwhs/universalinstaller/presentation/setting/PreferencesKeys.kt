@@ -144,6 +144,9 @@ object PreferencesKeys {
     /** Whether to show the "Download" tab in the source picker on the main screen. */
     val SHOW_DOWNLOAD_TAB = booleanPreferencesKey("show_download_tab")
 
+    /** Maximum parallel HTTP connections (threads) used per URL download (1..8, default 4). */
+    val DOWNLOAD_MAX_CONNECTIONS = intPreferencesKey("download_max_connections")
+
     /**
      * When true (default), external VIEW/SEND intents land in DialogInstallActivity instead
      * of the full InstallActivity — i.e. opening an APK from a file manager pops up a focused

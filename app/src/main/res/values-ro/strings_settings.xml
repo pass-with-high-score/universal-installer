@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">Obține cheie gratuită</string>
     <string name="quota_unlock_pro_badge_btn">Treci la Pro</string>
     <string name="quota_unlock_advanced_settings">Setări avansate</string>
+    <string name="setting_group_downloads">Descărcări</string>
+    <string name="setting_download_threads_title">Conexiuni de descărcare</string>
+    <string name="setting_download_threads_subtitle">Număr maxim de conexiuni paralele per descărcare URL. Valori mai mari accelerează fișierele mari (implicit: 4x).</string>
 </resources>

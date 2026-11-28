@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">निःशुल्क कुंजी पाएं</string>
     <string name="quota_unlock_pro_badge_btn">Pro अपग्रेड करें</string>
     <string name="quota_unlock_advanced_settings">उन्नत सेटिंग्स</string>
+    <string name="setting_group_downloads">डाउनलोड</string>
+    <string name="setting_download_threads_title">डाउनलोड कनेक्शन</string>
+    <string name="setting_download_threads_subtitle">प्रति URL डाउनलोड अधिकतम समानांतर कनेक्शन। अधिक मान बड़ी फ़ाइलों को तेज़ करते हैं (डिफ़ॉल्ट: 4x)।</string>
 </resources>

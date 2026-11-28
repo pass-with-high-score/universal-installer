@@ -387,4 +387,7 @@
     <string name="quota_unlock_get_free_key">Odbierz darmowy klucz</string>
     <string name="quota_unlock_pro_badge_btn">Ulepsz do Pro</string>
     <string name="quota_unlock_advanced_settings">Ustawienia zaawansowane</string>
+    <string name="setting_group_downloads">Pobieranie</string>
+    <string name="setting_download_threads_title">Połączenia pobierania</string>
+    <string name="setting_download_threads_subtitle">Maks. liczba równoległych połączeń na pobieranie z URL. Wyższe wartości przyspieszają duże pliki (domyślnie: 4x).</string>
 </resources>

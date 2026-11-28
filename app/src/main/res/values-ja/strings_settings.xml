@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">無料キーを取得</string>
     <string name="quota_unlock_pro_badge_btn">Pro にアップグレード</string>
     <string name="quota_unlock_advanced_settings">詳細設定</string>
+    <string name="setting_group_downloads">ダウンロード</string>
+    <string name="setting_download_threads_title">ダウンロード接続数</string>
+    <string name="setting_download_threads_subtitle">URLダウンロードごとの最大並列接続数。値を大きくすると大容量ファイルが高速化されます（デフォルト: 4x）。</string>
 </resources>

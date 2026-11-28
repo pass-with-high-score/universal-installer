@@ -135,4 +135,9 @@
     <string name="split_saved_badge">تم توفير %1$s • جارٍ التثبيت %2$s / %3$s</string>
     <string name="split_full_size_badge">الحجم الكامل %1$s (%2$d/%3$d أجزاء)</string>
     <string name="vt_cloud_keys_temporary_unavailable">خوادم الفحص السحابي مشغولة أو منقطعة مؤقتاً. يُرجى المحاولة مجدداً بعد قليل أو إدخال مفتاح API شخصي.</string>
+    <string name="milestone_reward_track_title">مكافآت Pro للإنجازات</string>
+    <string name="milestone_reward_track_next">افتح %1$d إنجازًا إضافيًا للحصول على +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">تم فتح المكافأة! استلم +%1$s Pro الآن</string>
+    <string name="milestone_reward_track_all_claimed">تم استلام جميع مكافآت Pro للإنجازات</string>
+    <string name="milestone_reward_claim_cta">استلام +%1$s Pro</string>
 </resources>

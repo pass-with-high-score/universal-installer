@@ -135,4 +135,9 @@
     <string name="split_saved_badge">Economisit %1$s • Se instalează %2$s / %3$s</string>
     <string name="split_full_size_badge">Dimensiune completă %1$s (%2$d/%3$d split-uri)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Serverele de scanare în cloud sunt temporar ocupate sau indisponibile. Reîncearcă în curând sau introdu o cheie API personală.</string>
+    <string name="milestone_reward_track_title">Recompense Pro pentru realizări</string>
+    <string name="milestone_reward_track_next">Deblochează încă %1$d realizare(ări) pentru +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Recompensă deblocată! Revendică +%1$s Pro acum</string>
+    <string name="milestone_reward_track_all_claimed">Toate recompensele Pro au fost revendicate</string>
+    <string name="milestone_reward_claim_cta">Revendică +%1$s Pro</string>
 </resources>

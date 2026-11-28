@@ -388,4 +388,7 @@
     <string name="quota_unlock_get_free_key">ফ্রি কী নিন</string>
     <string name="quota_unlock_pro_badge_btn">Pro আপগ্রেড</string>
     <string name="quota_unlock_advanced_settings">উন্নত সেটিংস</string>
+    <string name="setting_group_downloads">ডাউনলোড</string>
+    <string name="setting_download_threads_title">ডাউনলোড সংযোগ</string>
+    <string name="setting_download_threads_subtitle">প্রতিটি URL ডাউনলোডের জন্য সর্বোচ্চ সমান্তরাল সংযোগ। বেশি মান বড় ফাইল দ্রুত ডাউনলোড করে (ডিফল্ট: 4x)।</string>
 </resources>

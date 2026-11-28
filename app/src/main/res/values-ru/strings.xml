@@ -135,4 +135,9 @@
     <string name="split_saved_badge">Сэкономлено %1$s • Установка %2$s / %3$s</string>
     <string name="split_full_size_badge">Полный размер %1$s (%2$d/%3$d частей)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Серверы облачной проверки временно перегружены или недоступны. Повторите попытку позже или введите личный API-ключ.</string>
+    <string name="milestone_reward_track_title">Награды Pro за достижения</string>
+    <string name="milestone_reward_track_next">Откройте ещё %1$d достиж., чтобы получить +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Награда открыта! Заберите +%1$s Pro сейчас</string>
+    <string name="milestone_reward_track_all_claimed">Все награды Pro за достижения получены</string>
+    <string name="milestone_reward_claim_cta">Забрать +%1$s Pro</string>
 </resources>

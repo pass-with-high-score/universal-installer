@@ -19,7 +19,24 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.concurrent.atomic.AtomicBoolean
 
+data class MilestoneRewardTier(
+    val tierId: String,
+    val requiredUnlocked: Int,
+    val hoursMultiplier: Int,
+) {
+    fun durationHours(baseHours: Int): Int =
+        (baseHours.coerceAtLeast(1) * hoursMultiplier).coerceIn(1, 72)
+}
+
 object ProTrialManager {
+
+    val REWARD_TIERS: List<MilestoneRewardTier> = listOf(
+        MilestoneRewardTier(tierId = "TIER_2", requiredUnlocked = 2, hoursMultiplier = 1),
+        MilestoneRewardTier(tierId = "TIER_5", requiredUnlocked = 5, hoursMultiplier = 1),
+        MilestoneRewardTier(tierId = "TIER_7", requiredUnlocked = 7, hoursMultiplier = 2),
+        MilestoneRewardTier(tierId = "TIER_10", requiredUnlocked = 10, hoursMultiplier = 2),
+        MilestoneRewardTier(tierId = "TIER_15", requiredUnlocked = 15, hoursMultiplier = 3),
+    )
 
     private const val SYNC_COOLDOWN_MS = 15 * 60 * 1000L // 15 minutes
     private val syncScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -137,27 +154,75 @@ object ProTrialManager {
 
     suspend fun grantMilestoneTrial(context: Context, newlyUnlocked: List<MilestoneId>) {
         if (newlyUnlocked.isEmpty()) return
+        // Legacy entry point retained for callers that don't pass total unlocked count.
+        val prefs = runCatching { context.dataStore.data.first() }.getOrNull()
+        val unlockedCount = prefs?.get(
+            androidx.datastore.preferences.core.stringSetPreferencesKey("stats_announced_milestones")
+        )?.size ?: newlyUnlocked.size
+        checkAndGrantMilestoneTierTrials(context, unlockedCount)
+    }
+
+    suspend fun checkAndGrantMilestoneTierTrials(context: Context, unlockedCount: Int) {
+        if (unlockedCount < REWARD_TIERS.first().requiredUnlocked) return
         VirusTotalKeyManager.ensureRemoteConfigFetched()
         if (!VirusTotalKeyManager.isMilestoneProTrialEnabled()) return
-        val hours = VirusTotalKeyManager.getMilestoneProTrialHours().coerceIn(1, 72)
-        if (hours <= 0) return
+        val baseHours = VirusTotalKeyManager.getMilestoneProTrialHours().coerceIn(1, 72)
+        if (baseHours <= 0) return
 
-        val service = createService(context)
         val prefs = runCatching { context.dataStore.data.first() }.getOrNull()
         val localClaimed = prefs?.get(SharedPrefsKeys.PRO_TRIAL_CLAIMED_MILESTONES).orEmpty()
+        val eligibleTiers = REWARD_TIERS.filter {
+            unlockedCount >= it.requiredUnlocked && it.tierId !in localClaimed
+        }
+        if (eligibleTiers.isEmpty()) return
 
-        for (milestone in newlyUnlocked) {
-            if (milestone.name in localClaimed) continue
+        val service = createService(context)
+        for (tier in eligibleTiers) {
+            val hours = tier.durationHours(baseHours)
             service.claimTrial(
                 claimType = "milestone",
                 durationHours = hours,
-                milestoneId = milestone.name,
+                milestoneId = tier.tierId,
             ).onSuccess { claimRes ->
                 applyServerStatus(context, claimRes)
-                Timber.i("ProTrialManager: Backend claim milestone=${milestone.name} granted=${claimRes.granted}, expiresAt=${claimRes.trialExpiresAt}")
+                Timber.i(
+                    "ProTrialManager: Backend claim tier=${tier.tierId} (+${hours}h) granted=${claimRes.granted}, expiresAt=${claimRes.trialExpiresAt}"
+                )
             }.onFailure { err ->
-                Timber.w(err, "ProTrialManager: Backend milestone trial claim failed for ${milestone.name}")
+                Timber.w(err, "ProTrialManager: Backend tier trial claim failed for ${tier.tierId}")
             }
         }
+    }
+
+    suspend fun claimRewardTier(
+        context: Context,
+        tier: MilestoneRewardTier,
+        unlockedCount: Int,
+    ): Boolean {
+        if (unlockedCount < tier.requiredUnlocked) return false
+        VirusTotalKeyManager.ensureRemoteConfigFetched()
+        if (!VirusTotalKeyManager.isMilestoneProTrialEnabled()) return false
+        val baseHours = VirusTotalKeyManager.getMilestoneProTrialHours().coerceIn(1, 72)
+        if (baseHours <= 0) return false
+
+        val hours = tier.durationHours(baseHours)
+        val service = createService(context)
+        return service.claimTrial(
+            claimType = "milestone",
+            durationHours = hours,
+            milestoneId = tier.tierId,
+        ).fold(
+            onSuccess = { claimRes ->
+                applyServerStatus(context, claimRes)
+                Timber.i(
+                    "ProTrialManager: Manual claim tier=${tier.tierId} (+${hours}h) granted=${claimRes.granted}"
+                )
+                claimRes.granted || tier.tierId in claimRes.claimedMilestones
+            },
+            onFailure = { err ->
+                Timber.w(err, "ProTrialManager: Manual tier trial claim failed for ${tier.tierId}")
+                false
+            },
+        )
     }
 }

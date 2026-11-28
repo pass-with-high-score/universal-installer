@@ -134,4 +134,9 @@
     <string name="split_saved_badge">সাশ্রয় %1$s • ইনস্টল হচ্ছে %2$s / %3$s</string>
     <string name="split_full_size_badge">মোট আকার %1$s (%2$d/%3$dটি স্প্লিট)</string>
     <string name="vt_cloud_keys_temporary_unavailable">ক্লাউড স্ক্যান সার্ভার সাময়িকভাবে ব্যস্ত বা বিঘ্নিত। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন বা একটি ব্যক্তিগত API কী দিন।</string>
+    <string name="milestone_reward_track_title">Pro মাইলস্টোন পুরস্কার</string>
+    <string name="milestone_reward_track_next">+%2$s Pro পেতে আরও %1$dটি মাইলস্টোন আনলক করুন</string>
+    <string name="milestone_reward_track_ready">পুরস্কার আনলক হয়েছে! এখনই +%1$s Pro দাবি করুন</string>
+    <string name="milestone_reward_track_all_claimed">সব Pro মাইলস্টোন পুরস্কার দাবি করা হয়েছে</string>
+    <string name="milestone_reward_claim_cta">+%1$s Pro দাবি করুন</string>
 </resources>

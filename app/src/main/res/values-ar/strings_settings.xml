@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">احصل على مفتاح مجاني</string>
     <string name="quota_unlock_pro_badge_btn">ترقية Pro</string>
     <string name="quota_unlock_advanced_settings">الإعدادات المتقدمة</string>
+    <string name="setting_group_downloads">التنزيلات</string>
+    <string name="setting_download_threads_title">اتصالات التنزيل</string>
+    <string name="setting_download_threads_subtitle">الحد الأقصى للاتصالات المتوازية لكل تنزيل عبر الرابط. القيم الأعلى تسرّع تنزيل الملفات الكبيرة (الافتراضي: 4x).</string>
 </resources>

@@ -392,6 +392,7 @@ object UserStatsTracker {
             isStoreFlavor = BuildConfig.FLAVOR == "play",
         )
         val newlyUnlocked = mutableListOf<MilestoneId>()
+        var totalUnlockedCount = 0
         runCatching {
             context.dataStore.edit { prefs ->
                 mutator(prefs)
@@ -450,6 +451,7 @@ object UserStatsTracker {
                 prefs[KEY_ANNOUNCED_MILESTONES] = announced
                 prefs[KEY_UNSEEN_MILESTONES] = unseen
                 prefs[SharedPrefsKeys.UNSEEN_MILESTONE_COUNT] = unseen.size
+                totalUnlockedCount = announced.size
             }
         }.onFailure {
             Timber.w(it, "Failed to update user stats")
@@ -457,7 +459,10 @@ object UserStatsTracker {
 
         if (emitPopup) {
             if (newlyUnlocked.isNotEmpty()) {
-                app.pwhs.universalinstaller.domain.pro.ProTrialManager.grantMilestoneTrial(context, newlyUnlocked)
+                app.pwhs.universalinstaller.domain.pro.ProTrialManager.checkAndGrantMilestoneTierTrials(
+                    context = context,
+                    unlockedCount = totalUnlockedCount,
+                )
             }
             newlyUnlocked.forEach { milestone ->
                 _milestoneEvents.tryEmit(milestone)

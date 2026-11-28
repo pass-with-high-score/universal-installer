@@ -406,4 +406,7 @@
     <string name="quota_unlock_get_free_key">Get Free Key</string>
     <string name="quota_unlock_pro_badge_btn">Upgrade Pro</string>
     <string name="quota_unlock_advanced_settings">Advanced Settings</string>
+    <string name="setting_group_downloads">Downloads</string>
+    <string name="setting_download_threads_title">Download connections</string>
+    <string name="setting_download_threads_subtitle">Max parallel connections per URL download. Higher values speed up large files (default: 4x).</string>
 </resources>

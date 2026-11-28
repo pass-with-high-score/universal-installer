@@ -134,4 +134,9 @@
     <string name="split_saved_badge">Zaoszczędzono %1$s • Instalowanie %2$s / %3$s</string>
     <string name="split_full_size_badge">Pełny rozmiar %1$s (%2$d/%3$d części)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Serwery skanowania w chmurze są chwilowo zajęte lub niedostępne. Spróbuj ponownie za chwilę lub podaj własny klucz API.</string>
+    <string name="milestone_reward_track_title">Nagrody Pro za kamienie milowe</string>
+    <string name="milestone_reward_track_next">Odblokuj jeszcze %1$d osiągnięcie(a), aby dostać +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Nagroda odblokowana! Odbierz +%1$s Pro teraz</string>
+    <string name="milestone_reward_track_all_claimed">Wszystkie nagrody Pro zostały odebrane</string>
+    <string name="milestone_reward_claim_cta">Odbierz +%1$s Pro</string>
 </resources>

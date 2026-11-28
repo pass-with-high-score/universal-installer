@@ -146,4 +146,9 @@
     <string name="split_saved_badge">Saved %1$s • Installing %2$s / %3$s</string>
     <string name="split_full_size_badge">Full size %1$s (%2$d/%3$d splits)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Cloud scan servers are temporarily busy or interrupted. Please retry shortly or enter a personal API key.</string>
+    <string name="milestone_reward_track_title">Pro Milestone Rewards</string>
+    <string name="milestone_reward_track_next">Unlock %1$d more milestone(s) to get +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Reward unlocked! Claim +%1$s Pro now</string>
+    <string name="milestone_reward_track_all_claimed">All Pro milestone rewards claimed</string>
+    <string name="milestone_reward_claim_cta">Claim +%1$s Pro</string>
 </resources>

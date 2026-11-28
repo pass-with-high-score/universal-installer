@@ -146,4 +146,9 @@
     <string name="split_saved_badge">Đã giảm %1$s • Cài %2$s / %3$s</string>
     <string name="split_full_size_badge">Cài đầy đủ %1$s (%2$d/%3$d gói)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Hệ thống quét đám mây tạm thời gián đoạn. Vui lòng thử lại sau hoặc nhập khóa API cá nhân.</string>
+    <string name="milestone_reward_track_title">Mốc thưởng Pro</string>
+    <string name="milestone_reward_track_next">Mở thêm %1$d cột mốc nữa để nhận +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Đã đạt mốc! Nhận +%1$s Pro ngay</string>
+    <string name="milestone_reward_track_all_claimed">Đã nhận tất cả mốc thưởng Pro</string>
+    <string name="milestone_reward_claim_cta">Nhận +%1$s Pro</string>
 </resources>

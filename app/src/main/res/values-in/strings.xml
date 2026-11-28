@@ -135,4 +135,9 @@
     <string name="split_saved_badge">Hemat %1$s • Memasang %2$s / %3$s</string>
     <string name="split_full_size_badge">Ukuran penuh %1$s (%2$d/%3$d split)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Server pemindaian cloud sedang sibuk atau terganggu sementara. Coba lagi sebentar atau masukkan kunci API pribadi.</string>
+    <string name="milestone_reward_track_title">Hadiah Pro Pencapaian</string>
+    <string name="milestone_reward_track_next">Buka %1$d pencapaian lagi untuk +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Hadiah terbuka! Klaim +%1$s Pro sekarang</string>
+    <string name="milestone_reward_track_all_claimed">Semua hadiah Pro pencapaian telah diklaim</string>
+    <string name="milestone_reward_claim_cta">Klaim +%1$s Pro</string>
 </resources>

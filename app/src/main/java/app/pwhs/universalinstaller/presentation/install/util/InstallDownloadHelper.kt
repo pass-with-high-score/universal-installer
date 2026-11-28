@@ -130,6 +130,7 @@ object InstallDownloadHelper {
         packageDownloadService: PackageDownloadService,
         downloadNotifier: DownloadNotifier,
         downloadHistoryDao: DownloadHistoryDao,
+        maxConnections: Int = app.pwhs.universalinstaller.data.remote.SegmentedDownloadEngine.DEFAULT_MAX_CONNECTIONS,
         initialSegments: List<DownloadSegment> = emptyList(),
         knownTotalBytes: Long = -1L,
         shouldKeepPartialOnCancel: () -> Boolean = { false },
@@ -149,6 +150,7 @@ object InstallDownloadHelper {
         val result = packageDownloadService.downloadWithSegments(
             url = trimmed,
             destination = destination,
+            maxConnections = maxConnections,
             initialSegments = initialSegments,
             knownTotalBytes = knownTotalBytes,
             knownFileName = displayName,

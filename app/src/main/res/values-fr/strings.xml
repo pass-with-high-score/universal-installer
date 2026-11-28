@@ -135,4 +135,9 @@
     <string name="split_saved_badge">%1$s économisés • Installation %2$s / %3$s</string>
     <string name="split_full_size_badge">Taille complète %1$s (%2$d/%3$d splits)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Les serveurs d\'analyse cloud sont temporairement saturés ou interrompus. Réessayez dans un instant ou saisissez une clé API personnelle.</string>
+    <string name="milestone_reward_track_title">Récompenses Pro des jalons</string>
+    <string name="milestone_reward_track_next">Débloquez %1$d jalon(s) de plus pour +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Récompense débloquée ! Réclamez +%1$s Pro</string>
+    <string name="milestone_reward_track_all_claimed">Toutes les récompenses Pro ont été réclamées</string>
+    <string name="milestone_reward_claim_cta">Réclamer +%1$s Pro</string>
 </resources>

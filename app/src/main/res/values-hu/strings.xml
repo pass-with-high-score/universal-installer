@@ -134,4 +134,9 @@
     <string name="split_saved_badge">Megtakarítva: %1$s • Telepítés: %2$s / %3$s</string>
     <string name="split_full_size_badge">Teljes méret: %1$s (%2$d/%3$d részcsomag)</string>
     <string name="vt_cloud_keys_temporary_unavailable">A felhőalapú vizsgálószerverek átmenetileg foglaltak vagy nem elérhetők. Próbáld újra rövidesen, vagy adj meg saját API-kulcsot.</string>
+    <string name="milestone_reward_track_title">Pro mérföldkő-jutalmak</string>
+    <string name="milestone_reward_track_next">Még %1$d mérföldkő kell a +%2$s Pro jutalomhoz</string>
+    <string name="milestone_reward_track_ready">Jutalom feloldva! Igényeld a +%1$s Pro-t</string>
+    <string name="milestone_reward_track_all_claimed">Minden Pro mérföldkő-jutalom igényelve</string>
+    <string name="milestone_reward_claim_cta">+%1$s Pro igénylése</string>
 </resources>

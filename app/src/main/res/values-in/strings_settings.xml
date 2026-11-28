@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">Dapatkan Kunci Gratis</string>
     <string name="quota_unlock_pro_badge_btn">Tingkatkan Pro</string>
     <string name="quota_unlock_advanced_settings">Pengaturan Lanjutan</string>
+    <string name="setting_group_downloads">Unduhan</string>
+    <string name="setting_download_threads_title">Koneksi unduhan</string>
+    <string name="setting_download_threads_subtitle">Maksimal koneksi paralel per unduhan URL. Nilai lebih tinggi mempercepat file besar (default: 4x).</string>
 </resources>

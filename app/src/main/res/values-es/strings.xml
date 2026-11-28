@@ -135,4 +135,9 @@
     <string name="split_saved_badge">Ahorrado %1$s • Instalando %2$s / %3$s</string>
     <string name="split_full_size_badge">Tamaño total %1$s (%2$d/%3$d divisiones)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Los servidores de análisis en la nube están temporalmente ocupados o interrumpidos. Vuelve a intentarlo en breve o introduce una clave de API personal.</string>
+    <string name="milestone_reward_track_title">Recompensas Pro por hitos</string>
+    <string name="milestone_reward_track_next">Desbloquea %1$d hito(s) más para obtener +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">¡Recompensa desbloqueada! Reclama +%1$s Pro ahora</string>
+    <string name="milestone_reward_track_all_claimed">Todas las recompensas Pro reclamadas</string>
+    <string name="milestone_reward_claim_cta">Reclamar +%1$s Pro</string>
 </resources>

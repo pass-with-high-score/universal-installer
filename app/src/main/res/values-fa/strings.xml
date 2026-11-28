@@ -134,4 +134,9 @@
     <string name="split_saved_badge">%1$s صرفه‌جویی شد • در حال نصب %2$s / %3$s</string>
     <string name="split_full_size_badge">حجم کامل %1$s (%2$d/%3$d تکه)</string>
     <string name="vt_cloud_keys_temporary_unavailable">سرورهای اسکن ابری موقتاً شلوغ یا مختل هستند. لطفاً کمی بعد دوباره تلاش کنید یا یک کلید API شخصی وارد کنید.</string>
+    <string name="milestone_reward_track_title">پاداش‌های Pro دستاوردها</string>
+    <string name="milestone_reward_track_next">%1$d دستاورد دیگر باز کنید تا +%2$s Pro بگیرید</string>
+    <string name="milestone_reward_track_ready">پاداش باز شد! همین حالا +%1$s Pro را دریافت کنید</string>
+    <string name="milestone_reward_track_all_claimed">همه پاداش‌های Pro دریافت شده‌اند</string>
+    <string name="milestone_reward_claim_cta">دریافت +%1$s Pro</string>
 </resources>

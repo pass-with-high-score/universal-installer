@@ -135,4 +135,9 @@
     <string name="split_saved_badge">%1$s gespart • Installiere %2$s / %3$s</string>
     <string name="split_full_size_badge">Gesamtgröße %1$s (%2$d/%3$d Splits)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Cloud-Scan-Server sind vorübergehend ausgelastet oder unterbrochen. Bitte gleich erneut versuchen oder einen eigenen API-Schlüssel eingeben.</string>
+    <string name="milestone_reward_track_title">Pro-Meilenstein-Belohnungen</string>
+    <string name="milestone_reward_track_next">Noch %1$d Meilenstein(e) für +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Belohnung freigeschaltet! Jetzt +%1$s Pro sichern</string>
+    <string name="milestone_reward_track_all_claimed">Alle Pro-Meilenstein-Belohnungen erhalten</string>
+    <string name="milestone_reward_claim_cta">+%1$s Pro sichern</string>
 </resources>

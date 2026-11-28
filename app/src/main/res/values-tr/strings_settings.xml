@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">Ücretsiz Anahtar Al</string>
     <string name="quota_unlock_pro_badge_btn">Pro\'ya Yükselt</string>
     <string name="quota_unlock_advanced_settings">Gelişmiş Ayarlar</string>
+    <string name="setting_group_downloads">İndirmeler</string>
+    <string name="setting_download_threads_title">İndirme bağlantıları</string>
+    <string name="setting_download_threads_subtitle">URL indirmesi başına maks. paralel bağlantı. Daha yüksek değerler büyük dosyaları hızlandırır (varsayılan: 4x).</string>
 </resources>

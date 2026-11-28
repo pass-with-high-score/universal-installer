@@ -67,6 +67,26 @@ class SettingPreferencesDelegate(
         .map { it[SharedPrefsKeys.GITHUB_PAT_TOKEN].orEmpty() }
         .stateIn(scope, SharingStarted.WhileSubscribed(5000), "")
 
+    val downloadMaxConnections: StateFlow<Int> = dataStore.data
+        .map { prefs ->
+            (prefs[PreferencesKeys.DOWNLOAD_MAX_CONNECTIONS]
+                ?: app.pwhs.universalinstaller.data.remote.SegmentedDownloadEngine.DEFAULT_MAX_CONNECTIONS)
+                .coerceIn(1, 8)
+        }
+        .stateIn(
+            scope,
+            SharingStarted.WhileSubscribed(5000),
+            app.pwhs.universalinstaller.data.remote.SegmentedDownloadEngine.DEFAULT_MAX_CONNECTIONS,
+        )
+
+    fun setDownloadMaxConnections(count: Int) {
+        scope.launch {
+            dataStore.edit { prefs ->
+                prefs[PreferencesKeys.DOWNLOAD_MAX_CONNECTIONS] = count.coerceIn(1, 8)
+            }
+        }
+    }
+
     fun setGithubPatToken(token: String) {
         scope.launch {
             dataStore.edit { prefs -> prefs[SharedPrefsKeys.GITHUB_PAT_TOKEN] = token }

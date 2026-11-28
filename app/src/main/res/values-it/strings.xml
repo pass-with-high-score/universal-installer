@@ -135,4 +135,9 @@
     <string name="split_saved_badge">Risparmiati %1$s • Installazione %2$s / %3$s</string>
     <string name="split_full_size_badge">Dimensione totale %1$s (%2$d/%3$d split)</string>
     <string name="vt_cloud_keys_temporary_unavailable">I server di scansione cloud sono temporaneamente occupati o non disponibili. Riprova tra poco o inserisci una chiave API personale.</string>
+    <string name="milestone_reward_track_title">Premi Pro dei traguardi</string>
+    <string name="milestone_reward_track_next">Sblocca altri %1$d traguardi per +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Premio sbloccato! Riscatta +%1$s Pro ora</string>
+    <string name="milestone_reward_track_all_claimed">Tutti i premi Pro dei traguardi riscattati</string>
+    <string name="milestone_reward_claim_cta">Riscatta +%1$s Pro</string>
 </resources>

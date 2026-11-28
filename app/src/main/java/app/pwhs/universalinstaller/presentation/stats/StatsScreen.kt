@@ -55,6 +55,7 @@ import app.pwhs.universalinstaller.presentation.stats.components.ActivityTimelin
 import app.pwhs.universalinstaller.presentation.stats.components.InstallUninstallOverviewCard
 import app.pwhs.universalinstaller.presentation.stats.components.MilestoneCategoryFilterRow
 import app.pwhs.universalinstaller.presentation.stats.components.MilestoneItemCard
+import app.pwhs.universalinstaller.presentation.stats.components.MilestoneRewardTrackCard
 import app.pwhs.universalinstaller.presentation.stats.components.ModesAndSecurityCard
 import app.pwhs.universalinstaller.presentation.stats.components.StorageFormatsCard
 import app.pwhs.universalinstaller.presentation.stats.components.TopInstalledAppsCard
@@ -69,6 +70,10 @@ fun StatsScreen(
     val summary by viewModel.summary.collectAsState()
     val selectedDays by viewModel.selectedPeriodDays.collectAsState()
     val selectedCategory by viewModel.selectedCategory.collectAsState()
+    val claimedRewardTiers by viewModel.claimedRewardTiers.collectAsState()
+    val isPurchasedPro by viewModel.isPurchasedPro.collectAsState()
+    val milestoneRewardEnabled by viewModel.milestoneRewardEnabled.collectAsState()
+    val claimingTierId by viewModel.claimingTierId.collectAsState()
     val context = LocalContext.current
     val isStoreUser = remember(context) {
         InstallationSourceHelper.isInstalledFromStore(context, isStoreFlavor = BuildConfig.FLAVOR == "play")
@@ -283,6 +288,21 @@ fun StatsScreen(
                     }
                 }
             } else {
+                if (isStoreUser && milestoneRewardEnabled && !isPurchasedPro) {
+                    item(key = "milestone_reward_track") {
+                        MilestoneRewardTrackCard(
+                            unlockedCount = summary.unlockedCount,
+                            claimedTiers = claimedRewardTiers,
+                            baseRewardHours = viewModel.baseRewardHours,
+                            claimingTierId = claimingTierId,
+                            onClaimTier = viewModel::claimRewardTier,
+                            modifier = Modifier
+                                .padding(horizontal = 16.dp)
+                                .animateItem(),
+                        )
+                    }
+                }
+
                 item(key = "milestone_category_filter") {
                     MilestoneCategoryFilterRow(
                         selectedCategory = selectedCategory,

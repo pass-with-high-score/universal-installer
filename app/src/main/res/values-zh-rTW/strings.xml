@@ -134,4 +134,9 @@
     <string name="split_saved_badge">已節省 %1$s • 安裝 %2$s / %3$s</string>
     <string name="split_full_size_badge">完整大小 %1$s（%2$d/%3$d 個分割 APK）</string>
     <string name="vt_cloud_keys_temporary_unavailable">雲端掃描伺服器暫時忙碌或中斷。請稍後再試，或輸入個人 API 金鑰。</string>
+    <string name="milestone_reward_track_title">Pro 里程碑獎勵</string>
+    <string name="milestone_reward_track_next">再解鎖 %1$d 個里程碑即可獲得 +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">獎勵已解鎖！立即領取 +%1$s Pro</string>
+    <string name="milestone_reward_track_all_claimed">已領取全部 Pro 里程碑獎勵</string>
+    <string name="milestone_reward_claim_cta">領取 +%1$s Pro</string>
 </resources>

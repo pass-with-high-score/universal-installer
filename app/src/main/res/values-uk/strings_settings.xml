@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">Отримати безкоштовний ключ</string>
     <string name="quota_unlock_pro_badge_btn">Отримати Pro</string>
     <string name="quota_unlock_advanced_settings">Розширені налаштування</string>
+    <string name="setting_group_downloads">Завантаження</string>
+    <string name="setting_download_threads_title">Потоки завантаження</string>
+    <string name="setting_download_threads_subtitle">Макс. кількість паралельних підключень на одне завантаження за URL. Пришвидшує великі файли (типово: 4x).</string>
 </resources>

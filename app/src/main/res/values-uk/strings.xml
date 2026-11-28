@@ -135,4 +135,9 @@
     <string name="split_saved_badge">Заощаджено %1$s • Встановлення %2$s / %3$s</string>
     <string name="split_full_size_badge">Повний розмір %1$s (%2$d/%3$d частин)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Хмарні сервери сканування тимчасово зайняті або недоступні. Спробуйте пізніше або введіть власний API-ключ.</string>
+    <string name="milestone_reward_track_title">Нагороди Pro за досягнення</string>
+    <string name="milestone_reward_track_next">Відкрийте ще %1$d досягн., щоб отримати +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Нагороду відкрито! Отримайте +%1$s Pro зараз</string>
+    <string name="milestone_reward_track_all_claimed">Усі нагороди Pro за досягнення отримано</string>
+    <string name="milestone_reward_claim_cta">Отримати +%1$s Pro</string>
 </resources>

@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">获取免费密钥</string>
     <string name="quota_unlock_pro_badge_btn">升级 Pro</string>
     <string name="quota_unlock_advanced_settings">高级设置</string>
+    <string name="setting_group_downloads">下载</string>
+    <string name="setting_download_threads_title">下载线程数</string>
+    <string name="setting_download_threads_subtitle">每个 URL 下载的最大并行连接数。数值越高，大文件下载越快（默认：4x）。</string>
 </resources>

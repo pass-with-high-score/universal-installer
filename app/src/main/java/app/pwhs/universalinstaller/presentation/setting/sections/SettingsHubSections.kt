@@ -130,7 +130,8 @@ internal fun LazyListScope.SettingsHubSections(
             stringResource(R.string.setting_auto_open_title),
             stringResource(R.string.setting_default_installer_title),
             stringResource(R.string.setting_default_uninstaller_title),
-            "shizuku dhizuku root default custom microg priority engine mode downgrade replace permission test bypass source rollback uninstaller",
+            stringResource(R.string.setting_download_threads_title),
+            "shizuku dhizuku root default custom microg priority engine mode downgrade replace permission test bypass source rollback uninstaller download thread connection speed luong tai",
         )
 
         val rows = buildList<@Composable () -> Unit> {

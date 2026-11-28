@@ -135,4 +135,9 @@
     <string name="split_saved_badge">%1$s बचाया • %2$s / %3$s इंस्टॉल हो रहा है</string>
     <string name="split_full_size_badge">कुल आकार %1$s (%2$d/%3$d स्प्लिट)</string>
     <string name="vt_cloud_keys_temporary_unavailable">क्लाउड स्कैन सर्वर अस्थायी रूप से व्यस्त या बाधित हैं। कृपया थोड़ी देर बाद फिर प्रयास करें या अपनी व्यक्तिगत API कुंजी दर्ज करें।</string>
+    <string name="milestone_reward_track_title">Pro माइलस्टोन पुरस्कार</string>
+    <string name="milestone_reward_track_next">+%2$s Pro पाने के लिए %1$d और माइलस्टोन अनलॉक करें</string>
+    <string name="milestone_reward_track_ready">पुरस्कार अनलॉक! अभी +%1$s Pro प्राप्त करें</string>
+    <string name="milestone_reward_track_all_claimed">सभी Pro माइलस्टोन पुरस्कार प्राप्त हो चुके हैं</string>
+    <string name="milestone_reward_claim_cta">+%1$s Pro प्राप्त करें</string>
 </resources>

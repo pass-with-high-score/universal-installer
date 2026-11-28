@@ -327,6 +327,8 @@ class SettingViewModel(
     fun setOfflineChecksEnabled(enabled: Boolean) = preferencesDelegate.setOfflineChecksEnabled(enabled)
     val githubPatToken: StateFlow<String> = preferencesDelegate.githubPatToken
     fun setGithubPatToken(token: String) = preferencesDelegate.setGithubPatToken(token)
+    val downloadMaxConnections: StateFlow<Int> = preferencesDelegate.downloadMaxConnections
+    fun setDownloadMaxConnections(count: Int) = preferencesDelegate.setDownloadMaxConnections(count)
 
     // ── Profiles Delegates ──────────────────────────────────────────────────
 

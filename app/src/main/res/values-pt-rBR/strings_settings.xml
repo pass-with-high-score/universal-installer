@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">Obter chave gratuita</string>
     <string name="quota_unlock_pro_badge_btn">Virar Pro</string>
     <string name="quota_unlock_advanced_settings">Configurações avançadas</string>
+    <string name="setting_group_downloads">Downloads</string>
+    <string name="setting_download_threads_title">Conexões de download</string>
+    <string name="setting_download_threads_subtitle">Máximo de conexões paralelas por download de URL. Valores maiores aceleram arquivos grandes (padrão: 4x).</string>
 </resources>

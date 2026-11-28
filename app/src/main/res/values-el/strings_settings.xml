@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">Λήψη δωρεάν κλειδιού</string>
     <string name="quota_unlock_pro_badge_btn">Αναβάθμιση Pro</string>
     <string name="quota_unlock_advanced_settings">Σύνθετες ρυθμίσεις</string>
+    <string name="setting_group_downloads">Λήψεις</string>
+    <string name="setting_download_threads_title">Συνδέσεις λήψης</string>
+    <string name="setting_download_threads_subtitle">Μέγιστες παράλληλες συνδέσεις ανά λήψη URL. Υψηλότερες τιμές επιταχύνουν μεγάλα αρχεία (προεπιλογή: 4x).</string>
 </resources>

@@ -3,10 +3,13 @@ package app.pwhs.universalinstaller.presentation.install.util
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import app.pwhs.core.data.local.dataStore
 import app.pwhs.universalinstaller.R
 import app.pwhs.universalinstaller.data.local.DownloadHistoryDao
 import app.pwhs.universalinstaller.data.remote.DownloadSegment
 import app.pwhs.universalinstaller.data.remote.PackageDownloadService
+import app.pwhs.universalinstaller.data.remote.SegmentedDownloadEngine
+import app.pwhs.universalinstaller.presentation.setting.PreferencesKeys
 import app.pwhs.universalinstaller.presentation.install.ActiveDownloadItem
 import app.pwhs.universalinstaller.presentation.install.ActiveDownloadStatus
 import app.pwhs.universalinstaller.presentation.install.DownloadNotifier
@@ -22,6 +25,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.solrudev.ackpine.splits.SplitPackage
@@ -158,6 +162,9 @@ class InstallScanDelegate(
         val job = scope.launch {
             val unregister = DownloadCancellationManager.register { cancelDownload(id) }
             try {
+                val maxConnections = runCatching {
+                    application.dataStore.data.first()[PreferencesKeys.DOWNLOAD_MAX_CONNECTIONS]
+                }.getOrNull()?.coerceIn(1, 8) ?: SegmentedDownloadEngine.DEFAULT_MAX_CONNECTIONS
                 InstallDownloadHelper.executeSegmentedDownload(
                     context = context,
                     url = record.url,
@@ -166,6 +173,7 @@ class InstallScanDelegate(
                     packageDownloadService = packageDownloadService,
                     downloadNotifier = downloadNotifier,
                     downloadHistoryDao = downloadHistoryDao,
+                    maxConnections = maxConnections,
                     initialSegments = record.segments,
                     knownTotalBytes = record.totalBytes,
                     shouldKeepPartialOnCancel = { record.paused.get() },

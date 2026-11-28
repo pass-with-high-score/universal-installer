@@ -135,4 +135,9 @@
     <string name="split_saved_badge">已节省 %1$s • 正在安装 %2$s / %3$s</string>
     <string name="split_full_size_badge">完整大小 %1$s（%2$d/%3$d 个分包）</string>
     <string name="vt_cloud_keys_temporary_unavailable">云端扫描服务器暂时繁忙或中断，请稍后重试或输入个人 API 密钥。</string>
+    <string name="milestone_reward_track_title">Pro 里程碑奖励</string>
+    <string name="milestone_reward_track_next">再解锁 %1$d 个里程碑即可获得 +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">奖励已解锁！立即领取 +%1$s Pro</string>
+    <string name="milestone_reward_track_all_claimed">已领取全部 Pro 里程碑奖励</string>
+    <string name="milestone_reward_claim_cta">领取 +%1$s Pro</string>
 </resources>

@@ -135,4 +135,9 @@
     <string name="split_saved_badge">%1$s tasarruf • %2$s / %3$s yükleniyor</string>
     <string name="split_full_size_badge">Tam boyut %1$s (%2$d/%3$d parça)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Bulut tarama sunucuları geçici olarak meşgul veya kesintiye uğradı. Lütfen kısa süre sonra tekrar deneyin veya kişisel bir API anahtarı girin.</string>
+    <string name="milestone_reward_track_title">Pro Başarım Ödülleri</string>
+    <string name="milestone_reward_track_next">+%2$s Pro için %1$d başarım daha açın</string>
+    <string name="milestone_reward_track_ready">Ödül açıldı! Şimdi +%1$s Pro alın</string>
+    <string name="milestone_reward_track_all_claimed">Tüm Pro başarım ödülleri alındı</string>
+    <string name="milestone_reward_claim_cta">+%1$s Pro Al</string>
 </resources>

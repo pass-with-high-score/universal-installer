@@ -402,4 +402,7 @@
     <string name="quota_unlock_get_free_key">무료 키 발급</string>
     <string name="quota_unlock_pro_badge_btn">Pro 업그레이드</string>
     <string name="quota_unlock_advanced_settings">고급 설정</string>
+    <string name="setting_group_downloads">다운로드</string>
+    <string name="setting_download_threads_title">다운로드 연결 수</string>
+    <string name="setting_download_threads_subtitle">URL 다운로드당 최대 병렬 연결 수입니다. 값이 높을수록 대용량 파일이 빨라집니다 (기본값: 4x).</string>
 </resources>

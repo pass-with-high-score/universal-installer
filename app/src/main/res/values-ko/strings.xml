@@ -135,4 +135,9 @@
     <string name="split_saved_badge">%1$s 절약 • %2$s / %3$s 설치 중</string>
     <string name="split_full_size_badge">전체 크기 %1$s (분할 %2$d/%3$d개)</string>
     <string name="vt_cloud_keys_temporary_unavailable">클라우드 검사 서버가 일시적으로 혼잡하거나 연결이 원활하지 않습니다. 잠시 후 다시 시도하거나 개인 API 키를 입력하세요.</string>
+    <string name="milestone_reward_track_title">Pro 업적 보상</string>
+    <string name="milestone_reward_track_next">업적 %1$d개 더 달성 시 +%2$s Pro 지급</string>
+    <string name="milestone_reward_track_ready">보상 달성! 지금 +%1$s Pro 받기</string>
+    <string name="milestone_reward_track_all_claimed">모든 Pro 업적 보상을 받았습니다</string>
+    <string name="milestone_reward_claim_cta">+%1$s Pro 받기</string>
 </resources>

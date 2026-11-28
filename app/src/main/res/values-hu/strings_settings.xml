@@ -387,4 +387,7 @@
     <string name="quota_unlock_get_free_key">Ingyenes kulcs kérése</string>
     <string name="quota_unlock_pro_badge_btn">Pro váltás</string>
     <string name="quota_unlock_advanced_settings">Speciális beállítások</string>
+    <string name="setting_group_downloads">Letöltések</string>
+    <string name="setting_download_threads_title">Letöltési kapcsolatok</string>
+    <string name="setting_download_threads_subtitle">Párhuzamos kapcsolatok max. száma URL-letöltésenként. A magasabb érték gyorsítja a nagy fájlokat (alapértelmezett: 4x).</string>
 </resources>

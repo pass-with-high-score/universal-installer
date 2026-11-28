@@ -3,11 +3,18 @@ package app.pwhs.universalinstaller.presentation.setting.installer
 import android.app.Activity
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
@@ -17,6 +24,7 @@ import androidx.compose.material.icons.rounded.DeleteSweep
 import androidx.compose.material.icons.rounded.InstallMobile
 import androidx.compose.material.icons.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.RocketLaunch
+import androidx.compose.material.icons.rounded.Speed
 import androidx.compose.material.icons.rounded.Tune
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -24,8 +32,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -62,6 +75,7 @@ fun InstallerSettingsScreen(
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val useDhizuku by viewModel.useDhizuku.collectAsState()
+    val downloadMaxConnections by viewModel.downloadMaxConnections.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
 
     var showInstallOptionsSheet by remember { mutableStateOf(false) }
@@ -189,6 +203,20 @@ fun InstallerSettingsScreen(
 
                 item {
                     SettingsCardGroup(
+                        title = stringResource(R.string.setting_group_downloads),
+                        items = listOf(
+                            {
+                                DownloadConnectionsRow(
+                                    selectedConnections = downloadMaxConnections,
+                                    onSelect = viewModel::setDownloadMaxConnections,
+                                )
+                            },
+                        ),
+                    )
+                }
+
+                item {
+                    SettingsCardGroup(
                         title = stringResource(R.string.setting_group_defaults),
                         items = listOf(
                             {
@@ -231,5 +259,67 @@ fun InstallerSettingsScreen(
         InstallPriorityBottomSheet(
             onDismissRequest = { showInstallPrioritySheet = false },
         )
+    }
+}
+
+private val DOWNLOAD_THREAD_OPTIONS = listOf(1, 2, 4, 8)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DownloadConnectionsRow(
+    selectedConnections: Int,
+    onSelect: (Int) -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = Icons.Rounded.Speed,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(22.dp),
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.setting_download_threads_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = stringResource(R.string.setting_download_threads_subtitle),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(12.dp))
+        SingleChoiceSegmentedButtonRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 38.dp),
+        ) {
+            DOWNLOAD_THREAD_OPTIONS.forEachIndexed { index, count ->
+                SegmentedButton(
+                    selected = selectedConnections == count,
+                    onClick = { onSelect(count) },
+                    shape = SegmentedButtonDefaults.itemShape(
+                        index = index,
+                        count = DOWNLOAD_THREAD_OPTIONS.size,
+                    ),
+                    icon = {},
+                ) {
+                    Text(
+                        text = "${count}x",
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                }
+            }
+        }
     }
 }

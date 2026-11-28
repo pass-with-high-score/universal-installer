@@ -302,6 +302,7 @@ private fun SettingUi(
                 stringResource(R.string.setting_auto_open_title),
                 stringResource(R.string.setting_auto_confirm_title),
                 stringResource(R.string.setting_show_download_tab_title),
+                stringResource(R.string.setting_download_threads_title), "download", "thread", "connection", "luồng",
                 stringResource(R.string.setting_default_installer_title),
                 stringResource(R.string.setting_default_uninstaller_title), "uninstaller",
                 stringResource(R.string.setting_auto_approve_title),

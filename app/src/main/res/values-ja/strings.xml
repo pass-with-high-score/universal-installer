@@ -135,4 +135,9 @@
     <string name="split_saved_badge">%1$s 節約 • %2$s / %3$s をインストール</string>
     <string name="split_full_size_badge">フルサイズ %1$s (%2$d/%3$d 分割)</string>
     <string name="vt_cloud_keys_temporary_unavailable">クラウドスキャンサーバーが一時的に混雑しているか中断されています。しばらくしてから再試行するか、個人の API キーを入力してください。</string>
+    <string name="milestone_reward_track_title">Proマイルストーン報酬</string>
+    <string name="milestone_reward_track_next">あと%1$d個達成で +%2$s Pro を獲得</string>
+    <string name="milestone_reward_track_ready">報酬を獲得可能！今すぐ +%1$s Pro を受け取る</string>
+    <string name="milestone_reward_track_all_claimed">すべてのProマイルストーン報酬を受け取り済み</string>
+    <string name="milestone_reward_claim_cta">+%1$s Pro を受け取る</string>
 </resources>

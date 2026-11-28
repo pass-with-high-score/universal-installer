@@ -135,4 +135,9 @@
     <string name="split_saved_badge">Εξοικονομήθηκαν %1$s • Εγκατάσταση %2$s / %3$s</string>
     <string name="split_full_size_badge">Πλήρες μέγεθος %1$s (%2$d/%3$d τμήματα)</string>
     <string name="vt_cloud_keys_temporary_unavailable">Οι διακομιστές σάρωσης cloud είναι προσωρινά απασχολημένοι ή μη διαθέσιμοι. Δοκιμάστε ξανά σε λίγο ή εισαγάγετε ένα προσωπικό κλειδί API.</string>
+    <string name="milestone_reward_track_title">Ανταμοιβές Pro επιτευγμάτων</string>
+    <string name="milestone_reward_track_next">Ξεκλειδώστε %1$d ακόμη επίτευγμα(τα) για +%2$s Pro</string>
+    <string name="milestone_reward_track_ready">Η ανταμοιβή ξεκλειδώθηκε! Διεκδικήστε +%1$s Pro</string>
+    <string name="milestone_reward_track_all_claimed">Όλες οι ανταμοιβές Pro διεκδικήθηκαν</string>
+    <string name="milestone_reward_claim_cta">Διεκδίκηση +%1$s Pro</string>
 </resources>
